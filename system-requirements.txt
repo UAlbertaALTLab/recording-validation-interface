@@ -1,2 +1,4 @@
-geckodriver==0.19.1 (https://github.com/mozilla/geckodriver/releases/tag/v0.19.1)
+[main]
 python3==3.6.4
+[test]
+geckodriver==0.19.1 (https://github.com/mozilla/geckodriver/releases/tag/v0.19.1)
