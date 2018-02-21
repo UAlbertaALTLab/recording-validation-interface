@@ -1,0 +1,2 @@
+geckodriver==0.19.1 (https://github.com/mozilla/geckodriver/releases/tag/v0.19.1)
+python3==3.6.4

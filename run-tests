@@ -1,0 +1,2 @@
+#!/bin/sh
+mypy . && py.test --driver Firefox
