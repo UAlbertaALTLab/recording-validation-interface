@@ -10,7 +10,6 @@ Try to parse the index.html file.
 
 from pathlib import Path
 from unicodedata import normalize
-from urllib.parse import quote
 from warnings import warn
 
 from bs4 import BeautifulSoup  # type: ignore
@@ -46,6 +45,13 @@ def parse_sentence(sentence_column):
         crk = clean_phrase(contents[0].string or '')
         en = clean_phrase(contents[1].string or '')
 
+        if not crk:
+            warn(f'No transcription available: {row}. Skipping.')
+            continue
+        if not en:
+            warn(f'No translation available: {row}. Skipping.')
+            continue
+
         # Look at the <a> -- it contains the speaker AND a link to the
         # recording
         assert len(contents[2].find_all('a')) == 1
@@ -57,11 +63,10 @@ def parse_sentence(sentence_column):
 
         # Get the recording path. Make sure it exists, and escape it!
         # TODO: factor out as function.
-        # TODO: don't both percent-encoding
         raw_recording_path = str(anchor['href'] or '')
         assert raw_recording_path
         assert (base_dir / raw_recording_path).exists()
-        recording_path = quote(raw_recording_path)
+        recording_path = raw_recording_path
 
         sentences.append(
             (crk, en, speaker, recording_path)
@@ -72,6 +77,13 @@ def parse_sentence(sentence_column):
 def parse_words(word_column):
     for anchor in word_column.find_all('a'):
         speaker = clean_phrase(anchor.string or '')
+
+        if not crk:
+            warn(f'No transcription available: {row}. Skipping.')
+            continue
+        if not en:
+            warn(f'No translation available: {row}. Skipping.')
+            continue
 
         # Get the recording path. Make sure it exists, and escape it!
         raw_recording_path = str(anchor['href'] or '')
@@ -87,8 +99,9 @@ def parse_words(word_column):
             #
             # Try this on the Linux box:
             #   ls -li samples/words/otit* | grep -E '[^a-zA-Z0-9_-. ]'
-            warn(f'No audio file found: {raw_recording_path}')
-        recording_path = quote(raw_recording_path)
+            warn(f'No audio file found: "{raw_recording_path}". Skipping')
+            continue
+        recording_path = raw_recording_path
 
         yield speaker, recording_path
 
