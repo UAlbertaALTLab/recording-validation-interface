@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title> Cree Recordings Validation </title>
+</head>
+<body>
+  <h1> Cree Recordings Validation </h1>
+  <table>
+    <tr>
+      <td> Word </td>
+      <td> Translation </td>
+      <td> Speaker </td>
+      <td> Recording </td>
+    </tr>
+    {% for recording in recordings %}
+    <tr>
+      <td lang="crk">{{ recording.transcription }}</td>
+      <td lang="en">{{ recording.translation }}</td>
+      <td><code>{{ recording.speaker }}</code></td>
+      <td><a href="{{ recording.file_path | urlencode }}"> Listen </a></td>
+    </tr>
+    {% endfor %}
+  </table>
+</body>
+</html>
+{# vim: set ft=htmldjango :#}
