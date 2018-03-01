@@ -11,18 +11,18 @@ Try to parse the index.html file.
 from pathlib import Path
 from unicodedata import normalize
 from warnings import warn
-from typing import Tuple, List
+from typing import Tuple, List, Set, Dict
 
 from bs4 import BeautifulSoup  # type: ignore
 # TODO: use langid
 
 
-def parse(index_filename: Path) -> Tuple[List, List, List]:
+def parse(index_filename: Path) -> Tuple[Set, Dict, List]:
     base_dir = index_filename.parent
 
-    words = []  # type: ignore
+    words = {}  # type: ignore
     sentences = []  # type: ignore
-    recordings = []  # type: ignore
+    recordings = set()  # type: ignore
 
     print("Parsing...")
     with open(index_filename) as fp:
@@ -69,22 +69,19 @@ def parse(index_filename: Path) -> Tuple[List, List, List]:
             assert raw_recording_path
             assert (base_dir / raw_recording_path).exists()
             recording_path = raw_recording_path
+            recording = (crk, en, speaker, recording_path)
 
             sentences.append(
                 (crk, en, speaker, recording_path)
             )
+
+            recordings.add(recording)
+
         return sentences
 
     def parse_words(word_column):
         for anchor in word_column.find_all('a'):
             speaker = clean_phrase(anchor.string or '')
-
-            if not crk:
-                warn(f'No transcription available: {row}. Skipping.')
-                continue
-            if not en:
-                warn(f'No translation available: {row}. Skipping.')
-                continue
 
             # Get the recording path. Make sure it exists, and escape it!
             raw_recording_path = str(anchor['href'] or '')
@@ -103,7 +100,6 @@ def parse(index_filename: Path) -> Tuple[List, List, List]:
                 warn(f'No audio file found: "{raw_recording_path}". Skipping')
                 continue
             recording_path = raw_recording_path
-
             yield speaker, recording_path
 
     # Each row in the table is either a word or a sentence.
@@ -128,11 +124,23 @@ def parse(index_filename: Path) -> Tuple[List, List, List]:
             sentences.append((crk, en, parse_sentence(columns[3])))
 
         if is_word:
+            if not crk:
+                warn(f'No transcription available: {row}. Skipping.')
+                continue
+            if not en:
+                warn(f'No translation available: {row}. Skipping.')
+                continue
             for speaker, recording_path in parse_words(columns[2]):
-                words.append((crk, en, speaker, recording_path))
+                recording = (crk, en, speaker, recording_path)
+                recordings.add(recording)
+                # XXX: hash is only meaninful in THIS PROCESS of Python!
+                words[crk] = (crk, en, hash(recording))
+
     return recordings, words, sentences
 
 
 if __name__ == '__main__':
     index_filename = Path('data/samples/index.html')
     recordings, words, sentences = parse(index_filename)
+    from pprint import pprint
+    pprint(words)
