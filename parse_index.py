@@ -18,6 +18,7 @@ from bs4 import BeautifulSoup  # type: ignore
 
 
 index_filename = Path('data/samples/index.html')
+base_dir = index_filename.parent
 
 
 print("Parsing...")
@@ -50,15 +51,46 @@ def parse_sentence(sentence_column):
         assert len(contents[2].find_all('a')) == 1
         anchor = contents[2].a
         speaker = clean_phrase(anchor.string or '')
-        recording_path = quote(str(anchor['href']))
+
+        if not speaker:
+            warn(f'No speaker for sentence: "{crk}"')
+
+        # Get the recording path. Make sure it exists, and escape it!
+        # TODO: factor out as function.
+        # TODO: don't both percent-encoding
+        raw_recording_path = str(anchor['href'] or '')
+        assert raw_recording_path
+        assert (base_dir / raw_recording_path).exists()
+        recording_path = quote(raw_recording_path)
+
         sentences.append(
             (crk, en, speaker, recording_path)
         )
     return sentences
 
 
-def parse_word(word_column):
-    raise NotImplementedError
+def parse_words(word_column):
+    for anchor in word_column.find_all('a'):
+        speaker = clean_phrase(anchor.string or '')
+
+        # Get the recording path. Make sure it exists, and escape it!
+        raw_recording_path = str(anchor['href'] or '')
+        assert raw_recording_path
+        if not (base_dir / raw_recording_path).exists():
+            # So there are files that start with: otiti*
+            # but then I guess the encoding is denormalized and this causes
+            # issues both on my Mac and on the Linux machine... :/
+            #
+            # The result is, even though they are _there_, they are
+            # irretrivable by conventional means. The other way to get them is
+            # by looking them up by inode. Yay.
+            #
+            # Try this on the Linux box:
+            #   ls -li samples/words/otit* | grep -E '[^a-zA-Z0-9_-. ]'
+            warn(f'No audio file found: {raw_recording_path}')
+        recording_path = quote(raw_recording_path)
+
+        yield speaker, recording_path
 
 
 words = []  # type: ignore
@@ -84,15 +116,8 @@ for row in big_table:
     is_sentence = bool(columns[3].contents)
 
     if is_sentence:
-        assert not is_word
         sentences.append((crk, en, parse_sentence(columns[3])))
 
-    try:
-        if is_word:
-            words.append(
-                parse_word(columns[2])
-            )
-    except NotImplementedError:
-        break
-
-print(sentences)
+    if is_word:
+        for speaker, recording_path in parse_words(columns[2]):
+            words.append((crk, en, speaker, recording_path))
