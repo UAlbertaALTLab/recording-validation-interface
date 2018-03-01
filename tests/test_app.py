@@ -2,10 +2,14 @@
 # -*- coding: UTF-8 -*-
 
 
-def test_hello_world(selenium):
+def test_index(selenium):
     """
-    Example to figure out if my Selenium config is correct.
+    See if I find a Cree word on the page.
     """
     selenium.get('http://localhost:5000')
-    h1 = selenium.find_element_by_tag_name('h1')
-    assert 'Hello, World' in h1.text
+    elem = selenium.find_element_by_xpath(
+        "//*[contains(text(), 'cakayikan')]"
+    )
+    # There must be at LEAST one element!
+    assert elem.is_displayed()
+    assert elem.tag_name == 'td'
