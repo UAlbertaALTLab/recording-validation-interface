@@ -25,7 +25,7 @@ class Recording(db.Model):  # type: ignore
 
 
 @app.route('/')
-def big_list():
+def list_all_words():
     return render_template(
         'index.html',
         recordings=Recording.query.all()
