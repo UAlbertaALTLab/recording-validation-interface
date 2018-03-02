@@ -21,7 +21,7 @@ Running
 -------
 
 ```
-export FLASK_APP=app.py
+export FLASK_APP=recval/app.py
 flask run --host HOST
 ```
 

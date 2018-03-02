@@ -10,12 +10,14 @@ Creates the database from scratch.
 import sys
 from pathlib import Path
 
-from app import db, Recording
-from recval.parse_index import parse
-
-index_file = Path('./data/samples/index.html')
 
 if __name__ == '__main__':
+    from recval.app import db, Recording
+    from recval.parse_index import parse
+
+    index_file = Path('./data/samples/index.html')
+    assert index_file.exists()
+
     db.create_all()
 
     if 'create' in sys.argv[1:]:
