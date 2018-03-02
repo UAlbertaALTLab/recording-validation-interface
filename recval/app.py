@@ -11,6 +11,9 @@ from flask_sqlalchemy import SQLAlchemy  # type: ignore
 app = Flask(__name__)
 # XXX: temporary location for directory
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
+# Diable object modication tracking -- unneeded, and silences a warning.
+# See: http://flask-sqlalchemy.pocoo.org/2.3/config/#configuration-keys
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = 'sqlite:////tmp/test.db'
 db = SQLAlchemy(app)
 
 
