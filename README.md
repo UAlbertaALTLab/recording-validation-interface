@@ -10,9 +10,7 @@ Requires Python 3.6.
 
 Then, create a virtualenv (if applicable), and install the requirements:
 
-```
-pip install -r requirements.txt
-```
+    python3 -m pip install -r requirements.txt
 
 Consult `system-requirements.txt` for other system dependencies you may require.
 
@@ -20,10 +18,8 @@ Consult `system-requirements.txt` for other system dependencies you may require.
 Running
 -------
 
-```
-export FLASK_APP=recval/app.py
-flask run --host HOST
-```
+    export FLASK_APP=recval/app.py
+    flask run --host HOST
 
 Replace `HOST` with `127.0.0.1` (listen only locally) when running in debug mode.
 
@@ -34,14 +30,25 @@ production mode.
 Testing
 -------
 
-Ensure you have a server [running] on port 5000. Then,
+Install the test requirements:
 
-```
-./run-tests
-```
+    python3 -m pip install -r test-requirements.txt
 
-This will type-check the Python code with mypy and run the Selenium
-integration tests.
+Then run:
+
+    ./run-tests
+
+This will type-check the Python code with mypy, start a temporary
+server, and run the Selenium integration tests.
+
+Any additional arguments are passed to `py.test`.
+
+
+### Rerun tests when the code changes
+
+Ensure you have [entr](http://entrproject.org/) installed. Then:
+
+    ./watch-tests
 
 
 License
