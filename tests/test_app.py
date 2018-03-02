@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
+# Copyright © 2018 Eddie Antonio Santos. All rights reserved.
+
+
+import pytest
+
+# Use the live server for this test.
+pytestmark = pytest.mark.usefixtures("live_server")
+
 
 def test_index(selenium):
     """
