@@ -1,2 +1,10 @@
 #!/bin/sh
-mypy . && py.test --driver Firefox
+
+# Does a type-check, and runs py.test.
+# Any additional arguments are passed to py.test
+#
+# Useful arguments:
+#  -s       -- show stdout and stderr
+#  --pdb    -- launch pdb on test failures
+
+mypy . && py.test --driver Firefox "$@"

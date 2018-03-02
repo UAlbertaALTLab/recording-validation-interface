@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# Uses entr(1) <http://entrproject.org/> to watch the tests.
+#
+# Any additional arguments are pasesed to ./run-tests.
+
+find recval tests -type f \( -iname \*.py -o -iname \*.html \) \
+    | entr -c ./run-tests "$@"
