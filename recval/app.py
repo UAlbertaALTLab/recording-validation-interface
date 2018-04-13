@@ -31,18 +31,29 @@ def normalize_utterance(utterance):
     return normalize('NFC', utterance.strip())
 
 
-class Word(db.Model):
+class Phrase(db.Model):
+    """
+    A phrase is a sentence or a word.
+
+    A phrase has a transcription and a translation.
+
+    Note that translation and transcription MUST be NFC normalized!
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    transcription = db.Column(db.Text, nullable=False)  # TODO: convert to VersionedString
+    translation = db.Column(db.Text, nullable=False)  # TODO: convert to VersionedString
+
+
+class Word(Phrase):
     """
     A single word, with a translation.
 
     Note that translation and transcription MUST be NFC normalized!
     """
-    id = db.Column(db.Integer, primary_key=True)
-    transcription = db.Column(db.Text, nullable=False)
-    translation = db.Column(db.Text, nullable=False)
+    ...
 
 
-class Sentence(db.Model):
+class Sentence(Phrase):
     """
     An entire sentence, with a translation.
 
@@ -50,9 +61,6 @@ class Sentence(db.Model):
 
     Note that translation and transcription MUST be NFC normalized!
     """
-    id = db.Column(db.Integer, primary_key=True)
-    transcription = db.Column(db.Text, nullable=False)
-    translation = db.Column(db.Text, nullable=False)
     # TODO: link with words
 
 # TODO: Extract superclass Pharse := Word U Sentence
@@ -68,7 +76,8 @@ class Recording(db.Model):
     """
     # TODO: fingerprint the source wave file, convert to Vorbis audio/web (.weba)
     fingerprint = db.Column(db.Text, primary_key=True)
-    speaker = db.Column(db.Text, nullalble=True)  # TODO: Versioned String?
+    speaker = db.Column(db.Text, nullable=True)  # TODO: Versioned String?
+    phrase = db.Column(db.Integer, db.ForeignKey('phrase.id'))
 
 
 def _not_now():
