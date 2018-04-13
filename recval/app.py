@@ -38,10 +38,22 @@ class Phrase(db.Model):
     A phrase has a transcription and a translation.
 
     Note that translation and transcription MUST be NFC normalized!
+
+    See: http://docs.sqlalchemy.org/en/latest/orm/inheritance.html#single-table-inheritance
     """
+
+    __tablename__ = 'phrase'
     id = db.Column(db.Integer, primary_key=True)
     transcription = db.Column(db.Text, nullable=False)  # TODO: convert to VersionedString
     translation = db.Column(db.Text, nullable=False)  # TODO: convert to VersionedString
+    # Is this a word or a phrase?
+    type = db.Column(db.Text, nullable=False)
+
+    __mapper_args__ = {
+        'polymorphic_on': type,
+        # Sets 'type' to null, which is (intentionally) invalid!
+        'polymorphic_identity': None
+    }
 
 
 class Word(Phrase):
@@ -50,7 +62,9 @@ class Word(Phrase):
 
     Note that translation and transcription MUST be NFC normalized!
     """
-    ...
+    __mapper_args__ = {
+        'polymorphic_identity': 'word'
+    }
 
 
 class Sentence(Phrase):
@@ -61,7 +75,10 @@ class Sentence(Phrase):
 
     Note that translation and transcription MUST be NFC normalized!
     """
-    # TODO: link with words
+    # TODO: sentence contains zero or more words
+    __mapper_args__ = {
+        'polymorphic_identity': 'sentence'
+    }
 
 # TODO: Extract superclass Pharse := Word U Sentence
 
