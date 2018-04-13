@@ -3,11 +3,12 @@
 
 # Copyright © 2018 Eddie Antonio Santos. All rights reserved.
 
+from datetime import datetime
+from unicodedata import normalize
 
 from flask import Flask, render_template  # type: ignore
 from flask_sqlalchemy import SQLAlchemy  # type: ignore
 
-from unicodedata import normalize
 
 app = Flask(__name__)
 # XXX: temporary location for directory
@@ -28,9 +29,6 @@ def normalize_utterance(utterance):
     'phở'
     """
     return normalize('NFC', utterance.strip())
-
-
-# TODO: versioned string
 
 
 class Word(db.Model):
@@ -60,10 +58,51 @@ class Sentence(db.Model):
 
 class Recording(db.Model):  # type: ignore
     """
-    Represents a recording of a phrase (word or sentence).
+    A recording of a phrase, with
     """
     file_path = db.Column(db.Text, primary_key=True)
-    speaker = db.Column(db.Text)
+    speaker = db.Column(db.Text, nullalble=True)
+
+
+def _not_now():
+    """
+    I will implement this stuff in the next sprint, but I gotta get it out of
+    my mind first.
+    """
+
+    class VersionedString(db.Model):
+        """
+        A versioned string is is one with a history of what it was, and who
+        said it.
+
+        This is essentially represented as a linked list of TimestampedString
+        rows.
+        """
+        head = ... # TimestampedString: nullable=False
+        # TODO: convenience methods to access value, author, timestamp, of
+        # most recent.
+
+
+    class TimestampedString(db.Model):
+        """
+        A string with the author, and when the author wrote it. Can reference
+        a previous TimestampedString which implies that this string is an
+        revision of that string.
+
+        Essentially a linked list node.
+        """
+        value = str  # TODO: always normalize this!
+        author = ... # TODO: author
+        timestamp = db.Column(db.DateTime, nullable=False,
+                              default=datetime.utcnow)
+        previous = ... # TimestampedString nullable=True
+        
+
+    class Author(db.Model):
+        """
+        An author is allowed to create and update VersionedStrings.
+        """
+        email = db.Column(db.Text, primary_key=True)
 
 
 @app.route('/')
