@@ -55,13 +55,20 @@ class Sentence(db.Model):
     translation = db.Column(db.Text, nullable=False)
     # TODO: link with words
 
+# TODO: Extract superclass Pharse := Word U Sentence
 
-class Recording(db.Model):  # type: ignore
+
+class Recording(db.Model):
     """
-    A recording of a phrase, with
+    A recording of a phrase.
+
+    This is CONTENT-ADDRESSED memory. The "fingerprint" is a SHA-256 sum of
+    the raw recording file. The file itself is converted into ds
+
     """
-    file_path = db.Column(db.Text, primary_key=True)
-    speaker = db.Column(db.Text, nullalble=True)
+    # TODO: fingerprint the source wave file, convert to Vorbis audio/web (.weba)
+    fingerprint = db.Column(db.Text, primary_key=True)
+    speaker = db.Column(db.Text, nullalble=True)  # TODO: Versioned String?
 
 
 def _not_now():
@@ -96,7 +103,7 @@ def _not_now():
         timestamp = db.Column(db.DateTime, nullable=False,
                               default=datetime.utcnow)
         previous = ... # TimestampedString nullable=True
-        
+
 
     class Author(db.Model):
         """
