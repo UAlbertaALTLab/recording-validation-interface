@@ -1,0 +1,3 @@
+#!/bin/sh
+
+env FLASK_APP=recval/app.py flask run
