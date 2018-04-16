@@ -3,8 +3,11 @@
 
 # Copyright © 2018 Eddie Antonio Santos. All rights reserved.
 
+from os import fspath
 from datetime import datetime
 from unicodedata import normalize
+from pathlib import Path
+from hashlib import sha256
 
 from flask import Flask, render_template  # type: ignore
 from flask_sqlalchemy import SQLAlchemy  # type: ignore
@@ -18,6 +21,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
 # See: http://flask-sqlalchemy.pocoo.org/2.3/config/#configuration-keys
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = 'sqlite:////tmp/test.db'
 db = SQLAlchemy(app)
+
+here = Path('.').parent
+TRANSCODED_RECORDINGS_PATH = here / 'static' / 'audio'
 
 
 def normalize_utterance(utterance):
@@ -109,6 +115,18 @@ class Recording(db.Model):  # type: ignore
     phrase = db.relationship('Phrase', back_populates='recordings')
     # TODO: have an href webm link
 
+    @classmethod
+    def new(cls, phrase: Phrase, input_file: Path, speaker: str=None) -> 'Recording':
+        """
+        Create a new recording and transcode it for distribution.
+        """
+        assert input_file.exists()
+        fingerprint = compute_fingerprint(input_file)
+        transcode_to_aac(input_file, fingerprint)
+        return cls(fingerprint=fingerprint,
+                   phrase=phrase,
+                   speaker=speaker)
+
 
 def _not_now():
     """
@@ -147,6 +165,31 @@ def _not_now():
         An author is allowed to create and update VersionedStrings.
         """
         email = db.Column(db.Text, primary_key=True)
+
+
+def transcode_to_aac(recording_path: Path, fingerprint: str) -> None:
+    """
+    Transcodes .wav files to .aac files.
+    TODO: Factor this out!
+    """
+    from sh import ffmpeg  # type: ignore
+    assert recording_path.exists(), f"got {recording_path}"
+    assert len(fingerprint) == 64, f"got {fingerprint!r}"
+
+    app.logger.info('Transcoding %s', recording_path)
+    ffmpeg('-i', fspath(recording_path),
+           '-ac', 1,  # Mix to mono
+           '-acodec', 'aac',  # Use the AAC codec
+           TRANSCODED_RECORDINGS_PATH / f"{fingerprint}.mp4")
+
+
+def compute_fingerprint(file_path: Path) -> str:
+    """
+    Computes the SHA-256 hash of the given audio file path.
+    """
+    assert file_path.suffix == '.wav', f"got {file_path}"
+    with open(file_path, 'rb') as f:
+        return sha256(f.read()).hexdigest()
 
 
 @app.route('/')
