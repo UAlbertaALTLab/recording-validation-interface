@@ -19,7 +19,13 @@
       <td>
         <ul>
         {% for recording in phrase.recordings %}
-          <li> {{ recording.speaker }} <a href="{{ recording.file_path | urlencode }}"> Listen </a> </li>
+          <li> <span class="speaker">{{ recording.speaker }}</span>
+            
+            <audio controls preload=none>
+              <source src="{{ recording.aac_path | urlencode }}" type="audio/aac"/>
+            </audio>
+          </li>
+
         {% endfor %}
         </ul>
       </td>

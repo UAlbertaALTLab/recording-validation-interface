@@ -9,7 +9,7 @@ from unicodedata import normalize
 from pathlib import Path
 from hashlib import sha256
 
-from flask import Flask, render_template  # type: ignore
+from flask import Flask, render_template, send_from_directory  # type: ignore
 from flask_sqlalchemy import SQLAlchemy  # type: ignore
 from sqlalchemy.orm import subqueryload  # type: ignore
 
@@ -127,6 +127,10 @@ class Recording(db.Model):  # type: ignore
                    phrase=phrase,
                    speaker=speaker)
 
+    @property
+    def aac_path(self) -> str:
+        return fspath(TRANSCODED_RECORDINGS_PATH / (self.fingerprint + '.mp4'))
+
 
 def _not_now():
     """
@@ -200,3 +204,9 @@ def list_all_words():
         'index.html',
         phrases=query.all()
     )
+
+
+@app.route('/static/audio/<path>')
+def send_audio(path):
+    app.logger.warn(path)
+    return send_from_directory(fspath(TRANSCODED_RECORDINGS_PATH.resolve()), path)
