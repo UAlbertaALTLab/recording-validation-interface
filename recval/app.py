@@ -198,8 +198,9 @@ def compute_fingerprint(file_path: Path) -> str:
 
 @app.route('/')
 def list_all_words():
+    """
+    """
     query = Phrase.query.options(subqueryload(Phrase.recordings))
-    app.logger.warn(query)
     return render_template(
         'index.html',
         phrases=query.all()
@@ -208,5 +209,9 @@ def list_all_words():
 
 @app.route('/static/audio/<path>')
 def send_audio(path):
-    app.logger.warn(path)
+    """
+    Send a previously transcoded audio file.
+
+    See compute_fingerprint() and transcode_to_aac()
+    """
     return send_from_directory(fspath(TRANSCODED_RECORDINGS_PATH.resolve()), path)
