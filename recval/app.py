@@ -62,6 +62,9 @@ class Word(Phrase):
 
     Note that translation and transcription MUST be NFC normalized!
     """
+    # A word may be contained within another sentence
+    contained_within = db.Column(db.Integer, db.ForeignKey('phrase.id'),
+                                 nullable=False)
     __mapper_args__ = {
         'polymorphic_identity': 'word'
     }
@@ -78,12 +81,10 @@ class Sentence(Phrase):
 
     Note that translation and transcription MUST be NFC normalized!
     """
-    # TODO: sentence contains zero or more words
+    # NOTE: A sentence does not have any additional properties of its own.
     __mapper_args__ = {
         'polymorphic_identity': 'sentence'
     }
-
-# TODO: Extract superclass Pharse := Word U Sentence
 
 
 class Recording(db.Model):
@@ -97,7 +98,8 @@ class Recording(db.Model):
     # TODO: fingerprint the source wave file, convert to Vorbis audio/web (.weba)
     fingerprint = db.Column(db.Text, primary_key=True)
     speaker = db.Column(db.Text, nullable=True)  # TODO: Versioned String?
-    phrase = db.Column(db.Integer, db.ForeignKey('phrase.id'))
+    phrase = db.Column(db.Integer, db.ForeignKey('phrase.id'),
+                       nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False,
                           default=datetime.utcnow)
 
