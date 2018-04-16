@@ -8,17 +8,21 @@
   <h1> Cree Recordings Validation </h1>
   <table>
     <tr>
-      <td> Word </td>
+      <td> Transcription </td>
       <td> Translation </td>
-      <td> Speaker </td>
-      <td> Recording </td>
+      <td> Recordings </td>
     </tr>
-    {% for recording in recordings %}
+    {% for phrase in phrases %}
     <tr>
-      <td lang="crk">{{ recording.transcription }}</td>
-      <td lang="en">{{ recording.translation }}</td>
-      <td><code>{{ recording.speaker }}</code></td>
-      <td><a href="{{ recording.file_path | urlencode }}"> Listen </a></td>
+      <td lang="crk">{{ phrase.transcription }}</td>
+      <td lang="en">{{ phrase.translation }}</td>
+      <td>
+        <ul>
+        {% for recording in phrase.recordings %}
+          <li> {{ recording.speaker }} <a href="{{ recording.file_path | urlencode }}"> Listen </a> </li>
+        {% endfor %}
+        </ul>
+      </td>
     </tr>
     {% endfor %}
   </table>

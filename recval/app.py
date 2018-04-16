@@ -8,6 +8,7 @@ from unicodedata import normalize
 
 from flask import Flask, render_template  # type: ignore
 from flask_sqlalchemy import SQLAlchemy  # type: ignore
+from sqlalchemy.orm import subqueryload  # type: ignore
 
 
 app = Flask(__name__)
@@ -106,6 +107,7 @@ class Recording(db.Model):  # type: ignore
     phrase_id = db.Column(db.Integer, db.ForeignKey('phrase.id'),
                           nullable=False)
     phrase = db.relationship('Phrase', back_populates='recordings')
+    # TODO: have an href webm link
 
 
 def _not_now():
@@ -149,7 +151,9 @@ def _not_now():
 
 @app.route('/')
 def list_all_words():
+    query = Phrase.query.options(subqueryload(Phrase.recordings))
+    app.logger.warn(query)
     return render_template(
         'index.html',
-        recordings=Recording.query.all()
+        phrases=query.all()
     )
