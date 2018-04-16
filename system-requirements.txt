@@ -1,6 +1,5 @@
 [main]
 python3==3.6.4
 ffmpeg==3.3.3
-aac_enc=0.1.3+20140816-2
 [test]
 geckodriver==0.19.1 (https://github.com/mozilla/geckodriver/releases/tag/v0.19.1)
