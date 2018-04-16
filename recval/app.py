@@ -41,8 +41,8 @@ class Phrase(db.Model):
 
     See: http://docs.sqlalchemy.org/en/latest/orm/inheritance.html#single-table-inheritance
     """
-
     __tablename__ = 'phrase'
+
     id = db.Column(db.Integer, primary_key=True)
     transcription = db.Column(db.Text, nullable=False)  # TODO: convert to VersionedString
     translation = db.Column(db.Text, nullable=False)  # TODO: convert to VersionedString
@@ -66,6 +66,9 @@ class Word(Phrase):
         'polymorphic_identity': 'word'
     }
 
+
+# TODO: What about race-conditions?
+# Keep it ACID. Use transactions.
 
 class Sentence(Phrase):
     """
@@ -95,6 +98,8 @@ class Recording(db.Model):
     fingerprint = db.Column(db.Text, primary_key=True)
     speaker = db.Column(db.Text, nullable=True)  # TODO: Versioned String?
     phrase = db.Column(db.Integer, db.ForeignKey('phrase.id'))
+    timestamp = db.Column(db.DateTime, nullable=False,
+                          default=datetime.utcnow)
 
 
 def _not_now():
