@@ -31,7 +31,7 @@ def normalize_utterance(utterance):
     return normalize('NFC', utterance.strip())
 
 
-class Phrase(db.Model):
+class Phrase(db.Model):  # type: ignore
     """
     A phrase is a sentence or a word.
 
@@ -49,6 +49,9 @@ class Phrase(db.Model):
     # Is this a word or a phrase?
     type = db.Column(db.Text, nullable=False)
 
+    # One phrase may have one or more recordings.
+    recordings = db.relationship('Recording')
+
     __mapper_args__ = {
         'polymorphic_on': type,
         # Sets 'type' to null, which is (intentionally) invalid!
@@ -64,7 +67,7 @@ class Word(Phrase):
     """
     # A word may be contained within another sentence
     contained_within = db.Column(db.Integer, db.ForeignKey('phrase.id'),
-                                 nullable=False)
+                                 nullable=True)
     __mapper_args__ = {
         'polymorphic_identity': 'word'
     }
@@ -87,7 +90,7 @@ class Sentence(Phrase):
     }
 
 
-class Recording(db.Model):
+class Recording(db.Model):  # type: ignore
     """
     A recording of a phrase.
 
@@ -98,10 +101,11 @@ class Recording(db.Model):
     # TODO: fingerprint the source wave file, convert to Vorbis audio/web (.weba)
     fingerprint = db.Column(db.Text, primary_key=True)
     speaker = db.Column(db.Text, nullable=True)  # TODO: Versioned String?
-    phrase = db.Column(db.Integer, db.ForeignKey('phrase.id'),
-                       nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False,
                           default=datetime.utcnow)
+    phrase_id = db.Column(db.Integer, db.ForeignKey('phrase.id'),
+                          nullable=False)
+    phrase = db.relationship('Phrase', back_populates='recordings')
 
 
 def _not_now():
@@ -118,10 +122,9 @@ def _not_now():
         This is essentially represented as a linked list of TimestampedString
         rows.
         """
-        head = ... # TimestampedString: nullable=False
+        head = ...  # TimestampedString: nullable=False
         # TODO: convenience methods to access value, author, timestamp, of
         # most recent.
-
 
     class TimestampedString(db.Model):
         """
@@ -132,11 +135,10 @@ def _not_now():
         Essentially a linked list node.
         """
         value = str  # TODO: always normalize this!
-        author = ... # TODO: author
+        author = ...  # TODO: author
         timestamp = db.Column(db.DateTime, nullable=False,
                               default=datetime.utcnow)
-        previous = ... # TimestampedString nullable=True
-
+        previous = ...  # TimestampedString nullable=True
 
     class Author(db.Model):
         """
