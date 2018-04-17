@@ -18,7 +18,7 @@ Create a file called `recval.cfg` based on this template:
 
 ```python
 TRANSCODED_RECORDINGS_PATH = '/path/to/audio/directory'
-SQLALCHEMY_DATABASE_URI = '/path/to/recval.db'
+SQLALCHEMY_DATABASE_URI = 'sqlite:///path/to/recval.db'
 ```
 
 Save this file somewhere, preferably outside of the repository.
