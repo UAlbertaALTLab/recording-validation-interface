@@ -31,7 +31,7 @@ if app.config['SQLALCHEMY_DATABASE_URI'] == app.config['DEFAULT_DATABASE']:
 db = SQLAlchemy(app)
 
 # Determine where to read and write transcoded audio files.
-TRANSCODED_RECORDINGS_PATH = app.config['TRANSCODED_RECORDINGS_PATH'].resolve()
+TRANSCODED_RECORDINGS_PATH = Path(app.config['TRANSCODED_RECORDINGS_PATH']).resolve()
 assert TRANSCODED_RECORDINGS_PATH.is_dir()
 
 # Transcoded audio files.
