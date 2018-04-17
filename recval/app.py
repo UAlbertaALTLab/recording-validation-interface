@@ -216,6 +216,11 @@ def send_audio(path):
     See compute_fingerprint() and transcode_to_aac()
     """
     # TODO: load transcoded path from Flask config
+    content_type = mimetypes = {
+        '.mp4': 'audio/aac',
+        '.wav': 'audio/wave',
+    }.get(path[-4], None)
+
     return send_from_directory(fspath(TRANSCODED_RECORDINGS_PATH.resolve()),
                                path,
-                               mimetype='audio/aac')
+                               mimetype=content_type)
