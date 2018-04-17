@@ -1,58 +1,67 @@
-{# From http://flask-sqlalchemy.pocoo.org/2.3/api/#flask_sqlalchemy.Pagination.iter_pages #}
+{# Adapted from: http://flask-sqlalchemy.pocoo.org/2.3/api/#flask_sqlalchemy.Pagination.iter_pages #}
 {% macro render_pagination(pagination, endpoint) %}
-  <div class=pagination>
+  <ul class="nav nav-pills justify-content-center">
   {%- for page in pagination.iter_pages() %}
     {% if page %}
       {% if page != pagination.page %}
-        <a href="{{ url_for(endpoint, page=page) }}">{{ page }}</a>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for(endpoint, page=page) }}">{{ page }}</a></li>
       {% else %}
-        <strong>{{ page }}</strong>
+        <li class="nav-item"><a class="nav-link active" href="#">{{ page }}</a></li>
       {% endif %}
     {% else %}
-      <span class=ellipsis>…</span>
+        <li class="nav-item ellipsis">…</li>
     {% endif %}
   {%- endfor %}
-  </div>
+  </ul>
 {% endmacro %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
   <title> Maskwacîs Recordings Validation </title>
 </head>
 <body>
-  <h1> Maskwacîs Recordings Validation </h1>
+  <header class="navbar navbar-dark bg-dark box-shadow">
+    <a class="navbar-brand" href="#"> Maskwacîs Recordings Validation </a>
+  </header>
 
-  <table>
-    <tr>
-      <td> Transcription </td>
-      <td> Translation </td>
-      <td> Recordings </td>
-    </tr>
-    {% for phrase in page.items %}
-    <tr>
-      <td lang="crk">{{ phrase.transcription }}</td>
-      <td lang="en">{{ phrase.translation }}</td>
-      <td>
-        <ul>
-        {% for recording in phrase.recordings %}
-          <li> <span class="speaker">{{ recording.speaker }}</span>
+  <main role="main" class="container">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col"> Transcription </th>
+          <th scope="col"> Translation </th>
+          <th scope="col"> Recordings </th>
+        </tr>
+      </thead>
+      {% for phrase in page.items %}
+      <tr>
+        <td lang="crk">{{ phrase.transcription }}</td>
+        <td lang="en">{{ phrase.translation }}</td>
+        <td>
+          <ul>
+          {% for recording in phrase.recordings %}
+            <li> <span class="speaker">{{ recording.speaker }}</span>
 
-            <audio controls preload=none>
-              <source src="{{ recording.aac_path | urlencode }}" type="audio/aac"/>
-            </audio>
-          </li>
+              <audio controls preload=none>
+                <source src="{{ recording.aac_path | urlencode }}" type="audio/aac"/>
+              </audio>
+            </li>
 
-        {% endfor %}{# for recording in phrase.recordings #}
-        </ul>
-      </td>
-    </tr>
-    {% endfor %}{# for phrase in page.phrases#}
-  </table>
+          {% endfor %}{# for recording in phrase.recordings #}
+          </ul>
+        </td>
+      </tr>
+      {% endfor %}{# for phrase in page.phrases#}
+    </table>
 
-  <nav>
-    Pages {{ render_pagination(page, 'list_phrases') }}
-  </nav>
+    <nav>
+      {{ render_pagination(page, 'list_phrases') }}
+    </nav>
+  </main>
+
 
 </body>
 </html>
