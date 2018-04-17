@@ -13,10 +13,10 @@ from unicodedata import normalize
 from pathlib import Path
 from hashlib import sha256
 
-from flask import (
+from flask import (  # type: ignore
     Flask, abort, url_for, render_template, send_from_directory, redirect,
     request
-)  # type: ignore
+)
 from flask_sqlalchemy import SQLAlchemy  # type: ignore
 from sqlalchemy.orm import subqueryload  # type: ignore
 from werkzeug.exceptions import NotFound  # type: ignore
@@ -158,37 +158,51 @@ class Recording(db.Model):  # type: ignore
         return url_for('send_audio', filename=f"{self.fingerprint}.mp4")
 
 
+class VersionedString(db.Model):  # type: ignore
+    """
+    A versioned string is is one with a history of what it used to be, and who
+    said it.
+    """
+    id = db.Column(db.String, primary_key=True)
+    # id of the first commit.
+    provenance = db.Column(db.String, nullable=True)  # TODO: self-reference table
+    previous = db.Column(db.String, nullable=True)  # TODO: self-reference table
+    # TODO: author as an entity
+    author = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    value = db.Column(db.Text, nullable=False)  # TODO: always normalize this!
+
+    # TODO: create index on provenance to get full history
+
+    def show(self) -> str:
+        """
+        Returns the VersionedString somewhat like a Git object:
+
+        See: https://gist.github.com/masak/2415865
+        """
+        def generate():
+            if self.provenance:
+                yield f"provenance {self.provenance}"
+            if self.previous:
+                yield f"previous {self.previous}"
+            yield f"author {self.author}"
+            yield f"date {self.timestamp:%Y-%m-%dT%H:%M:%S%z}"
+            yield ''
+            yield self.value
+        return '\n'.join(generate())
+
+    def compute_sha256hash(self) -> str:
+        return sha256(self.show().encode('UTF-8')).hexdigest()
+
+    def new(cls, value: str, previous: 'VersionedString') -> None:
+        raise NotImplementedError
+
+
 def _not_now():
     """
     I will implement this stuff in the next sprint, but I gotta get it out of
     my mind first.
     """
-
-    class VersionedString(db.Model):
-        """
-        A versioned string is is one with a history of what it was, and who
-        said it.
-
-        This is essentially represented as a linked list of TimestampedString
-        rows.
-        """
-        head = ...  # TimestampedString: nullable=False
-        # TODO: convenience methods to access value, author, timestamp, of
-        # most recent.
-
-    class TimestampedString(db.Model):
-        """
-        A string with the author, and when the author wrote it. Can reference
-        a previous TimestampedString which implies that this string is an
-        revision of that string.
-
-        Essentially a linked list node.
-        """
-        value = str  # TODO: always normalize this!
-        author = ...  # TODO: author
-        timestamp = db.Column(db.DateTime, nullable=False,
-                              default=datetime.utcnow)
-        previous = ...  # TimestampedString nullable=True
 
     class Author(db.Model):
         """
