@@ -82,6 +82,15 @@ class Phrase(db.Model):  # type: ignore
         'polymorphic_identity': None
     }
 
+    def update(self, field: str, value: str) -> 'Phrase':
+        """
+        Update the field: either a translation or a transcription.
+        """
+        assert field in ('translation', 'transcription')
+        normalized_value = normalize_utterance(value)
+        setattr(self, field, normalized_value)
+        return self
+
 
 class Word(Phrase):
     """
@@ -257,7 +266,7 @@ def update_text(phrase_id):
     phrase = Phrase.query.filter(Phrase.id == phrase_id).one()
 
     # Actually update the translation or transcription.
-    setattr(phrase, field, normalize_utterance(value))
+    phrase.update(field, value)
     db.session.commit()
     return '', 204
 
