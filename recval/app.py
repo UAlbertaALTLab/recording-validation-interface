@@ -14,7 +14,8 @@ from pathlib import Path
 from hashlib import sha256
 
 from flask import (
-    Flask, url_for, render_template, send_from_directory, redirect
+    Flask, abort, url_for, render_template, send_from_directory, redirect,
+    request
 )  # type: ignore
 from flask_sqlalchemy import SQLAlchemy  # type: ignore
 from sqlalchemy.orm import subqueryload  # type: ignore
@@ -220,7 +221,7 @@ def index():
     return redirect(url_for('list_phrases', page=1))
 
 
-@app.route('/<int:page>/')
+@app.route('/phrases/<int:page>/')
 def list_phrases(page):
     """
     List SOME of the words, contrary to the name.
@@ -230,6 +231,35 @@ def list_phrases(page):
         'index.html',
         page=query.paginate(page=page)
     )
+
+
+@app.route('/phrase/<int:phrase_id>', methods=['PATCH'])
+def update_text(phrase_id):
+    """
+    Changes the text for a field of the given phrase.
+
+    Takes in a JSON request body like this:
+
+        {
+            "field": "translation" | "transcription",
+            "value": "<new contents for the field>",
+        }
+    """
+    # Ensure the field exists first.
+    body = request.get_json()
+    field = body.get('field')
+    value = body.get('value')
+    # Reject requests with invalid arugm
+    if not (field in ('translation', 'transcription') and isinstance(value, str)):
+        abort(400)
+
+    # TODO: Require a CSRF token, probably
+    phrase = Phrase.query.filter(Phrase.id == phrase_id).one()
+
+    # Actually update the translation or transcription.
+    setattr(phrase, field, normalize_utterance(value))
+    db.session.commit()
+    return '', 204
 
 
 @app.route('/static/audio/<filename>')

@@ -49,7 +49,7 @@
         </tr>
       </thead>
       {% for phrase in page.items %}
-      <tr>
+      <tr data-phrase="{{ phrase.id }}">
         <td lang="crk">{{ phrase.transcription }}</td>
         <td lang="en">{{ phrase.translation }}</td>
         <td>
