@@ -14,10 +14,20 @@ Then, create a virtualenv (if applicable), and install the requirements:
 
 Consult `system-requirements.txt` for other system dependencies you may require.
 
+Create a file called `recval.cfg` based on this template:
+
+```python
+TRANSCODED_RECORDINGS_PATH = '/path/to/audio/directory'
+SQLALCHEMY_DATABASE_URI = '/path/to/recval.db'
+```
+
+Save this file somewhere, preferably outside of the repository.
+
 
 Running
 -------
 
+    export RECVAL_SETTINGS=/path/to/recval.cfg
     export FLASK_APP=recval/app.py
     flask run --host HOST
 
