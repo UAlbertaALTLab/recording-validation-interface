@@ -1,3 +1,19 @@
+{# From http://flask-sqlalchemy.pocoo.org/2.3/api/#flask_sqlalchemy.Pagination.iter_pages #}
+{% macro render_pagination(pagination, endpoint) %}
+  <div class=pagination>
+  {%- for page in pagination.iter_pages() %}
+    {% if page %}
+      {% if page != pagination.page %}
+        <a href="{{ url_for(endpoint, page=page) }}">{{ page }}</a>
+      {% else %}
+        <strong>{{ page }}</strong>
+      {% endif %}
+    {% else %}
+      <span class=ellipsis>…</span>
+    {% endif %}
+  {%- endfor %}
+  </div>
+{% endmacro %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,13 +22,14 @@
 </head>
 <body>
   <h1> Maskwacîs Recordings Validation </h1>
+
   <table>
     <tr>
       <td> Transcription </td>
       <td> Translation </td>
       <td> Recordings </td>
     </tr>
-    {% for phrase in phrases %}
+    {% for phrase in page.items %}
     <tr>
       <td lang="crk">{{ phrase.transcription }}</td>
       <td lang="en">{{ phrase.translation }}</td>
@@ -26,12 +43,17 @@
             </audio>
           </li>
 
-        {% endfor %}
+        {% endfor %}{# for recording in phrase.recordings #}
         </ul>
       </td>
     </tr>
-    {% endfor %}
+    {% endfor %}{# for phrase in page.phrases#}
   </table>
+
+  <nav>
+    Pages {{ render_pagination(page, 'list_all_words') }}
+  </nav>
+
 </body>
 </html>
 {# vim: set ft=htmldjango :#}

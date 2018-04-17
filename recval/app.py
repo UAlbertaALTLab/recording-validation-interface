@@ -218,7 +218,7 @@ def list_all_words():
     query = Phrase.query.options(subqueryload(Phrase.recordings))
     return render_template(
         'index.html',
-        phrases=query.limit(10).all()
+        page=query.paginate()
     )
 
 
