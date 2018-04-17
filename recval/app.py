@@ -18,18 +18,21 @@ from flask_sqlalchemy import SQLAlchemy  # type: ignore
 from sqlalchemy.orm import subqueryload  # type: ignore
 from werkzeug.exceptions import NotFound  # type: ignore
 
-
+# Configure from default settings, then the file specifeied by the environment
+# variable.
+# See: http://flask.pocoo.org/docs/0.12/config/#configuring-from-files
 app = Flask(__name__)
-# TODO: allow configuration for this.
-# XXX: temporary location for directory
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
-# Diable object modication tracking -- unneeded, and silences a warning.
-# See: http://flask-sqlalchemy.pocoo.org/2.3/config/#configuration-keys
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config.from_object('recval.default_settings')
+app.config.from_envvar('RECVAL_SETTINGS')
+
+# Setup SQLAlchemy
+if app.config['SQLALCHEMY_DATABASE_URI'] == app.config['DEFAULT_DATABASE']:
+    app.logger.warn('Using default database: %s', app.config['DEFAULT_DATABASE'])
 db = SQLAlchemy(app)
 
-here = Path('.').parent
-TRANSCODED_RECORDINGS_PATH = here / 'static' / 'audio'
+# Determine where to read and write transcoded audio files.
+TRANSCODED_RECORDINGS_PATH = app.config['TRANSCODED_RECORDINGS_PATH'].resolve()
+assert TRANSCODED_RECORDINGS_PATH.is_dir()
 
 # Transcoded audio files.
 AUDIO_MIME_TYPES = {
@@ -140,7 +143,8 @@ class Recording(db.Model):  # type: ignore
 
     @property
     def aac_path(self) -> str:
-        return fspath(TRANSCODED_RECORDINGS_PATH / (self.fingerprint + '.mp4'))
+        # TODO: use url_for
+        return f"/static/audio/{self.fingerprint}.mp4"
 
 
 def _not_now():
@@ -188,8 +192,8 @@ def transcode_to_aac(recording_path: Path, fingerprint: str) -> None:
     TODO: Factor this out!
     """
     from sh import ffmpeg  # type: ignore
-    assert recording_path.exists(), f"got {recording_path}"
-    assert len(fingerprint) == 64, f"got {fingerprint!r}"
+    assert recording_path.exists(), f"Could not stat {recording_path}"
+    assert len(fingerprint) == 64, f"Unexpced fingerprint: {fingerprint!r}"
 
     app.logger.info('Transcoding %s', recording_path)
     ffmpeg('-i', fspath(recording_path),
@@ -202,7 +206,7 @@ def compute_fingerprint(file_path: Path) -> str:
     """
     Computes the SHA-256 hash of the given audio file path.
     """
-    assert file_path.suffix == '.wav', f"got {file_path}"
+    assert file_path.suffix == '.wav', f"Expected .wav file; got {file_path}"
     with open(file_path, 'rb') as f:
         return sha256(f.read()).hexdigest()
 
@@ -210,16 +214,17 @@ def compute_fingerprint(file_path: Path) -> str:
 @app.route('/')
 def list_all_words():
     """
+    List SOME of the words, contrary to the name.
     """
     query = Phrase.query.options(subqueryload(Phrase.recordings))
     return render_template(
         'index.html',
-        phrases=query.all()
+        phrases=query.limit(10).all()
     )
 
 
-@app.route('/static/audio/<path>')
-def send_audio(path):
+@app.route('/static/audio/<filename>')
+def send_audio(filename):
     """
     Send a previously transcoded audio file.
 
@@ -227,11 +232,10 @@ def send_audio(path):
     """
     # Fail if we don't recognize the file extension.
     try:
-        content_type = AUDIO_MIME_TYPES[Path(path).suffix]
+        content_type = AUDIO_MIME_TYPES[Path(filename).suffix]
     except KeyError:
         raise NotFound
 
     # TODO: load transcoded path from Flask config
-    return send_from_directory(fspath(TRANSCODED_RECORDINGS_PATH.resolve()),
-                               path,
-                               mimetype=content_type)
+    return send_from_directory(fspath(TRANSCODED_RECORDINGS_PATH),
+                               filename, mimetype=content_type)
