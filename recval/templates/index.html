@@ -21,6 +21,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
   <title> Maskwacîs Recordings Validation </title>
+  <style>
+  ul.recordings {
+    padding: auto 0;
+    list-style: none;
+  }
+  li .speaker {
+    display: inline-block;
+    min-width: 4rem;
+    text-align: center;
+    margin: .5rem;
+  }
+  </style>
 </head>
 <body>
   <header class="navbar navbar-dark bg-dark box-shadow">
@@ -28,7 +40,7 @@
   </header>
 
   <main role="main" class="container">
-    <table class="table">
+    <table class="table table-striped">
       <thead>
         <tr>
           <th scope="col"> Transcription </th>
@@ -41,9 +53,14 @@
         <td lang="crk">{{ phrase.transcription }}</td>
         <td lang="en">{{ phrase.translation }}</td>
         <td>
-          <ul>
+          <ul class="recordings">
           {% for recording in phrase.recordings %}
-            <li> <span class="speaker">{{ recording.speaker }}</span>
+            <li>
+              {% if recording.speaker %}
+                <span class="speaker">{{ recording.speaker }}</span>
+              {% else %}
+                <span class="badge badge-warning speaker unknown-speaker">???</span>
+              {% endif %}
 
               <audio controls preload=none>
                 <source src="{{ recording.aac_path | urlencode }}" type="audio/aac"/>
