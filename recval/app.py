@@ -3,6 +3,10 @@
 
 # Copyright © 2018 Eddie Antonio Santos. All rights reserved.
 
+"""
+TODO: Spend sprint 2 factoring things out of this file!
+"""
+
 from os import fspath
 from datetime import datetime
 from unicodedata import normalize
@@ -12,6 +16,7 @@ from hashlib import sha256
 from flask import Flask, render_template, send_from_directory  # type: ignore
 from flask_sqlalchemy import SQLAlchemy  # type: ignore
 from sqlalchemy.orm import subqueryload  # type: ignore
+from werkzeug.exceptions import NotFound  # type: ignore
 
 
 app = Flask(__name__)
@@ -25,6 +30,11 @@ db = SQLAlchemy(app)
 
 here = Path('.').parent
 TRANSCODED_RECORDINGS_PATH = here / 'static' / 'audio'
+
+# Transcoded audio files.
+AUDIO_MIME_TYPES = {
+    '.mp4': 'audio/aac',
+}
 
 
 def normalize_utterance(utterance):
@@ -215,12 +225,13 @@ def send_audio(path):
 
     See compute_fingerprint() and transcode_to_aac()
     """
-    # TODO: load transcoded path from Flask config
-    content_type = mimetypes = {
-        '.mp4': 'audio/aac',
-        '.wav': 'audio/wave',
-    }.get(path[-4], None)
+    # Fail if we don't recognize the file extension.
+    try:
+        content_type = AUDIO_MIME_TYPES[Path(path).suffix]
+    except KeyError:
+        raise NotFound
 
+    # TODO: load transcoded path from Flask config
     return send_from_directory(fspath(TRANSCODED_RECORDINGS_PATH.resolve()),
                                path,
                                mimetype=content_type)
