@@ -211,7 +211,7 @@ def compute_fingerprint(file_path: Path) -> str:
 
 
 @app.route('/')
-def list_all_words():
+def list_phrases():
     """
     List SOME of the words, contrary to the name.
     """

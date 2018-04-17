@@ -14,7 +14,7 @@ def test_index(selenium, live_server):
     """
     See if I find a Cree word on the page.
     """
-    url = live_server.url(url_for('list_all_words'))
+    url = live_server.url(url_for('list_phrases'))
     selenium.get(url)
     elem = selenium.find_element_by_xpath(
         "//*[contains(text(), 'cakayikan')]"
@@ -28,7 +28,7 @@ def test_word_related_to_sentence(client):
     """
     Determine whether a Cree word is related to a sentence.
     """
-    rv = client.get(url_for('list_all_words'))
+    rv = client.get(url_for('list_phrases'))
     assert rv.status_code == 200
     webpage = rv.data.decode('UTF-8')
 
