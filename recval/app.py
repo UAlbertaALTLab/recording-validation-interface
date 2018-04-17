@@ -220,15 +220,15 @@ def index():
     return redirect(url_for('list_phrases', page=1))
 
 
-@app.route('/<page>/')
-def list_phrases(page=1):
+@app.route('/<int:page>/')
+def list_phrases(page):
     """
     List SOME of the words, contrary to the name.
     """
     query = Phrase.query.options(subqueryload(Phrase.recordings))
     return render_template(
         'index.html',
-        page=query.paginate()
+        page=query.paginate(page=page)
     )
 
 
