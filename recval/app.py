@@ -13,7 +13,9 @@ from unicodedata import normalize
 from pathlib import Path
 from hashlib import sha256
 
-from flask import Flask, url_for, render_template, send_from_directory  # type: ignore
+from flask import (
+    Flask, url_for, render_template, send_from_directory, redirect
+)  # type: ignore
 from flask_sqlalchemy import SQLAlchemy  # type: ignore
 from sqlalchemy.orm import subqueryload  # type: ignore
 from werkzeug.exceptions import NotFound  # type: ignore
@@ -211,7 +213,15 @@ def compute_fingerprint(file_path: Path) -> str:
 
 
 @app.route('/')
-def list_phrases():
+def index():
+    """
+    Redirects to the first page of phrases.
+    """
+    return redirect(url_for('list_phrases', page=1))
+
+
+@app.route('/<page>/')
+def list_phrases(page=1):
     """
     List SOME of the words, contrary to the name.
     """
