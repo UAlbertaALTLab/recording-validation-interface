@@ -13,7 +13,7 @@ from unicodedata import normalize
 from pathlib import Path
 from hashlib import sha256
 
-from flask import Flask, render_template, send_from_directory  # type: ignore
+from flask import Flask, url_for, render_template, send_from_directory  # type: ignore
 from flask_sqlalchemy import SQLAlchemy  # type: ignore
 from sqlalchemy.orm import subqueryload  # type: ignore
 from werkzeug.exceptions import NotFound  # type: ignore
@@ -143,8 +143,7 @@ class Recording(db.Model):  # type: ignore
 
     @property
     def aac_path(self) -> str:
-        # TODO: use url_for
-        return f"/static/audio/{self.fingerprint}.mp4"
+        return url_for('send_audio', filename=f"{self.fingerprint}.mp4")
 
 
 def _not_now():
