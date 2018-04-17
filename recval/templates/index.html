@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title> Cree Recordings Validation </title>
+  <title> Maskwacîs Recordings Validation </title>
 </head>
 <body>
-  <h1> Cree Recordings Validation </h1>
+  <h1> Maskwacîs Recordings Validation </h1>
   <table>
     <tr>
       <td> Transcription </td>
@@ -20,7 +20,7 @@
         <ul>
         {% for recording in phrase.recordings %}
           <li> <span class="speaker">{{ recording.speaker }}</span>
-            
+
             <audio controls preload=none>
               <source src="{{ recording.aac_path | urlencode }}" type="audio/aac"/>
             </audio>

@@ -15,11 +15,12 @@ from sqlalchemy.orm import subqueryload  # type: ignore
 
 
 app = Flask(__name__)
+# TODO: allow configuration for this.
 # XXX: temporary location for directory
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
 # Diable object modication tracking -- unneeded, and silences a warning.
 # See: http://flask-sqlalchemy.pocoo.org/2.3/config/#configuration-keys
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = 'sqlite:////tmp/test.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 here = Path('.').parent
@@ -214,4 +215,7 @@ def send_audio(path):
 
     See compute_fingerprint() and transcode_to_aac()
     """
-    return send_from_directory(fspath(TRANSCODED_RECORDINGS_PATH.resolve()), path)
+    # TODO: load transcoded path from Flask config
+    return send_from_directory(fspath(TRANSCODED_RECORDINGS_PATH.resolve()),
+                               path,
+                               mimetype='audio/aac')
