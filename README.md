@@ -14,7 +14,7 @@ Then, create a virtualenv (if applicable), and install the requirements:
 
 Consult `system-requirements.txt` for other system dependencies you may require.
 
-Create a file called `recval.cfg` based on this template:
+Create a file called `recval_settings.py` based on this template:
 
 ```python
 TRANSCODED_RECORDINGS_PATH = '/path/to/audio/directory'
@@ -27,7 +27,19 @@ Save this file somewhere, preferably outside of the repository.
 Running
 -------
 
-    export RECVAL_SETTINGS=/path/to/recval.cfg
+When developing and running tests, do this to setup the environment
+variables:
+
+    source ./source-this.sh
+
+Otherwise, set the environment variables manually, like so:
+
+    export RECVAL_SETTINGS=/path/to/recval_settings.py
+
+---
+
+Finally, you can run the server!
+
     export FLASK_APP=recval/app.py
     flask run --host HOST
 
