@@ -45,12 +45,18 @@ AUDIO_MIME_TYPES = {
 
 def normalize_utterance(utterance):
     r"""
+    Normalizes utterances (translations, transcriptions, etc.)
+
     >>> normalize_utterance("  hello ")
     'hello'
     >>> normalize_utterance("pho\u031B\u0309 ")
     'phở'
     >>> normalize_utterance("   phơ\u0309 ")
     'phở'
+
+    TODO: Should be idempotent. i.e.,
+
+    assert normalize_utterance(s) == normalize_utterance(normalize_utterance(s))
     """
     return normalize('NFC', utterance.strip())
 
@@ -131,7 +137,6 @@ class Recording(db.Model):  # type: ignore
     the raw recording file. The file itself is converted into ds
 
     """
-    # TODO: fingerprint the source wave file, convert to Vorbis audio/web (.weba)
     fingerprint = db.Column(db.Text, primary_key=True)
     speaker = db.Column(db.Text, nullable=True)  # TODO: Versioned String?
     timestamp = db.Column(db.DateTime, nullable=False,
@@ -139,7 +144,6 @@ class Recording(db.Model):  # type: ignore
     phrase_id = db.Column(db.Integer, db.ForeignKey('phrase.id'),
                           nullable=False)
     phrase = db.relationship('Phrase', back_populates='recordings')
-    # TODO: have an href webm link
 
     @classmethod
     def new(cls, phrase: Phrase, input_file: Path, speaker: str=None) -> 'Recording':
@@ -163,10 +167,11 @@ class VersionedString(db.Model):  # type: ignore
     A versioned string is is one with a history of what it used to be, and who
     said it.
     """
-    id = db.Column(db.String, primary_key=True)
+    id = db.Column(db.String, primary_key=True)  # TODO: validator for this.
+
     # id of the first commit.
-    provenance = db.Column(db.String, nullable=True)  # TODO: self-reference table
-    previous = db.Column(db.String, nullable=True)  # TODO: self-reference table
+    _provenance = db.Column(db.String, nullable=True)  # TODO: self-reference table
+    _previous = db.Column(db.String, nullable=True)  # TODO: self-reference table
     # TODO: author as an entity
     author = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
@@ -179,9 +184,12 @@ class VersionedString(db.Model):  # type: ignore
         Returns the VersionedString somewhat like a Git object:
 
         See: https://gist.github.com/masak/2415865
+
+        TODO: test show() before and after provenance and ID are set.
         """
         def generate():
-            if self.provenance:
+            if self.provenance and self.provenance != self.id:
+                # Yield the provenance ONLY when this is a non-root commit.
                 yield f"provenance {self.provenance}"
             if self.previous:
                 yield f"previous {self.previous}"
@@ -192,10 +200,37 @@ class VersionedString(db.Model):  # type: ignore
         return '\n'.join(generate())
 
     def compute_sha256hash(self) -> str:
+        """
+        Compute a hash that can be used as a ID for this versioned string.
+        """
         return sha256(self.show().encode('UTF-8')).hexdigest()
 
-    def new(cls, value: str, previous: 'VersionedString') -> None:
-        raise NotImplementedError
+    def derive(self, value: str, author: str) -> 'VersionedString':
+        """
+        Create a versioned string using this instance as its previous.
+        """
+        assert self.provenance is not None
+        instance = type(self).new(value, author)
+        instance.previous = self
+        instance.provenance = self.provenance
+        # Setting previous and provenance changed the hash,
+        # so recompute it.
+        instance.id = instance.compute_sha256hash()
+        return instance
+
+    @classmethod
+    def new(cls, value: str, author: str) -> 'VersionedString':
+        """
+        Create a "root" versioned string.
+        That is, it has no history, and its provenance is itself.
+        """
+        instance = cls(value=normalize_utterance(value),
+                       timestamp=datetime.utcnow())
+
+        # This is the root version.
+        instance.id = instance.compute_sha256hash()
+        instance.provenance = instance.id
+        return instance
 
 
 def _not_now():
