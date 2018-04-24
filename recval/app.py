@@ -255,11 +255,18 @@ def transcode_to_aac(recording_path: Path, fingerprint: str) -> None:
     assert recording_path.exists(), f"Could not stat {recording_path}"
     assert len(fingerprint) == 64, f"Unexpced fingerprint: {fingerprint!r}"
 
+    out_filename = TRANSCODED_RECORDINGS_PATH / f"{fingerprint}.mp4"
+    if out_filename.exists():
+        app.logger.info('File already transcoded. Skipping: %s', out_filename)
+        return
+
     app.logger.info('Transcoding %s', recording_path)
     ffmpeg('-i', fspath(recording_path),
+           '-nostdin',
+           '-n',  # Do not overwrite existing files
            '-ac', 1,  # Mix to mono
            '-acodec', 'aac',  # Use the AAC codec
-           TRANSCODED_RECORDINGS_PATH / f"{fingerprint}.mp4")
+           out_filename)
 
 
 def compute_fingerprint(file_path: Path) -> str:
