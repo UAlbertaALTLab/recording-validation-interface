@@ -9,7 +9,6 @@ TODO: Spend sprint 2 factoring things out of this file!
 
 from os import fspath
 from datetime import datetime
-from unicodedata import normalize
 from pathlib import Path
 from hashlib import sha256
 
@@ -20,6 +19,8 @@ from flask import (  # type: ignore
 from flask_sqlalchemy import SQLAlchemy  # type: ignore
 from sqlalchemy.orm import subqueryload  # type: ignore
 from werkzeug.exceptions import NotFound  # type: ignore
+
+from recval.normalization import normalize as normalize_utterance
 
 # Configure from default settings, then the file specifeied by the environment
 # variable.
@@ -41,24 +42,6 @@ assert TRANSCODED_RECORDINGS_PATH.is_dir()
 AUDIO_MIME_TYPES = {
     '.mp4': 'audio/aac',
 }
-
-
-def normalize_utterance(utterance):
-    r"""
-    Normalizes utterances (translations, transcriptions, etc.)
-
-    >>> normalize_utterance("  hello ")
-    'hello'
-    >>> normalize_utterance("pho\u031B\u0309 ")
-    'phở'
-    >>> normalize_utterance("   phơ\u0309 ")
-    'phở'
-
-    TODO: Should be idempotent. i.e.,
-
-    assert normalize_utterance(s) == normalize_utterance(normalize_utterance(s))
-    """
-    return normalize('NFC', utterance.strip())
 
 
 class Phrase(db.Model):  # type: ignore
