@@ -57,6 +57,29 @@ def test_insert_recording_twice(db):
         db.session.commit()
 
 
+def test_transcription_history(db):
+    word = Word(transcription='\n aci\u0302mosis \r', translation='puppy')
+    recording = Recording.new(phrase=word, input_file=TEST_WAV, speaker='NIL')
+    # Insert it for the first time.
+    db.session.add(recording)
+    db.session.commit()
+    word_id = word.id
+    del word
+
+    # In another instance, fetch the word.
+    word = Word.query.filter(Word.id == word_id).one()
+    assert word.transcription == 'ac\u00EEmosis'  # acîmosis
+
+    # Now change it. For example, remove the circumflex.
+    word.update('transcription', 'acimosis')
+    db.session.commit()
+    del word
+
+    # Fetch it one more time, and check that it has changed.
+    word = Word.query.filter(Word.id == word_id).one()
+    assert word.transcription == 'acimosis'
+
+
 @pytest.fixture()
 def app():
     with _app.app_context():
@@ -76,6 +99,7 @@ def db(app):
     yield _db
 
     # Tear down the database.
+    _db.session.rollback()
     _db.drop_all()
     _db.session.flush()
     _db.session.expunge_all()
