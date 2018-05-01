@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest  # type: ignore
 from sqlalchemy.schema import MetaData, DropConstraint  # type: ignore
+from sqlalchemy.exc import SQLAlchemyError  # type: ignore
 
 from recval.model import Word, Sentence, Recording
 from recval.model import db as _db
@@ -37,6 +38,25 @@ def test_insert_word(db):
     assert word in result_set
 
 
+def test_insert_recording_twice(db):
+    """
+    Insert the exact SAME recording twice should fail.
+    """
+
+    word = Word(transcription='acimosis', translation='puppy')
+
+    # Insert it once.
+    rec1 = Recording.new(phrase=word, input_file=TEST_WAV, speaker='NIL')
+    db.session.add(rec1)
+    db.session.commit()
+
+    # Insert it again.
+    rec2 = Recording.new(phrase=word, input_file=TEST_WAV, speaker='NIL')
+    db.session.add(rec1)
+    with pytest.raises(SQLAlchemyError):
+        db.session.commit()
+
+
 @pytest.fixture()
 def app():
     with _app.app_context():
@@ -47,6 +67,7 @@ def app():
 def db(app):
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///:memory:'
 
+    # Setup the database.
     _db.create_all()
     _db.session.flush()
     _db.session.expunge_all()
@@ -54,4 +75,7 @@ def db(app):
 
     yield _db
 
-    _db.session.close()
+    # Tear down the database.
+    _db.drop_all()
+    _db.session.flush()
+    _db.session.expunge_all()
