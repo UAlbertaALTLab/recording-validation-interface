@@ -44,6 +44,9 @@ AUDIO_MIME_TYPES = {
 }
 
 
+Model = db.Model
+
+
 class Phrase(db.Model):  # type: ignore
     """
     A phrase is a sentence or a word.
