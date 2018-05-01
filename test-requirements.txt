@@ -7,12 +7,7 @@ pluggy==0.6.0
 psutil==5.4.3
 py==1.5.2
 pycodestyle==2.3.1
-pytest-base-url==1.4.1
-pytest-flask==0.10.0
-pytest-html==1.16.1
-pytest-metadata==1.6.0
 pytest-selenium==1.11.4
-pytest-variables==1.7.1
 pytest==3.4.1
 requests==2.18.4
 selenium==3.9.0
