@@ -10,7 +10,7 @@ from pathlib import Path
 
 from flask import current_app, url_for  # type: ignore
 from flask_sqlalchemy import SQLAlchemy  # type: ignore
-from sqlalchemy.orm import subqueryload  # type: ignore
+from sqlalchemy.orm import subqueryload, validates  # type: ignore
 
 from recval.normalization import normalize as normalize_utterance
 
@@ -46,6 +46,14 @@ class Phrase(db.Model):  # type: ignore
         'polymorphic_identity': None
     }
 
+    @validates('translation')
+    def validate_translation(self, _key, utterance):
+        return self.validate_utterance(utterance)
+
+    @validates('transcription')
+    def validate_transcription(self, _key, utterance):
+        return self.validate_utterance(utterance)
+
     def update(self, field: str, value: str) -> 'Phrase':
         """
         Update the field: either a translation or a transcription.
@@ -54,6 +62,12 @@ class Phrase(db.Model):  # type: ignore
         normalized_value = normalize_utterance(value)
         setattr(self, field, normalized_value)
         return self
+
+    @staticmethod
+    def validate_utterance(utterance):
+        value = normalize_utterance(utterance)
+        assert len(value) > 0
+        return value
 
 
 class Word(Phrase):

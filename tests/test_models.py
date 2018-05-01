@@ -39,7 +39,7 @@ def setup_db(app):
 
 def test_insert_word(app):
     # TODO: test unnormalized word.
-    word = Word(transcription='acimosis', translation='puppy')
+    word = Word(transcription=' acimosis', translation='puppy ')
     recording = Recording.new(phrase=word, input_file=TEST_WAV, speaker='NIL')
     db.session.add(recording)
     db.session.commit()
