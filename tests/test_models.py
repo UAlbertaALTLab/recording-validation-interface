@@ -44,5 +44,10 @@ def test_insert_word(app):
     db.session.add(recording)
     db.session.commit()
 
-    result, = Word.query.all()
-    assert result == word
+    result_set = Word.query.filter(Word.translation == 'puppy').all()
+    assert len(result_set) >= 1
+    assert word in result_set
+
+    result_set = Word.query.filter(Word.transcription == 'acimosis').all()
+    assert len(result_set) >= 1
+    assert word in result_set
