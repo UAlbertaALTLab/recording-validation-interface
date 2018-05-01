@@ -11,7 +11,7 @@ REPOSITORY_ROOT = Path(__file__).parent.parent
 assert (REPOSITORY_ROOT / '.git').is_dir()
 
 # The default database if none exists.
-DEFAULT_DATABASE = 'sqlite:////tmp/test.db'
+DEFAULT_DATABASE = 'sqlite:////tmp/recval-temporary.db'
 
 
 # ################################# Flask ####################################

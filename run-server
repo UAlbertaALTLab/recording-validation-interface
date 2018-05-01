@@ -1,3 +1,6 @@
 #!/bin/sh
 
-env FLASK_APP=recval/app.py flask run
+export FLASK_APP=recval/app.py
+export FLASK_DEBUG=1
+
+flask run
