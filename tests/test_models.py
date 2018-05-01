@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
+import tempfile
 from pathlib import Path
 
-import pytest
-import tempfile
-from sqlalchemy.schema import MetaData, DropConstraint
+import pytest  # type: ignore
+from sqlalchemy.schema import MetaData, DropConstraint  # type: ignore
 
-from recval.app import db, Word, Sentence, Recording
+from recval.model import db, Word, Sentence, Recording
 from recval.app import app as _app
 
 
