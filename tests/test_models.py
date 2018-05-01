@@ -1,39 +1,47 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
+from pathlib import Path
 
-# Based on http://alextechrants.blogspot.ca/2013/08/unit-testing-sqlalchemy-apps.html
+import pytest
+import tempfile
+from sqlalchemy.schema import MetaData, DropConstraint
 
-from sqlalchemy.engine import create_engine  # type: ignore
-from sqlalchemy.orm.session import Session  # type: ignore
-
-from recval.app import Model, Word, Sentence, Recording  # This is your declarative base class
-
-
-def setup_module():
-    global transaction, connection, engine
-
-    # Connect to the database and create the schema within a transaction
-    engine = create_engine('postgresql:///yourdb')
-    connection = engine.connect()
-    transaction = connection.begin()
-    Base.metadata.create_all(connection)
-
-    # If you want to insert fixtures to the DB, do it here
+from recval.app import db, Word, Sentence, Recording
+from recval.app import app as _app
 
 
-def teardown_module():
-    # Roll back the top level transaction and disconnect from the database
-    transaction.rollback()
-    connection.close()
-    engine.dispose()
+TEST_WAV = Path(__file__).parent / 'fixtures' / 'test.wav'
+assert TEST_WAV.exists()
+
+# Based on http://alextechrants.blogspot.ca/2014/01/unit-testing-sqlalchemy-apps-part-2.html
 
 
-class DatabaseTest:
-    def setup(self):
-        self.__transaction = connection.begin_nested()
-        self.session = Session(connection)
+@pytest.fixture(scope='session')
+def app():
+    return _app
 
-    def teardown(self):
-        self.session.close()
-        self.__transaction.rollback()
+
+@pytest.fixture(scope='session', autouse=True)
+def setup_db(app):
+    with tempfile.TemporaryDirectory() as d:
+        path = Path(d) / 'test.db'
+        app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{path!s}'
+
+        db.create_all()
+        db.session.flush()
+        db.session.expunge_all()
+        db.session.commit()
+
+        yield
+
+
+def test_insert_word():
+    # TODO: test unnormalized word.
+    word = Word(transcription='acimosis', translation='puppy')
+    recording = Recording.new(phrase=word, input_file=TEST_WAV, speaker='NIL')
+    db.session.add(recording)
+    db.session.commit()
+
+    result, = Word.query.all()
+    assert result == word
