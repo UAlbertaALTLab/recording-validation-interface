@@ -19,7 +19,8 @@ assert TEST_WAV.exists()
 
 @pytest.fixture(scope='session')
 def app():
-    return _app
+    with _app.app_context():
+        yield _app
 
 
 @pytest.fixture(scope='session', autouse=True)
@@ -36,7 +37,7 @@ def setup_db(app):
         yield
 
 
-def test_insert_word():
+def test_insert_word(app):
     # TODO: test unnormalized word.
     word = Word(transcription='acimosis', translation='puppy')
     recording = Recording.new(phrase=word, input_file=TEST_WAV, speaker='NIL')
