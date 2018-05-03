@@ -103,13 +103,13 @@ class Phrase(db.Model):  # type: ignore
     @property
     def translation_history(self):
         return VersionedString.query.filter_by(
-            provenance_id=self.translation_id
+            provenance_id=self.translation_meta.provenance_id
         ).all()
 
     @property
     def transcription_history(self):
         return VersionedString.query.filter_by(
-            provenance_id=self.transcription_id
+            provenance_id=self.transcription_meta.provenance_id
         ).all()
 
     def update(self, field: str, value: str) -> 'Phrase':
@@ -267,7 +267,7 @@ class VersionedString(db.Model):  # type: ignore
         """
         # TODO: support for date.
         instance = type(self).new(value, author_name)
-        instance.previous = self
+        instance.previous_id = self.id
         instance.provenance_id = self.provenance_id
         # Setting previous and provenance changed the hash,
         # so recompute it.
