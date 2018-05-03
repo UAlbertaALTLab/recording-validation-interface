@@ -34,17 +34,21 @@ class Phrase(db.Model):  # type: ignore
 
     id = db.Column(db.Integer, primary_key=True)
 
-    # The transcription and translation are "versioned".
+    # The transcription and translation are "versioned strings", with a
+    # history, timestamp, and an author.
     transcription_id = db.Column(db.Text, db.ForeignKey('versioned_string.id'),
                                  nullable=False)
-    transcription_meta = db.relationship('VersionedString')
+    translation_id = db.Column(db.Text, db. ForeignKey('versioned_string.id'),
+                               nullable=False)
 
-    # TODO: do the same for translation.
-
-    translation = db.Column(db.Text, nullable=False)  # TODO: convert to VersionedString
     # Is this a word or a phrase?
     type = db.Column(db.Text, nullable=False)
 
+    # Maintain the relationship to the transcription
+    transcription_meta = db.relationship('VersionedString',
+                                         foreign_keys=[transcription_id])
+    translation_meta = db.relationship('VersionedString',
+                                       foreign_keys=[translation_id])
     # One phrase may have one or more recordings.
     recordings = db.relationship('Recording')
 
@@ -54,11 +58,13 @@ class Phrase(db.Model):  # type: ignore
         'polymorphic_identity': None
     }
 
-    def __init__(self, *, transcription, **kwargs):
+    def __init__(self, *, transcription, translation,  **kwargs):
         # Create versioned transcription.
         super().__init__(
             transcription_meta=VersionedString.new(value=transcription,
                                                    author_name='<unknown>'),
+            translation_meta=VersionedString.new(value=translation,
+                                                 author_name='<unknown>'),
             **kwargs
         )
 
@@ -78,9 +84,33 @@ class Phrase(db.Model):  # type: ignore
     def transcription(cls):
         return VersionedString.value
 
-    @validates('translation')
-    def validate_translation(self, _key, utterance):
-        return self.validate_utterance(utterance)
+    @hybrid_property
+    def translation(self) -> str:
+        value = self.translation_meta.value
+        assert value == normalize_utterance(value)
+        return value
+
+    @translation.setter  # type: ignore
+    def translation(self, value: str) -> None:
+        # TODO: set current author.
+        previous = self.translation_meta
+        self.translation_meta = previous.derive(value, '<unknown author>')
+
+    @translation.expression  # type: ignore
+    def translation(cls):
+        return VersionedString.value
+
+    @property
+    def translation_history(self):
+        return VersionedString.query.filter_by(
+            provenance_id=self.translation_id
+        ).all()
+
+    @property
+    def transcription_history(self):
+        return VersionedString.query.filter_by(
+            provenance_id=self.transcription_id
+        ).all()
 
     def update(self, field: str, value: str) -> 'Phrase':
         """
@@ -200,6 +230,10 @@ class VersionedString(db.Model):  # type: ignore
         value = normalize_utterance(utterance)
         assert len(value) > 0
         return value
+
+    @property
+    def is_root(self) -> bool:
+        return self.id == self.provenance_id
 
     def show(self) -> str:
         """
