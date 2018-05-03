@@ -129,13 +129,31 @@ class Phrase(db.Model):  # type: ignore
         return value
 
 
+class ElicitationOrigin(Enum):
+    """
+    How the particular phrase got it into the database in the first place.
+    There are at least three sources:
+
+     - word in the Maskwacîs dictionary.
+     - word created using the Rapid Words methodology
+       (https://www.sil.org/dictionaries-lexicography/rapid-word-collection-methodology)
+     - word is in a sentence
+    """
+    maskwacîs = auto()
+    rapid_words = auto()
+
+
 class Word(Phrase):
     """
     A single word, with a translation.
 
     Note that translation and transcription MUST be NFC normalized!
     """
-    # A word may be contained within another sentence
+
+    # The elicitation origin of this term.
+    origin = db.Column(db.Enum(ElicitationOrigin), nullable=True)
+
+    # A sentence that contains this word.
     contained_within = db.Column(db.Integer, db.ForeignKey('phrase.id'),
                                  nullable=True)
     __mapper_args__ = {

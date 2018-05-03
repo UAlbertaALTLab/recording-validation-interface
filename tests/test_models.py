@@ -10,7 +10,8 @@ import pytest  # type: ignore
 from sqlalchemy.schema import MetaData, DropConstraint  # type: ignore
 from sqlalchemy.exc import SQLAlchemyError  # type: ignore
 
-from recval.model import Word, Sentence, Recording, RecordingQuality
+from recval.model import Phrase, Word, Sentence, Recording
+from recval.model import RecordingQuality, ElicitationOrigin
 from recval.model import db as _db
 from recval.app import app as _app
 
@@ -145,6 +146,23 @@ def test_mark_recordings(db, acimosis):
     # And make sure it has changed.
     recording = Recording.query.filter_by(fingerprint=rec_id).one()
     assert recording.quality == RecordingQuality.clean
+
+
+def test_mark_word_source(db, acimosis):
+    """
+    Test marking the word with its source:
+     - Maskwacîs dictionary
+     - Rapid words
+    """
+    phrase = Phrase.query.filter_by(id=acimosis).one()
+    assert phrase.origin is None
+
+    phrase.origin = ElicitationOrigin.maskwacîs
+    db.session.commit()
+    del phrase
+
+    phrase = Phrase.query.filter_by(id=acimosis).one()
+    assert phrase.origin == ElicitationOrigin.maskwacîs
 
 
 @pytest.fixture()
