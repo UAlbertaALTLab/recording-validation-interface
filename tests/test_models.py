@@ -10,7 +10,7 @@ import pytest  # type: ignore
 from sqlalchemy.schema import MetaData, DropConstraint  # type: ignore
 from sqlalchemy.exc import SQLAlchemyError  # type: ignore
 
-from recval.model import Word, Sentence, Recording
+from recval.model import Word, Sentence, Recording, RecordingQuality
 from recval.model import db as _db
 from recval.app import app as _app
 
@@ -92,7 +92,7 @@ def test_translation_history(db, acimosis):
     translation updates the history.
     """
 
-    # In another instance, fetch the word.
+    # Fetch the word.
     word = Word.query.filter(Word.id == acimosis).one()
     assert word.translation == 'puppy'
 
@@ -126,18 +126,33 @@ def test_translation_history(db, acimosis):
     assert len(word.translation_history) == 3
 
 
-def test_mark_recordings(db):
+def test_mark_recordings(db, acimosis):
     """
-    Tests the ability to mark recordings as usable/unusable.
+    Tests the ability to mark recordings as clean/unusable.
     """
+    # Fetch the word.
+    word = Word.query.filter(Word.id == acimosis).one()
+    recording = next(iter(word.recordings))
+    rec_id = recording.fingerprint
+    assert recording.quality is None
 
+    # Update it...
+    recording.quality = RecordingQuality.clean
+    db.session.commit()
+    del word
+    del recording
 
+    # And make sure it has changed.
+    recording = Recording.query.filter_by(fingerprint=rec_id).one()
+    assert recording.quality == RecordingQuality.clean
 
 
 @pytest.fixture()
 def acimosis(db):
     """
     Inserts the word 'acimosis'/'puppy' into the database.
+
+    Returns the phrase.id of the inserted phrase.
     """
     word = Word(transcription='acîmosis', translation=' puppy  ')
     recording = Recording.new(phrase=word, input_file=TEST_WAV, speaker='NIL')

@@ -4,6 +4,7 @@
 # Copyright © 2018 Eddie Antonio Santos. All rights reserved.
 
 from datetime import datetime
+from enum import Enum, auto
 from hashlib import sha256
 from os import fspath
 from pathlib import Path
@@ -159,6 +160,14 @@ class Sentence(Phrase):
     }
 
 
+class RecordingQuality(Enum):
+    """
+    A tag regarding the quality of a recording.
+    """
+    clean = auto()
+    unusable = auto()
+
+
 class Recording(db.Model):  # type: ignore
     """
     A recording of a phrase.
@@ -173,6 +182,8 @@ class Recording(db.Model):  # type: ignore
                           default=datetime.utcnow)
     phrase_id = db.Column(db.Integer, db.ForeignKey('phrase.id'),
                           nullable=False)
+    quality = db.Column(db.Enum(RecordingQuality), nullable=True)
+
     phrase = db.relationship('Phrase', back_populates='recordings')
 
     @classmethod
