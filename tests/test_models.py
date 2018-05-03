@@ -109,16 +109,29 @@ def test_translation_history(db):
     assert len(word.translation_history) == 1
 
     # Now, update it!
-    word.translation = 'many doggos'
+    word.translation = 'smol doggo'
     db.session.commit()
     del word
 
     # Refetch it.
     word = Word.query.filter_by(id=word_id).one()
-    assert word.translation == 'many doggos'
+    assert word.translation == 'smol doggo'
 
+    # Get the entire translation history.
     assert not word.translation_meta.is_root
     assert len(word.translation_history) == 2
+
+    # Update it back to the original. It should create a NEW entry.
+    word.translation = 'puppy'
+    db.session.commit()
+    del word
+
+    # Fetch it one last time.
+    word = Word.query.filter_by(id=word_id).one()
+    # It should be back to puppy.
+    assert word.translation == 'puppy'
+    assert not word.translation_meta.is_root
+    assert len(word.translation_history) == 3
 
 
 @pytest.fixture()
