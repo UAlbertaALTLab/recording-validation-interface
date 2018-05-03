@@ -139,13 +139,18 @@ class VersionedString(db.Model):  # type: ignore
     A versioned string is is one with a history of what it used to be, and who
     said it.
     """
-    id = db.Column(db.String, primary_key=True)  # TODO: validator for this.
 
-    # id of the first commit.
-    _provenance = db.Column(db.String, nullable=True)  # TODO: self-reference table
-    _previous = db.Column(db.String, nullable=True)  # TODO: self-reference table
+    __tablename__ = 'versioned_string'
+
+    # TODO: validator for this.
+    id = db.Column(db.String, primary_key=True)
+
+    # 'provenance' is simply the id of the first string in the series.
+    provenance = db.Column(db.String, db.ForeignKey('versioned_string.id'))
+    previous = db.Column(db.String, db.ForeignKey('versioned_string.id'))
+
     # TODO: author as an entity
-    author = db.Column(db.Text, nullable=False)
+    author_name = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     value = db.Column(db.Text, nullable=False)  # TODO: always normalize this!
 
