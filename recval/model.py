@@ -37,7 +37,7 @@ class Phrase(db.Model):  # type: ignore
     # The transcription and translation are "versioned".
     transcription_id = db.Column(db.Text, db.ForeignKey('versioned_string.id'),
                                  nullable=False)
-    transcription_history = db.relationship('VersionedString')
+    transcription_meta = db.relationship('VersionedString')
 
     # TODO: do the same for translation.
 
@@ -57,22 +57,22 @@ class Phrase(db.Model):  # type: ignore
     def __init__(self, *, transcription, **kwargs):
         # Create versioned transcription.
         super().__init__(
-            transcription_history=VersionedString.new(value=transcription,
-                                                      author_name='<unknown>'),
+            transcription_meta=VersionedString.new(value=transcription,
+                                                   author_name='<unknown>'),
             **kwargs
         )
 
     @hybrid_property
     def transcription(self) -> str:
-        value = self.transcription_history.value
+        value = self.transcription_meta.value
         assert value == normalize_utterance(value)
         return value
 
     @transcription.setter  # type: ignore
     def transcription(self, value: str) -> None:
         # TODO: set current author.
-        previous = self.transcription_history
-        self.transcription_history = previous.derive(value, '<unknown author>')
+        previous = self.transcription_meta
+        self.transcription_meta = previous.derive(value, '<unknown author>')
 
     @transcription.expression  # type: ignore
     def transcription(cls):
