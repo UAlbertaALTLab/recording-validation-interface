@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
+# Copyright © 2018 Eddie Antonio Santos. All rights reserved.
+
 import tempfile
 from pathlib import Path
 
@@ -40,7 +42,7 @@ def test_insert_word(db):
 
 def test_insert_recording_twice(db):
     """
-    Insert the exact SAME recording twice should fail.
+    Insert the exact SAME recording twice; the second should fail.
     """
 
     word = Word(transcription='acimosis', translation='puppy')
@@ -57,7 +59,11 @@ def test_insert_recording_twice(db):
         db.session.commit()
 
 
-def test_transcription_history(db):
+def test_transcription_update(db):
+    """
+    Ensure that a word's transcription can be changed.
+    """
+
     word = Word(transcription='\n aci\u0302mosis \r', translation='puppy')
     recording = Recording.new(phrase=word, input_file=TEST_WAV, speaker='NIL')
     # Insert it for the first time.
@@ -82,12 +88,20 @@ def test_transcription_history(db):
 
 @pytest.fixture()
 def app():
+    """
+    Yield an active Flask app context.
+    """
     with _app.app_context():
         yield _app
 
 
 @pytest.fixture()
 def db(app):
+    """
+    Yields a database object bound to an active app context.
+    The database starts empty, and is cleared of all data at the end of the
+    test.
+    """
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///:memory:'
 
     # Setup the database.
