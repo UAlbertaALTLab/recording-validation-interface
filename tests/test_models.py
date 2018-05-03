@@ -86,6 +86,29 @@ def test_transcription_update(db):
     assert word.transcription == 'acimosis'
 
 
+def test_translation_history(db):
+    """
+    Checks that the translation has a history, and that updating the
+    translation updates the history.
+    """
+
+    word = Word(transcription='acîmosis', translation=' puppy  ')
+    recording = Recording.new(phrase=word, input_file=TEST_WAV, speaker='NIL')
+    # Insert it for the first time.
+    db.session.add(recording)
+    db.session.commit()
+    word_id = word.id
+    del word
+
+    # In another instance, fetch the word.
+    word = Word.query.filter(Word.id == word_id).one()
+    assert word.translation == 'puppy'
+
+    # Now, check its history.
+    assert word.translation_meta.is_root
+    assert len(word.translation_history) == 1
+
+
 @pytest.fixture()
 def app():
     """
