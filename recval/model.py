@@ -11,6 +11,7 @@ from pathlib import Path
 from flask import current_app, url_for  # type: ignore
 from flask_sqlalchemy import SQLAlchemy  # type: ignore
 from sqlalchemy.orm import subqueryload, validates  # type: ignore
+from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
 
 from recval.normalization import normalize as normalize_utterance
 
@@ -33,12 +34,13 @@ class Phrase(db.Model):  # type: ignore
 
     id = db.Column(db.Integer, primary_key=True)
 
-    # The transcription and translation is "versioned".
+    # The transcription and translation are "versioned".
     transcription_id = db.Column(db.Text, db.ForeignKey('versioned_string.id'),
                                  nullable=False)
     transcription_history = db.relationship('VersionedString')
 
-    #transcription = db.Column(db.Text, nullable=False)  # TODO: convert to VersionedString
+    # TODO: do the same for translation.
+
     translation = db.Column(db.Text, nullable=False)  # TODO: convert to VersionedString
     # Is this a word or a phrase?
     type = db.Column(db.Text, nullable=False)
@@ -53,24 +55,28 @@ class Phrase(db.Model):  # type: ignore
     }
 
     def __init__(self, *, transcription, **kwargs):
-        # Create versioned
+        # Create versioned transcription.
         super().__init__(
             transcription_history=VersionedString.new(value=transcription,
                                                       author_name='<unknown>'),
             **kwargs
         )
 
-    @property
+    @hybrid_property
     def transcription(self) -> str:
         value = self.transcription_history.value
         assert value == normalize_utterance(value)
         return value
 
-    @transcription.setter
+    @transcription.setter  # type: ignore
     def transcription(self, value: str) -> None:
         # TODO: set current author.
         previous = self.transcription_history
         self.transcription_history = previous.derive(value, '<unknown author>')
+
+    @transcription.expression  # type: ignore
+    def transcription(cls):
+        return VersionedString.value
 
     @validates('translation')
     def validate_translation(self, _key, utterance):
