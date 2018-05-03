@@ -33,6 +33,7 @@ class Phrase(db.Model):  # type: ignore
 
     id = db.Column(db.Integer, primary_key=True)
 
+    # The transcription and translation is "versioned".
     transcription_id = db.Column(db.Text, db.ForeignKey('versioned_string.id'),
                                  nullable=False)
     transcription_history = db.relationship('VersionedString')
@@ -58,6 +59,18 @@ class Phrase(db.Model):  # type: ignore
                                                       author_name='<unknown>'),
             **kwargs
         )
+
+    @property
+    def transcription(self) -> str:
+        value = self.transcription_history.value
+        assert value == normalize_utterance(value)
+        return value
+
+    @transcription.setter
+    def transcription(self, value: str) -> None:
+        # TODO: set current author.
+        previous = self.transcription_history
+        self.transcription_history = previous.derive(value, '<unknown author>')
 
     @validates('translation')
     def validate_translation(self, _key, utterance):
@@ -157,11 +170,18 @@ class VersionedString(db.Model):  # type: ignore
     id = db.Column(db.String, primary_key=True)
     value = db.Column(db.Text, nullable=False)  # TODO: always normalize this!
 
-    # 'provenance' is simply the id of the first string in the series.
-    provenance = db.Column(db.String, db.ForeignKey('versioned_string.id'),
-                           nullable=False)
-    previous = db.Column(db.String, db.ForeignKey('versioned_string.id'),
-                         nullable=True)
+    # 'provenance' is simply the first string in the series.
+    provenance_id = db.Column(db.String, db.ForeignKey('versioned_string.id'),
+                              nullable=False)
+    previous_id = db.Column(db.String, db.ForeignKey('versioned_string.id'),
+                            nullable=True)
+
+    provenance = db.relationship('VersionedString',
+                                 foreign_keys=[provenance_id],
+                                 uselist=False)
+    previous = db.relationship('VersionedString',
+                               foreign_keys=[previous_id],
+                               uselist=False)
 
     # TODO: author as an entity
     author_name = db.Column(db.Text, nullable=False)
@@ -208,7 +228,7 @@ class VersionedString(db.Model):  # type: ignore
         # TODO: support for date.
         instance = type(self).new(value, author_name)
         instance.previous = self
-        instance.provenance = self.provenance
+        instance.provenance_id = self.provenance_id
         # Setting previous and provenance changed the hash,
         # so recompute it.
         instance.id = instance.compute_sha256hash()
@@ -226,7 +246,7 @@ class VersionedString(db.Model):  # type: ignore
 
         # This is the root version.
         instance.id = instance.compute_sha256hash()
-        instance.provenance = instance.id
+        instance.provenance_id = instance.id
         return instance
 
 
