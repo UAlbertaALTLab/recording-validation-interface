@@ -3,6 +3,10 @@
 
 # Copyright © 2018 Eddie Antonio Santos. All rights reserved.
 
+"""
+The data models for the validation app.
+"""
+
 from datetime import datetime
 from enum import Enum, auto
 from hashlib import sha256
@@ -19,6 +23,28 @@ from recval.normalization import normalize as normalize_utterance
 
 db = SQLAlchemy()
 Model = db.Model
+
+
+class RecordingQuality(Enum):
+    """
+    Tag describing the quality of a recording.
+    """
+    clean = auto()
+    unusable = auto()
+
+
+class ElicitationOrigin(Enum):
+    """
+    How the particular phrase got it into the database in the first place.
+    There are at least three sources:
+
+     - word in the Maskwacîs dictionary.
+     - word created using the Rapid Words methodology
+       (https://www.sil.org/dictionaries-lexicography/rapid-word-collection-methodology)
+     - word is in a sentence
+    """
+    maskwacîs = auto()
+    rapid_words = auto()
 
 
 class Phrase(db.Model):  # type: ignore
@@ -129,20 +155,6 @@ class Phrase(db.Model):  # type: ignore
         return value
 
 
-class ElicitationOrigin(Enum):
-    """
-    How the particular phrase got it into the database in the first place.
-    There are at least three sources:
-
-     - word in the Maskwacîs dictionary.
-     - word created using the Rapid Words methodology
-       (https://www.sil.org/dictionaries-lexicography/rapid-word-collection-methodology)
-     - word is in a sentence
-    """
-    maskwacîs = auto()
-    rapid_words = auto()
-
-
 class Word(Phrase):
     """
     A single word, with a translation.
@@ -161,9 +173,6 @@ class Word(Phrase):
     }
 
 
-# TODO: What about race-conditions?
-# Keep it ACID. Use transactions.
-
 class Sentence(Phrase):
     """
     An entire sentence, with a translation.
@@ -176,14 +185,6 @@ class Sentence(Phrase):
     __mapper_args__ = {
         'polymorphic_identity': 'sentence'
     }
-
-
-class RecordingQuality(Enum):
-    """
-    A tag regarding the quality of a recording.
-    """
-    clean = auto()
-    unusable = auto()
 
 
 class Recording(db.Model):  # type: ignore
@@ -233,7 +234,7 @@ class VersionedString(db.Model):  # type: ignore
 
     # TODO: validator for this.
     id = db.Column(db.String, primary_key=True)
-    value = db.Column(db.Text, nullable=False)  # TODO: always normalize this!
+    value = db.Column(db.Text, nullable=False)
 
     # 'provenance' is simply the first string in the series.
     provenance_id = db.Column(db.String, db.ForeignKey('versioned_string.id'),
