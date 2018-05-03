@@ -32,7 +32,12 @@ class Phrase(db.Model):  # type: ignore
     __tablename__ = 'phrase'
 
     id = db.Column(db.Integer, primary_key=True)
-    transcription = db.Column(db.Text, nullable=False)  # TODO: convert to VersionedString
+
+    transcription_id = db.Column(db.Text, db.ForeignKey('versioned_string.id'),
+                                 nullable=False)
+    transcription_history = db.relationship('VersionedString')
+
+    #transcription = db.Column(db.Text, nullable=False)  # TODO: convert to VersionedString
     translation = db.Column(db.Text, nullable=False)  # TODO: convert to VersionedString
     # Is this a word or a phrase?
     type = db.Column(db.Text, nullable=False)
@@ -46,12 +51,16 @@ class Phrase(db.Model):  # type: ignore
         'polymorphic_identity': None
     }
 
+    def __init__(self, *, transcription, **kwargs):
+        # Create versioned
+        super().__init__(
+            transcription_history=VersionedString.new(value=transcription,
+                                                      author_name='<unknown>'),
+            **kwargs
+        )
+
     @validates('translation')
     def validate_translation(self, _key, utterance):
-        return self.validate_utterance(utterance)
-
-    @validates('transcription')
-    def validate_transcription(self, _key, utterance):
         return self.validate_utterance(utterance)
 
     def update(self, field: str, value: str) -> 'Phrase':
@@ -138,23 +147,33 @@ class VersionedString(db.Model):  # type: ignore
     """
     A versioned string is is one with a history of what it used to be, and who
     said it.
+
+    The actual value of a versioned string is ALWAYS normalized.
     """
 
     __tablename__ = 'versioned_string'
 
     # TODO: validator for this.
     id = db.Column(db.String, primary_key=True)
+    value = db.Column(db.Text, nullable=False)  # TODO: always normalize this!
 
     # 'provenance' is simply the id of the first string in the series.
-    provenance = db.Column(db.String, db.ForeignKey('versioned_string.id'))
-    previous = db.Column(db.String, db.ForeignKey('versioned_string.id'))
+    provenance = db.Column(db.String, db.ForeignKey('versioned_string.id'),
+                           nullable=False)
+    previous = db.Column(db.String, db.ForeignKey('versioned_string.id'),
+                         nullable=True)
 
     # TODO: author as an entity
     author_name = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    value = db.Column(db.Text, nullable=False)  # TODO: always normalize this!
 
     # TODO: create index on provenance to get full history
+
+    @validates('value')
+    def validate_value(self, _key, utterance):
+        value = normalize_utterance(utterance)
+        assert len(value) > 0
+        return value
 
     def show(self) -> str:
         """
@@ -170,7 +189,7 @@ class VersionedString(db.Model):  # type: ignore
                 yield f"provenance {self.provenance}"
             if self.previous:
                 yield f"previous {self.previous}"
-            yield f"author {self.author}"
+            yield f"author {self.author_name}"
             yield f"date {self.timestamp:%Y-%m-%dT%H:%M:%S%z}"
             yield ''
             yield self.value
@@ -182,12 +201,12 @@ class VersionedString(db.Model):  # type: ignore
         """
         return sha256(self.show().encode('UTF-8')).hexdigest()
 
-    def derive(self, value: str, author: str) -> 'VersionedString':
+    def derive(self, value: str, author_name: str) -> 'VersionedString':
         """
-        Create a versioned string using this instance as its previous.
+        Create a versioned string using this instance as its previous value.
         """
-        assert self.provenance is not None
-        instance = type(self).new(value, author)
+        # TODO: support for date.
+        instance = type(self).new(value, author_name)
         instance.previous = self
         instance.provenance = self.provenance
         # Setting previous and provenance changed the hash,
@@ -196,13 +215,14 @@ class VersionedString(db.Model):  # type: ignore
         return instance
 
     @classmethod
-    def new(cls, value: str, author: str) -> 'VersionedString':
+    def new(cls, value: str, author_name: str) -> 'VersionedString':
         """
         Create a "root" versioned string.
         That is, it has no history, and its provenance is itself.
         """
         instance = cls(value=normalize_utterance(value),
-                       timestamp=datetime.utcnow())
+                       timestamp=datetime.utcnow(),
+                       author_name=author_name)
 
         # This is the root version.
         instance.id = instance.compute_sha256hash()
