@@ -86,22 +86,14 @@ def test_transcription_update(db):
     assert word.transcription == 'acimosis'
 
 
-def test_translation_history(db):
+def test_translation_history(db, acimosis):
     """
     Checks that the translation has a history, and that updating the
     translation updates the history.
     """
 
-    word = Word(transcription='acîmosis', translation=' puppy  ')
-    recording = Recording.new(phrase=word, input_file=TEST_WAV, speaker='NIL')
-    # Insert it for the first time.
-    db.session.add(recording)
-    db.session.commit()
-    word_id = word.id
-    del word
-
     # In another instance, fetch the word.
-    word = Word.query.filter(Word.id == word_id).one()
+    word = Word.query.filter(Word.id == acimosis).one()
     assert word.translation == 'puppy'
 
     # Now, check its history.
@@ -114,7 +106,7 @@ def test_translation_history(db):
     del word
 
     # Refetch it.
-    word = Word.query.filter_by(id=word_id).one()
+    word = Word.query.filter_by(id=acimosis).one()
     assert word.translation == 'smol doggo'
 
     # Get the entire translation history.
@@ -127,11 +119,32 @@ def test_translation_history(db):
     del word
 
     # Fetch it one last time.
-    word = Word.query.filter_by(id=word_id).one()
+    word = Word.query.filter_by(id=acimosis).one()
     # It should be back to puppy.
     assert word.translation == 'puppy'
     assert not word.translation_meta.is_root
     assert len(word.translation_history) == 3
+
+
+def test_mark_recordings(db):
+    """
+    Tests the ability to mark recordings as usable/unusable.
+    """
+
+
+
+
+@pytest.fixture()
+def acimosis(db):
+    """
+    Inserts the word 'acimosis'/'puppy' into the database.
+    """
+    word = Word(transcription='acîmosis', translation=' puppy  ')
+    recording = Recording.new(phrase=word, input_file=TEST_WAV, speaker='NIL')
+    # Insert it for the first time.
+    db.session.add(recording)
+    db.session.commit()
+    return word.id
 
 
 @pytest.fixture()
