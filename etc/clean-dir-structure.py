@@ -43,13 +43,11 @@ True
 """
 
 import re
-from typing import NamedTuple, Optional
-from typing import TypeVar, Callable, Match, AnyStr
-from pathlib import Path
-from enum import Enum, auto
 from datetime import date as datetype
 from datetime import datetime
-
+from enum import Enum, auto
+from pathlib import Path
+from typing import AnyStr, Callable, Match, NamedTuple, Optional, TypeVar
 
 # Pattern that tries to match and parse most folder names.
 directory_pattern = re.compile(r'''
