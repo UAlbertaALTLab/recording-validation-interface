@@ -103,3 +103,9 @@ ENV/
 
 # pytest
 .pytest_cache/
+
+# PyCharm
+.idea
+
+# Local stuff
+*.db
