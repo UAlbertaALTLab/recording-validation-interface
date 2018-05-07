@@ -91,10 +91,12 @@ class TimeOfDay(Enum):
 
 
 class Location(Enum):
-    KITCHEN = 'KCH'
-    OFFICE = 'OFF'
-    DOWNSTAIRS = 'DS'
-    UPSTAIRS = 'US'
+    # For the first three years of recording:
+    DOWNSTAIRS = 'DS'  # Downstairs in Sohki house
+    UPSTAIRS = 'US'  # Upstairs in Sohki house
+    # For the last academic year of recording:
+    KITCHEN = 'KCH'  # Kitchen in Miyo head office
+    OFFICE = 'OFF'  # Office in Miyo head office
 
     @staticmethod
     def parse(text: str) -> 'Location':
