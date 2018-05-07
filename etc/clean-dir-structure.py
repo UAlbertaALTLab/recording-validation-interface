@@ -5,6 +5,8 @@
 """
 Cleans up the directory structure for recording sessions.
 
+Unit tests:
+
 >>> Session.from_name('sagiesbr-annotations2') is None
 True
 >>> s = Session.from_name('2018-01-24am2-kch')
@@ -48,6 +50,7 @@ from datetime import date as datetype
 from datetime import datetime
 
 
+# Pattern that tries to match and parse most folder names.
 directory_pattern = re.compile(r'''
     \A
     (?P<isodate>
@@ -154,50 +157,17 @@ class Session(NamedTuple):
         return f"{self.date:%Y-%m-%d}-{time}-{loc}-{subsesh:1d}"
         
 
-
-def resolve_bad_name(filename: str) -> Optional[Session]:
-    return {
-        '2017-04-20om-ds': Session(date=datetype(2017, 4, 20),
-                                   subsession=None,
-                                   time_of_day=TimeOfDay.AFTERNOON,
-                                   location=Location.DOWNSTAIRS),
-    }.get(filename, None)
-
-
-def resolve_exception(filename: str) -> Optional[Session]:
-    return {
-        '2014-04-25-Maskwacis': None,
-        '2017-02-16USAM': None,
-    }.get(filename, None)
-
-
-def find_session_dirs():
-    """
-    Return a list of pairs of (Path, Session).
-    """
-    sessions = []
-    for entry in Path('.').iterdir():
-        if not entry.is_dir():
-            continue
-
-        try:
-            sesh = (
-                Session.from_name(entry.stem) or
-                resolve_bad_name(entry.stem)
-            )
-        except ValueError:
-            log('Exceptional session name:', entry.stem)
-            sesh = resolve_exception(entry.stem)
-
-        if not sesh:
-            log('Not a valid session:', entry.stem)
-            continue
-
-        sessions.append((entry, sesh))
-    return sessions
-        
-
 def main():
+    """
+    Finds all directories that look like sessions, and reorganizes them into
+    sessions/.
+    """
+    cwd = Path('.')
+    assert cwd.resolve() == Path('/data/av/backup-mwe'), (
+        "I'm expecting this script to run in backup-mwe, "
+        f"but I'm actually in {cwd}"
+    )
+
     sessions = find_session_dirs()
 
     out_dir = Path('.') / 'sessions'
@@ -209,6 +179,92 @@ def main():
         except FileExistsError:
             log("Will not overwrite duplicate session:", original_path)
             continue
+
+
+# Files to explicilty ignore.
+IGNORE = (
+    '2014-04-25-Maskwacis',  # XXX: add to exceptions?
+    '2014-06-16-Maskwacis', # XXX: add to exceptions?
+    '2014-12-09-Maskwacis',  # XXX: add to exceptions?
+    '2015-02-09_English_snow',  # XXX: add to exceptions?
+    '2015-03-18-Maskwacis',  # XXX: add to exceptions?
+    '2016-11-18_est',  # XXX: add to exceptions?
+    '2016-11-amDS',  # XXX: add to exceptions
+    '2017-05-04amUSPM',  # XXX: add to exceptions?
+    '2017-07-15ETHNOBOTANY',  # XXX: add to exceptions?
+    '2017-11-08am-OFF',  # Uppercase duplicate of 2017-11-08am-OFF
+    '2017-11-08pm-OFF',  # Uppercase duplicate of 2017-11-08am-OFF
+    '2017-10-25am-KCH',  # Duplicate of 2017-10-25am-kit
+    '2017-10-25-pm-KCH',  # Duplicate of 2017-10-25i-pm-kit
+    '2015-09-21am1_data',
+    '2015-09-21am2_data',
+    'AdvancedCreeRecordings',
+    'ahtest',
+    'ANNOTATION2015-05-05am',
+    'badmeg_annotations',
+    'mjerry-annotations',
+    'mjtest',
+    'My Passport for Mac 1',
+    'PsalmRaw',
+    '__pycache__',
+    'sagiesbr-annotations',
+    'sagiesbr-annotations2',
+    'sessions',
+    'test',
+    'test123',
+    'test2',
+    'tim-clean',
+    'treule_annotations',
+)
+
+# Files that require special handling.
+EXCEPTIONS = {
+    '2016-02-16USPM':   Session.from_name('2016-02-16PM-US'),
+    '2016-10-24pmB-US': Session.from_name('2016-10-24PM2-US'),
+    '2016-10-24pmC-US': Session.from_name('2016-10-24PM3-US'),
+    '2016-10-31pmDS2':  Session.from_name('2016-10-31PM2-DS'),
+    '2016-11-28am-US2': Session.from_name('2016-11-28AM2-US'),
+    '2016-11-28am-US3': Session.from_name('2016-11-28AM3-US'),
+    '2016-11-28pm-US2': Session.from_name('2016-11-28PM2-US'),
+    '2017-01-19-DS-am': Session.from_name('2017-01-19AM-DS'),
+    '2017-01-19-DS-pm': Session.from_name('2017-01-19PM-DS'),
+    '2017-02-02USAM':   Session.from_name('2017-02-02AM-US'),
+    '2017-02-02USPM':   Session.from_name('2017-02-02PM-US'),
+    '2017-02-16USAM':   Session.from_name('2017-02-16AM-US'),
+    '2017-02-16USAM':   Session.from_name('2017-02-16AM-US'),
+    '2017-03-09USam':   Session.from_name('2017-03-09AM-US'),
+    '2017-03-09USpm':   Session.from_name('2017-03-09PM-US'),
+    '2017-04-20om-ds':  Session.from_name('2017-04-20PM-DS'),
+}
+
+
+def find_session_dirs():
+    """
+    Return a list of pairs of (Path, Session).
+    """
+    sessions = []
+    for entry in Path('.').iterdir():
+        filename = entry.stem
+        if not entry.is_dir():
+            continue
+
+        if filename in IGNORE:
+            continue
+        elif filename in EXCEPTIONS:
+            sesh = EXCEPTIONS[filename]
+        else:
+            try:
+                sesh = Session.from_name(filename)
+            except ValueError:
+                log(f"invalid name:", repr(filename))
+                raise
+
+        if not sesh:
+            raise ValueError(f'Not a valid session: {filename!r}')
+
+        sessions.append((entry, sesh))
+    return sessions
+        
 
 
 def log(*args, **kwargs):
