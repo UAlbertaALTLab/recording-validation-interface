@@ -44,6 +44,7 @@ True
 
 import re
 from typing import NamedTuple, Optional
+from typing import TypeVar, Callable, Match, AnyStr
 from pathlib import Path
 from enum import Enum, auto
 from datetime import date as datetype
@@ -134,13 +135,12 @@ class Session(NamedTuple):
         m = directory_pattern.match(directory_name)
         if m is None:
             return None
-        
+
         # Parse out all the things into appropriate datatypes.
         date = datetime.strptime(m.group('isodate'), '%Y-%m-%d').date()
-        time_of_day = (m.group('time_of_day') and
-                       TimeOfDay.parse(m.group('time_of_day')))
-        subsession = m.group('subsession') and int(m.group('subsession'))
-        location = m.group('location') and Location.parse(m.group('location'))
+        time_of_day = apply_or_none(TimeOfDay.parse, m.group('time_of_day'))
+        subsession = apply_or_none(int, m.group('subsession'))
+        location = apply_or_none(Location.parse, m.group('location'))
 
         return cls(date=date,
                    time_of_day=time_of_day,
@@ -155,7 +155,20 @@ class Session(NamedTuple):
         loc = (self.location and self.location.value) or '___'
         subsesh = self.subsession or 0
         return f"{self.date:%Y-%m-%d}-{time}-{loc}-{subsesh:1d}"
-        
+
+
+T = TypeVar('T')
+
+
+def apply_or_none(fn: Callable[[AnyStr], T],
+                  match: Optional[AnyStr]) -> Optional[T]:
+    """
+    Applies fn to the match ONLY if the match is not None.
+    """
+    if match is not None:
+        return fn(match)
+    return None
+
 
 def main():
     """
@@ -184,7 +197,7 @@ def main():
 # Files to explicilty ignore.
 IGNORE = (
     '2014-04-25-Maskwacis',  # XXX: add to exceptions?
-    '2014-06-16-Maskwacis', # XXX: add to exceptions?
+    '2014-06-16-Maskwacis',  # XXX: add to exceptions?
     '2014-12-09-Maskwacis',  # XXX: add to exceptions?
     '2015-02-09_English_snow',  # XXX: add to exceptions?
     '2015-03-18-Maskwacis',  # XXX: add to exceptions?
@@ -264,7 +277,6 @@ def find_session_dirs():
 
         sessions.append((entry, sesh))
     return sessions
-        
 
 
 def log(*args, **kwargs):
@@ -275,5 +287,4 @@ def log(*args, **kwargs):
 
 if __name__ == '__main__':
     main()
-
 # vim: set ts=4 sw=4 sts=4 et:
