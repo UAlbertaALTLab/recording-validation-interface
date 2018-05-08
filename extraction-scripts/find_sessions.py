@@ -11,12 +11,14 @@ import logging
 import re
 from pathlib import Path
 from decimal import Decimal
+from typing import Dict
 
 from pydub import AudioSegment  # type: ignore
 from textgrid import TextGrid  # type: ignore
-from slugify import slugify
+from slugify import slugify  # type: ignore
 
 from recval.normalization import normalize
+from recval.recording_session import RecordingSession
 
 
 here = Path('.')
@@ -42,7 +44,7 @@ english_pattern = re.compile(r'\b(?:english|eng|en)\b', re.IGNORECASE)
 
 def extract_items(sound: AudioSegment,
                   text_grid: TextGrid,
-                  session: str,  # Something like "2015-05-05am"
+                  session: RecordingSession,
                   speaker: str,  # Something like "ABC"
                   ) -> None:
     assert len(text_grid.tiers) >= 2, "TextGrid has too few tiers"
@@ -132,6 +134,9 @@ def to_milliseconds(seconds: Decimal) -> int:
 
 
 class RecordingExtractor:
+    def __init__(self) -> None:
+        self.sessions: Dict[RecordingSession, Path] = {}
+
     def scan(self, root_directory: Path) -> None:
         """
         Scans the directory provided for sessions.
@@ -144,12 +149,15 @@ class RecordingExtractor:
             if not session_dir.resolve().is_dir():
                 info(' ... rejecting %s; not a directory', session_dir)
                 continue
-            # TODO: get session
             # TODO: make sure we haven't yet seen this session!
             self.extract_session(session_dir)
 
-    # def extract_session(self, session_dir: Path, session: RecordingSession) -> None:
     def extract_session(self, session_dir: Path) -> None:
+        session = RecordingSession.from_name(session_dir.stem)
+        if session in self.sessions:
+            raise RuntimeError(f"Duplicate session: {session} "
+                               f"found at {self.sessions[session]}")
+
         info(' ... Scanning %s for .TextGrid files', session_dir)
         text_grids = list(session_dir.glob('*.TextGrid'))
         info(' ... %d text grids', len(text_grids))
@@ -165,7 +173,6 @@ class RecordingExtractor:
             info(' ... ... Matching sound file for %s', text_grid)
 
             # TODO: get speaker from the session-codes table?
-            session = session_dir.stem
             speaker = '???'
 
             info(' ... ... Extract items from %s using speaker ID %s',
@@ -174,7 +181,6 @@ class RecordingExtractor:
             extract_items(AudioSegment.from_file(str(sound_file)),
                           TextGrid.fromFile(str(text_grid)),
                           session, speaker)
-
 
 
 if __name__ == '__main__':
