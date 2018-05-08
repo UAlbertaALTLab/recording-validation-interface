@@ -14,9 +14,10 @@ from flask import (  # type: ignore
     Flask, abort, url_for, render_template, send_from_directory, redirect,
     request
 )
+from sqlalchemy.orm import subqueryload  # type: ignore
 from werkzeug.exceptions import NotFound  # type: ignore
 
-from recval.model import db, Word, Sentence, Recording, VersionedString
+from recval.model import db, Phrase
 
 # Configure from default settings, then the file specifeied by the environment
 # variable.

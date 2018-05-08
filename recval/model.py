@@ -15,7 +15,7 @@ from pathlib import Path
 
 from flask import current_app, url_for  # type: ignore
 from flask_sqlalchemy import SQLAlchemy  # type: ignore
-from sqlalchemy.orm import subqueryload, validates  # type: ignore
+from sqlalchemy.orm import validates  # type: ignore
 from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
 
 from recval.normalization import normalize as normalize_utterance
