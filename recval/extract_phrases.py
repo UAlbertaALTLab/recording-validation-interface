@@ -6,7 +6,6 @@
 #  - extract_items.praat
 #  - extract_sessions.praat
 
-import argparse
 import logging
 import re
 from decimal import Decimal
@@ -15,22 +14,14 @@ from pathlib import Path
 from typing import Dict, NamedTuple
 
 from pydub import AudioSegment  # type: ignore
-from slugify import slugify  # type: ignore
 from textgrid import IntervalTier, TextGrid  # type: ignore
 
 from recval.normalization import normalize
 from recval.recording_session import RecordingSession
 
-here = Path('.')
 logger = logging.getLogger(__name__)
 info = logger.info
 warn = logger.warn
-
-parser = argparse.ArgumentParser()
-parser.add_argument('master_directory', default=here, type=Path,
-                    help='Where to look for session folders')
-parser.add_argument('session_codes', default=here / 'speaker-codes.csv', type=Path,
-                    help='A TSV that contains codes for sessions...?', nargs='?')
 
 
 class RecordingInfo(NamedTuple):
@@ -233,18 +224,3 @@ def to_milliseconds(seconds: Decimal) -> int:
     Converts interval times to an integer in milliseconds.
     """
     return int(seconds * 1000)
-
-
-if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
-    args = parser.parse_args()
-
-    # TODO: read session-codes?
-    scanner = RecordingExtractor()
-    for recording, audio in scanner.scan(root_directory=args.master_directory):
-        info(" ... ... ... Exporting:\n%s", recording.signature())
-        r = recording
-        # Export it.
-        slug = slugify(f"{r.type}-{r.transcription}-{r.session}-{r.speaker}-{r.timestamp}",
-                       to_lower=True)
-        audio.export(str(Path('/tmp') / f"{slug}.wav"))
