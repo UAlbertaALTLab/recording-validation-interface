@@ -148,6 +148,7 @@ class Phrase(db.Model):  # type: ignore
         setattr(self, field, normalized_value)
         return self
 
+    # TODO: remove this:
     @staticmethod
     def validate_utterance(utterance):
         value = normalize_utterance(utterance)
@@ -206,13 +207,15 @@ class Recording(db.Model):  # type: ignore
     phrase = db.relationship('Phrase', back_populates='recordings')
 
     @classmethod
-    def new(cls, phrase: Phrase, input_file: Path, speaker: str=None) -> 'Recording':
+    def new(cls, phrase: Phrase, input_file: Path, speaker: str=None,
+            fingerprint: str=None) -> 'Recording':
         """
         Create a new recording and transcode it for distribution.
         """
         assert input_file.exists()
-        fingerprint = compute_fingerprint(input_file)
-        transcode_to_aac(input_file, fingerprint)
+        if fingerprint is None:
+            fingerprint = compute_fingerprint(input_file)
+            transcode_to_aac(input_file, fingerprint)
         return cls(fingerprint=fingerprint,
                    phrase=phrase,
                    speaker=speaker)
