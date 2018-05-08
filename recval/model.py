@@ -342,6 +342,7 @@ def transcode_to_aac(recording_path: Path, fingerprint: str) -> None:
     Transcodes .wav files to .aac files.
     TODO: Factor this out!
     """
+    # TODO: use pydub instead of some gnarly sh command.
     from sh import ffmpeg  # type: ignore
     assert recording_path.exists(), f"Could not stat {recording_path}"
     assert len(fingerprint) == 64, f"expected fingerprint: {fingerprint!r}"
