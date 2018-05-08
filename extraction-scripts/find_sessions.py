@@ -9,18 +9,17 @@
 import argparse
 import logging
 import re
-from pathlib import Path
 from decimal import Decimal
-from typing import Dict, NamedTuple
 from hashlib import sha256
+from pathlib import Path
+from typing import Dict, NamedTuple
 
 from pydub import AudioSegment  # type: ignore
-from textgrid import TextGrid, IntervalTier  # type: ignore
 from slugify import slugify  # type: ignore
+from textgrid import IntervalTier, TextGrid  # type: ignore
 
 from recval.normalization import normalize
 from recval.recording_session import RecordingSession
-
 
 here = Path('.')
 logger = logging.getLogger(__name__)
@@ -71,7 +70,7 @@ class RecordingExtractor:
     def __init__(self) -> None:
         self.sessions: Dict[RecordingSession, Path] = {}
 
-    def scan(self, root_directory: Path) -> None:
+    def scan(self, root_directory: Path):
         """
         Scans the directory provided for sessions.
 
@@ -85,7 +84,7 @@ class RecordingExtractor:
                 continue
             yield from self.extract_session(session_dir)
 
-    def extract_session(self, session_dir: Path) -> None:
+    def extract_session(self, session_dir: Path):
         session = RecordingSession.from_name(session_dir.stem)
         if session in self.sessions:
             raise RuntimeError(f"Duplicate session: {session} "
@@ -123,6 +122,7 @@ WORD_TIER_CREE = 1
 SENTENCE_TIER_ENGLISH = 2
 SENTENCE_TIER_CREE = 3
 
+
 class PhraseExtractor:
     """
     Extracts recorings from a session directory.
@@ -138,7 +138,7 @@ class PhraseExtractor:
         self.text_grid = text_grid
         self.speaker = speaker
 
-    def extract_all(self) -> None:
+    def extract_all(self):
         assert len(self.text_grid.tiers) >= 4, "TextGrid has too few tiers"
 
         info(' ... ... extracting words')
@@ -221,10 +221,11 @@ english_pattern = re.compile(r'\b(?:english|eng|en)\b', re.IGNORECASE)
 
 
 def is_english_tier(tier: IntervalTier) -> bool:
-    return english_pattern.search(tier.name)
+    return bool(english_pattern.search(tier.name))
+
 
 def is_cree_tier(tier: IntervalTier) -> bool:
-    return cree_pattern.search(tier.name)
+    return bool(cree_pattern.search(tier.name))
 
 
 def to_milliseconds(seconds: Decimal) -> int:
