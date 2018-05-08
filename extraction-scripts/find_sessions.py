@@ -8,7 +8,7 @@ import argparse
 import logging
 from pathlib import Path
 
-from textgrid import TextGrid
+from textgrid import TextGrid  # type: ignore
 
 from recval.normalization import normalize
 
@@ -123,8 +123,6 @@ if __name__ == '__main__':
             info('... ... Extract items from %s using speaker ID %s', sound_file,
                  speaker)
 
-            # TODO: "select" sound ID
-            # TODO: "select" annotation ID
             extract_items(sound_file,
                           TextGrid.fromFile(str(text_grid)),
                           args.word_directory, args.sentence_directory,
