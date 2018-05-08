@@ -12,6 +12,7 @@ import re
 from pathlib import Path
 from decimal import Decimal
 from typing import Dict, NamedTuple
+from hashlib import sha256
 
 from pydub import AudioSegment  # type: ignore
 from textgrid import TextGrid, IntervalTier  # type: ignore
@@ -44,8 +45,22 @@ class RecordingInfo(NamedTuple):
     timestamp: str
     transcription: str
     translation: str
-    # TODO: create manifest
-    # TODO: create sha256hash of manifest
+
+    def signature(self) -> str:
+        return (
+            f"session: {self.session}\n"
+            f"speaker: {self.speaker}\n"
+            f"timestamp: {self.timestamp}\n"
+            f"{self.type}: {self.transcription}\n"
+            "\n"
+            f"{self.translation}\n"
+        )
+
+    def compute_sha256hash(self) -> str:
+        """
+        Compute a hash that can be used as a ID for this recording.
+        """
+        return sha256(self.signature().encode('UTF-8')).hexdigest()
 
 
 class RecordingExtractor:
@@ -68,7 +83,7 @@ class RecordingExtractor:
             if not session_dir.resolve().is_dir():
                 info(' ... rejecting %s; not a directory', session_dir)
                 continue
-            self.extract_session(session_dir)
+            yield from self.extract_session(session_dir)
 
     def extract_session(self, session_dir: Path) -> None:
         session = RecordingSession.from_name(session_dir.stem)
@@ -100,7 +115,7 @@ class RecordingExtractor:
                                         AudioSegment.from_file(str(sound_file)),
                                         TextGrid.fromFile(str(text_grid)),
                                         speaker)
-            extractor.extract_all()
+            yield from extractor.extract_all()
 
 
 WORD_TIER_ENGLISH = 0
@@ -124,31 +139,25 @@ class PhraseExtractor:
         self.speaker = speaker
 
     def extract_all(self) -> None:
-        assert len(self.text_grid.tiers) >= 2, "TextGrid has too few tiers"
+        assert len(self.text_grid.tiers) >= 4, "TextGrid has too few tiers"
 
         info(' ... ... extracting words')
-        self.extract_words(cree_tier=self.text_grid.tiers[WORD_TIER_CREE],
-                           english_tier=self.text_grid.tiers[WORD_TIER_ENGLISH])
+        yield from self.extract_words(
+            cree_tier=self.text_grid.tiers[WORD_TIER_CREE],
+            english_tier=self.text_grid.tiers[WORD_TIER_ENGLISH]
+        )
 
         info(' ... ... extracting sentences')
-        self.extract_sentences(
+        yield from self.extract_sentences(
             cree_tier=self.text_grid.tiers[SENTENCE_TIER_CREE],
             english_tier=self.text_grid.tiers[SENTENCE_TIER_ENGLISH]
         )
 
     def extract_words(self, cree_tier, english_tier):
-        self.extract_phrases('word', cree_tier, english_tier)
+        yield from self.extract_phrases('word', cree_tier, english_tier)
 
     def extract_sentences(self, cree_tier, english_tier):
-        self.extract_phrases('sentence', cree_tier, english_tier)
-
-    def timestamp_within_sentence(self, timestamp: Decimal):
-        """
-        Return True when the timestamp is found inside a Cree sentence.
-        """
-        sentences = self.text_grid.tiers[SENTENCE_TIER_CREE]
-        sentence = sentences.intervalContaining(timestamp)
-        return sentence and sentence.mark != ''
+        yield from self.extract_phrases('sentence', cree_tier, english_tier)
 
     def extract_phrases(self, _type: str,
                         cree_tier: IntervalTier, english_tier: IntervalTier):
@@ -181,12 +190,31 @@ class PhraseExtractor:
             # tmills: normalize sound levels (some speakers are very quiet)
             sound_bite.normalize(headroom=0.1)  # dB
 
-            # Export it.
-            slug = slugify(f"{_type}-{transcription}-{self.session}-{self.speaker}-{start}",
-                           to_lower=True)
-            sound_bite.export(str(Path('/tmp') / f"{slug}.wav"))
+            yield self.info_for(_type, transcription, translation,
+                                start, sound_bite)
 
-            # TODO: yield word
+    def info_for(self, _type, transcription, translation, timestamp,
+                 sound_bite):
+        """
+        Return a tuple of the phrase and its audio.
+        """
+        assert _type in ('word', 'sentence')
+        info = RecordingInfo(session=self.session,
+                             speaker=self.speaker,
+                             type=_type,
+                             timestamp=timestamp,
+                             transcription=transcription,
+                             translation=translation)
+        return info, sound_bite
+
+    def timestamp_within_sentence(self, timestamp: Decimal):
+        """
+        Return True when the timestamp is found inside a Cree sentence.
+        """
+        sentences = self.text_grid.tiers[SENTENCE_TIER_CREE]
+        sentence = sentences.intervalContaining(timestamp)
+        return sentence and sentence.mark != ''
+
 
 cree_pattern = re.compile(r'\b(?:cree|crk)\b', re.IGNORECASE)
 english_pattern = re.compile(r'\b(?:english|eng|en)\b', re.IGNORECASE)
@@ -212,4 +240,10 @@ if __name__ == '__main__':
 
     # TODO: read session-codes?
     scanner = RecordingExtractor()
-    scanner.scan(root_directory=args.master_directory)
+    for recording, audio in scanner.scan(root_directory=args.master_directory):
+        info(" ... ... ... Exporting:\n%s", recording.signature())
+        r = recording
+        # Export it.
+        slug = slugify(f"{r.type}-{r.transcription}-{r.session}-{r.speaker}-{r.timestamp}",
+                       to_lower=True)
+        audio.export(str(Path('/tmp') / f"{slug}.wav"))
