@@ -133,37 +133,48 @@ def to_milliseconds(seconds: Decimal) -> int:
 
 class RecordingExtractor:
     def scan(self, root_directory: Path) -> None:
+        """
+        Scans the directory provided for sessions.
+
+        For each session directory found, its TextGrid/.wav file pairs are
+        scanned for words and sentences.
+        """
         info('Scanning %s for sessions...', root_directory)
         for session_dir in root_directory.iterdir():
             if not session_dir.resolve().is_dir():
                 info(' ... rejecting %s; not a directory', session_dir)
                 continue
+            # TODO: get session
+            # TODO: make sure we haven't yet seen this session!
+            self.extract_session(session_dir)
 
-            info(' ... Scanning %s for .TextGrid files', session_dir)
-            text_grids = list(session_dir.glob('*.TextGrid'))
-            info(' ... %d text grids', len(text_grids))
+    # def extract_session(self, session_dir: Path, session: RecordingSession) -> None:
+    def extract_session(self, session_dir: Path) -> None:
+        info(' ... Scanning %s for .TextGrid files', session_dir)
+        text_grids = list(session_dir.glob('*.TextGrid'))
+        info(' ... %d text grids', len(text_grids))
+        for text_grid in text_grids:
+            sound_file = text_grid.with_suffix('.wav')
+            # TODO: tmill's kludge for certain missing filenames???
+            if not sound_file.exists():
+                warn(' ... ... could not find cooresponding audio for %s',
+                     text_grid)
+                continue
 
-            for text_grid in text_grids:
-                sound_file = text_grid.with_suffix('.wav')
-                # TODO: tmill's kludge for certain missing filenames???
-                if not sound_file.exists():
-                    warn(' ... ... could not find cooresponding audio for %s',
-                         text_grid)
-                    continue
+            assert text_grid.exists() and sound_file.exists()
+            info(' ... ... Matching sound file for %s', text_grid)
 
-                assert text_grid.exists() and sound_file.exists()
-                info(' ... ... Matching sound file for %s', text_grid)
+            # TODO: get speaker from the session-codes table?
+            session = session_dir.stem
+            speaker = '???'
 
-                # TODO: get speaker from the session-codes table?
-                session = session_dir.stem
-                speaker = '???'
+            info(' ... ... Extract items from %s using speaker ID %s',
+                 sound_file, speaker)
 
-                info(' ... ... Extract items from %s using speaker ID %s',
-                     sound_file, speaker)
+            extract_items(AudioSegment.from_file(str(sound_file)),
+                          TextGrid.fromFile(str(text_grid)),
+                          session, speaker)
 
-                extract_items(AudioSegment.from_file(str(sound_file)),
-                              TextGrid.fromFile(str(text_grid)),
-                              session, speaker)
 
 
 if __name__ == '__main__':
