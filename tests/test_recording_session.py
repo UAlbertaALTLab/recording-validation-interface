@@ -44,3 +44,8 @@ def test_time_of_day_missing():
     assert s.time_of_day is None
     assert s.location is Location.OFFICE
     assert s.as_filename() == '2016-01-18-__-OFF-0'
+
+
+def test_str_is_same_as_filename():
+    s = RecordingSession.from_name('2016-01-18-AM-OFF-0')
+    assert str(s) == s.as_filename()

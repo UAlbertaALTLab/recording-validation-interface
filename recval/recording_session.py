@@ -135,6 +135,8 @@ class RecordingSession(NamedTuple):
         subsesh = self.subsession or 0
         return f"{self.date:%Y-%m-%d}-{time}-{loc}-{subsesh:1d}"
 
+    def __str__(self) -> str:
+        return self.as_filename()
 
 T = TypeVar('T')
 
