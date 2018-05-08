@@ -148,13 +148,6 @@ class Phrase(db.Model):  # type: ignore
         setattr(self, field, normalized_value)
         return self
 
-    # TODO: remove this:
-    @staticmethod
-    def validate_utterance(utterance):
-        value = normalize_utterance(utterance)
-        assert len(value) > 0
-        return value
-
 
 class Word(Phrase):
     """
