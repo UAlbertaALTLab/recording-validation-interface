@@ -5,6 +5,22 @@
 """
 Cleans up the directory structure for recording sessions.
 
+Dumps the cleaned up names in ./samples/
+
+This script works by iterating through ALL of the diretories in the current
+working directory, minus the ones in the IGNORE list (see below) and tries to
+parse the name of each directory as a session name. The session names are
+roughly in a parseable manner, but they are not especially consistent over
+time. As a result, there is an EXCEPTION list that is checked before to return
+an explicit session.
+
+The sessions are collected, and symbolic links are created to the true
+directories.
+
+**This script makes no attempt to rename or overwrite existing data!***
+
+---
+
 Unit tests:
 
 >>> Session.from_name('sagiesbr-annotations2') is None
@@ -131,7 +147,7 @@ class Session(NamedTuple):
         return self.date.day
 
     @classmethod
-    def from_name(cls, directory_name: str) -> 'Session':
+    def from_name(cls, directory_name: str) -> Optional['Session']:
         m = directory_pattern.match(directory_name)
         if m is None:
             return None
@@ -164,6 +180,8 @@ def apply_or_none(fn: Callable[[AnyStr], T],
                   match: Optional[AnyStr]) -> Optional[T]:
     """
     Applies fn to the match ONLY if the match is not None.
+
+    This is similar to >>= from Haskell.
     """
     if match is not None:
         return fn(match)
