@@ -2,10 +2,13 @@
 # -*- coding: UTF-8 -*-
 
 # Copyright © 2018 Eddie Antonio Santos. All rights reserved.
-# Derived from a Praat script by Timothy Mills
+# Derived from Praat scripts written by Timothy Mills
+#  - extract_items.praat
+#  - extract_sessions.praat
 
 import argparse
 import logging
+import re
 from pathlib import Path
 from decimal import Decimal
 
@@ -14,6 +17,7 @@ from textgrid import TextGrid  # type: ignore
 from slugify import slugify
 
 from recval.normalization import normalize
+
 
 here = Path('.')
 logger = logging.getLogger(__name__)
@@ -38,6 +42,9 @@ WORD_TIER_CREE = 1
 SENTENCE_TIER_ENGLISH = 2
 SENTENCE_TIER_CREE = 3
 
+cree_pattern = re.compile(r'\b(?:cree|crk)\b', re.IGNORECASE)
+english_pattern = re.compile(r'\b(?:english|eng|en)\b', re.IGNORECASE)
+
 
 def extract_items(sound: AudioSegment,
                   text_grid: TextGrid,
@@ -50,18 +57,21 @@ def extract_items(sound: AudioSegment,
                   ) -> None:
     sentence_save = sentence_directory / sentence_filename
     word_save = word_directory / word_filename
-    # TODO: select the sound and the text grid
-
-    # Not required: counting words and sentences extracted
 
     assert len(text_grid.tiers) >= 2, "TextGrid has too few tiers"
-    # TODO: Ensure the name of the tier contains \bCREE\b or \bCrk\b.
-    cree_words_intervals = text_grid.tiers[WORD_TIER_CREE]
-    # TODO: Ensure the name of the tier contains \bEnglish\b, \beng\b or \ben\b.
-    english_words_intervals = text_grid.tiers[WORD_TIER_ENGLISH]
 
-    for interval in cree_words_intervals:
-        if not interval.mark:
+    cree_word_intervals = text_grid.tiers[WORD_TIER_CREE]
+    assert cree_pattern.search(cree_word_intervals.name)
+
+    english_word_intervals = text_grid.tiers[WORD_TIER_ENGLISH]
+    assert english_pattern.search(english_word_intervals.name)
+
+    cree_sentence_intervals = text_grid.tiers[SENTENCE_TIER_CREE]
+    assert cree_pattern.search(cree_sentence_intervals.name)
+
+    info(' ... ... extracting words')
+    for interval in cree_word_intervals:
+        if not interval.mark or interval.mark.strip() == '':
             # This interval is empty, for some reason.
             continue
 
@@ -70,30 +80,67 @@ def extract_items(sound: AudioSegment,
         start = to_milliseconds(interval.minTime)
         end = to_milliseconds(interval.maxTime)
         midtime = (interval.minTime + interval.maxTime) / 2
-        # TODO: determine if it's an isolated word or an example sentence
-        # TODO: Get interval at time sentenceTierCree, midTime
-        # TODO: get sentence label
 
-        is_word = True
-        if is_word:
-            # Get english gloss
-            english_interval = english_words_intervals.intervalContaining(midtime)
-            translation = normalize(english_interval.mark)
+        # Figure out if this word belongs to a sentence.
+        sentence = cree_sentence_intervals.intervalContaining(midtime)
+        is_sentence = sentence and sentence.mark != ''
 
-            # Snip out the sounds.
-            sound_bite = sound[start:end]
-            # tmills: normalize sound levels (some speakers are very quiet)
-            sound_bite.normalize(headroom=0.1)  # dB
+        if is_sentence:
+            # It's an example sentence; leave it for the next loop.
+            continue
 
-            # Export it.
-            slug = slugify(f"{transcription}-{session}-{speaker}-{start}",
-                           to_lower=True)
-            sound_bite.export(str(Path('/tmp') / f"{slug}.wav"))
+        # Get the word's English gloss.
+        english_interval = english_word_intervals.intervalContaining(midtime)
+        translation = normalize(english_interval.mark)
 
-            # import code; code.interact(local=locals())
+        # Snip out the sounds.
+        sound_bite = sound[start:end]
+        # tmills: normalize sound levels (some speakers are very quiet)
+        sound_bite.normalize(headroom=0.1)  # dB
+
+        # Export it.
+        slug = slugify(f"word-{transcription}-{session}-{speaker}-{start}",
+                       to_lower=True)
+        sound_bite.export(str(Path('/tmp') / f"{slug}.wav"))
+
+        # TODO: yield word
+
+    info(' ... ... extracting sentences')
+    english_sentence_intervals = text_grid.tiers[SENTENCE_TIER_ENGLISH]
+    assert english_pattern.search(english_sentence_intervals.name)
+
+    for interval in cree_sentence_intervals:
+        if not interval.mark or interval.mark.strip() == '':
+            # This interval is empty, for some reason.
+            continue
+
+        transcription = normalize(interval.mark)
+
+        start = to_milliseconds(interval.minTime)
+        end = to_milliseconds(interval.maxTime)
+        midtime = (interval.minTime + interval.maxTime) / 2
+
+        # Get the sentencs's English translation.
+        english_interval = english_word_intervals.intervalContaining(midtime)
+        translation = normalize(english_interval.mark)
+
+        # Snip out the sounds.
+        sound_bite = sound[start:end]
+        # tmills: normalize sound levels (some speakers are very quiet)
+        sound_bite.normalize(headroom=0.1)  # dB
+
+        # Export it.
+        slug = slugify(f"sentence-{transcription}-{session}-{speaker}-{start}",
+                       to_lower=True)
+        sound_bite.export(str(Path('/tmp') / f"{slug}.wav"))
+
+        # TODO: yield sentence.
 
 
 def to_milliseconds(seconds: Decimal) -> int:
+    """
+    Converts interval times to an integer in milliseconds.
+    """
     return int(seconds * 1000)
 
 
@@ -101,12 +148,12 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     args = parser.parse_args()
 
-    # TODO: read session codes?
+    # TODO: read session-codes?
 
     info('Scanning %s for sessions...', args.master_directory)
     for session_dir in args.master_directory.iterdir():
         if not session_dir.resolve().is_dir():
-            info('... rejecting %s; not a directory', session_dir)
+            info(' ... rejecting %s; not a directory', session_dir)
             continue
 
         info(' ... Scanning %s for .TextGrid files', session_dir)
@@ -115,20 +162,16 @@ if __name__ == '__main__':
 
         for text_grid in text_grids:
             sound_file = text_grid.with_suffix('.wav')
-            # TODO: tmill's kludge for certain missing filenames.
+            # TODO: tmill's kludge for certain missing filenames???
             if not sound_file.exists():
                 warn(' ... ... could not find cooresponding audio for %s',
                      text_grid)
                 continue
 
             assert text_grid.exists() and sound_file.exists()
-            info('... ... Matching sounds file for %s', text_grid)
-            # TODO: load "long" sound file
-            # TODO: load from file: annotation
+            info(' ... ... Matching sound file for %s', text_grid)
 
-            # TODO: "Select" the sessino table ID
-            # TODO: something about speaker-codes?
-            # TODO: get speaker
+            # TODO: get speaker from the session-codes table?
             session = session_dir.stem
             speaker = '???'
 
