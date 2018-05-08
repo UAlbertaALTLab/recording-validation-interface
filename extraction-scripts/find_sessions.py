@@ -131,40 +131,16 @@ class PhraseExtractor:
                            english_tier=self.text_grid.tiers[WORD_TIER_ENGLISH])
 
         info(' ... ... extracting sentences')
-        english_word_intervals = self.text_grid.tiers[WORD_TIER_ENGLISH]
-        assert is_english_tier(english_word_intervals)
-        cree_sentence_intervals = self.text_grid.tiers[SENTENCE_TIER_CREE]
-        assert cree_pattern.search(cree_sentence_intervals.name)
-
-        for interval in cree_sentence_intervals:
-            if not interval.mark or interval.mark.strip() == '':
-                # This interval is empty, for some reason.
-                continue
-
-            transcription = normalize(interval.mark)
-
-            start = to_milliseconds(interval.minTime)
-            end = to_milliseconds(interval.maxTime)
-            midtime = (interval.minTime + interval.maxTime) / 2
-
-            # Get the sentencs's English translation.
-            english_interval = english_word_intervals.intervalContaining(midtime)
-            translation = normalize(english_interval.mark)
-
-            # Snip out the sounds.
-            sound_bite = self.sound[start:end]
-            # tmills: normalize sound levels (some speakers are very quiet)
-            sound_bite.normalize(headroom=0.1)  # dB
-
-            # Export it.
-            slug = slugify(f"sentence-{transcription}-{self.session}-{self.speaker}-{start}",
-                           to_lower=True)
-            sound_bite.export(str(Path('/tmp') / f"{slug}.wav"))
-
-            # TODO: yield sentence.
+        self.extract_sentences(
+            cree_tier=self.text_grid.tiers[SENTENCE_TIER_CREE],
+            english_tier=self.text_grid.tiers[SENTENCE_TIER_ENGLISH]
+        )
 
     def extract_words(self, cree_tier, english_tier):
         self.extract_phrases('word', cree_tier, english_tier)
+
+    def extract_sentences(self, cree_tier, english_tier):
+        self.extract_phrases('sentence', cree_tier, english_tier)
 
     def timestamp_within_sentence(self, timestamp: Decimal):
         """
@@ -206,7 +182,7 @@ class PhraseExtractor:
             sound_bite.normalize(headroom=0.1)  # dB
 
             # Export it.
-            slug = slugify(f"word-{transcription}-{self.session}-{self.speaker}-{start}",
+            slug = slugify(f"{_type}-{transcription}-{self.session}-{self.speaker}-{start}",
                            to_lower=True)
             sound_bite.export(str(Path('/tmp') / f"{slug}.wav"))
 
