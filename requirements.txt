@@ -7,3 +7,5 @@ MarkupSafe==1.0
 sh==1.12.14
 SQLAlchemy==1.2.3
 Werkzeug==0.14.1
+awesome-slugify==1.6.5
+pydub==0.21.0

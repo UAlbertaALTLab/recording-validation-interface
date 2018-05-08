@@ -7,8 +7,11 @@
 import argparse
 import logging
 from pathlib import Path
+from decimal import Decimal
 
+from pydub import AudioSegment  # type: ignore
 from textgrid import TextGrid  # type: ignore
+from slugify import slugify
 
 from recval.normalization import normalize
 
@@ -30,13 +33,13 @@ parser.add_argument('--word-filename', default='word_codes.txt')
 parser.add_argument('--sentence-filename', default='word_codes.txt')
 
 
-WORD_TIER_CREE = 1
 WORD_TIER_ENGLISH = 0
-SENTENCE_TIER_CREE = 3
+WORD_TIER_CREE = 1
 SENTENCE_TIER_ENGLISH = 2
+SENTENCE_TIER_CREE = 3
 
 
-def extract_items(sound: bytes,
+def extract_items(sound: AudioSegment,
                   text_grid: TextGrid,
                   word_directory: Path,
                   sentence_directory: Path,
@@ -51,10 +54,10 @@ def extract_items(sound: bytes,
 
     # Not required: counting words and sentences extracted
 
-    # TODO: select the text grid?
     assert len(text_grid.tiers) >= 2, "TextGrid has too few tiers"
-    # TODO: other sanity check for tiers.
+    # TODO: Ensure the name of the tier contains \bCREE\b or \bCrk\b.
     cree_words_intervals = text_grid.tiers[WORD_TIER_CREE]
+    # TODO: Ensure the name of the tier contains \bEnglish\b, \beng\b or \ben\b.
     english_words_intervals = text_grid.tiers[WORD_TIER_ENGLISH]
 
     for interval in cree_words_intervals:
@@ -64,8 +67,8 @@ def extract_items(sound: bytes,
 
         transcription = normalize(interval.mark)
 
-        interval.minTime
-        interval.maxTime
+        start = to_milliseconds(interval.minTime)
+        end = to_milliseconds(interval.maxTime)
         midtime = (interval.minTime + interval.maxTime) / 2
         # TODO: determine if it's an isolated word or an example sentence
         # TODO: Get interval at time sentenceTierCree, midTime
@@ -76,13 +79,22 @@ def extract_items(sound: bytes,
             # Get english gloss
             english_interval = english_words_intervals.intervalContaining(midtime)
             translation = normalize(english_interval.mark)
-            import code
-            code.interact(local=locals())
 
-            # TODO: THE REST OF THE SCRIPT
+            # Snip out the sounds.
+            sound_bite = sound[start:end]
+            # tmills: normalize sound levels (some speakers are very quiet)
+            sound_bite.normalize(headroom=0.1)  # dB
 
-            # but this is where the sound extraction would happen
-            # you can use Praat to normalize sound levels
+            # Export it.
+            slug = slugify(f"{transcription}-{session}-{speaker}-{start}",
+                           to_lower=True)
+            sound_bite.export(str(Path('/tmp') / f"{slug}.wav"))
+
+            # import code; code.interact(local=locals())
+
+
+def to_milliseconds(seconds: Decimal) -> int:
+    return int(seconds * 1000)
 
 
 if __name__ == '__main__':
@@ -97,15 +109,15 @@ if __name__ == '__main__':
             info('... rejecting %s; not a directory', session_dir)
             continue
 
-        info('... Scanning %s for .TextGrid files', session_dir)
+        info(' ... Scanning %s for .TextGrid files', session_dir)
         text_grids = list(session_dir.glob('*.TextGrid'))
-        info('... %d text grids', len(text_grids))
+        info(' ... %d text grids', len(text_grids))
 
         for text_grid in text_grids:
             sound_file = text_grid.with_suffix('.wav')
             # TODO: tmill's kludge for certain missing filenames.
             if not sound_file.exists():
-                warn('... ... could not find cooresponding audio for %s',
+                warn(' ... ... could not find cooresponding audio for %s',
                      text_grid)
                 continue
 
@@ -120,10 +132,10 @@ if __name__ == '__main__':
             session = session_dir.stem
             speaker = '???'
 
-            info('... ... Extract items from %s using speaker ID %s', sound_file,
-                 speaker)
+            info(' ... ... Extract items from %s using speaker ID %s',
+                 sound_file, speaker)
 
-            extract_items(sound_file,
+            extract_items(AudioSegment.from_file(str(sound_file)),
                           TextGrid.fromFile(str(text_grid)),
                           args.word_directory, args.sentence_directory,
                           args.word_filename, args.sentence_filename,
