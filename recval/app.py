@@ -99,6 +99,7 @@ def send_audio(filename):
     except KeyError:
         raise NotFound
 
-    # TODO: load transcoded path from Flask config
-    return send_from_directory(fspath(TRANSCODED_RECORDINGS_PATH),
-                               filename, mimetype=content_type)
+    path = app.config['TRANSCODED_RECORDINGS_PATH']
+    assert path.resolve().is_dir()
+    return send_from_directory(fspath(path), filename,
+                               mimetype=content_type)
