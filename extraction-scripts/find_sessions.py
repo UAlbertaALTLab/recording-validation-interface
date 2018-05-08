@@ -11,7 +11,7 @@ import logging
 import re
 from pathlib import Path
 from decimal import Decimal
-from typing import Dict
+from typing import Dict, NamedTuple
 
 from pydub import AudioSegment  # type: ignore
 from textgrid import TextGrid  # type: ignore
@@ -33,13 +33,17 @@ parser.add_argument('session_codes', default=here / 'speaker-codes.csv', type=Pa
                     help='A TSV that contains codes for sessions...?', nargs='?')
 
 
-WORD_TIER_ENGLISH = 0
-WORD_TIER_CREE = 1
-SENTENCE_TIER_ENGLISH = 2
-SENTENCE_TIER_CREE = 3
-
-cree_pattern = re.compile(r'\b(?:cree|crk)\b', re.IGNORECASE)
-english_pattern = re.compile(r'\b(?:english|eng|en)\b', re.IGNORECASE)
+class RecordingInfo(NamedTuple):
+    """
+    All the information you could possible want to know about a recorded
+    snippet.
+    """
+    session: RecordingSession
+    speaker: str
+    type: str
+    timestamp: str
+    transcription: str
+    translation: str
 
 
 class RecordingExtractor:
@@ -62,7 +66,6 @@ class RecordingExtractor:
             if not session_dir.resolve().is_dir():
                 info(' ... rejecting %s; not a directory', session_dir)
                 continue
-            # TODO: make sure we haven't yet seen this session!
             self.extract_session(session_dir)
 
     def extract_session(self, session_dir: Path) -> None:
@@ -97,12 +100,21 @@ class RecordingExtractor:
                                   speaker)
 
 
+WORD_TIER_ENGLISH = 0
+WORD_TIER_CREE = 1
+SENTENCE_TIER_ENGLISH = 2
+SENTENCE_TIER_CREE = 3
+
+
 class PhraseExtractor:
     """
     Extracts recorings from a session directory.
     """
     def __init__(self, session: RecordingSession) -> None:
         self.session = session
+
+    cree_pattern = re.compile(r'\b(?:cree|crk)\b', re.IGNORECASE)
+    english_pattern = re.compile(r'\b(?:english|eng|en)\b', re.IGNORECASE)
 
     def extract_all(self,
                     sound: AudioSegment,
@@ -112,13 +124,13 @@ class PhraseExtractor:
         assert len(text_grid.tiers) >= 2, "TextGrid has too few tiers"
 
         cree_word_intervals = text_grid.tiers[WORD_TIER_CREE]
-        assert cree_pattern.search(cree_word_intervals.name)
+        assert self.cree_pattern.search(cree_word_intervals.name)
 
         english_word_intervals = text_grid.tiers[WORD_TIER_ENGLISH]
-        assert english_pattern.search(english_word_intervals.name)
+        assert self.english_pattern.search(english_word_intervals.name)
 
         cree_sentence_intervals = text_grid.tiers[SENTENCE_TIER_CREE]
-        assert cree_pattern.search(cree_sentence_intervals.name)
+        assert self.cree_pattern.search(cree_sentence_intervals.name)
 
         info(' ... ... extracting words')
         for interval in cree_word_intervals:
@@ -158,7 +170,7 @@ class PhraseExtractor:
 
         info(' ... ... extracting sentences')
         english_sentence_intervals = text_grid.tiers[SENTENCE_TIER_ENGLISH]
-        assert english_pattern.search(english_sentence_intervals.name)
+        assert self.english_pattern.search(english_sentence_intervals.name)
 
         for interval in cree_sentence_intervals:
             if not interval.mark or interval.mark.strip() == '':
@@ -186,6 +198,9 @@ class PhraseExtractor:
             sound_bite.export(str(Path('/tmp') / f"{slug}.wav"))
 
             # TODO: yield sentence.
+
+    def extract_phrases(self, cree_tier, english_tier):
+        ...
 
 
 def to_milliseconds(seconds: Decimal) -> int:
