@@ -14,7 +14,7 @@ from decimal import Decimal
 from typing import Dict, NamedTuple
 
 from pydub import AudioSegment  # type: ignore
-from textgrid import TextGrid  # type: ignore
+from textgrid import TextGrid, IntervalTier  # type: ignore
 from slugify import slugify  # type: ignore
 
 from recval.normalization import normalize
@@ -44,6 +44,8 @@ class RecordingInfo(NamedTuple):
     timestamp: str
     transcription: str
     translation: str
+    # TODO: create manifest
+    # TODO: create sha256hash of manifest
 
 
 class RecordingExtractor:
@@ -78,7 +80,6 @@ class RecordingExtractor:
         text_grids = list(session_dir.glob('*.TextGrid'))
         info(' ... %d text grids', len(text_grids))
 
-        extractor = PhraseExtractor(session)
         for text_grid in text_grids:
             sound_file = text_grid.with_suffix('.wav')
             # TODO: tmill's kludge for certain missing filenames???
@@ -95,9 +96,11 @@ class RecordingExtractor:
 
             info(' ... ... Extract items from %s using speaker ID %s',
                  sound_file, speaker)
-            extractor.extract_all(AudioSegment.from_file(str(sound_file)),
-                                  TextGrid.fromFile(str(text_grid)),
-                                  speaker)
+            extractor = PhraseExtractor(session,
+                                        AudioSegment.from_file(str(sound_file)),
+                                        TextGrid.fromFile(str(text_grid)),
+                                        speaker)
+            extractor.extract_all()
 
 
 WORD_TIER_ENGLISH = 0
@@ -105,72 +108,33 @@ WORD_TIER_CREE = 1
 SENTENCE_TIER_ENGLISH = 2
 SENTENCE_TIER_CREE = 3
 
-
 class PhraseExtractor:
     """
     Extracts recorings from a session directory.
     """
-    def __init__(self, session: RecordingSession) -> None:
+    def __init__(self,
+                 session: RecordingSession,
+                 sound: AudioSegment,
+                 text_grid: TextGrid,
+                 speaker: str,  # Something like "ABC"
+                 ) -> None:
         self.session = session
+        self.sound = sound
+        self.text_grid = text_grid
+        self.speaker = speaker
 
-    cree_pattern = re.compile(r'\b(?:cree|crk)\b', re.IGNORECASE)
-    english_pattern = re.compile(r'\b(?:english|eng|en)\b', re.IGNORECASE)
-
-    def extract_all(self,
-                    sound: AudioSegment,
-                    text_grid: TextGrid,
-                    speaker: str,  # Something like "ABC"
-                    ) -> None:
-        assert len(text_grid.tiers) >= 2, "TextGrid has too few tiers"
-
-        cree_word_intervals = text_grid.tiers[WORD_TIER_CREE]
-        assert self.cree_pattern.search(cree_word_intervals.name)
-
-        english_word_intervals = text_grid.tiers[WORD_TIER_ENGLISH]
-        assert self.english_pattern.search(english_word_intervals.name)
-
-        cree_sentence_intervals = text_grid.tiers[SENTENCE_TIER_CREE]
-        assert self.cree_pattern.search(cree_sentence_intervals.name)
+    def extract_all(self) -> None:
+        assert len(self.text_grid.tiers) >= 2, "TextGrid has too few tiers"
 
         info(' ... ... extracting words')
-        for interval in cree_word_intervals:
-            if not interval.mark or interval.mark.strip() == '':
-                # This interval is empty, for some reason.
-                continue
-
-            transcription = normalize(interval.mark)
-
-            start = to_milliseconds(interval.minTime)
-            end = to_milliseconds(interval.maxTime)
-            midtime = (interval.minTime + interval.maxTime) / 2
-
-            # Figure out if this word belongs to a sentence.
-            sentence = cree_sentence_intervals.intervalContaining(midtime)
-            is_sentence = sentence and sentence.mark != ''
-
-            if is_sentence:
-                # It's an example sentence; leave it for the next loop.
-                continue
-
-            # Get the word's English gloss.
-            english_interval = english_word_intervals.intervalContaining(midtime)
-            translation = normalize(english_interval.mark)
-
-            # Snip out the sounds.
-            sound_bite = sound[start:end]
-            # tmills: normalize sound levels (some speakers are very quiet)
-            sound_bite.normalize(headroom=0.1)  # dB
-
-            # Export it.
-            slug = slugify(f"word-{transcription}-{self.session}-{speaker}-{start}",
-                           to_lower=True)
-            sound_bite.export(str(Path('/tmp') / f"{slug}.wav"))
-
-            # TODO: yield word
+        self.extract_words(cree_tier=self.text_grid.tiers[WORD_TIER_CREE],
+                           english_tier=self.text_grid.tiers[WORD_TIER_ENGLISH])
 
         info(' ... ... extracting sentences')
-        english_sentence_intervals = text_grid.tiers[SENTENCE_TIER_ENGLISH]
-        assert self.english_pattern.search(english_sentence_intervals.name)
+        english_word_intervals = self.text_grid.tiers[WORD_TIER_ENGLISH]
+        assert is_english_tier(english_word_intervals)
+        cree_sentence_intervals = self.text_grid.tiers[SENTENCE_TIER_CREE]
+        assert cree_pattern.search(cree_sentence_intervals.name)
 
         for interval in cree_sentence_intervals:
             if not interval.mark or interval.mark.strip() == '':
@@ -188,19 +152,75 @@ class PhraseExtractor:
             translation = normalize(english_interval.mark)
 
             # Snip out the sounds.
-            sound_bite = sound[start:end]
+            sound_bite = self.sound[start:end]
             # tmills: normalize sound levels (some speakers are very quiet)
             sound_bite.normalize(headroom=0.1)  # dB
 
             # Export it.
-            slug = slugify(f"sentence-{transcription}-{self.session}-{speaker}-{start}",
+            slug = slugify(f"sentence-{transcription}-{self.session}-{self.speaker}-{start}",
                            to_lower=True)
             sound_bite.export(str(Path('/tmp') / f"{slug}.wav"))
 
             # TODO: yield sentence.
 
-    def extract_phrases(self, cree_tier, english_tier):
-        ...
+    def extract_words(self, cree_tier, english_tier):
+        self.extract_phrases('word', cree_tier, english_tier)
+
+    def timestamp_within_sentence(self, timestamp: Decimal):
+        """
+        Return True when the timestamp is found inside a Cree sentence.
+        """
+        sentences = self.text_grid.tiers[SENTENCE_TIER_CREE]
+        sentence = sentences.intervalContaining(timestamp)
+        return sentence and sentence.mark != ''
+
+    def extract_phrases(self, _type: str,
+                        cree_tier: IntervalTier, english_tier: IntervalTier):
+        assert is_cree_tier(cree_tier), cree_tier.name
+        assert is_english_tier(english_tier), english_tier.name
+
+        for interval in cree_tier:
+            if not interval.mark or interval.mark.strip() == '':
+                # This interval is empty, for some reason.
+                continue
+
+            transcription = normalize(interval.mark)
+
+            start = to_milliseconds(interval.minTime)
+            end = to_milliseconds(interval.maxTime)
+            midtime = (interval.minTime + interval.maxTime) / 2
+
+            # Figure out if this word belongs to a sentence.
+            if _type == 'word' and self.timestamp_within_sentence(midtime):
+                # It's an example sentence; leave it for the next loop.
+                info(' ... ... ... %r is in a sentence', transcription)
+                continue
+
+            # Get the word's English gloss.
+            english_interval = english_tier.intervalContaining(midtime)
+            translation = normalize(english_interval.mark)
+
+            # Snip out the sounds.
+            sound_bite = self.sound[start:end]
+            # tmills: normalize sound levels (some speakers are very quiet)
+            sound_bite.normalize(headroom=0.1)  # dB
+
+            # Export it.
+            slug = slugify(f"word-{transcription}-{self.session}-{self.speaker}-{start}",
+                           to_lower=True)
+            sound_bite.export(str(Path('/tmp') / f"{slug}.wav"))
+
+            # TODO: yield word
+
+cree_pattern = re.compile(r'\b(?:cree|crk)\b', re.IGNORECASE)
+english_pattern = re.compile(r'\b(?:english|eng|en)\b', re.IGNORECASE)
+
+
+def is_english_tier(tier: IntervalTier) -> bool:
+    return english_pattern.search(tier.name)
+
+def is_cree_tier(tier: IntervalTier) -> bool:
+    return cree_pattern.search(tier.name)
 
 
 def to_milliseconds(seconds: Decimal) -> int:
