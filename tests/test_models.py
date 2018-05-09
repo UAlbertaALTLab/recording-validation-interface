@@ -12,14 +12,11 @@ from sqlalchemy.exc import SQLAlchemyError  # type: ignore
 
 from recval.model import Phrase, Word, Sentence, Recording, VersionedString
 from recval.model import RecordingQuality, ElicitationOrigin
-from recval.model import db as _db
-from recval.app import app as _app, user_datastore
+from recval.app import user_datastore
 
 
 TEST_WAV = Path(__file__).parent / 'fixtures' / 'test.wav'
 assert TEST_WAV.exists()
-
-# Based on http://alextechrants.blogspot.ca/2014/01/unit-testing-sqlalchemy-apps-part-2.html
 
 
 def test_insert_word(db):
@@ -198,8 +195,6 @@ def test_authentication(db):
     assert User.query.count() == 1
 
 
-
-
 # TODO: test validator role
 # TODO: test instructor role
 # TODO:
@@ -221,38 +216,3 @@ def acimosis(db):
     db.session.add(recording)
     db.session.commit()
     return word.id
-
-
-@pytest.fixture()
-def app():
-    """
-    Yield an active Flask app context.
-    """
-    with _app.app_context():
-        yield _app
-
-
-@pytest.fixture()
-def db(app):
-    """
-    Yields a database object bound to an active app context.
-    The database starts empty, and is cleared of all data at the end of the
-    test.
-    """
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///:memory:'
-
-    # TODO: place audio in temporary directory.
-
-    # Setup the database.
-    _db.create_all()
-    _db.session.flush()
-    _db.session.expunge_all()
-    _db.session.commit()
-
-    yield _db
-
-    # Tear down the database.
-    _db.session.rollback()
-    _db.drop_all()
-    _db.session.flush()
-    _db.session.expunge_all()
