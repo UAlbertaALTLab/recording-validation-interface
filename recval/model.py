@@ -15,15 +15,13 @@ from os import fspath
 from pathlib import Path
 
 from flask import current_app, url_for  # type: ignore
+from flask_security import (RoleMixin, SQLAlchemyUserDatastore,  # type: ignore
+                            UserMixin)
 from flask_sqlalchemy import SQLAlchemy  # type: ignore
-from flask_security import (  # type: ignore
-    UserMixin, RoleMixin, SQLAlchemyUserDatastore
-)
-from sqlalchemy.orm import validates  # type: ignore
 from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
+from sqlalchemy.orm import validates  # type: ignore
 
 from recval.normalization import normalize as normalize_utterance
-
 
 db = SQLAlchemy()
 Model = db.Model
@@ -339,6 +337,7 @@ roles_users = db.Table(
     db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
     db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
 )
+
 
 class Role(db.Model, RoleMixin):  # type: ignore
     """

@@ -138,6 +138,7 @@ class RecordingSession(NamedTuple):
     def __str__(self) -> str:
         return self.as_filename()
 
+
 T = TypeVar('T')
 
 

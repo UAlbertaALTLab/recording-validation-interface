@@ -10,17 +10,14 @@ TODO: Spend sprint 2 factoring things out of this file!
 from os import fspath
 from pathlib import Path
 
-from flask import (  # type: ignore
-    Flask, abort, url_for, render_template, send_from_directory, redirect,
-    request
-)
+from flask import (Flask, abort, redirect, render_template,  # type: ignore
+                   request, send_from_directory, url_for)
+from flask_security import (Security, SQLAlchemyUserDatastore,  # type: ignore
+                            login_required)
 from sqlalchemy.orm import subqueryload  # type: ignore
 from werkzeug.exceptions import NotFound  # type: ignore
-from flask_security import (  # type: ignore
-    Security, SQLAlchemyUserDatastore, login_required
-)
 
-from recval.model import db, Phrase, user_datastore
+from recval.model import Phrase, db, user_datastore
 
 # Configure from default settings, then the file specifeied by the environment
 # variable.
