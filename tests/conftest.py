@@ -3,9 +3,9 @@
 
 # Copyright © 2018 Eddie Antonio Santos. All rights reserved.
 
+from pathlib import Path
+
 import pytest  # type: ignore
-from recval.model import db as _db
-from recval.app import app as _app, user_datastore
 
 
 @pytest.fixture()
@@ -13,9 +13,9 @@ def app():
     """
     Yield an active Flask app context.
     """
+    from recval.app import app as _app
     with _app.app_context():
         yield _app
-
 
 
 @pytest.fixture()
@@ -27,6 +27,7 @@ def db(app):
 
     Based on http://alextechrants.blogspot.ca/2014/01/unit-testing-sqlalchemy-apps-part-2.html
     """
+    from recval.model import db as _db
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///:memory:'
 
     # TODO: place audio in temporary directory.
@@ -49,3 +50,29 @@ def db(app):
 @pytest.fixture()
 def client(app, db):
     yield app.test_client()
+
+
+@pytest.fixture()
+def acimosis(db, wave_file_path):
+    """
+    Inserts the word 'acimosis'/'puppy' into the database.
+
+    Returns the phrase.id of the inserted phrase.
+    """
+    from recval.model import Word, Recording
+    word = Word(transcription='acîmosis', translation=' puppy  ')
+    recording = Recording.new(phrase=word, input_file=wave_file_path, speaker='NIL')
+    # Insert it for the first time.
+    db.session.add(recording)
+    db.session.commit()
+    return word.id
+
+
+@pytest.fixture()
+def wave_file_path():
+    """
+    A recording saying "acimosis" (puppy), for use in test cases.
+    """
+    test_wav = Path(__file__).parent / 'fixtures' / 'test.wav'
+    assert test_wav.exists()
+    return test_wav

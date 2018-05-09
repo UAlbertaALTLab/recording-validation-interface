@@ -12,17 +12,14 @@ from recval.app import user_datastore
 from recval.model import (ElicitationOrigin, Phrase, Recording,
                           RecordingQuality, VersionedString, Word)
 
-TEST_WAV = Path(__file__).parent / 'fixtures' / 'test.wav'
-assert TEST_WAV.exists()
 
-
-def test_insert_word(db):
+def test_insert_word(db, wave_file_path):
     """
     Insert a word, and retrieve it again.
     """
 
     word = Word(transcription=' acimosis', translation='puppy ')
-    recording = Recording.new(phrase=word, input_file=TEST_WAV, speaker='NIL')
+    recording = Recording.new(phrase=word, input_file=wave_file_path, speaker='NIL')
     db.session.add(recording)
     db.session.commit()
 
@@ -35,7 +32,7 @@ def test_insert_word(db):
     assert word in result_set
 
 
-def test_insert_recording_twice(db):
+def test_insert_recording_twice(db, wave_file_path):
     """
     Insert the exact SAME recording twice; the second should fail.
     """
@@ -43,24 +40,24 @@ def test_insert_recording_twice(db):
     word = Word(transcription='acimosis', translation='puppy')
 
     # Insert it once.
-    rec1 = Recording.new(phrase=word, input_file=TEST_WAV, speaker='NIL')
+    rec1 = Recording.new(phrase=word, input_file=wave_file_path, speaker='NIL')
     db.session.add(rec1)
     db.session.commit()
 
     # Insert it again.
-    rec2 = Recording.new(phrase=word, input_file=TEST_WAV, speaker='NIL')
+    rec2 = Recording.new(phrase=word, input_file=wave_file_path, speaker='NIL')
     db.session.add(rec1)
     with pytest.raises(SQLAlchemyError):
         db.session.commit()
 
 
-def test_transcription_update(db):
+def test_transcription_update(db, wave_file_path):
     """
     Ensure that a word's transcription can be changed.
     """
 
     word = Word(transcription='\n aci\u0302mosis \r', translation='puppy')
-    recording = Recording.new(phrase=word, input_file=TEST_WAV, speaker='NIL')
+    recording = Recording.new(phrase=word, input_file=wave_file_path, speaker='NIL')
     # Insert it for the first time.
     db.session.add(recording)
     db.session.commit()
@@ -198,18 +195,3 @@ def test_authentication(db):
 # TODO: test simple authentication
 # TODO: test versioned strings with authors
 # TODO: test roles...?
-
-
-@pytest.fixture()
-def acimosis(db):
-    """
-    Inserts the word 'acimosis'/'puppy' into the database.
-
-    Returns the phrase.id of the inserted phrase.
-    """
-    word = Word(transcription='acîmosis', translation=' puppy  ')
-    recording = Recording.new(phrase=word, input_file=TEST_WAV, speaker='NIL')
-    # Insert it for the first time.
-    db.session.add(recording)
-    db.session.commit()
-    return word.id
