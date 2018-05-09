@@ -5,35 +5,66 @@
 
 """
 Creates the database from scratch.
+
+This is script is really ugly. I'm sorry :C.
 """
 
 import sys
 from os import fspath
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Any
 
 from tqdm import tqdm  # type: ignore
 
 from recval.extract_phrases import RecordingExtractor, RecordingInfo
-from recval.model import Phrase, Recording, Sentence, Word, db
+from recval.model import Phrase, Recording, Sentence, Word, VersionedString, db
 
 
-cache: Dict[RecordingInfo, Phrase] = {}
+info2phrase = {}  # type: ignore
 
 
 def make_phrase(info: RecordingInfo) -> Phrase:
-    if info in cache:
-        return cache[info]
+    """
+    Tries to fetch an existing phrase from the database, or else creates a
+    new one.
+    """
+
+    key = info.type, info.transcription
+
+    if key in info2phrase:
+        # Look up the phrase.
+        phrase_id = info2phrase[key]
+        return Phrase.query.filter_by(id=phrase_id).one()
+
+    # Otherwise, create a new phrase.
+    transcription = fetch_versioned_string(info.transcription)
+    translation = fetch_versioned_string(info.translation)
     if info.type == 'word':
-        p = Word(transcription=info.transcription,
-                 translation=info.translation)
+        p = Word(transcription_meta=transcription,
+                 translation_meta=translation)
     elif info.type == 'sentence':
-        p = Sentence(transcription=info.transcription,
-                     translation=info.translation)
+        p = Sentence(transcription_meta=transcription,
+                     translation_meta=translation)
     else:
         raise Exception(f"Unexpected phrase type: {info.type!r}")
-    cache[info] = p
+    assert p.id is None
+    db.session.add(p)
+    db.session.commit()
+    assert p.id is not None
+    info2phrase[key] = p.id
     return p
+
+
+def fetch_versioned_string(value: str) -> VersionedString:
+    """
+    Get a versioned string.
+    """
+    res = VersionedString.query.filter_by(value=value).all()
+    assert len(res) in (0, 1)
+    if res:
+        return res[0]
+    v = VersionedString.new(value=value, author_name='<unknown>')
+    return v
 
 
 if __name__ == '__main__':
@@ -67,5 +98,5 @@ if __name__ == '__main__':
                                       input_file=recording_path,
                                       speaker=info.speaker,
                                       fingerprint=fingerprint)
-            db.session.merge(recording)
+            db.session.add(recording)
             db.session.commit()

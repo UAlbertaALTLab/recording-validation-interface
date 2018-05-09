@@ -86,15 +86,18 @@ class Phrase(db.Model):  # type: ignore
         'polymorphic_identity': None
     }
 
-    def __init__(self, *, transcription, translation,  **kwargs):
+    def __init__(self, *, transcription=None, translation=None,  **kwargs):
         # Create versioned transcription.
-        super().__init__(
-            transcription_meta=VersionedString.new(value=transcription,
-                                                   author_name='<unknown>'),
-            translation_meta=VersionedString.new(value=translation,
-                                                 author_name='<unknown>'),
-            **kwargs
-        )
+        if transcription or translation:
+            super().__init__(
+                transcription_meta=VersionedString.new(value=transcription,
+                                                       author_name='<unknown>'),
+                translation_meta=VersionedString.new(value=translation,
+                                                     author_name='<unknown>'),
+                **kwargs
+            )
+        else:
+            super().__init__(**kwargs)
 
     @hybrid_property
     def transcription(self) -> str:
