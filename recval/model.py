@@ -343,6 +343,7 @@ roles_users = db.Table(
 class Role(db.Model, RoleMixin):  # type: ignore
     """
     Specifies a user's roles. Possible roles:
+     - site-admin
      - validator
      - instructor
      - <importer>

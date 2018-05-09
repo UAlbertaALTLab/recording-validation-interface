@@ -16,7 +16,9 @@ from flask import (  # type: ignore
 )
 from sqlalchemy.orm import subqueryload  # type: ignore
 from werkzeug.exceptions import NotFound  # type: ignore
-from flask_security import Security, SQLAlchemyUserDatastore  # type: ignore
+from flask_security import (  # type: ignore
+    Security, SQLAlchemyUserDatastore, login_required
+)
 
 from recval.model import db, Phrase, user_datastore
 
@@ -38,6 +40,7 @@ security = Security(app, user_datastore)
 
 # Transcoded audio files.
 AUDIO_MIME_TYPES = {
+    # TODO: m4a everything!
     '.mp4': 'audio/aac',
 }
 
@@ -63,6 +66,7 @@ def list_phrases(page):
 
 
 @app.route('/phrase/<int:phrase_id>', methods=['PATCH'])
+@login_required
 def update_text(phrase_id):
     """
     Changes the text for a field of the given phrase.
