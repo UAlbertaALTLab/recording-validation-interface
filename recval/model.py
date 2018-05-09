@@ -7,6 +7,7 @@
 The data models for the validation app.
 """
 
+import warnings
 from datetime import datetime
 from enum import Enum, auto
 from hashlib import sha256
@@ -109,6 +110,9 @@ class Phrase(db.Model):  # type: ignore
 
     @transcription.expression  # type: ignore
     def transcription(cls):
+        warnings.warn("Deprecated. "
+                      "The outer expression MUST join on VersionedString "
+                      "for this query to work as expected.")
         return VersionedString.value
 
     @hybrid_property
@@ -125,6 +129,9 @@ class Phrase(db.Model):  # type: ignore
 
     @translation.expression  # type: ignore
     def translation(cls):
+        warnings.warn("Deprecated. "
+                      "The outer expression MUST join on VersionedString "
+                      "for this query to work as expected.")
         return VersionedString.value
 
     @property
@@ -147,6 +154,9 @@ class Phrase(db.Model):  # type: ignore
         normalized_value = normalize_utterance(value)
         setattr(self, field, normalized_value)
         return self
+
+    def __repr__(self):
+        return f"<{type(self).__name__} {self.id} {self.transcription!r}>"
 
 
 class Word(Phrase):

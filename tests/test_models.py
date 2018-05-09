@@ -10,7 +10,7 @@ import pytest  # type: ignore
 from sqlalchemy.schema import MetaData, DropConstraint  # type: ignore
 from sqlalchemy.exc import SQLAlchemyError  # type: ignore
 
-from recval.model import Phrase, Word, Sentence, Recording
+from recval.model import Phrase, Word, Sentence, Recording, VersionedString
 from recval.model import RecordingQuality, ElicitationOrigin
 from recval.model import db as _db
 from recval.app import app as _app
@@ -163,6 +163,30 @@ def test_mark_word_source(db, acimosis):
 
     phrase = Phrase.query.filter_by(id=acimosis).one()
     assert phrase.origin == ElicitationOrigin.maskwacîs
+
+
+def test_search_by_transcription(db, acimosis):
+    """
+    Test adding a new phrase that does not have the same transcription.
+    """
+    initial_results = Phrase.query.all()
+    assert len(initial_results) == 1
+    assert initial_results[0].transcription != 'acimosisak'
+    del initial_results
+
+    word = Word(transcription='acimosisak', translation='litter of pups')
+    db.session.add(word)
+    db.session.commit()
+    del word
+
+    results = Phrase.query.all()
+    assert len(results) == 2
+    del results
+
+    results = Phrase.query.filter(
+        Phrase.transcription_id == VersionedString.id
+    ).filter(Phrase.transcription == 'acimosisak').all()
+    assert len(results) == 1
 
 
 @pytest.fixture()
