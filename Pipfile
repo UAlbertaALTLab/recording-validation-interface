@@ -9,6 +9,7 @@ awesome-slugify = ">=1.6"
 pydub = ">=0.21.0"
 Flask = ">=0.12.2"
 Flask-SQLAlchemy = ">=2.3.2"
+flask-security = "*"
 
 [dev-packages]
 hypothesis = ">=3.56.5"
