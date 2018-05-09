@@ -17,6 +17,7 @@ def app():
         yield _app
 
 
+
 @pytest.fixture()
 def db(app):
     """
@@ -43,3 +44,8 @@ def db(app):
     _db.drop_all()
     _db.session.flush()
     _db.session.expunge_all()
+
+
+@pytest.fixture()
+def client(app, db):
+    yield app.test_client()

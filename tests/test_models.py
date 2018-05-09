@@ -3,17 +3,14 @@
 
 # Copyright © 2018 Eddie Antonio Santos. All rights reserved.
 
-import tempfile
 from pathlib import Path
 
 import pytest  # type: ignore
-from sqlalchemy.schema import MetaData, DropConstraint  # type: ignore
 from sqlalchemy.exc import SQLAlchemyError  # type: ignore
 
-from recval.model import Phrase, Word, Sentence, Recording, VersionedString
-from recval.model import RecordingQuality, ElicitationOrigin
 from recval.app import user_datastore
-
+from recval.model import (ElicitationOrigin, Phrase, Recording,
+                          RecordingQuality, VersionedString, Word)
 
 TEST_WAV = Path(__file__).parent / 'fixtures' / 'test.wav'
 assert TEST_WAV.exists()
