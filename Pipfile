@@ -1,0 +1,20 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+sh = ">=1.12"
+awesome-slugify = ">=1.6"
+pydub = ">=0.21.0"
+Flask = ">=0.12.2"
+Flask-SQLAlchemy = ">=2.3.2"
+
+[dev-packages]
+hypothesis = ">=3.56.5"
+pycodestyle = ">=2.3.1"
+pytest = ">=3.4.1"
+mypy = ">=0.560"
+
+[requires]
+python_version = "3.6"
