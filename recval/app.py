@@ -16,8 +16,9 @@ from flask import (  # type: ignore
 )
 from sqlalchemy.orm import subqueryload  # type: ignore
 from werkzeug.exceptions import NotFound  # type: ignore
+from flask_security import Security, SQLAlchemyUserDatastore  # type: ignore
 
-from recval.model import db, Phrase
+from recval.model import db, Phrase, user_datastore
 
 # Configure from default settings, then the file specifeied by the environment
 # variable.
@@ -30,7 +31,10 @@ app.config.from_envvar('RECVAL_SETTINGS')
 if app.config['SQLALCHEMY_DATABASE_URI'] == app.config['DEFAULT_DATABASE']:
     app.logger.warn('Using default database: %s', app.config['DEFAULT_DATABASE'])
 
+# Setup SQLAlchemy and Flask-Security
 db.init_app(app)
+security = Security(app, user_datastore)
+
 
 # Transcoded audio files.
 AUDIO_MIME_TYPES = {

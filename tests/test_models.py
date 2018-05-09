@@ -13,7 +13,7 @@ from sqlalchemy.exc import SQLAlchemyError  # type: ignore
 from recval.model import Phrase, Word, Sentence, Recording, VersionedString
 from recval.model import RecordingQuality, ElicitationOrigin
 from recval.model import db as _db
-from recval.app import app as _app
+from recval.app import app as _app, user_datastore
 
 
 TEST_WAV = Path(__file__).parent / 'fixtures' / 'test.wav'
@@ -189,6 +189,25 @@ def test_search_by_transcription(db, acimosis):
     assert len(results) == 1
 
 
+def test_authentication(db):
+    from recval.model import User, user_datastore
+    user_datastore.create_user(email='test@example.com',
+                               password='<none>')
+    db.session.commit()
+
+    assert User.query.count() == 1
+
+
+
+
+# TODO: test validator role
+# TODO: test instructor role
+# TODO:
+# TODO: test simple authentication
+# TODO: test versioned strings with authors
+# TODO: test roles...?
+
+
 @pytest.fixture()
 def acimosis(db):
     """
@@ -221,6 +240,8 @@ def db(app):
     test.
     """
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///:memory:'
+
+    # TODO: place audio in temporary directory.
 
     # Setup the database.
     _db.create_all()

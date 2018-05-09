@@ -16,6 +16,9 @@ from pathlib import Path
 
 from flask import current_app, url_for  # type: ignore
 from flask_sqlalchemy import SQLAlchemy  # type: ignore
+from flask_security import (  # type: ignore
+    UserMixin, RoleMixin, SQLAlchemyUserDatastore
+)
 from sqlalchemy.orm import validates  # type: ignore
 from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
 
@@ -329,16 +332,46 @@ class VersionedString(db.Model):  # type: ignore
         return instance
 
 
-'''
-I will implement this stuff in the next sprint, but I gotta get it out of
-my mind first.
+# Define models required for Flask-Security:
+# https://pythonhosted.org/Flask-Security/quickstart.html
+roles_users = db.Table(
+    'roles_users',
+    db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
+    db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
+)
 
-class Author(db.Model):
+class Role(db.Model, RoleMixin):  # type: ignore
+    """
+    Specifies a user's roles. Possible roles:
+     - validator
+     - instructor
+     - <importer>
+
+    Most of this code is boilerplate from:
+    https://pythonhosted.org/Flask-Security/quickstart.html
+    """
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(255), unique=True)
+    description = db.Column(db.String(255))
+
+
+class User(db.Model, UserMixin):  # type: ignore
     """
     An author is allowed to create and update VersionedStrings.
+
+    Most of this code is boilerplate from:
+    https://pythonhosted.org/Flask-Security/quickstart.html
     """
-    email = db.Column(db.Text, primary_key=True)
-'''
+    id = db.Column(db.Integer(), primary_key=True)
+    email = db.Column(db.String(255), unique=True)
+    password = db.Column(db.String(255))
+    active = db.Column(db.Boolean())
+    confirmed_at = db.Column(db.DateTime())
+    roles = db.relationship('Role', secondary=roles_users,
+                            backref=db.backref('users', lazy='dynamic'))
+
+
+user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 
 
 def compute_fingerprint(file_path: Path) -> str:
