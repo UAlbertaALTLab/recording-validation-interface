@@ -371,6 +371,8 @@ class User(db.Model, UserMixin):  # type: ignore
                             backref=db.backref('users', lazy='dynamic'))
 
 
+# TODO: add roles:
+# - create_role('validator')
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 
 

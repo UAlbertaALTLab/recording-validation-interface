@@ -62,6 +62,7 @@ def list_phrases(page):
     )
 
 
+# TODO: require validator role
 @app.route('/phrase/<int:phrase_id>', methods=['PATCH'])
 @login_required
 def update_text(phrase_id):

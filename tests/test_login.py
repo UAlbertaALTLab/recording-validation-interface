@@ -27,10 +27,11 @@ def test_change_string_unauthenticated(app, client, acimosis):
                            value='pup pup'),
             content_type='application/json'
         )
-        print(rv.headers['location'])
         # Ensure the app does not allow us to do this without logging in.
-        assert rv.status_code in (401, 403, 404)
+        assert rv.status_code in (302, 401, 403, 404)
 
+
+# TODO: create users, and login as them
 
 @pytest.mark.skip
 def test_login(app, client):
