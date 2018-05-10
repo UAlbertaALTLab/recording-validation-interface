@@ -5,6 +5,10 @@
 
 """
 The data models for the validation app.
+
+See database to initialize and create the database.
+
+Do not use db directly; instead, use database.init_db() instead.
 """
 
 import warnings
@@ -24,7 +28,6 @@ from sqlalchemy.orm import validates  # type: ignore
 from recval.normalization import normalize as normalize_utterance
 
 db = SQLAlchemy()
-Model = db.Model
 
 
 class RecordingQuality(Enum):

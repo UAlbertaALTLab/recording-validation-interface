@@ -27,24 +27,24 @@ def db(app):
 
     Based on http://alextechrants.blogspot.ca/2014/01/unit-testing-sqlalchemy-apps-part-2.html
     """
-    from recval.model import db as _db
+    from recval.database import init_db
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///:memory:'
 
     # TODO: place audio in temporary directory.
 
     # Setup the database.
-    _db.create_all()
-    _db.session.flush()
-    _db.session.expunge_all()
-    _db.session.commit()
+    db = init_db()
+    db.session.flush()
+    db.session.expunge_all()
+    db.session.commit()
 
-    yield _db
+    yield db
 
     # Tear down the database.
-    _db.session.rollback()
-    _db.drop_all()
-    _db.session.flush()
-    _db.session.expunge_all()
+    db.session.rollback()
+    db.drop_all()
+    db.session.flush()
+    db.session.expunge_all()
 
 
 @pytest.fixture()

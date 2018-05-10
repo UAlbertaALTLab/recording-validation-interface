@@ -17,7 +17,8 @@ from typing import Dict, Any
 from tqdm import tqdm  # type: ignore
 
 from recval.extract_phrases import RecordingExtractor, RecordingInfo
-from recval.model import Phrase, Recording, Sentence, Word, VersionedString, db
+from recval.model import Phrase, Recording, Sentence, Word, VersionedString
+from recval.database import init_db
 
 
 info2phrase = {}  # type: ignore
@@ -74,10 +75,11 @@ if __name__ == '__main__':
 
     ex = RecordingExtractor()
     with app.app_context():
-        # Create the schema.
-        db.create_all()
         dest = app.config['TRANSCODED_RECORDINGS_PATH']
         assert dest.resolve().is_dir()
+
+        # Create the schema.
+        db = init_db()
 
         # Insert each thing found.
         for info, audio in tqdm(ex.scan(root_directory=directory)):
