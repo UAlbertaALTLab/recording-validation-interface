@@ -20,6 +20,10 @@ def init_db():
         name='<importer>',
         description='A bot that imports recordings and other data.'
     )
+    validator_role = user_datastore.create_role(
+        name='validator',
+        description='A user that can change transcriptions and translations'
+    )
 
     # Create the special <importer> account.
     user_datastore.create_user(
