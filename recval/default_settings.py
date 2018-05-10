@@ -16,8 +16,8 @@ DEFAULT_DATABASE = 'sqlite:////tmp/recval-temporary.db'
 
 # ################################# Flask ####################################
 
-# TODO: Consider setting APPLICATION_ROOT -- http://flask.pocoo.org/docs/0.12/config/
-# TODO: Consider settings USE_X_SENDFILE
+# TODO: Consider settings USE_X_SENDFILE:
+# See: http://flask.pocoo.org/docs/0.12/config/
 
 # ############################### SQLAlchemy #################################
 
@@ -32,3 +32,11 @@ SQLALCHEMY_TRACK_MODIFICATIONS = False
 # ################################# RecVal ###################################
 
 TRANSCODED_RECORDINGS_PATH = REPOSITORY_ROOT / 'static' / 'audio'
+
+# NOTE: you must generate a secret key.  This should be a
+# **cryptographically** generated random hash of some sort.
+# An easy way to create one is to use Python3.6's secrets module:
+#
+# import secrets;
+# print(secrets.token_hex())
+SECRET_KEY = None

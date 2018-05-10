@@ -8,7 +8,7 @@ Install
 
 Requires Python 3.6.
 
-Then, create a virtualenv (if applicable), and install the requirements:
+Create a virtualenv (if applicable), and install the requirements:
 
     python3 -m pip install -r requirements.txt
 
@@ -19,9 +19,13 @@ Create a file called `recval_settings.py` based on this template:
 ```python
 TRANSCODED_RECORDINGS_PATH = '/path/to/audio/directory'
 SQLALCHEMY_DATABASE_URI = 'sqlite:///path/to/recval.db'
+SECRET_KEY =  # generate a cryptographically generated hash for this
 ```
 
-Save this file somewhere, preferably outside of the repository.
+Save this file somewhere. If it's the deployed/production version of the
+site, save this file outside of the repository, and outside of
+`DOCUMENT_ROOT`. For local development, it's fine to have this file in
+the local directory.
 
 
 Running
@@ -61,7 +65,7 @@ Then run:
     ./run-tests
 
 This will type-check the Python code with mypy, start a temporary
-server, and run the Selenium integration tests.
+server, and run the tests.
 
 Any additional arguments are passed to `py.test`.
 
