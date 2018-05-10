@@ -61,9 +61,7 @@ def test_database_has_bot_user(db):
     There should be one bot user, the importer.
     It should have the importer role.
     """
-    from recval.model import user_datastore
-    importer = user_datastore.find_user(email='importer@localhost')
-    assert importer is not None
+    from recval.database import importer
     assert importer.has_role('<importer>')
 
 
@@ -71,10 +69,8 @@ def test_cannot_login_as_importer(client, app):
     """
     It should be IMPOSSIBLE to login as the importer!
     """
-    from recval.model import user_datastore
+    from recval.database import importer
 
-    # The password should be unset...
-    importer = user_datastore.find_user(email='importer@localhost')
     assert importer.password is None
 
     # Additionally, logging in should not work.
@@ -103,7 +99,6 @@ def test_validator_can_change_transcriptions(app, client, acimosis, validator):
             content_type='application/json'
         )
         assert rv.status_code == 204, rv.data.decode('UTF-8')
-
 
 
 def json_body(**kwargs) -> bytes:

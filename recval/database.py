@@ -7,6 +7,18 @@
 Defines rountines for creating the database.
 """
 
+from werkzeug.local import LocalProxy
+
+# The default email addres of the importer user. It should not really exist.
+_IMPORTER_EMAIL = 'importer@localhost'
+
+
+# A proxy for the importer -- a bot with the <importer> role.
+@LocalProxy
+def importer():
+    from recval.model import user_datastore
+    return user_datastore.find_user(email=_IMPORTER_EMAIL)
+
 
 def init_db():
     """
@@ -27,7 +39,7 @@ def init_db():
 
     # Create the special <importer> account.
     user_datastore.create_user(
-        email='importer@localhost',
+        email=_IMPORTER_EMAIL,
         password=None,
         active=False,
         confirmed_at=None,
