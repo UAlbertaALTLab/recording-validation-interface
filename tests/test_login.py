@@ -42,6 +42,23 @@ def test_login(app, client):
         assert 200 == rv.status_code
 
 
+def test_database_has_bot_user(db):
+    """
+    There should be one bot user, the importer.
+    It should have the importer role.
+    """
+    from recval.model import user_datastore
+    importer = user_datastore.find_user(email='importer@localhost')
+    assert importer is not None
+    assert importer.has_role('<importer>')
+
+
+# It should be IMPOSSIBLE to login as the importer!
+
+
 def json_body(**kwargs) -> bytes:
+    """
+    Create a JSON body, for sending as a request body to an endpoint.
+    """
     import json
     return json.dumps(dict(**kwargs)).encode('UTF-8')

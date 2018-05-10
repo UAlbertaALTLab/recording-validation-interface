@@ -182,11 +182,12 @@ def test_search_by_transcription(db, acimosis):
 
 def test_authentication(db):
     from recval.model import User, user_datastore
+    before = User.query.count()
     user_datastore.create_user(email='test@example.com',
                                password='<none>')
     db.session.commit()
 
-    assert User.query.count() == 1
+    assert User.query.count() == before + 1
 
 
 # TODO: test validator role
