@@ -24,7 +24,7 @@ def init_db():
     # Create the special <importer> account.
     user_datastore.create_user(
         email='importer@localhost',
-        password='',
+        password=None,
         active=False,
         confirmed_at=None,
         roles=[importer_role]

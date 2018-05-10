@@ -53,7 +53,26 @@ def test_database_has_bot_user(db):
     assert importer.has_role('<importer>')
 
 
-# It should be IMPOSSIBLE to login as the importer!
+def test_cannot_login_as_importer(client, app):
+    """
+    It should be IMPOSSIBLE to login as the importer!
+    """
+    from recval.model import user_datastore
+
+    # The password should be unset...
+    importer = user_datastore.find_user(email='importer@localhost')
+    assert importer.password is None
+
+    # Additionally, logging in should not work.
+    with app.test_request_context():
+        rv = client.post(url_for('security.login'),
+                         follow_redirects=True,
+                         data=dict(
+                             email='importer@localhost',
+                             password=''
+                         ))
+        # TODO: Create a more robust test :/
+        assert b'Password not provided' in rv.data
 
 
 def json_body(**kwargs) -> bytes:
