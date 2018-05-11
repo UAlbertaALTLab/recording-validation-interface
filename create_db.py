@@ -90,12 +90,15 @@ if __name__ == '__main__':
                 # See: https://superuser.com/a/1055816/711047
                 audio.set_channels(1).\
                     export(fspath(recording_path),
-                           format='adts', codec='aac')
-                           # tags=dict(title=info.transcription,
-                           #           artist=info.speaker,
-                           #           album=info.session,
-                           #           year=info.session.year),
-                           # id3v2_version='3')
+                           format='adts', codec='aac',
+                           # https://www.ffmpeg.org/doxygen/3.2/group__metadata__api.html
+                           tags=dict(title=info.transcription,
+                                     performer=info.speaker,
+                                     album=info.session,
+                                     language="crk",
+                                     creation_time=f"{info.session.date:%Y-%m-%d}",
+                                     year=info.session.year),
+                           id3v2_version='3')
                 assert recording_path.exists()
             phrase = make_phrase(info)
             recording = Recording.new(phrase=phrase,
