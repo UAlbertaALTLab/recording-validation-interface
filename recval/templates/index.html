@@ -90,7 +90,7 @@
               {% endif %}
 
               <audio controls preload=none>
-                <source src="{{ recording.aac_path | urlencode }}" type="audio/aac"/>
+                <source src="{{ recording | audio_url }}" type="audio/aac"/>
               </audio>
             </li>
 

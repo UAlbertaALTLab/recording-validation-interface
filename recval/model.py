@@ -230,10 +230,6 @@ class Recording(db.Model):  # type: ignore
                    phrase=phrase,
                    speaker=speaker)
 
-    @property
-    def aac_path(self) -> str:
-        return url_for('send_audio', filename=f"{self.fingerprint}.m4a")
-
 
 class VersionedString(db.Model):  # type: ignore
     """

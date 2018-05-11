@@ -17,7 +17,7 @@ from flask_security import (Security, SQLAlchemyUserDatastore,  # type: ignore
 from sqlalchemy.orm import subqueryload  # type: ignore
 from werkzeug.exceptions import NotFound  # type: ignore
 
-from recval.model import Phrase, db, user_datastore
+from recval.model import Phrase, Recording, db, user_datastore
 
 # Configure from default settings, then the file specifeied by the environment
 # variable.
@@ -110,6 +110,19 @@ def send_audio(filename):
     assert path.resolve().is_dir()
     return send_from_directory(fspath(path), filename,
                                mimetype=content_type)
+
+
+@app.template_filter('audio_url')
+def audio_url_filter(rec: Recording) -> str:
+    """
+    Filter that returns a url to the compressed audio file for this particular
+    recording.
+
+    Usage (in a template):
+
+        <source src="{{ recording | audio_url }}" type="audio/aac" />
+    """
+    return url_for('send_audio', filename=f"{rec.fingerprint}.m4a")
 
 
 @app.context_processor
