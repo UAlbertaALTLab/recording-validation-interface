@@ -232,7 +232,7 @@ class Recording(db.Model):  # type: ignore
 
     @property
     def aac_path(self) -> str:
-        return url_for('send_audio', filename=f"{self.fingerprint}.mp4")
+        return url_for('send_audio', filename=f"{self.fingerprint}.m4a")
 
 
 class VersionedString(db.Model):  # type: ignore
@@ -402,7 +402,7 @@ def transcode_to_aac(recording_path: Path, fingerprint: str) -> None:
     transcoded_recordings_path = Path(current_app.config['TRANSCODED_RECORDINGS_PATH']).resolve()
     assert transcoded_recordings_path.is_dir()
 
-    out_filename = transcoded_recordings_path / f"{fingerprint}.mp4"
+    out_filename = transcoded_recordings_path / f"{fingerprint}.m4a"
     if out_filename.exists():
         current_app.logger.info('File already transcoded. Skipping: %s', out_filename)
         return

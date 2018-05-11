@@ -37,8 +37,7 @@ security = Security(app, user_datastore)
 
 # Transcoded audio files.
 AUDIO_MIME_TYPES = {
-    # TODO: m4a everything!
-    '.mp4': 'audio/aac',
+    '.m4a': 'audio/aac',
 }
 
 
