@@ -23,11 +23,11 @@ def test_insert_word(db, wave_file_path):
     db.session.add(recording)
     db.session.commit()
 
-    result_set = Word.query.filter(Word.translation == 'puppy').all()
+    result_set = Word.query_by(translation='puppy').all()
     assert len(result_set) >= 1
     assert word in result_set
 
-    result_set = Word.query.filter(Word.transcription == 'acimosis').all()
+    result_set = Word.query_by(transcription='acimosis').all()
     assert len(result_set) >= 1
     assert word in result_set
 
@@ -174,9 +174,7 @@ def test_search_by_transcription(db, acimosis):
     assert len(results) == 2
     del results
 
-    results = Phrase.query.filter(
-        Phrase.transcription_id == VersionedString.id
-    ).filter(Phrase.transcription == 'acimosisak').all()
+    results = Phrase.query_by(transcription=' acimosisak ').all()
     assert len(results) == 1
 
 

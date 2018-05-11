@@ -115,13 +115,6 @@ class Phrase(db.Model):  # type: ignore
         previous = self.transcription_meta
         self.transcription_meta = previous.derive(value, '<unknown author>')
 
-    @transcription.expression  # type: ignore
-    def transcription(cls):
-        warnings.warn("Deprecated. "
-                      "The outer expression MUST join on VersionedString "
-                      "for this query to work as expected.")
-        return VersionedString.value
-
     @hybrid_property
     def translation(self) -> str:
         value = self.translation_meta.value
@@ -133,13 +126,6 @@ class Phrase(db.Model):  # type: ignore
         # TODO: set current author.
         previous = self.translation_meta
         self.translation_meta = previous.derive(value, '<unknown author>')
-
-    @translation.expression  # type: ignore
-    def translation(cls):
-        warnings.warn("Deprecated. "
-                      "The outer expression MUST join on VersionedString "
-                      "for this query to work as expected.")
-        return VersionedString.value
 
     @property
     def translation_history(self):
@@ -164,6 +150,26 @@ class Phrase(db.Model):  # type: ignore
 
     def __repr__(self):
         return f"<{type(self).__name__} {self.id} {self.transcription!r}>"
+
+    @classmethod
+    def query_by(cls, transcription=None, translation=None):
+        """
+        Returns a query that will search on the text value of transcription or
+        translation.
+        """
+        assert bool(transcription) ^ bool(translation), (
+            "Must search for one of transcription or translation; not both"
+        )
+        query = Phrase.query
+        if transcription:
+            query = query.\
+                filter(VersionedString.id == cls.transcription_id)
+        else:
+            assert translation
+            query = query.\
+                filter(VersionedString.id == cls.translation_id)
+        value = normalize_utterance(transcription or translation)
+        return query.filter(VersionedString.value == value)
 
 
 class Word(Phrase):
