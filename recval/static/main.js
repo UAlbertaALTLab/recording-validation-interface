@@ -13,6 +13,7 @@ $(function () {
 
     if (!updateURI) {
       console.error('No update URI found for ', event.target);
+      return;
     }
 
     var original = $el.text();
@@ -23,8 +24,12 @@ $(function () {
       return;
     }
 
+    /**
+     * Do a PATCH to this API, with our credentials.
+     */
     fetch(updateURI, {
       method: 'PATCH',
+      credentials: 'same-origin',
       body: JSON.stringify({ field: field, value: value }),
       headers: {
         'Content-Type': 'application/json',
