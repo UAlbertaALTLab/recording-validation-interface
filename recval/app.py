@@ -13,7 +13,7 @@ from pathlib import Path
 from flask import (Flask, abort, redirect, render_template,  # type: ignore
                    request, send_from_directory, url_for)
 from flask_security import (Security, SQLAlchemyUserDatastore,  # type: ignore
-                            login_required)
+                            current_user, roles_required)
 from sqlalchemy.orm import subqueryload  # type: ignore
 from werkzeug.exceptions import NotFound  # type: ignore
 
@@ -63,7 +63,7 @@ def list_phrases(page):
 
 # TODO: require validator role
 @app.route('/phrase/<int:phrase_id>', methods=['PATCH'])
-@login_required
+@roles_required('validator')
 def update_text(phrase_id):
     """
     Changes the text for a field of the given phrase.
@@ -75,6 +75,7 @@ def update_text(phrase_id):
             "value": "<new contents for the field>",
         }
     """
+
     # Ensure the field exists first.
     body = request.get_json()
     field = body.get('field')
@@ -109,3 +110,8 @@ def send_audio(filename):
     assert path.resolve().is_dir()
     return send_from_directory(fspath(path), filename,
                                mimetype=content_type)
+
+
+@app.context_processor
+def inject_user():
+    return dict(user=current_user)

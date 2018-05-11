@@ -17,7 +17,15 @@ def create(args):
     """
     Create a new user.
     """
+    from recval.app import app, user_datastore, db
+
     email = args.email
+
+    with app.app_context():
+        if user_datastore.find_user(email=email):
+            print("There is already a user whose email is", email + "!")
+            sys.exit(1)
+
     print("Creating user with email", email)
     password = getpass(f'Enter a new password for {email}: ')
     password_verify = getpass('Re-type password: ')
@@ -33,19 +41,20 @@ def create(args):
         print("Will NOT create user.")
         sys.exit(1)
 
-    from recval.app import app, user_datastore, db
     with app.app_context():
-        validator = user_datastore.find_role('validator')
-        assert validator is not None
-        user_datastore.create_user(
+        new_user = user_datastore.create_user(
             email=email,
             password=hash_password(password),
             active=True,
             confirmed_at=datetime.utcnow(),
-            roles=[validator]
+            roles=['validator']
         )
         db.session.commit()
-        assert user_datastore.find_user(email=email) is not None
+
+        # Make sure we stored them!
+        stored_user = user_datastore.find_user(email=email)
+        assert stored_user is not None
+        assert stored_user.has_role('validator')
 
 
 parser = argparse.ArgumentParser()
