@@ -10,7 +10,7 @@ import sys
 from datetime import datetime
 from getpass import getpass
 
-from flask_security.utils import encrypt_password  # type: ignore
+from flask_security.utils import hash_password  # type: ignore
 
 
 def create(args):
@@ -39,7 +39,7 @@ def create(args):
         assert validator is not None
         user_datastore.create_user(
             email=email,
-            password=encrypt_password(password),
+            password=hash_password(password),
             active=True,
             confirmed_at=datetime.utcnow(),
             roles=[validator]
