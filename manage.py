@@ -2,16 +2,21 @@
 # -*- coding: UTF-8 -*-
 
 """
-Manage user accounts.
+Script to manage user accounts.
 """
 
 import argparse
 import sys
-from getpass import getpass
 from datetime import datetime
+from getpass import getpass
+
+from flask_security.utils import encrypt_password  # type: ignore
 
 
 def create(args):
+    """
+    Create a new user.
+    """
     email = args.email
     print("Creating user with email", email)
     password = getpass(f'Enter a new password for {email}: ')
@@ -34,7 +39,7 @@ def create(args):
         assert validator is not None
         user_datastore.create_user(
             email=email,
-            password=password,
+            password=encrypt_password(password),
             active=True,
             confirmed_at=datetime.utcnow(),
             roles=[validator]
@@ -54,4 +59,6 @@ parser_create.set_defaults(func=create)
 
 if __name__ == '__main__':
     args = parser.parse_args()
+    if not hasattr(args, 'func'):
+        parser.error('must specify a subcommand')
     args.func(args)

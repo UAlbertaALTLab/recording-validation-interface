@@ -29,14 +29,21 @@ SQLALCHEMY_DATABASE_URI = DEFAULT_DATABASE
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
+# ############################# Flask-Security ############################# #
+
+# Password hashing algorithm. Either BCrypt or PBKDF2 are good choices.
+SECURITY_PASSWORD_HASH = 'pbkdf2_sha512'
+
+
 # ################################# RecVal ###################################
 
 TRANSCODED_RECORDINGS_PATH = REPOSITORY_ROOT / 'static' / 'audio'
 
-# NOTE: you must generate a secret key.  This should be a
-# **cryptographically** generated random hash of some sort.
-# An easy way to create one is to use Python3.6's secrets module:
+# NOTE: you must generate a secret key and password salt.  This should be a
+# **cryptographically** generated random hash of some sort.  An easy way to
+# create one is to use Python3.6's secrets module:
 #
 # import secrets;
 # print(secrets.token_hex())
 SECRET_KEY = None
+SECURITY_PASSWORD_SALT = None
