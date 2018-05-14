@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
-import pytest
-from hypothesis import given
-from hypothesis.strategies import text
+import pytest  # type: ignore
+from hypothesis import given  # type: ignore
+from hypothesis.strategies import text  # type: ignore
 
 from recval.normalization import normalize, to_indexable_form
 
@@ -40,59 +40,37 @@ def test_index():
     # Ê (->) {Ē}, # E + combining macron U+0304
     # Î (->) {Ī}, # I + combining macron U+0304
     # Ô (->) {Ō}, # O + combining macron U+0304
+    assert "aeio" == to_indexable_form("A\u0304E\u0304I\u0304O\u0304")
 
     # â (->) ā, # a macron
     # ê (->) ē, # e macron
     # î (->) ī, # i macron
     # ô (->) ō, # o macron
+    assert "aeio" == to_indexable_form("\u0101\u0113\u012B\u014d")
 
     # Â (->) Ā, # A macron
     # Ê (->) Ē, # E macron
     # Î (->) Ī, # I macron
     # Ô (->) Ō, # O macron
-
-    # a (->) Â, # THESE to be deleted when the SoMe variant is running
-    # e (->) Ê, # THESE to be deleted when the SoMe variant is running
-    # i (->) Î, # THESE to be deleted when the SoMe variant is running
-    # o (->) Ô, # THESE to be deleted when the SoMe variant is running
+    assert "aeio" == to_indexable_form("\u0100\u0112\u012A\u014C")
 
     # â (->) {â}, # a + combining circumflex accent U+0302
     # ê (->) {ê}, # e + combining circumflex accent U+0302
     # î (->) {î}, # i + combining circumflex accent U+0302
     # ô (->) {ô}, # o + combining circumflex accent U+0302
+    assert "aeio" == to_indexable_form("a\u0302e\u0302i\u0302o\u0302")
 
     # Â (->) {Â}, # A + combining circumflex accent U+0302
     # Ê (->) {Ê}, # E + combining circumflex accent U+0302
     # Î (->) {Î}, # I + combining circumflex accent U+0302
     # Ô (->) {Ô}, # O + combining circumflex accent U+0302
-
-    # â (->) a, # THESE to be deleted when the SoMe variant is running
-    # ê (->) e, # THESE to be deleted when the SoMe variant is running
-    # î (->) i, # THESE to be deleted when the SoMe variant is running
-    # ô (->) o, # THESE to be deleted when the SoMe variant is running
+    assert "aeio" == to_indexable_form("A\u0302E\u0302I\u0302O\u0302")
 
     # NS 152 materials consistantly write some vowels as long where Arok's
     # write them as short. E.G. NS 152 give 'askîy' and Arok gives 'askiy.'
-
-    # â (->) A, # THESE to be deleted when the SoMe variant is running
-    # ê (->) E, # THESE to be deleted when the SoMe variant is running
-    # î (->) I, # THESE to be deleted when the SoMe variant is running
-    # ô (->) O,  # THESE to be deleted when the SoMe variant is running
-
-    # a (->) A, # THESE to be deleted when the SoMe variant is running
-    # e (->) E, # THESE to be deleted when the SoMe variant is running
-    # i (->) I, # THESE to be deleted when the SoMe variant is running
-    # o (->) O,  # THESE to be deleted when the SoMe variant is running
-
-    # a (->) â, # THESE to be deleted when the SoMe variant is running
-    # e (->) ê, # THESE to be deleted when the SoMe variant is running
-    # i (->) î, # THESE to be deleted when the SoMe variant is running
-    # o (->) ô # THESE to be deleted when the SoMe variant is running
-
-    # ;
+    assert "askiy" == to_indexable_form("askîy")
 
     # # Explanation:
     # # lexical side (->) input
     # # Or, in other words:
     # # correct (->) in use out there
-    # """
