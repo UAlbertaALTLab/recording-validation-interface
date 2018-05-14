@@ -189,8 +189,11 @@ def test_authentication(db):
 
 
 def test_search(db, acimosis, acimosisak):
-    word = Word.search_by('acimosis').first()
-    assert word.transcription == 'acimosis'
+    """
+    Test the full-text search feature.
+    """
+    word = Word.search_by('puppy').one()
+    assert word.translation == 'puppy'
 
 
 @pytest.fixture

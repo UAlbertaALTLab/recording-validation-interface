@@ -22,7 +22,9 @@ from flask import current_app, url_for  # type: ignore
 from flask_security import (RoleMixin, SQLAlchemyUserDatastore,  # type: ignore
                             UserMixin)
 from flask_sqlalchemy import SQLAlchemy  # type: ignore
+from sqlalchemy import DDL, event  # type: ignore
 from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
+from sqlalchemy.sql.expression import text  # type: ignore
 from sqlalchemy.orm import validates  # type: ignore
 
 from recval.normalization import normalize as normalize_utterance
@@ -170,6 +172,33 @@ class Phrase(db.Model):  # type: ignore
                 filter(VersionedString.id == cls.translation_id)
         value = normalize_utterance(transcription or translation)
         return query.filter(VersionedString.value == value)
+
+    @classmethod
+    def search_by(cls, search_string: str):
+        identity = cls.__mapper_args__['polymorphic_identity']
+        return cls.query.from_statement(text(f"""
+            SELECT *
+              FROM phrase
+             WHERE translation_id IN
+             (SELECT id FROM versioned_string, versioned_string_fts
+               WHERE versioned_string_fts MATCH :query
+                 AND versioned_string.rowid = versioned_string_fts.docid)
+                 AND phrase.type in (:type)
+        """)).params(query=search_string, type=identity)
+        # SELECT phrase.id FROM phrase, versioned_string, versioned_string_fts
+        # WHERE versioned_string.rowid = versioned_string_fts.docid AND
+        # versioned_string_fts MATCH 'pup*' AND (versioned_string.id =
+        # phrase.translation_id OR versioned_string.id =
+        # phrase.transcription_id);
+
+        #   SELECT phrase.id
+        #     FROM phrase
+        #     WHERE transcription_id IN
+        #     (SELECT versioned_string.id
+        #        FROM versioned_string, {VERSIONED_STRING_FTS}
+        #       WHERE {VERSIONED_STRING_FTS} MATCH :query
+        #         AND {VERSIONED_STRING_FTS}.docid = versioned_string.rowid)
+        #     AND phrase.type IN (:type)
 
 
 class Word(Phrase):
@@ -335,6 +364,48 @@ class VersionedString(db.Model):  # type: ignore
         return instance
 
 
+VERSIONED_STRING_FTS = 'versioned_string_fts'
+
+# Create a "content-less" full-text search table using SQLite3's FTS4 module.
+# https://www.sqlite.org/fts3.html#_external_content_fts4_tables_
+event.listen(
+    VersionedString.__table__,
+    'after_create',
+    DDL(f'''
+        CREATE VIRTUAL TABLE {VERSIONED_STRING_FTS}
+        USING fts4(content={VersionedString.__tablename__}, value)
+    ''').execute_if(dialect='sqlite')
+)
+# Make sure we drop the table too.
+event.listen(
+    VersionedString.__table__,
+    'before_drop',
+    DDL(f'''
+        DROP TABLE {VERSIONED_STRING_FTS}
+    ''').execute_if(dialect='sqlite')
+)
+
+
+@event.listens_for(VersionedString, 'after_insert')
+def insert_into_fts_table(mapper, connection, target):
+    """
+    Automatically indexes terms for full-text search when they are inserted
+    into the VersionedString table.
+    """
+    # In order to insert into a "contentless" FTS table, we MUST always insert
+    # the rowid. However, we only know the hash of the versioned string we
+    # just inserted; not the rowid. This insert statement lets the database
+    # engine figure out the value from the rowid it created.
+    connection.execute(
+        f'''
+           INSERT INTO {VERSIONED_STRING_FTS} (docid, value)
+           SELECT rowid, value
+           FROM {VersionedString.__tablename__}
+           WHERE id = ?
+        ''', (target.id,)
+    )
+
+
 # Define models required for Flask-Security:
 # https://pythonhosted.org/Flask-Security/quickstart.html
 roles_users = db.Table(
@@ -376,8 +447,6 @@ class User(db.Model, UserMixin):  # type: ignore
                             backref=db.backref('users', lazy='dynamic'))
 
 
-# TODO: add roles:
-# - create_role('validator')
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 
 
