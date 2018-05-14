@@ -25,4 +25,10 @@ def to_indexable_form(text: str) -> str:
 
     # TODO: definitely some unicode normalization going on here.
 
-    return re.sub(r"(?<=[qwrtpsdfghjklzxcvbnm])'", "i", text)
+    # Decompose the text...
+    text = unicodedata.normalize('NFD', text)
+    # So that we can rip off combining accents (e.g., circumflex or macron)
+    text = re.sub(r"[\u0300-\u03ff]", '', text)
+    # Undo short-i elision
+    text = re.sub(r"(?<=[qwrtpsdfghjklzxcvbnm])'", "i", text)
+    return text

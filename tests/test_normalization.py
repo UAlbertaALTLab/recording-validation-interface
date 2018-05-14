@@ -34,6 +34,7 @@ def test_index():
     # ê (->) {ē}, # e + combining macron U+0304
     # î (->) {ī}, # i + combining macron U+0304
     # ô (->) {ō}, # o + combining macron U+0304
+    assert "aeio" == to_indexable_form("a\u0304e\u0304i\u0304o\u0304")
 
     # Â (->) {Ā}, # A + combining macron U+0304
     # Ê (->) {Ē}, # E + combining macron U+0304
