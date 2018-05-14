@@ -213,6 +213,14 @@ def test_search_phrases(db, acimosis, acimosisak):
     p = Phrase.search_by('acimosisak').one()
 
 
+def test_search_transcription_accents(db, acimosis, acimosisak):
+    """
+    Test the full-text search for matches with variations in transcription.
+    """
+    word = Word.search_by("ÂCIMOS'S").one()
+    assert word.translation == 'puppy'
+
+
 @pytest.fixture
 def acimosisak(db):
     word = Word(transcription='acimosisak', translation='litter of pups')

@@ -27,7 +27,7 @@ from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
 from sqlalchemy.sql.expression import text  # type: ignore
 from sqlalchemy.orm import validates  # type: ignore
 
-from recval.normalization import normalize as normalize_utterance
+from recval.normalization import to_indexable_form, normalize as normalize_utterance
 
 db = SQLAlchemy()
 
@@ -191,7 +191,7 @@ class Phrase(db.Model):  # type: ignore
                        AND versioned_string.rowid = versioned_string_fts.docid) AS vs
              WHERE (translation_id = vs.id OR transcription_id = vs.id)
                AND phrase.type in (:type)
-        """)).params(query=search_string, type=identity)
+        """)).params(query=to_indexable_form(search_string), type=identity)
 
 
 class Word(Phrase):
@@ -392,10 +392,10 @@ def insert_into_fts_table(mapper, connection, target):
     connection.execute(
         f'''
            INSERT INTO {VERSIONED_STRING_FTS} (docid, value)
-           SELECT rowid, value
+           SELECT rowid, ?
            FROM {VersionedString.__tablename__}
            WHERE id = ?
-        ''', (target.id,)
+        ''', (to_indexable_form(target.value), target.id,)
     )
 
 
