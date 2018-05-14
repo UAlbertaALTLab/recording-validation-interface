@@ -188,9 +188,13 @@ def test_authentication(db):
     assert User.query.count() == before + 1
 
 
-# TODO: test validator role
-# TODO: test instructor role
-# TODO:
-# TODO: test simple authentication
-# TODO: test versioned strings with authors
-# TODO: test roles...?
+def test_search(db, acimosis, acimosisak):
+    word = Word.search_by('acimosis').first()
+    assert word.transcription == 'acimosis'
+
+
+@pytest.fixture
+def acimosisak(db):
+    word = Word(transcription='acimosisak', translation='litter of pups')
+    db.session.add(word)
+    db.session.commit()
