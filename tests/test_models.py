@@ -204,6 +204,15 @@ def test_search_full_transcription(db, acimosis, acimosisak):
     assert word.transcription == 'acimosisak'
 
 
+@pytest.mark.skip
+def test_search_phrases(db, acimosis, acimosisak):
+    """
+    Test that you can search on both phrases and sentences.
+    """
+    # TODO: a test that inserts both a sentence and a word.
+    p = Phrase.search_by('acimosisak').one()
+
+
 @pytest.fixture
 def acimosisak(db):
     word = Word(transcription='acimosisak', translation='litter of pups')
