@@ -188,12 +188,20 @@ def test_authentication(db):
     assert User.query.count() == before + 1
 
 
-def test_search(db, acimosis, acimosisak):
+def test_search_full_translation(db, acimosis, acimosisak):
     """
-    Test the full-text search feature.
+    Test the full-text search feature for exact words in the translation.
     """
     word = Word.search_by('puppy').one()
     assert word.translation == 'puppy'
+
+
+def test_search_full_transcription(db, acimosis, acimosisak):
+    """
+    Test the full-text search feature for exact words in the transcription.
+    """
+    word = Word.search_by('acimosisak').one()
+    assert word.transcription == 'acimosisak'
 
 
 @pytest.fixture

@@ -175,30 +175,23 @@ class Phrase(db.Model):  # type: ignore
 
     @classmethod
     def search_by(cls, search_string: str):
+        """
+        Does a full-text search on both transcription and translation
+        columns for the given word.
+        """
         identity = cls.__mapper_args__['polymorphic_identity']
+        # The idea of this query is to get a table of just all the versioned
+        # strings that match the query, and then to join this table with the
+        # phrase table.
         return cls.query.from_statement(text(f"""
             SELECT *
-              FROM phrase
-             WHERE translation_id IN
-             (SELECT id FROM versioned_string, versioned_string_fts
-               WHERE versioned_string_fts MATCH :query
-                 AND versioned_string.rowid = versioned_string_fts.docid)
-                 AND phrase.type in (:type)
+              FROM phrase,
+                   (SELECT id FROM versioned_string, versioned_string_fts
+                     WHERE versioned_string_fts MATCH :query
+                       AND versioned_string.rowid = versioned_string_fts.docid) AS vs
+             WHERE (translation_id = vs.id OR transcription_id = vs.id)
+               AND phrase.type in (:type)
         """)).params(query=search_string, type=identity)
-        # SELECT phrase.id FROM phrase, versioned_string, versioned_string_fts
-        # WHERE versioned_string.rowid = versioned_string_fts.docid AND
-        # versioned_string_fts MATCH 'pup*' AND (versioned_string.id =
-        # phrase.translation_id OR versioned_string.id =
-        # phrase.transcription_id);
-
-        #   SELECT phrase.id
-        #     FROM phrase
-        #     WHERE transcription_id IN
-        #     (SELECT versioned_string.id
-        #        FROM versioned_string, {VERSIONED_STRING_FTS}
-        #       WHERE {VERSIONED_STRING_FTS} MATCH :query
-        #         AND {VERSIONED_STRING_FTS}.docid = versioned_string.rowid)
-        #     AND phrase.type IN (:type)
 
 
 class Word(Phrase):
