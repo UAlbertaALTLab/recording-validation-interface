@@ -47,6 +47,7 @@
       <span class="navbar-toggler-icon"></span>
     </button>
 
+    {# The navbar #}
     <div class="navbar-collapse collapse justify-content-stretch" id="navbarSupportedContent">
       <ul class="navbar-nav ml-auto">
         {% if current_user.email %}
@@ -62,6 +63,10 @@
         </li>
         {% endif %}
       </ul>
+      <form class="form-inline my-2 my-lg-0">
+        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+      </form>
     </div>
   </nav>
 
