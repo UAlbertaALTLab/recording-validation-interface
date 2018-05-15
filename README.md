@@ -19,7 +19,8 @@ Create a file called `recval_settings.py` based on this template:
 ```python
 TRANSCODED_RECORDINGS_PATH = '/path/to/audio/directory'
 SQLALCHEMY_DATABASE_URI = 'sqlite:///path/to/recval.db'
-SECRET_KEY =  # generate a cryptographically generated hash for this
+SECRET_KEY =  # generate a cryptographically generated key for this
+SECURITY_PASSWORD_SALT = # generate a cryptographically generated salt for this
 ```
 
 Save this file somewhere. If it's the deployed/production version of the
@@ -27,6 +28,8 @@ site, save this file outside of the repository, and outside of
 `DOCUMENT_ROOT`. For local development, it's fine to have this file in
 the local directory.
 
+
+**TODO**: DOCUMENT HOW TO CREATE THE DATABASE FOR THE FIRST TIME.
 
 Running
 -------

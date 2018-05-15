@@ -1,12 +1,13 @@
+awesome-slugify==1.6.5
 click==6.7
-Flask==0.12.2
-Flask-SQLAlchemy==2.3.2
 Flask-Security==3.0.0
+Flask-SQLAlchemy==2.3.2
+Flask==0.12.2
 itsdangerous==0.24
 Jinja2==2.10
 MarkupSafe==1.0
+pydub==0.21.0
 sh==1.12.14
 SQLAlchemy==1.2.3
+TextGrid==1.4
 Werkzeug==0.14.1
-awesome-slugify==1.6.5
-pydub==0.21.0
