@@ -56,7 +56,7 @@ def list_phrases(page):
     """
     query = Phrase.query.options(subqueryload(Phrase.recordings))
     return render_template(
-        'index.html',
+        'list_phrases.html',
         page=query.paginate(page=page)
     )
 
