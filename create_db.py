@@ -75,7 +75,7 @@ if __name__ == '__main__':
 
     ex = RecordingExtractor()
     with app.app_context():
-        dest = app.config['TRANSCODED_RECORDINGS_PATH']
+        dest = Path(app.config['TRANSCODED_RECORDINGS_PATH'])
         assert dest.resolve().is_dir()
 
         # Create the schema.
