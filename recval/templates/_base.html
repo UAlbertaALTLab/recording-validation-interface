@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% block head %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+  <title>{% block title %} Maskwacîs Recordings Validation {% endblock title %}</title>
+  <style>
+  ul.recordings {
+    padding: auto 0;
+    list-style: none;
+  }
+  li .speaker {
+    display: inline-block;
+    min-width: 4rem;
+    text-align: center;
+    margin: .5rem;
+  }
+
+  /* Temporary styles to make it clear that you can click and edit text. */
+  td[lang] { cursor: cell }
+  td[lang]:hover { text-decoration: underline }
+  </style>
+  {% endblock head %}
+</head>
+<body>
+
+  {# The header #}
+  <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+    <a class="navbar-brand" href="#"> Maskwacîs Recordings Validation </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    {# The navbar #}
+    <div class="navbar-collapse collapse justify-content-stretch" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto">
+        {% if current_user is logged_in %}
+        <li class="nav-item active">
+          <span class="navbar-text">{{ current_user.email }}</span>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link btn btn-danger ml-2" href="{{ url_for('security.logout') }}">Logout</a>
+        </li>
+        {% else %}
+        <li>
+          <a class="nav-link btn btn-primary ml-2" href="{{ url_for('security.login') }}">Login</a>
+        </li>
+        {% endif %}
+      </ul>
+      <form class="form-inline ml-2 my-2 my-lg-0" method="GET" action="{{
+        url_for('search_phrases')
+      }}">
+        <input class="form-control mr-sm-2" name="q" type="search" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+      </form>
+    </div>
+  </nav>
+
+  <main role="main" class="container">
+    {% block content %}
+    <p class="error">
+      If you're seeing this, something is wrong. Please contact
+      <a href="mailto:easantos+recval@ualberta.ca"> the main developer </a>
+      about it!
+    </p>
+    {% endblock content %}
+  </main>
+
+  {% block bodyscripts %}
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static', filename='main.js') }}"></script>
+  {% endblock bodyscripts %}
+</body>
+</html>
+{# vim: set ft=htmldjango :#}
