@@ -24,8 +24,8 @@
   }
 
   /* Temporary styles to make it clear that you can click and edit text. */
-  td[lang] { cursor: cell }
-  td[lang]:hover { text-decoration: underline }
+  td.editable { cursor: cell }
+  td.editable:hover { text-decoration: underline }
   </style>
   {% endblock head %}
 </head>
@@ -33,7 +33,7 @@
 
   {# The header #}
   <nav class="navbar navbar-expand-md navbar-dark bg-dark">
-    <a class="navbar-brand" href="#"> Maskwacîs Recordings Validation </a>
+    <a class="navbar-brand" href="{{ url_for('index') }}"> Maskwacîs Recordings Validation </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
