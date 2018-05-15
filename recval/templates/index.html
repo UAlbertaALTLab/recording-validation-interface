@@ -50,7 +50,7 @@
     {# The navbar #}
     <div class="navbar-collapse collapse justify-content-stretch" id="navbarSupportedContent">
       <ul class="navbar-nav ml-auto">
-        {% if current_user.email %}
+        {% if current_user is logged_in %}
         <li class="nav-item active">
           <span class="navbar-text">{{ current_user.email }}</span>
         </li>

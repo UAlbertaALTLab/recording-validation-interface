@@ -130,6 +130,8 @@ def send_audio(filename):
                                mimetype=content_type)
 
 
+# ########################### Template utilities ########################### #
+
 @app.template_filter('audio_url')
 def audio_url_filter(rec: Recording) -> str:
     """
@@ -149,3 +151,15 @@ def inject_user():
     Ensures `user` is usable in the template.
     """
     return dict(user=current_user)
+
+
+@app.template_test(name='logged_in')
+def is_logged_in(user):
+    from recval.model import User
+    from flask_security import AnonymousUser
+    if isinstance(user, AnonymousUser):
+        return False
+    elif isinstance(user, User):
+        return True
+    else:
+        raise ValueError(f"not a user {user!r}")
