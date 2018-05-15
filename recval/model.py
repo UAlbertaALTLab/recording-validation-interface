@@ -180,18 +180,25 @@ class Phrase(db.Model):  # type: ignore
         columns for the given word.
         """
         identity = cls.__mapper_args__['polymorphic_identity']
+
         # The idea of this query is to get a table of just all the versioned
         # strings that match the query, and then to join this table with the
         # phrase table.
-        return cls.query.from_statement(text(f"""
-            SELECT *
-              FROM phrase,
-                   (SELECT id FROM versioned_string, versioned_string_fts
-                     WHERE versioned_string_fts MATCH :query
-                       AND versioned_string.rowid = versioned_string_fts.docid) AS vs
-             WHERE (translation_id = vs.id OR transcription_id = vs.id)
-               AND phrase.type in (:type)
-        """)).params(query=to_indexable_form(search_string), type=identity)
+        fts_query = text(f"""
+           SELECT id FROM versioned_string, {VERSIONED_STRING_FTS}
+            WHERE {VERSIONED_STRING_FTS} MATCH :query
+              AND versioned_string.rowid = {VERSIONED_STRING_FTS}.docid
+        """).\
+            columns(id=db.String).\
+            params(query=to_indexable_form(search_string)).\
+            alias('fts_query')
+
+        # Implict join with the search results to recover the phrases that
+        # match EITHER the translation or the transcription.
+        return cls.query.filter(
+            (cls.translation_id == fts_query.c.id) |
+            (cls.transcription_id == fts_query.c.id)
+        )
 
 
 class Word(Phrase):
