@@ -1,6 +1,6 @@
-# recording-validation-interface
+# Maskwacîs recordings validation
 
-Maskwacîs recordings validation interface.
+An app for viewing and validating recordings done in Maskwacîs.
 
 
 Install
@@ -28,8 +28,54 @@ site, save this file outside of the repository, and outside of
 `DOCUMENT_ROOT`. For local development, it's fine to have this file in
 the local directory.
 
+### Creating the database for the first time
 
-**TODO**: DOCUMENT HOW TO CREATE THE DATABASE FOR THE FIRST TIME.
+Use the `./create_db.py` script (after setting `RECVAL_SETTINGS`; see
+below) to create the initial database. Use it like this:
+
+    ./create_db.py /path/to/sessions/
+
+`sessions/` is a directory filled with directories (or symbolic
+links to directories) with filenames in the form of:
+
+    {ISOdate}-{AM/PM}-{Location or '___'}-{Subsession or '0'}
+
+For example, on Sapir, I might have something like this:
+
+    $ ls ~/av/backup-mwe/sessions/
+    2015-05-08-AM-___-0
+    2016-05-16-PM-___-0
+    2016-11-28-AM-US-2
+    2017-05-25-AM-DS-2
+    2018-04-18-AM-KCH-0
+    ...
+
+Each directory should have `*.TextGrid` files pair with a `*.wav` file:
+
+    $ ls -F1 ~/av/backup-mwe/sessions/2015-05-08-AM-___-0/
+    2015-05-08-01.TextGrid
+    2015-05-08-01.wav
+    2015-05-08-02.TextGrid
+    2015-05-08-02.wav
+    2015-05-08-03.TextGrid
+    2015-05-08-03.wav
+    ...
+
+
+### Creating new users
+
+Once the database is created, you can register new users using the
+`./manage.py` command (after setting `RECVAL_SETTINGS`; see below):
+
+    $ ./manage.py create user@domain.net
+    Creating user with email user@domain.net
+    Enter a new password for user@domain.net: ********
+    Re-type password: ********
+    Creating validator:
+      Email: herp@derp.net
+      Password: ********
+    Is this okay? (y/n) y
+
 
 Running
 -------
@@ -43,17 +89,9 @@ Otherwise, set the environment variables manually, like so:
 
     export RECVAL_SETTINGS=/path/to/recval_settings.py
 
----
-
 Finally, you can run the server!
 
-    export FLASK_APP=recval/app.py
-    flask run --host HOST
-
-Replace `HOST` with `127.0.0.1` (listen only locally) when running in debug mode.
-
-Replace `HOST` with `0.0.0.0` (listen to all devices) when running in
-production mode.
+    ./run-server
 
 
 Testing
