@@ -125,7 +125,7 @@ def send_audio(filename):
     except KeyError:
         raise NotFound
 
-    path = app.config['TRANSCODED_RECORDINGS_PATH']
+    path = Path(app.config['TRANSCODED_RECORDINGS_PATH'])
     assert path.resolve().is_dir()
     return send_from_directory(fspath(path), filename,
                                mimetype=content_type)
