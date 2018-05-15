@@ -18,8 +18,8 @@
   </thead>
   {% for phrase in page.items %}
   <tr data-update-uri="{{ url_for('update_text', phrase_id=phrase.id) }}">
-    <td class="editable" lang="crk">{{ phrase.transcription }}</td>
-    <td class="editable" lang="en">{{ phrase.translation }}</td>
+    <td lang="crk">{{ phrase.transcription }}</td>
+    <td lang="en">{{ phrase.translation }}</td>
     <td>
       <ul class="recordings">
       {% for recording in phrase.recordings %}
@@ -49,7 +49,9 @@
 
 {% block bodyscripts %}
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+{% if current_user is logged_in %}{# enables inline editing UI #}
 <script src="{{ url_for('static', filename='main.js') }}"></script>
+{% endif %}
 {% endblock bodyscripts %}
 
 {# vim: set ft=htmldjango :#}
