@@ -52,7 +52,7 @@ def index():
 @app.route('/phrases/<int:page>/')
 def list_phrases(page):
     """
-    List SOME of the words, contrary to the name.
+    Paginate all of the phrases in the database.
     """
     query = Phrase.query.options(subqueryload(Phrase.recordings))
     return render_template(
@@ -61,7 +61,25 @@ def list_phrases(page):
     )
 
 
-# TODO: require validator role
+@app.route('/phrases/')
+def search_phrases():
+    """
+    Searches for phrases.
+
+    Query parameters:
+        q=  fuzzy-match an entire word
+    """
+    query_text = request.args.get('q')
+    if query_text is None:
+        abort(400)
+    query = Phrase.search_by(query_text)
+    # page = int(request.args.get('page', 1))
+    return render_template(
+        'search.html',
+        results=query.all()
+    )
+
+
 @app.route('/phrase/<int:phrase_id>', methods=['PATCH'])
 @roles_required('validator')
 def update_text(phrase_id):
@@ -127,4 +145,7 @@ def audio_url_filter(rec: Recording) -> str:
 
 @app.context_processor
 def inject_user():
+    """
+    Ensures `user` is usable in the template.
+    """
     return dict(user=current_user)
