@@ -6,16 +6,18 @@
 from flask import url_for  # type: ignore
 
 
-def test_search_box_on_first_page(client):
+def test_search_box_on_first_page(app, client):
     """
     The front page should show the search box.
     """
     rv = client.get('/', follow_redirects=True)
     assert 200 == rv.status_code
     assert b'Search' in rv.data
+    with app.test_request_context():
+        assert url_for('search_phrases').encode('UTF-8') in rv.data
 
 
-def test_search_box(app, client, acimosis):
+def test_search_page(app, client, acimosis):
     """
     We should be able to search for puppies!
     """
