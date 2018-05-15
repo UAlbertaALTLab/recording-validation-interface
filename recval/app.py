@@ -76,7 +76,8 @@ def search_phrases():
     # page = int(request.args.get('page', 1))
     return render_template(
         'search.html',
-        results=query.all()
+        page=query.paginate(),
+        search_term=query_text
     )
 
 

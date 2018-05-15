@@ -6,7 +6,6 @@
 
 {% extends '_base.html' %}
 {% import '_macros.html' as macros %}
- 
 
 {% block content %}
 <table class="table table-striped">
@@ -46,6 +45,11 @@
 <nav>
   {{ macros.pagination(page, 'list_phrases') }}
 </nav>
-{% endblock %}{# content #}
+{% endblock content %}
+
+{% block bodyscripts %}
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="{{ url_for('static', filename='main.js') }}"></script>
+{% endblock bodyscripts %}
 
 {# vim: set ft=htmldjango :#}

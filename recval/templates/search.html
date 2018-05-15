@@ -1,6 +1,53 @@
-<dl>
-{% for phrase in results %}
-  <dt> {{ phrase.transcription }}
-  <dd> {{ phrase.translation }}
-{% endfor %}
-</dl>
+{# Copyright © 2018 Eddie Antonio Santos. All rights reserved.  #}
+
+{#
+ # Displays search results for phrases.
+ #}
+
+{% extends '_base.html' %}
+{% import '_macros.html' as macros %}
+
+
+{% block content %}
+<h2> Results for <q>{{ search_term }}</q> </h2>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col"> Transcription </th>
+      <th scope="col"> Translation </th>
+      <th scope="col"> Recordings </th>
+    </tr>
+  </thead>
+  {% for phrase in page.items %}
+  <tr>
+    <td lang="crk">{{ phrase.transcription }}</td>
+    <td lang="en">{{ phrase.translation }}</td>
+    <td>
+      <ul class="recordings">
+      {% for recording in phrase.recordings %}
+        <li>
+          {% if recording.speaker %}
+            <span class="speaker">{{ recording.speaker }}</span>
+          {% else %}
+            <span class="badge badge-warning speaker unknown-speaker">???</span>
+          {% endif %}
+
+          <audio controls preload=none>
+            <source src="{{ recording | audio_url }}" type="audio/aac"/>
+          </audio>
+        </li>
+
+      {% endfor %}{# for recording in phrase.recordings #}
+      </ul>
+    </td>
+  </tr>
+  {% endfor %}{# for phrase in page.phrases#}
+</table>
+
+<nav>
+  {{ macros.pagination(page, 'search_phrases') }}
+</nav>
+{% endblock content %}
+
+{# vim: set ft=htmldjango :#}
