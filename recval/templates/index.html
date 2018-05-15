@@ -1,19 +1,4 @@
-{# Adapted from: http://flask-sqlalchemy.pocoo.org/2.3/api/#flask_sqlalchemy.Pagination.iter_pages #}
-{% macro render_pagination(pagination, endpoint) %}
-  <ul class="nav nav-pills justify-content-center">
-  {%- for page in pagination.iter_pages() %}
-    {% if page %}
-      {% if page != pagination.page %}
-        <li class="nav-item"><a class="nav-link" href="{{ url_for(endpoint, page=page) }}">{{ page }}</a></li>
-      {% else %}
-        <li class="nav-item"><a class="nav-link active" href="#">{{ page }}</a></li>
-      {% endif %}
-    {% else %}
-        <li class="nav-item ellipsis">…</li>
-    {% endif %}
-  {%- endfor %}
-  </ul>
-{% endmacro %}
+{% import 'macros.html' as macros %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -109,7 +94,7 @@
     </table>
 
     <nav>
-      {{ render_pagination(page, 'list_phrases') }}
+      {{ macros.pagination(page, 'list_phrases') }}
     </nav>
   </main>
 

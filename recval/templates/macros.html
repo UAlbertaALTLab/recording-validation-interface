@@ -1,0 +1,24 @@
+{# Copyright © 2018 Eddie Antonio Santos. All rights reserved.  #}
+
+{#
+ # pagination() -- renders navigation links for a pagination object.
+ #  e.g,. {1} [2] [3] ... [100]
+ #
+ # Adapted from: http://flask-sqlalchemy.pocoo.org/2.3/api/#flask_sqlalchemy.Pagination.iter_pages
+ #}
+{% macro pagination(pagination, endpoint) %}
+<ul class="nav nav-pills justify-content-center">
+{%- for page in pagination.iter_pages() %}
+  {% if page %}
+    {% if page != pagination.page %}
+      <li class="nav-item"><a class="nav-link" href="{{ url_for(endpoint, page=page) }}">{{ page }}</a></li>
+    {% else %}
+      <li class="nav-item"><a class="nav-link active" href="#">{{ page }}</a></li>
+    {% endif %}
+  {% else %}
+      <li class="nav-item ellipsis">…</li>
+  {% endif %}
+{%- endfor %}
+</ul>
+{% endmacro %}
+{# vim: set ft=htmldjango :#}
