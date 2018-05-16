@@ -8,39 +8,35 @@
 {% import '_macros.html' as macros %}
 
 {% block content %}
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th scope="col"> Transcription </th>
-      <th scope="col"> Translation </th>
-      <th scope="col"> Recordings </th>
+<div class="table-responsive">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col"> Transcription </th>
+        <th scope="col"> Translation </th>
+        <th scope="col"> Recordings </th>
+      </tr>
+    </thead>
+    {% for phrase in page.items %}
+    <tr data-update-uri="{{ url_for('update_text', phrase_id=phrase.id) }}">
+      <td lang="crk">{{ phrase.transcription }}</td>
+      <td lang="en">{{ phrase.translation }}</td>
+      <td>
+        <ul class="recordings">
+        {% for recording in phrase.recordings %}
+          <li>
+            <audio controls preload=none>
+              <source src="{{ recording | audio_url }}" type="audio/aac"/>
+            </audio>
+          </li>
+
+        {% endfor %}{# for recording in phrase.recordings #}
+        </ul>
+      </td>
     </tr>
-  </thead>
-  {% for phrase in page.items %}
-  <tr data-update-uri="{{ url_for('update_text', phrase_id=phrase.id) }}">
-    <td lang="crk">{{ phrase.transcription }}</td>
-    <td lang="en">{{ phrase.translation }}</td>
-    <td>
-      <ul class="recordings">
-      {% for recording in phrase.recordings %}
-        <li>
-          {% if recording.speaker %}
-            <span class="speaker">{{ recording.speaker }}</span>
-          {% else %}
-            <span class="badge badge-warning speaker unknown-speaker">???</span>
-          {% endif %}
-
-          <audio controls preload=none>
-            <source src="{{ recording | audio_url }}" type="audio/aac"/>
-          </audio>
-        </li>
-
-      {% endfor %}{# for recording in phrase.recordings #}
-      </ul>
-    </td>
-  </tr>
-  {% endfor %}{# for phrase in page.phrases#}
-</table>
+    {% endfor %}{# for phrase in page.phrases#}
+  </table>
+</div>
 
 <nav>
   {{ macros.pagination(page, 'list_phrases') }}
@@ -48,7 +44,6 @@
 {% endblock content %}
 
 {% block bodyscripts %}
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 {% if current_user is logged_in %}{# enables inline editing UI #}
 <script src="{{ url_for('static', filename='main.js') }}"></script>
 {% endif %}
