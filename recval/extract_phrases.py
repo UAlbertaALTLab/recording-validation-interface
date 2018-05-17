@@ -179,7 +179,7 @@ class PhraseExtractor:
             # Snip out the sounds.
             sound_bite = self.sound[start:end]
             # tmills: normalize sound levels (some speakers are very quiet)
-            sound_bite.normalize(headroom=0.1)  # dB
+            sound_bite = sound_bite.normalize(headroom=0.1)  # dB
 
             yield self.info_for(_type, transcription, translation,
                                 start, sound_bite)
