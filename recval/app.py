@@ -18,6 +18,7 @@ from sqlalchemy.orm import subqueryload  # type: ignore
 from werkzeug.exceptions import NotFound  # type: ignore
 
 from recval.model import Phrase, Recording, db, user_datastore
+from recval.model import ElicitationOrigin, RecordingQuality
 
 # Configure from default settings, then the file specifeied by the environment
 # variable.
@@ -85,7 +86,10 @@ def search_phrases():
 @roles_required('validator')
 def edit_phrase(phrase_id):
     phrase = Phrase.query.filter_by(id=phrase_id).one()
-    return render_template('edit_phrase.html', phrase=phrase)
+    return render_template('edit_phrase.html',
+                           phrase=phrase,
+                           origins=ElicitationOrigin,
+                           qualities=RecordingQuality)
 
 
 @app.route('/phrase/<int:phrase_id>', methods=['PATCH'])
@@ -110,12 +114,39 @@ def update_text(phrase_id):
     if not (field in ('translation', 'transcription') and isinstance(value, str)):
         abort(400)
 
-    # TODO: Require a CSRF token, probably
     phrase = Phrase.query.filter(Phrase.id == phrase_id).one()
 
     # Actually update the translation or transcription.
     phrase.update(field, value)
     db.session.commit()
+    return '', 204
+
+
+@app.route('/recording/<recording_id>', methods=['PATCH'])
+@roles_required('validator')
+def update_recording(recording_id):
+    """
+    Changes the assigned quality of the recording.
+
+    {
+        "quality": "clean" | "unusable" | null
+    }
+    """
+
+    levels = [level.name for level in RecordingQuality]
+
+    # Ensure the field exists first.
+    body = request.get_json()
+    field = body.get('quality')
+    # Reject requests with invalid arugm
+    if not (field in (None, *levels)):
+        abort(400)
+
+    # Update the field!
+    phrase = Recording.query.filter_by(id=recording_id).one()
+    phrase.quality = field
+    db.session.commit()
+
     return '', 204
 
 

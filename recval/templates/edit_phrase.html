@@ -28,19 +28,26 @@
 
 {% if phrase.type == 'word' %}
 <form action="{{ url_for("update_text", phrase_id=phrase.id) }}">
-  <input id="rb-dictionary" name="origin" value="dictionary" type="radio" tabindex=3>
+  <input id="rb-dictionary" name="origin" value="maskwacîs" type="radio" tabindex=3>
   <label for="rb-dictionary">Maskwacîs Dictionary</label>
 
-  <input id="rb-rapidwords" name="origin" value="rapidwords" type="radio">
+  <input id="rb-rapidwords" name="origin" value="rapid_words" type="radio">
   <label for="rb-dictionary">Rapid words</label>
 </form>
 {% endif %}
-<pre> {{ phrase.origin | pprint }} </pre>
 
 <aside class="recordings">
   <ul>
     {% for recording in phrase.recordings %}
-    <li> {{ macros.player(recording) }} </li>
+    <li> {{ macros.player(recording) }}
+      <form action="{{ url_for('update_recording', recording_id=recording.id) }}">
+        <input id="rb-clean-{{ loop.index }}" name="quality" value="clean" type="radio">
+        <label for="rb-clean-{{ loop.index }}">Clean</label>
+
+        <input id="rb-unusable-{{ loop.index }}" name="quality" value="unusable" type="radio">
+        <label for="rb-unusable-{{ loop.index }}">Unusable</label>
+      </form>
+    </li>
     {% endfor %}
   </ul>
 </aside>
