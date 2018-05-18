@@ -22,10 +22,41 @@
 </ul>
 {% endmacro %}
 
+{#
+ # An audio player for a recording.
+ #}
 {% macro player(recording) %}
 <audio controls preload=none>
   <source src="{{ recording | audio_url }}" type="audio/aac"/>
 </audio>
+{% endmacro %}
+
+{#
+ # Expands to a <td> that displays the Cree transcription. Adds a link to edit when
+ # a validator.
+ #}
+{% macro td_transcription(user, phrase) %}
+<td lang="crk">
+{% if 'validator' in user.roles %}
+  <a href="{{ url_for('edit_phrase', phrase_id=phrase.id) }}">{{ phrase.transcription }}</a>
+{% else %}
+  {{ phrase.transcription }}
+{% endif %}
+</td>
+{% endmacro %}
+
+{#
+ # Expands to a <td> that displays the English translation. Adds a link to edit when
+ # a validator.
+ #}
+{% macro td_translation(user, phrase) %}
+<td lang="en">
+{% if 'validator' in user.roles %}
+  <a href="{{ url_for('edit_phrase', phrase_id=phrase.id) }}">{{ phrase.translation }}</a>
+{% else %}
+  {{ phrase.translation }}
+{% endif %}
+</td>
 {% endmacro %}
 
 {# vim: set ft=htmldjango :#}

@@ -19,8 +19,8 @@
     </thead>
     {% for phrase in page.items %}
     <tr data-update-uri="{{ url_for('update_text', phrase_id=phrase.id) }}">
-      <td lang="crk">{{ phrase.transcription }}</td>
-      <td lang="en">{{ phrase.translation }}</td>
+      {{ macros.td_transcription(user, phrase) }}
+      {{ macros.td_translation(user, phrase) }}
       <td>
         <ul class="recordings">
         {% for recording in phrase.recordings %}
@@ -40,11 +40,5 @@
   {{ macros.pagination(page, 'list_phrases') }}
 </nav>
 {% endblock content %}
-
-{% block bodyscripts %}
-{% if current_user is logged_in %}{# enables inline editing UI #}
-<script src="{{ url_for('static', filename='main.js') }}"></script>
-{% endif %}
-{% endblock bodyscripts %}
 
 {# vim: set ft=htmldjango :#}

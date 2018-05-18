@@ -22,8 +22,8 @@
     </thead>
     {% for phrase in page.items %}
     <tr>
-      <td lang="crk">{{ phrase.transcription }}</td>
-      <td lang="en">{{ phrase.translation }}</td>
+      {{ macros.td_transcription(user, phrase) }}
+      {{ macros.td_translation(user, phrase) }}
       <td>
         <ul class="recordings">
         {% for recording in phrase.recordings %}
