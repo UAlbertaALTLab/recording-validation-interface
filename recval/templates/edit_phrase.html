@@ -5,6 +5,7 @@
  #}
 
 {% extends '_base.html' %}
+{% import '_macros.html' as macros %}
 
 {% block content %}
 <form action="{{ url_for("update_text", phrase_id=phrase.id) }}">
@@ -36,11 +37,13 @@
 {% endif %}
 <pre> {{ phrase.origin | pprint }} </pre>
 
-<ul>
-  {% for rec in phrase.recordings %}
-  <li> {{ rec | pprint }} </li>
-  {% endfor %}
-</ul>
+<aside class="recordings">
+  <ul>
+    {% for recording in phrase.recordings %}
+    <li> {{ macros.player(recording) }} </li>
+    {% endfor %}
+  </ul>
+</aside>
 {% endblock content %}
 
 {# vim: set ft=htmldjango :#}

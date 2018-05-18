@@ -25,9 +25,7 @@
         <ul class="recordings">
         {% for recording in phrase.recordings %}
           <li>
-            <audio controls preload=none>
-              <source src="{{ recording | audio_url }}" type="audio/aac"/>
-            </audio>
+            {{ macros.player(recording) }}
           </li>
 
         {% endfor %}{# for recording in phrase.recordings #}

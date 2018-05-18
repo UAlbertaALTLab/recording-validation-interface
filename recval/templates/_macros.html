@@ -21,4 +21,11 @@
 {%- endfor %}
 </ul>
 {% endmacro %}
+
+{% macro player(recording) %}
+<audio controls preload=none>
+  <source src="{{ recording | audio_url }}" type="audio/aac"/>
+</audio>
+{% endmacro %}
+
 {# vim: set ft=htmldjango :#}
