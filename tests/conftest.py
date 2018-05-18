@@ -3,9 +3,11 @@
 
 # Copyright © 2018 Eddie Antonio Santos. All rights reserved.
 
+from datetime import datetime
 from pathlib import Path
 
 import pytest  # type: ignore
+from flask_security import current_user  # type: ignore
 
 
 @pytest.fixture()
@@ -76,3 +78,25 @@ def wave_file_path():
     test_wav = Path(__file__).parent / 'fixtures' / 'test.wav'
     assert test_wav.exists()
     return test_wav
+
+
+@pytest.fixture
+def validator(user_datastore):
+    """
+    A user that has validation privledges.
+    """
+    validator_role = user_datastore.find_role('validator')
+    assert validator_role is not None
+    return user_datastore.create_user(
+        email='validator@localhost',
+        password=None,
+        active=True,
+        confirmed_at=datetime.utcnow(),
+        roles=[validator_role]
+    )
+
+
+@pytest.fixture
+def user_datastore():
+    from recval.model import user_datastore
+    return user_datastore

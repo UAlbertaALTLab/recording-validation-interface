@@ -81,6 +81,13 @@ def search_phrases():
     )
 
 
+@app.route('/phrase/<int:phrase_id>')
+@roles_required('validator')
+def edit_phrase(phrase_id):
+    phrase = Phrase.query.filter_by(id=phrase_id).one()
+    return render_template('edit_phrase.html', phrase=phrase)
+
+
 @app.route('/phrase/<int:phrase_id>', methods=['PATCH'])
 @roles_required('validator')
 def update_text(phrase_id):

@@ -107,27 +107,3 @@ def json_body(**kwargs) -> bytes:
     """
     import json
     return json.dumps(dict(**kwargs)).encode('UTF-8')
-
-
-@pytest.fixture
-def user_datastore():
-    from recval.model import user_datastore
-    return user_datastore
-
-
-@pytest.fixture
-def validator(user_datastore):
-    """
-    A user that has validation privledges.
-    """
-    from datetime import datetime
-    from flask_security import current_user
-    validator_role = user_datastore.find_role('validator')
-    assert validator_role is not None
-    return user_datastore.create_user(
-        email='validator@localhost',
-        password=None,
-        active=True,
-        confirmed_at=datetime.utcnow(),
-        roles=[validator_role]
-    )
