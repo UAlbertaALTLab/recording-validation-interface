@@ -10,7 +10,7 @@
 {% block content %}
 <div class="row">
   <div class="phrase-validation col">
-    <form action="{{ url_for("update_text", phrase_id=phrase.id) }}">
+    <form data-update-text action="{{ url_for("update_text", phrase_id=phrase.id) }}">
       <div class="form-group">
         <label for="transcription">Transcription</label>
         <div class="input-group mb-3">
@@ -30,7 +30,7 @@
       </div>
     </form>
 
-    <form action="{{ url_for("update_text", phrase_id=phrase.id) }}">
+    <form data-update-text action="{{ url_for("update_text", phrase_id=phrase.id) }}">
       <div class="form-group">
         <label for="translation">Translation</label>
         <div class="input-group mb-3">
@@ -92,5 +92,9 @@
   </aside>
 </div>
 {% endblock content %}
+
+{% block bodyscripts %}
+<script src="{{ url_for('static', filename='edit-phrase.js') }}"></script>
+{% endblock bodyscripts %}
 
 {# vim: set ft=htmldjango :#}

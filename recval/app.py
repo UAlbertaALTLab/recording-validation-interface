@@ -101,23 +101,34 @@ def update_text(phrase_id):
     Takes in a JSON request body like this:
 
         {
-            "field": "translation" | "transcription",
             "value": "<new contents for the field>",
         }
     """
 
-    # Ensure the field exists first.
-    body = request.get_json()
-    field = body.get('field')
-    value = body.get('value')
-    # Reject requests with invalid arugm
-    if not (field in ('translation', 'transcription') and isinstance(value, str)):
+    payload = request.get_json()
+    phrase = Phrase.query.filter_by(id=phrase_id).one()
+    valid_fields = 'transcription', 'translation', 'origin'
+
+    # Reject any requests that contain extraneous fields.
+    if any(f not in valid_fields for f in payload):
         abort(400)
 
-    phrase = Phrase.query.filter(Phrase.id == phrase_id).one()
+    # Set the translation and transcription first.
+    for field in 'translation', 'transcription':
+        if field in payload:
+            value = payload[field]
+            if not isinstance(value, str) or len(value) < 1:
+                abort(400)
+            phrase.transcription = value
 
-    # Actually update the translation or transcription.
-    phrase.update(field, value)
+    # Set the origin.
+    if 'origin' in payload:
+        valid_origins = (o.name for o in ElicitationOrigin)
+        value = payload['origin']
+        if value not in (None, *valid_origins):
+            abort(400)
+        phrase.transcription = value
+
     db.session.commit()
     return '', 204
 
