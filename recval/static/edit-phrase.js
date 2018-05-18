@@ -3,8 +3,9 @@
  */
 $(function () {
   var $forms = $('form.transcription, form.translation');
-  console.assert($forms.length == 2);
+  console.assert($forms.length === 2);
   var $origin = $('form.origin');
+  var $recordings = $('form.recording');
 
   /* Handle the submission of the transcrption, translation forms. */
   $forms.each(function () {
@@ -19,7 +20,7 @@ $(function () {
 
     /* When you change the text, re-enable the "change" button. */
     $input.on('keyup change', function (event) {
-      if (event.target.value == initialValue) {
+      if (event.target.value === initialValue) {
         disableSubmitButton();
       } else {
         enableSubmitButton();
@@ -57,17 +58,30 @@ $(function () {
     }
   });
 
-  /* Update when a radio button is selected. */
+  /* PATCH when a radio button for "elicitation origin" selected. */
   $origin.change(function (event) {
     var url = $origin.attr('action');
     updateField(url, 'origin', event.target.value).then((res) => {
       if (!res.ok) {
-        alert('Did not change value!');
+        alert('Could not change value!');
       }
     });
   });
 
+  /* PATCH when a "clean"|"unusable" button is selected. */
+  $recordings.change(function (event) {
+    var url = $(this).attr('action');
+    console.assert(event.target.name === 'quality');
+    updateField(url, 'quality', event.target.value).then((res) => {
+      if (!res.ok) {
+        alert('Could not change value!');
+      }
+    });
+  });
 
+  /**
+   * Issues a PATCH to the given URI, updating the given value.
+   */
   function updateField(uri, field, value) {
     return fetch(uri, {
       method: 'PATCH',

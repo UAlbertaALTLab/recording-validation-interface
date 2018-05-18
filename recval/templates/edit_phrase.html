@@ -73,16 +73,18 @@
     <ul class="list-group list-group-flush">
       {% for recording in phrase.recordings %}
       <li class="list-group-item"> {{ macros.player(recording) }}
-        <form action="{{ url_for('update_recording', recording_id=recording.id) }}">
+        <form class="recording" action="{{ url_for('update_recording', recording_id=recording.id) }}">
           <div class="form-check form-check-inline">
             <input id="rb-clean-{{ loop.index }}" name="quality" value="clean" type="radio"
-                   class="form-check-input">
+                   class="form-check-input"
+                   {% if recording.quality.name == 'clean' %}checked{% endif %}>
             <label for="rb-clean-{{ loop.index }}" class="form-check-label">Clean</label>
           </div>
 
           <div class="form-check form-check-inline">
             <input id="rb-unusable-{{ loop.index }}" name="quality" value="unusable" type="radio"
-                   class="form-check-input">
+                   class="form-check-input"
+                   {% if recording.quality.name == 'unusable' %}checked{% endif %}>
             <label for="rb-unusable-{{ loop.index }}" class="form-check-label">Unusable</label>
           </div>
         </form>
