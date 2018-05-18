@@ -9,30 +9,59 @@
 
 {% block content %}
 <form action="{{ url_for("update_text", phrase_id=phrase.id) }}">
-  <label for="transcription">Transcription</label>
-  <input name="transcription" value="{{ phrase.transcription}}"
-         type="text" required minlength=1 spellcheck=false
-         tabindex=1>
-  <button type="submit" disable>Change</button>
-  <button type="reset" disable>Revert</button>
+  <div class="form-group">
+    <label for="transcription">Transcription</label>
+    <div class="input-group mb-3">
+      <input id="transcription" name="transcription"
+             value="{{ phrase.transcription}}"
+             type="text" required minlength=1
+             spellcheck=false lang="crk"
+             autofocus tabindex=1
+             class="form-control form-control-lg">
+      <div class="input-group-append">
+        <button class="btn btn-primary" type="submit">Change</button>
+        {# I think it'd be useful to have a "revert" button, but this is not
+           the right design. #}
+        {# <button class="btn btn-danger" type="reset">Revert</button> #}
+      </div>
+    </div>
+  </div>
 </form>
 
 <form action="{{ url_for("update_text", phrase_id=phrase.id) }}">
-  <label for="translation">Translation</label>
-  <input name="translation" value="{{ phrase.translation}}"
-         type="text" required minlength="1" spellcheck
-         tabindex=2>
-  <button type="submit" disabled>Change</button>
-  <button type="reset" disabled>Revert</button>
+  <div class="form-group">
+    <label for="translation">Translation</label>
+    <div class="input-group mb-3">
+      <input id="translation" name="translation"
+             value="{{ phrase.translation}}"
+             type="text" required minlength="1"
+             spellcheck lang="en"
+             tabindex=2
+             class="form-control form-control-lg">
+      <div class="input-group-append">
+        <button class="btn btn-primary" type="submit">Change</button>
+      </div>
+    </div>
+  </div>
 </form>
 
 {% if phrase.type == 'word' %}
 <form action="{{ url_for("update_text", phrase_id=phrase.id) }}">
-  <input id="rb-dictionary" name="origin" value="maskwacîs" type="radio" tabindex=3>
-  <label for="rb-dictionary">Maskwacîs Dictionary</label>
+  <fieldset class="form-group">
+    <legend>Origin</legend>
 
-  <input id="rb-rapidwords" name="origin" value="rapid_words" type="radio">
-  <label for="rb-dictionary">Rapid words</label>
+    <div class="form-check form-check-inline">
+      <input id="rb-dictionary" name="origin" value="maskwacîs" type="radio" tabindex=3
+             class="form-check-input">
+      <label for="rb-dictionary" class="form-check-label">Maskwacîs Dictionary</label>
+    </div>
+
+    <div class="form-check form-check-inline">
+      <input id="rb-rapidwords" name="origin" value="rapid_words" type="radio"
+             class="form-check-input">
+      <label for="rb-dictionary" class="form-check-label">Rapid words</label>
+    </div>
+  </fieldset>
 </form>
 {% endif %}
 
@@ -41,11 +70,17 @@
     {% for recording in phrase.recordings %}
     <li> {{ macros.player(recording) }}
       <form action="{{ url_for('update_recording', recording_id=recording.id) }}">
-        <input id="rb-clean-{{ loop.index }}" name="quality" value="clean" type="radio">
-        <label for="rb-clean-{{ loop.index }}">Clean</label>
+        <div class="form-check form-check-inline">
+          <input id="rb-clean-{{ loop.index }}" name="quality" value="clean" type="radio"
+                 class="form-check-input">
+          <label for="rb-clean-{{ loop.index }}" class="form-check-label">Clean</label>
+        </div>
 
-        <input id="rb-unusable-{{ loop.index }}" name="quality" value="unusable" type="radio">
-        <label for="rb-unusable-{{ loop.index }}">Unusable</label>
+        <div class="form-check form-check-inline">
+          <input id="rb-unusable-{{ loop.index }}" name="quality" value="unusable" type="radio"
+                 class="form-check-input">
+          <label for="rb-unusable-{{ loop.index }}" class="form-check-label">Unusable</label>
+        </div>
       </form>
     </li>
     {% endfor %}
