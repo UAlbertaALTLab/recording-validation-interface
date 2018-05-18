@@ -10,7 +10,7 @@
 {% block content %}
 <div class="row">
   <div class="phrase-validation col">
-    <form data-update-text action="{{ url_for("update_text", phrase_id=phrase.id) }}">
+    <form class="transcription" action="{{ url_for("update_text", phrase_id=phrase.id) }}">
       <div class="form-group">
         <label for="transcription">Transcription</label>
         <div class="input-group mb-3">
@@ -30,7 +30,7 @@
       </div>
     </form>
 
-    <form data-update-text action="{{ url_for("update_text", phrase_id=phrase.id) }}">
+    <form class="translation" action="{{ url_for("update_text", phrase_id=phrase.id) }}">
       <div class="form-group">
         <label for="translation">Translation</label>
         <div class="input-group mb-3">
@@ -48,19 +48,19 @@
     </form>
 
     {% if phrase.type == 'word' %}
-    <form action="{{ url_for("update_text", phrase_id=phrase.id) }}">
+    <form class="origin" action="{{ url_for("update_text", phrase_id=phrase.id) }}">
       <fieldset class="form-group">
         <legend>Origin</legend>
 
         <div class="form-check form-check-inline">
           <input id="rb-dictionary" name="origin" value="maskwacîs" type="radio" tabindex=3
-                 class="form-check-input">
+                 class="form-check-input" {% if phrase.origin.name == "maskwacîs" %}checked{% endif %}>
           <label for="rb-dictionary" class="form-check-label">Maskwacîs Dictionary</label>
         </div>
 
         <div class="form-check form-check-inline">
           <input id="rb-rapidwords" name="origin" value="rapid_words" type="radio"
-                 class="form-check-input">
+                 class="form-check-input" {% if phrase.origin.name == "rapid_words" %}checked{% endif %}>
           <label for="rb-rapidwords" class="form-check-label">Rapid words</label>
         </div>
       </fieldset>

@@ -119,7 +119,7 @@ def update_text(phrase_id):
             value = payload[field]
             if not isinstance(value, str) or len(value) < 1:
                 abort(400)
-            phrase.transcription = value
+            setattr(phrase, field, value)
 
     # Set the origin.
     if 'origin' in payload:
@@ -127,7 +127,7 @@ def update_text(phrase_id):
         value = payload['origin']
         if value not in (None, *valid_origins):
             abort(400)
-        phrase.transcription = value
+        phrase.origin = value
 
     db.session.commit()
     return '', 204
