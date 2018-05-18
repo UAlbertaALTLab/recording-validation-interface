@@ -8,84 +8,89 @@
 {% import '_macros.html' as macros %}
 
 {% block content %}
-<form action="{{ url_for("update_text", phrase_id=phrase.id) }}">
-  <div class="form-group">
-    <label for="transcription">Transcription</label>
-    <div class="input-group mb-3">
-      <input id="transcription" name="transcription"
-             value="{{ phrase.transcription}}"
-             type="text" required minlength=1
-             spellcheck=false lang="crk"
-             autofocus tabindex=1
-             class="form-control form-control-lg">
-      <div class="input-group-append">
-        <button class="btn btn-primary" type="submit">Change</button>
-        {# I think it'd be useful to have a "revert" button, but this is not
-           the right design. #}
-        {# <button class="btn btn-danger" type="reset">Revert</button> #}
+<div class="row">
+  <div class="phrase-validation col">
+    <form action="{{ url_for("update_text", phrase_id=phrase.id) }}">
+      <div class="form-group">
+        <label for="transcription">Transcription</label>
+        <div class="input-group mb-3">
+          <input id="transcription" name="transcription"
+                 value="{{ phrase.transcription}}"
+                 type="text" required minlength=1
+                 spellcheck=false lang="crk"
+                 autofocus tabindex=1
+                 class="form-control form-control-lg">
+          <div class="input-group-append">
+            <button class="btn btn-primary" type="submit">Change</button>
+            {# I think it'd be useful to have a "revert" button, but this is not
+               the right design. #}
+            {# <button class="btn btn-danger" type="reset">Revert</button> #}
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</form>
+    </form>
 
-<form action="{{ url_for("update_text", phrase_id=phrase.id) }}">
-  <div class="form-group">
-    <label for="translation">Translation</label>
-    <div class="input-group mb-3">
-      <input id="translation" name="translation"
-             value="{{ phrase.translation}}"
-             type="text" required minlength="1"
-             spellcheck lang="en"
-             tabindex=2
-             class="form-control form-control-lg">
-      <div class="input-group-append">
-        <button class="btn btn-primary" type="submit">Change</button>
+    <form action="{{ url_for("update_text", phrase_id=phrase.id) }}">
+      <div class="form-group">
+        <label for="translation">Translation</label>
+        <div class="input-group mb-3">
+          <input id="translation" name="translation"
+                 value="{{ phrase.translation}}"
+                 type="text" required minlength="1"
+                 spellcheck lang="en"
+                 tabindex=2
+                 class="form-control form-control-lg">
+          <div class="input-group-append">
+            <button class="btn btn-primary" type="submit">Change</button>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</form>
+    </form>
 
-{% if phrase.type == 'word' %}
-<form action="{{ url_for("update_text", phrase_id=phrase.id) }}">
-  <fieldset class="form-group">
-    <legend>Origin</legend>
+    {% if phrase.type == 'word' %}
+    <form action="{{ url_for("update_text", phrase_id=phrase.id) }}">
+      <fieldset class="form-group">
+        <legend>Origin</legend>
 
-    <div class="form-check form-check-inline">
-      <input id="rb-dictionary" name="origin" value="maskwacîs" type="radio" tabindex=3
-             class="form-check-input">
-      <label for="rb-dictionary" class="form-check-label">Maskwacîs Dictionary</label>
-    </div>
-
-    <div class="form-check form-check-inline">
-      <input id="rb-rapidwords" name="origin" value="rapid_words" type="radio"
-             class="form-check-input">
-      <label for="rb-dictionary" class="form-check-label">Rapid words</label>
-    </div>
-  </fieldset>
-</form>
-{% endif %}
-
-<aside class="recordings">
-  <ul>
-    {% for recording in phrase.recordings %}
-    <li> {{ macros.player(recording) }}
-      <form action="{{ url_for('update_recording', recording_id=recording.id) }}">
         <div class="form-check form-check-inline">
-          <input id="rb-clean-{{ loop.index }}" name="quality" value="clean" type="radio"
+          <input id="rb-dictionary" name="origin" value="maskwacîs" type="radio" tabindex=3
                  class="form-check-input">
-          <label for="rb-clean-{{ loop.index }}" class="form-check-label">Clean</label>
+          <label for="rb-dictionary" class="form-check-label">Maskwacîs Dictionary</label>
         </div>
 
         <div class="form-check form-check-inline">
-          <input id="rb-unusable-{{ loop.index }}" name="quality" value="unusable" type="radio"
+          <input id="rb-rapidwords" name="origin" value="rapid_words" type="radio"
                  class="form-check-input">
-          <label for="rb-unusable-{{ loop.index }}" class="form-check-label">Unusable</label>
+          <label for="rb-rapidwords" class="form-check-label">Rapid words</label>
         </div>
-      </form>
-    </li>
-    {% endfor %}
-  </ul>
-</aside>
+      </fieldset>
+    </form>
+    {% endif %}
+  </div>{# .phrase-validation #}
+
+  <aside class="recordings col-3">
+    <legend> Recordings </legend>
+    <ul class="list-group list-group-flush">
+      {% for recording in phrase.recordings %}
+      <li class="list-group-item"> {{ macros.player(recording) }}
+        <form action="{{ url_for('update_recording', recording_id=recording.id) }}">
+          <div class="form-check form-check-inline">
+            <input id="rb-clean-{{ loop.index }}" name="quality" value="clean" type="radio"
+                   class="form-check-input">
+            <label for="rb-clean-{{ loop.index }}" class="form-check-label">Clean</label>
+          </div>
+
+          <div class="form-check form-check-inline">
+            <input id="rb-unusable-{{ loop.index }}" name="quality" value="unusable" type="radio"
+                   class="form-check-input">
+            <label for="rb-unusable-{{ loop.index }}" class="form-check-label">Unusable</label>
+          </div>
+        </form>
+      </li>
+      {% endfor %}
+    </ul>
+  </aside>
+</div>
 {% endblock content %}
 
 {# vim: set ft=htmldjango :#}
