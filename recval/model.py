@@ -237,11 +237,10 @@ class Recording(db.Model):  # type: ignore
     """
     A recording of a phrase.
 
-    This is CONTENT-ADDRESSED memory. The "fingerprint" is a SHA-256 sum of
-    the raw recording file. The file itself is converted into ds
-
+    The id is a SHA-256 sum of either the session, or if session data is
+    missing, the wav file itself.
     """
-    fingerprint = db.Column(db.Text, primary_key=True)
+    id = db.Column(db.Text, primary_key=True)
     speaker = db.Column(db.Text, nullable=True)  # TODO: Versioned String?
     timestamp = db.Column(db.DateTime, nullable=False,
                           default=datetime.utcnow)
@@ -261,7 +260,7 @@ class Recording(db.Model):  # type: ignore
         if fingerprint is None:
             fingerprint = compute_fingerprint(input_file)
             transcode_to_aac(input_file, fingerprint)
-        return cls(fingerprint=fingerprint,
+        return cls(id=fingerprint,
                    phrase=phrase,
                    speaker=speaker)
 

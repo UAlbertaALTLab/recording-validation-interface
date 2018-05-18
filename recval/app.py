@@ -154,8 +154,6 @@ def update_recording(recording_id):
 def send_audio(filename):
     """
     Send a previously transcoded audio file.
-
-    See compute_fingerprint() and transcode_to_aac()
     """
     # Fail if we don't recognize the file extension.
     try:
@@ -181,7 +179,7 @@ def audio_url_filter(rec: Recording) -> str:
 
         <source src="{{ recording | audio_url }}" type="audio/aac" />
     """
-    return url_for('send_audio', filename=f"{rec.fingerprint}.m4a")
+    return url_for('send_audio', filename=f"{rec.id}.m4a")
 
 
 @app.context_processor

@@ -125,7 +125,7 @@ def test_mark_recordings(db, acimosis):
     # Fetch the word.
     word = Word.query.filter(Word.id == acimosis).one()
     recording = next(iter(word.recordings))
-    rec_id = recording.fingerprint
+    rec_id = recording.id
     assert recording.quality is None
 
     # Update it...
@@ -135,7 +135,7 @@ def test_mark_recordings(db, acimosis):
     del recording
 
     # And make sure it has changed.
-    recording = Recording.query.filter_by(fingerprint=rec_id).one()
+    recording = Recording.query.filter_by(id=rec_id).one()
     assert recording.quality == RecordingQuality.clean
 
 

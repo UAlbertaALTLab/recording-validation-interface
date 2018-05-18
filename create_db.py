@@ -83,8 +83,8 @@ if __name__ == '__main__':
 
         # Insert each thing found.
         for info, audio in tqdm(ex.scan(root_directory=directory)):
-            fingerprint = info.compute_sha256hash()
-            recording_path = dest / f"{fingerprint}.m4a"
+            rec_id = info.compute_sha256hash()
+            recording_path = dest / f"{rec_id}.m4a"
             if not recording_path.exists():
                 # Export a mono AAC file with metadata.
                 # See: https://superuser.com/a/1055816/711047
@@ -101,9 +101,9 @@ if __name__ == '__main__':
                            id3v2_version='3')
                 assert recording_path.exists()
             phrase = make_phrase(info)
-            recording = Recording.new(phrase=phrase,
+            recording = Recording.new(fingerprint=rec_id,
+                                      phrase=phrase,
                                       input_file=recording_path,
-                                      speaker=info.speaker,
-                                      fingerprint=fingerprint)
+                                      speaker=info.speaker)
             db.session.add(recording)
             db.session.commit()
