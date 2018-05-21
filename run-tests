@@ -7,4 +7,4 @@
 #  -s       -- show stdout and stderr
 #  --pdb    -- launch pdb on test failures
 
-mypy recval && py.test --driver Firefox "$@"
+mypy recval && py.test -Wd --driver Firefox "$@"
