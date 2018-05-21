@@ -8,7 +8,7 @@ import tempfile
 from uuid import uuid4
 from pathlib import Path
 
-from recval.recording import transcode_to_aac
+from recval.transcode_recording import transcode_to_aac
 
 
 def test_can_transcode_wave_file(wave_file_path: Path,

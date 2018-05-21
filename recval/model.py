@@ -28,7 +28,7 @@ from sqlalchemy.sql.expression import text  # type: ignore
 from sqlalchemy.orm import validates  # type: ignore
 
 from recval.normalization import to_indexable_form, normalize as normalize_utterance
-from recval.recording import transcode_to_aac, compute_fingerprint
+from recval.transcode_recording import transcode_to_aac, compute_fingerprint
 
 db = SQLAlchemy()
 
