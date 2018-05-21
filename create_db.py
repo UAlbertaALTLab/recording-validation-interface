@@ -19,7 +19,7 @@ from tqdm import tqdm  # type: ignore
 from recval.extract_phrases import RecordingExtractor, RecordingInfo
 from recval.model import Phrase, Recording, Sentence, Word, VersionedString
 from recval.database import init_db
-
+from recval.transcode_recording import transcode_to_aac
 
 info2phrase = {}  # type: ignore
 
@@ -86,20 +86,17 @@ if __name__ == '__main__':
             rec_id = info.compute_sha256hash()
             recording_path = dest / f"{rec_id}.m4a"
             if not recording_path.exists():
-                # Export a mono AAC file with metadata.
-                # See: https://superuser.com/a/1055816/711047
-                audio.set_channels(1).\
-                    export(fspath(recording_path),
-                           format='adts', codec='aac',
-                           # https://www.ffmpeg.org/doxygen/3.2/group__metadata__api.html
-                           tags=dict(title=info.transcription,
-                                     performer=info.speaker,
-                                     album=info.session,
-                                     language="crk",
-                                     creation_time=f"{info.session.date:%Y-%m-%d}",
-                                     year=info.session.year),
-                           id3v2_version='3')
+                # https://www.ffmpeg.org/doxygen/3.2/group__metadata__api.html
+                transcode_to_aac(audio, recording_path, tags=dict(
+                    title=info.transcription,
+                    performer=info.speaker,
+                    album=info.session,
+                    language="crk",
+                    creation_time=f"{info.session.date:%Y-%m-%d}",
+                    year=info.session.year
+                ))
                 assert recording_path.exists()
+
             phrase = make_phrase(info)
             recording = Recording.new(fingerprint=rec_id,
                                       phrase=phrase,
