@@ -28,6 +28,7 @@ from sqlalchemy.sql.expression import text  # type: ignore
 from sqlalchemy.orm import validates  # type: ignore
 
 from recval.normalization import to_indexable_form, normalize as normalize_utterance
+from recval.recording import transcode_to_aac, compute_fingerprint
 
 db = SQLAlchemy()
 
@@ -258,11 +259,32 @@ class Recording(db.Model):  # type: ignore
         """
         assert input_file.exists()
         if fingerprint is None:
-            fingerprint = compute_fingerprint(input_file)
-            transcode_to_aac(input_file, fingerprint)
+            fingerprint = cls._transcode(input_file)
         return cls(id=fingerprint,
                    phrase=phrase,
                    speaker=speaker)
+
+    @staticmethod
+    def _transcode(recording_path: Path) -> str:
+        import warnings
+        warnings.warn("Computing ID from fingerprint", DeprecationWarning)
+        transcoded_recordings_path = Path(
+            current_app.config['TRANSCODED_RECORDINGS_PATH']
+        ).resolve()
+        assert transcoded_recordings_path.is_dir()
+
+        fingerprint = compute_fingerprint(recording_path)
+        assert len(fingerprint) == 64, f"expected fingerprint: {fingerprint!r}"
+
+        destination = transcoded_recordings_path / f"{fingerprint}.m4a"
+        if destination.exists():
+            current_app.logger.info('File already transcoded. Skipping: %s',
+                                    destination)
+            return fingerprint
+
+        current_app.logger.info('Transcoding %s', recording_path)
+        transcode_to_aac(recording_path, destination)
+        return fingerprint
 
 
 class VersionedString(db.Model):  # type: ignore
@@ -447,40 +469,3 @@ class User(db.Model, UserMixin):  # type: ignore
 
 
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
-
-
-def compute_fingerprint(file_path: Path) -> str:
-    """
-    Computes the SHA-256 hash of the given audio file path.
-    """
-    assert file_path.suffix == '.wav', f"Expected .wav file; got {file_path}"
-    with open(file_path, 'rb') as f:
-        return sha256(f.read()).hexdigest()
-
-
-def transcode_to_aac(recording_path: Path, fingerprint: str) -> None:
-    """
-    Transcodes .wav files to .aac files.
-    TODO: Factor this out!
-    """
-    # TODO: use pydub instead of some gnarly sh command.
-    from sh import ffmpeg  # type: ignore
-    assert recording_path.exists(), f"Could not stat {recording_path}"
-    assert len(fingerprint) == 64, f"expected fingerprint: {fingerprint!r}"
-
-    # Determine where to read and write transcoded audio files.
-    transcoded_recordings_path = Path(current_app.config['TRANSCODED_RECORDINGS_PATH']).resolve()
-    assert transcoded_recordings_path.is_dir()
-
-    out_filename = transcoded_recordings_path / f"{fingerprint}.m4a"
-    if out_filename.exists():
-        current_app.logger.info('File already transcoded. Skipping: %s', out_filename)
-        return
-
-    current_app.logger.info('Transcoding %s', recording_path)
-    ffmpeg('-i', fspath(recording_path),
-           '-nostdin',
-           '-n',  # Do not overwrite existing files
-           '-ac', 1,  # Mix to mono
-           '-acodec', 'aac',  # Use the AAC codec
-           out_filename)
