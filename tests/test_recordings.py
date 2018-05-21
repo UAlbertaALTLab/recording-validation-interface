@@ -9,7 +9,7 @@ from uuid import uuid4
 from pathlib import Path
 
 import pytest  # type: ignore
-from pydub.generators import Sine  # type: ignore
+from pydub.generators import Square  # type: ignore
 
 from recval.transcode_recording import transcode_to_aac
 
@@ -31,7 +31,7 @@ def test_can_transcode_wave_file(wave_file_path: Path,
 
 def test_can_transcode_audio_in_memory(temporary_directory: Path) -> None:
     # Transcode a file in memory.
-    recording = Sine(440).to_audio_segment()
+    recording = Square(441).to_audio_segment()
     destination = temporary_directory / f"{uuid4()}.m4a"
 
     assert not destination.exists()
