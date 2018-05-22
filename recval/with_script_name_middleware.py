@@ -9,7 +9,7 @@ Usage:
 In .flaskenv, write this:
 
     export RECVAL_SCRIPT_NAME=/script/name/for/your/app
-    export FLASK_APP=recval.with_script_name_middleware
+    export FLASK_APP=recval.with_script_name_middleware:create_app
 
 For example, if the server is NOT running as the root host, but rather is
 running as a "subdirectory", e.g.,
@@ -31,7 +31,7 @@ Based on: https://gist.github.com/Larivact/1ee3bad0e53b2e2c4e40
 
 import sys
 from os import environ as env
-from recval.app import app
+from recval.app import app as _app
 
 
 def script_name_middleware(app):
@@ -46,7 +46,7 @@ def script_name_middleware(app):
             "Did not provide FLASK_SCRIPT_NAME in the environment!\n"
             "Usage:\n"
             "     export FLASK_SCRIPT_NAME=/your-path-prefix\n"
-            "     export FLASK_APP=recval.with_script_name_middleware\n"
+            "     export FLASK_APP=recval.with_script_name_middleware:create_app\n"
             "     flask run\n"
         )
 
@@ -61,4 +61,6 @@ def script_name_middleware(app):
     return application
 
 
-app.wsgi_app = script_name_middleware(app.wsgi_app)
+def create_app():
+    _app.wsgi_app = script_name_middleware(_app.wsgi_app)
+    return _app

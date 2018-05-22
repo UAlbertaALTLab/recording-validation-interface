@@ -46,7 +46,7 @@ the following `.flaskenv` instead:
 ```sh
 export FLASK_SCRIPT_NAME=/validation
 # Location of the WSGI app, with middleware:
-export FLASK_APP=recval.with_script_name_middleware
+export FLASK_APP=recval.with_script_name_middleware:create_app
 export RECVAL_SETTINGS=/path/to/recval_settings.py
 ```
 
