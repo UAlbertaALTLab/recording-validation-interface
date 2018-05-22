@@ -21,7 +21,7 @@ Create a file called `recval_settings.py` based on this template:
 TRANSCODED_RECORDINGS_PATH = '/path/to/audio/directory'
 SQLALCHEMY_DATABASE_URI = 'sqlite:///path/to/recval.db'
 SECRET_KEY =  # generate a cryptographically generated key for this
-SECURITY_PASSWORD_SALT = # generate a cryptographically generated salt for this
+SECURITY_PASSWORD_SALT =  # generate a cryptographically generated salt for this
 ```
 
 Save this file somewhere. If it's the deployed/production version of the
@@ -37,6 +37,19 @@ directory, based on the following template:
 export FLASK_APP=recval.app
 export RECVAL_SETTINGS=/path/to/recval_settings.py
 ```
+
+If you're running on a subdirectory (e.g.,
+https://sapir.artsrn.ualberta.ca/validation), rather than on
+a virtualhost (e.g., https://validation.artsrn.ualberta.ca/), use
+the following `.flaskenv` instead:
+
+```sh
+export FLASK_SCRIPT_NAME=/validation
+# Location of the WSGI app, with middleware:
+export FLASK_APP=recval.with_script_name_middleware
+export RECVAL_SETTINGS=/path/to/recval_settings.py
+```
+
 
 ### Creating the database for the first time
 
@@ -90,11 +103,9 @@ Once the database is created, you can register new users using the
 Running
 -------
 
-Type
+Type:
 
-```
-flask run
-```
+    flask run
 
 This should use the WSGI app configured in `.flaskenv`.
 
@@ -110,10 +121,12 @@ Then run:
 
     ./run-tests
 
-This will type-check the Python code with mypy, start a temporary
+This will type-check the Python code with [mypy], start a temporary
 server, and run the tests.
 
 Any additional arguments are passed to `py.test`.
+
+[mypy]: http://mypy-lang.org/
 
 
 ### Rerun tests when the code changes
