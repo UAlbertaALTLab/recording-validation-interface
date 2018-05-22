@@ -12,7 +12,8 @@ Create a virtualenv (if applicable), and install the requirements:
 
     python3 -m pip install -r requirements.txt
 
-Consult `system-requirements.txt` for other system dependencies you may require.
+Consult `system-requirements.txt` for other system dependencies you may
+require (e.g., [`ffmpeg`](https://www.ffmpeg.org/)).
 
 Create a file called `recval_settings.py` based on this template:
 
@@ -27,6 +28,15 @@ Save this file somewhere. If it's the deployed/production version of the
 site, save this file outside of the repository, and outside of
 `DOCUMENT_ROOT`. For local development, it's fine to have this file in
 the local directory.
+
+Finally, create a file called `.flaskenv` in the current working
+directory, based on the following template:
+
+```sh
+# Location of the WSGI app:
+export FLASK_APP=recval.app
+export RECVAL_SETTINGS=/path/to/recval_settings.py
+```
 
 ### Creating the database for the first time
 
@@ -80,18 +90,13 @@ Once the database is created, you can register new users using the
 Running
 -------
 
-When developing and running tests, do this to setup the environment
-variables:
+Type
 
-    source ./source-this.sh
+```
+flask run
+```
 
-Otherwise, set the environment variables manually, like so:
-
-    export RECVAL_SETTINGS=/path/to/recval_settings.py
-
-Finally, you can run the server!
-
-    ./run-server
+This should use the WSGI app configured in `.flaskenv`.
 
 
 Testing
