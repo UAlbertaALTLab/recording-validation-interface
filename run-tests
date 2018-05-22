@@ -7,4 +7,5 @@
 #  -s       -- show stdout and stderr
 #  --pdb    -- launch pdb on test failures
 
+. .flaskenv || exit 1
 mypy recval && py.test -Wd --driver Firefox "$@"
