@@ -53,8 +53,8 @@ export RECVAL_SETTINGS=/path/to/recval_settings.py
 
 ### Creating the database for the first time
 
-Use the `./create_db.py` script (after setting `RECVAL_SETTINGS`; see
-below) to create the initial database. Use it like this:
+Use the `./create_db.py` script to create the initial database. Use it
+like this:
 
     ./create_db.py /path/to/sessions/
 
@@ -88,9 +88,9 @@ Each directory should have `*.TextGrid` files pair with a `*.wav` file:
 ### Creating new users
 
 Once the database is created, you can register new users using the
-`./manage.py` command (after setting `RECVAL_SETTINGS`; see below):
+`flask user create` command:
 
-    $ ./manage.py create user@domain.net
+    $ flask user create user@domain.net
     Creating user with email user@domain.net
     Enter a new password for user@domain.net: ********
     Re-type password: ********
