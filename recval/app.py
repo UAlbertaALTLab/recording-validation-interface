@@ -34,6 +34,7 @@ if app.config['SQLALCHEMY_DATABASE_URI'] == app.config['DEFAULT_DATABASE']:
 # Setup SQLAlchemy and Flask-Security
 db.init_app(app)
 security = Security(app, user_datastore)
+from .cli import *
 
 
 # Transcoded audio files.
