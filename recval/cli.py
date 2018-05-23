@@ -76,7 +76,7 @@ def init_db(directory: Path) -> None:
     Creates the database from scratch.
     """
 
-    from typing import Dict, Any
+    import logging
 
     from recval.extract_phrases import RecordingExtractor, RecordingInfo
     from recval.model import Phrase, Recording, Sentence, Word, VersionedString
@@ -137,6 +137,7 @@ def init_db(directory: Path) -> None:
 
     # Insert each thing found.
     # TODO: use click.progressbar()?
+    logging.basicConfig(level=logging.INFO)
     ex = RecordingExtractor()
     for info, audio in ex.scan(root_directory=directory):
         rec_id = info.compute_sha256hash()
