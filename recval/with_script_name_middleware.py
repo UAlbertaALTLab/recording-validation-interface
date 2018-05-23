@@ -6,9 +6,9 @@ prefix) to whatever is in the FLASK_SCRIPT_NAME environment variable.
 
 Usage:
 
-In .flaskenv, write this:
+In .env, write this:
 
-    export RECVAL_SCRIPT_NAME=/script/name/for/your/app
+    export FLASK_SCRIPT_NAME=/script/name/for/your/app
     export FLASK_APP=recval.with_script_name_middleware:create_app
 
 For example, if the server is NOT running as the root host, but rather is
