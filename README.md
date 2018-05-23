@@ -29,7 +29,7 @@ site, save this file outside of the repository, and outside of
 `DOCUMENT_ROOT`. For local development, it's fine to have this file in
 the local directory.
 
-Finally, create a file called `.flaskenv` in the current working
+Finally, create a file called `.env` in the current working
 directory, based on the following template:
 
 ```sh
@@ -41,7 +41,7 @@ export RECVAL_SETTINGS=/path/to/recval_settings.py
 If you're running on a subdirectory (e.g.,
 https://sapir.artsrn.ualberta.ca/validation), rather than on
 a virtualhost (e.g., https://validation.artsrn.ualberta.ca/), use
-the following `.flaskenv` instead:
+the following `.env` instead:
 
 ```sh
 export FLASK_SCRIPT_NAME=/validation
@@ -107,7 +107,7 @@ Type:
 
     flask run
 
-This should use the WSGI app configured in `.flaskenv`.
+This should use the WSGI app configured in `.env`.
 
 
 Testing

@@ -109,4 +109,4 @@ ENV/
 
 # Local stuff
 *.db
-.flaskenv
+.env
