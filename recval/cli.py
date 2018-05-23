@@ -162,5 +162,35 @@ def init_db(directory: Path) -> None:
         db.session.commit()
 
 
+@db_cli.command('destroy')
+@with_appcontext
+def destroy_db() -> None:
+    """
+    Deletes the database and all transcoded audio files.
+    Intended for development environments only!
+    """
+    db_file = Path('/tmp/recval-temporary.db')
+    audio_dir = Path(app.config['TRANSCODED_RECORDINGS_PATH'])
+
+    # Do nothing if not interactive.
+    if not sys.stdin.isatty():
+        sys.exit(2)
+
+    click.confirm(
+        f"Are you sure want to delete the database ({db_file}) "
+        f" and all transcoded recordings in {audio_dir}?"
+    )
+    try:
+        click.secho(f'Deleting {db_file}', fg='red', bold=True)
+        db_file.unlink()
+    except FileNotFoundError:
+        pass
+
+    click.secho(f'Deleting all *.m4a files in {audio_dir}',
+                fg='red', bold=True)
+    for audio_file in audio_dir.glob('*.m4a'):
+        audio_file.unlink()
+
+
 app.cli.add_command(user_cli)
 app.cli.add_command(db_cli)
