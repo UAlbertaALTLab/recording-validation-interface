@@ -4,14 +4,12 @@
 # Copyright © 2018 Eddie Antonio Santos. All rights reserved.
 
 import sys
-from datetime import datetime
 from getpass import getpass
 from typing import List
 
 import click
 from flask import Flask  # type: ignore
 from flask.cli import AppGroup, with_appcontext  # type: ignore
-from flask_security.utils import hash_password  # type: ignore
 
 from recval.app import app
 
@@ -30,6 +28,8 @@ def create(email):
     Create a new user with the given email.
     """
     from recval.app import user_datastore, db
+    from flask_security.utils import hash_password  # type: ignore
+    from datetime import datetime
 
     if user_datastore.find_user(email=email):
         print("There is already a user whose email is", email + "!")
@@ -45,8 +45,7 @@ def create(email):
     print("Creating validator:")
     print("  Email:", email)
     print("  Password:", "*" * 8)
-    confirmation = input("Is this okay? (y/n) ")
-    if not confirmation.lower().startswith('y'):
+    if not click.confirm("Is this okay?"):
         print("Will NOT create user.")
         sys.exit(1)
 
