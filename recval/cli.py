@@ -161,7 +161,7 @@ def init_db(directory: Path) -> None:
 
     from recval.extract_phrases import RecordingExtractor, RecordingInfo
     from recval.model import Phrase, Recording, Sentence, Word, VersionedString
-    from recval.database import init_db, special_users
+    from recval.database import init_db
     from recval.transcode_recording import transcode_to_aac
 
     # TODO: have a default place to look for sessions?
@@ -208,12 +208,12 @@ def init_db(directory: Path) -> None:
         """
         Get a versioned string.
         """
+        from recval.database.special_users import importer
         res = VersionedString.query.filter_by(value=value).all()
         assert len(res) in (0, 1)
         if res:
             return res[0]
-        v = VersionedString.new(value=value,
-                                author=special_users.importer)
+        v = VersionedString.new(value=value, author=importer)
         return v
 
     # Create the schema.
