@@ -68,6 +68,23 @@ def create_user(email):
     assert stored_user.has_role('validator')
 
 
+@user_cli.command('list')
+@with_appcontext
+def list_users():
+    """
+    List all users and their roles.
+    """
+    from recval.model import User
+
+    template = "{email:24} | {roles:24}"
+    print(template.format(email='Email', roles='Roles'))
+    for user in User.query.all():
+          print(template.format(
+              email=user.email,
+              roles=','.join(sorted(role.name for role in user.roles))
+          ))
+
+
 @db_cli.command('init')
 @with_appcontext
 @click.argument('directory', type=Path)
@@ -82,6 +99,8 @@ def init_db(directory: Path) -> None:
     from recval.model import Phrase, Recording, Sentence, Word, VersionedString
     from recval.database import init_db
     from recval.transcode_recording import transcode_to_aac
+
+    # TODO: have a default place to look for sessions?
 
     info2phrase = {}  # type: ignore
 
