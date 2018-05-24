@@ -28,13 +28,17 @@ def init_db():
     db.create_all()
 
     # Create roles.
-    importer_role = user_datastore.create_role(
+    importer_role = user_datastore.find_or_create_role(
         name='<importer>',
         description='A bot that imports recordings and other data.'
     )
-    validator_role = user_datastore.create_role(
+    user_datastore.find_or_create_role(
         name='validator',
         description='A user that can change transcriptions and translations'
+    )
+    user_datastore.find_or_create_role(
+        name='community',
+        description='A community member can list phrases and hear recordings',
     )
 
     # Create the special <importer> account.

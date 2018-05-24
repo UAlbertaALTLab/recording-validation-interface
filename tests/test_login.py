@@ -31,13 +31,27 @@ def test_change_string_unauthenticated(app, client, acimosis):
         assert rv.status_code in (302, 401, 403, 404)
 
 
+def test_roles(db) -> None:
+    """
+    A fresh database should have at miniumum, these roles:
+
+     - validator
+     - community
+
+    """
+    from recval.model import Role
+    roles = set(r.name for r in Role.query.all())
+
+    assert {'validator', 'community'}.issubset(roles)
+
+
 @pytest.mark.skip
 def test_login(app, client, db):
     """
     Test logging in as users.
     """
     from datetime import datetime
-    from flask_security import current_user
+    from flask_security import current_user  # type: ignore
 
     user1 = user_datastore.create_user(
         email='user1@example.com',
