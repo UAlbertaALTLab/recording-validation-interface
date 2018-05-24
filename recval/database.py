@@ -7,9 +7,7 @@
 Defines rountines for creating the database.
 """
 
-from typing import cast
-
-from werkzeug.local import LocalProxy
+import typing
 
 from recval.model import User
 
@@ -17,13 +15,17 @@ from recval.model import User
 _IMPORTER_EMAIL = 'importer@localhost'
 
 
-def _get_importer():
-    from recval.model import user_datastore
-    return user_datastore.find_user(email=_IMPORTER_EMAIL)
+class _SpecialUsers:
+    if typing.TYPE_CHECKING:
+        from recval.model import User
+
+    @property
+    def importer(self) -> 'User':
+        from recval.model import user_datastore
+        return user_datastore.find_user(email=_IMPORTER_EMAIL)
 
 
-# A proxy for the importer -- a bot with the <importer> role.
-importer = cast(User, LocalProxy(_get_importer))
+special_users = _SpecialUsers()
 
 
 def init_db():

@@ -9,6 +9,7 @@ import pytest  # type: ignore
 from sqlalchemy.exc import SQLAlchemyError  # type: ignore
 
 from recval.app import user_datastore
+from recval.database import special_users
 from recval.model import (ElicitationOrigin, Phrase, Recording,
                           RecordingQuality, VersionedString, Word)
 
@@ -241,7 +242,8 @@ def test_derived_versioned_string(db, validator):
     """
     Ensure that we can derive a versioned string and have a different author.
     """
-    from recval.database import importer
+    importer = special_users.importer
+
     v = VersionedString.new('acimos(is)', author=importer)
     original_id = v.id
     db.session.add(v)

@@ -6,6 +6,8 @@
 import pytest  # type: ignore
 from flask import url_for  # type: ignore
 
+from recval.database import special_users
+
 
 def test_unauthenticated(client):
     """
@@ -75,17 +77,15 @@ def test_database_has_bot_user(db):
     There should be one bot user, the importer.
     It should have the importer role.
     """
-    from recval.database import importer
-    assert importer.has_role('<importer>')
+    assert special_users.importer.has_role('<importer>')
 
 
 def test_cannot_login_as_importer(client, app):
     """
     It should be IMPOSSIBLE to login as the importer!
     """
-    from recval.database import importer
 
-    assert importer.password is None
+    assert special_users.importer.password is None
 
     # Additionally, logging in should not work.
     with app.test_request_context():

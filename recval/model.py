@@ -365,20 +365,10 @@ class VersionedString(db.Model):  # type: ignore
         Create a "root" versioned string.
         That is, it has no history, and its provenance is itself.
         """
-        if author is not None:
-            # This MIGHT be a proxy, so get a reference to the original proxy
-            try:
-                real_author = author._get_current_object()
-            except AttributeError:
-                real_author = author
-            else:
-                assert isinstance(real_author, User)
-        else:
-            real_author = None
         instance = cls(value=normalize_utterance(value),
                        previous_id=None,
                        timestamp=datetime.now(),
-                       author=real_author)
+                       author=author)
 
         # This is the root version.
         instance.id = instance.compute_sha256hash()
