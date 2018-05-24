@@ -3,8 +3,6 @@
 
 # Copyright © 2018 Eddie Antonio Santos. All rights reserved.
 
-from hashlib import sha256
-from os import fspath
 from pathlib import Path
 from typing import Union
 
@@ -37,18 +35,9 @@ def transcode_to_aac(
 
     # This assumes ffmpeg as the backend. This will save
     # a mono audio stream encoded in AAC, in an MP4 container.
-    audio.export(destination,
-                 format='ipod', codec='aac', **kwargs).\
-        close()
-
-
-def compute_fingerprint(file_path: Path) -> str:
-    """
-    Computes the SHA-256 hash of the given audio file path.
-    """
-    assert file_path.suffix == '.wav', f"Expected .wav file; got {file_path}"
-    with open(file_path, 'rb') as f:
-        return sha256(f.read()).hexdigest()
+    audio.export(
+        destination, format='ipod', codec='aac', **kwargs
+    ).close()
 
 
 # TODO: transcode to Opus in Ogg to support libre browsers and basically

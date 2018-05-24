@@ -28,7 +28,7 @@ from sqlalchemy.sql.expression import text  # type: ignore
 from sqlalchemy.orm import validates  # type: ignore
 
 from recval.normalization import to_indexable_form, normalize as normalize_utterance
-from recval.transcode_recording import transcode_to_aac, compute_fingerprint
+
 
 db = SQLAlchemy()
 
@@ -39,6 +39,7 @@ class RecordingQuality(Enum):
     """
     clean = auto()
     unusable = auto()
+    # TODO: add "exemplary" status?
 
 
 class ElicitationOrigin(Enum):
@@ -258,33 +259,9 @@ class Recording(db.Model):  # type: ignore
         Create a new recording and transcode it for distribution.
         """
         assert input_file.exists()
-        if fingerprint is None:
-            fingerprint = cls._transcode(input_file)
         return cls(id=fingerprint,
                    phrase=phrase,
                    speaker=speaker)
-
-    @staticmethod
-    def _transcode(recording_path: Path) -> str:
-        import warnings
-        warnings.warn("Computing ID from fingerprint", DeprecationWarning)
-        transcoded_recordings_path = Path(
-            current_app.config['TRANSCODED_RECORDINGS_PATH']
-        ).resolve()
-        assert transcoded_recordings_path.is_dir()
-
-        fingerprint = compute_fingerprint(recording_path)
-        assert len(fingerprint) == 64, f"expected fingerprint: {fingerprint!r}"
-
-        destination = transcoded_recordings_path / f"{fingerprint}.m4a"
-        if destination.exists():
-            current_app.logger.info('File already transcoded. Skipping: %s',
-                                    destination)
-            return fingerprint
-
-        current_app.logger.info('Transcoding %s', recording_path)
-        transcode_to_aac(recording_path, destination)
-        return fingerprint
 
 
 class VersionedString(db.Model):  # type: ignore
