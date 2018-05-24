@@ -24,7 +24,8 @@ def transcode_to_aac(
 
     if isinstance(recording, Path):
         assert recording.exists(), f"Could not stat {recording}"
-        audio = AudioSegment.from_file(fspath(recording))
+        with open(recording, 'rb') as recording_file:
+            audio = AudioSegment.from_file(recording_file)
     elif isinstance(recording, AudioSegment):
         audio = recording
     else:
@@ -36,8 +37,9 @@ def transcode_to_aac(
 
     # This assumes ffmpeg as the backend. This will save
     # a mono audio stream encoded in AAC, in an MP4 container.
-    audio.export(fspath(destination),
-                 format='ipod', codec='aac', **kwargs)
+    audio.export(destination,
+                 format='ipod', codec='aac', **kwargs).\
+        close()
 
 
 def compute_fingerprint(file_path: Path) -> str:
