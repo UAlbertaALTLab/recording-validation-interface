@@ -182,7 +182,8 @@ def destroy_db() -> None:
 
     click.confirm(
         f"Are you sure want to delete the database ({db_file}) "
-        f" and all transcoded recordings in {audio_dir}?"
+        f" and all transcoded recordings in {audio_dir}?",
+        abort=True
     )
     try:
         click.secho(f'Deleting {db_file}', fg='red', bold=True)
