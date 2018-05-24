@@ -170,12 +170,15 @@ def destroy_db() -> None:
     Deletes the database and all transcoded audio files.
     Intended for development environments only!
     """
-    db_file = Path('/tmp/recval-temporary.db')
-    audio_dir = Path(app.config['TRANSCODED_RECORDINGS_PATH'])
 
     # Do nothing if not interactive.
-    if not sys.stdin.isatty():
-        sys.exit(2)
+    if app.config['ENV'] != 'development':
+        click.echo("This option is only applicable in development mode!",
+                   err=True)
+        sys.exit(1)
+
+    db_file = Path('/tmp/recval-temporary.db')
+    audio_dir = Path(app.config['TRANSCODED_RECORDINGS_PATH'])
 
     click.confirm(
         f"Are you sure want to delete the database ({db_file}) "
