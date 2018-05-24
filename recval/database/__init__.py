@@ -15,19 +15,6 @@ from recval.model import User
 _IMPORTER_EMAIL = 'importer@localhost'
 
 
-class _SpecialUsers:
-    if typing.TYPE_CHECKING:
-        from recval.model import User
-
-    @property
-    def importer(self) -> 'User':
-        from recval.model import user_datastore
-        return user_datastore.find_user(email=_IMPORTER_EMAIL)
-
-
-special_users = _SpecialUsers()
-
-
 def init_db():
     """
     Initializes the database for the first time.
