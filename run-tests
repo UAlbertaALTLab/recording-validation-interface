@@ -7,5 +7,6 @@
 #  -s       -- show stdout and stderr
 #  --pdb    -- launch pdb on test failures
 
+. .env || echo "$(tputs bold)Warning$(tputs reset): Did not source .env"
 . .flaskenv || exit 1
 mypy recval && py.test -Wd --driver Firefox "$@"

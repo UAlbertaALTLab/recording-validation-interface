@@ -193,5 +193,5 @@ def destroy_db() -> None:
         audio_file.unlink()
 
 
-app.cli.add_command(user_cli)
-app.cli.add_command(db_cli)
+app.cli.add_command(user_cli)  # type: ignore
+app.cli.add_command(db_cli)  # type: ignore
