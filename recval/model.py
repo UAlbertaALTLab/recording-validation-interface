@@ -98,10 +98,8 @@ class Phrase(db.Model):  # type: ignore
         # Create versioned transcription.
         if transcription or translation:
             super().__init__(
-                transcription_meta=VersionedString.new(value=transcription,
-                                                       author_name='<unknown>'),
-                translation_meta=VersionedString.new(value=translation,
-                                                     author_name='<unknown>'),
+                transcription_meta=VersionedString.new(value=transcription),
+                translation_meta=VersionedString.new(value=translation),
                 **kwargs
             )
         else:
@@ -283,25 +281,39 @@ class VersionedString(db.Model):  # type: ignore
                               nullable=False)
     previous_id = db.Column(db.String, db.ForeignKey('versioned_string.id'),
                             nullable=True)
+    author_id = db.Column(db.Integer(), db.ForeignKey('user.id'),
+                          nullable=True)  # TODO: make this not nullable!
+    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
+    # The very first string in the series.
     provenance = db.relationship('VersionedString',
                                  foreign_keys=[provenance_id],
                                  uselist=False)
+    # The immediately last version of the string.
     previous = db.relationship('VersionedString',
                                foreign_keys=[previous_id],
                                uselist=False)
-
-    # TODO: author as an entity
-    author_name = db.Column(db.Text, nullable=False)
-    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-
-    # TODO: create index on provenance to get full history
+    author = db.relationship('User', foreign_keys=[author_id])
 
     @validates('value')
     def validate_value(self, _key, utterance):
         value = normalize_utterance(utterance)
         assert len(value) > 0
         return value
+
+    @validates('author_id')
+    def validate_author_id(self, _key, author_id):
+        if author_id is None:
+            warnings.warn("Author should not be None, "
+                          "and will be non-nullable in the future",
+                          DeprecationWarning)
+        return author_id
+
+    @property
+    def author_email(self):
+        if not self.author:
+            return '<unknown>'
+        return self.author.email
 
     @property
     def is_root(self) -> bool:
@@ -316,12 +328,12 @@ class VersionedString(db.Model):  # type: ignore
         TODO: test show() before and after provenance and ID are set.
         """
         def generate():
-            if self.provenance and self.provenance != self.id:
+            if not self.is_root:
                 # Yield the provenance ONLY when this is a non-root commit.
-                yield f"provenance {self.provenance}"
-            if self.previous:
-                yield f"previous {self.previous}"
-            yield f"author {self.author_name}"
+                yield f"provenance {self.provenance_id}"
+            if self.previous_id:
+                yield f"previous {self.previous_id}"
+            yield f"author {self.author_email}"
             yield f"date {self.timestamp:%Y-%m-%dT%H:%M:%S%z}"
             yield ''
             yield self.value
@@ -333,28 +345,29 @@ class VersionedString(db.Model):  # type: ignore
         """
         return sha256(self.show().encode('UTF-8')).hexdigest()
 
-    def derive(self, value: str, author_name: str) -> 'VersionedString':
+    def derive(self, value: str, author_name: str=None) -> 'VersionedString':
         """
         Create a versioned string using this instance as its previous value.
         """
         # TODO: support for date.
-        instance = type(self).new(value, author_name)
-        instance.previous_id = self.id
-        instance.provenance_id = self.provenance_id
+        child = type(self).new(value)
+        child.previous_id = self.id
+        child.provenance_id = self.provenance_id
         # Setting previous and provenance changed the hash,
         # so recompute it.
-        instance.id = instance.compute_sha256hash()
-        return instance
+        child.id = child.compute_sha256hash()
+        assert child.id != child.provenance_id
+        return child
 
     @classmethod
-    def new(cls, value: str, author_name: str) -> 'VersionedString':
+    def new(cls, value: str, author: 'User'=None) -> 'VersionedString':
         """
         Create a "root" versioned string.
         That is, it has no history, and its provenance is itself.
         """
         instance = cls(value=normalize_utterance(value),
                        timestamp=datetime.utcnow(),
-                       author_name=author_name)
+                       author=author)
 
         # This is the root version.
         instance.id = instance.compute_sha256hash()

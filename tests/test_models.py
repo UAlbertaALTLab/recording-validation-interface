@@ -224,6 +224,21 @@ def test_search_transcription_accents(db, acimosis, acimosisak):
     assert word.translation == 'puppy'
 
 
+def test_versioned_string_author(db, validator):
+    """
+    Ensure that we can set an author for the given versioned string.
+    """
+    v = VersionedString.new('acimosis', author=validator)
+    db.session.add(v)
+    db.session.commit()
+    del v
+
+    v = VersionedString.query.filter_by(author=validator).one()
+    assert v.author == validator
+
+
+# TODO: test for versioned string derive.
+
 @pytest.fixture
 def acimosisak(db):
     word = Word(transcription='acimosisak', translation='litter of pups')

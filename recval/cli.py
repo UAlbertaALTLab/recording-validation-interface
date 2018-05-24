@@ -212,7 +212,7 @@ def init_db(directory: Path) -> None:
         assert len(res) in (0, 1)
         if res:
             return res[0]
-        v = VersionedString.new(value=value, author_name='<unknown>')
+        v = VersionedString.new(value=value)
         return v
 
     # Create the schema.
