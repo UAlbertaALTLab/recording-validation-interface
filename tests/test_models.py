@@ -237,7 +237,33 @@ def test_versioned_string_author(db, validator):
     assert v.author == validator
 
 
-# TODO: test for versioned string derive.
+def test_derived_versioned_string(db, validator):
+    """
+    Ensure that we can derive a versioned string and have a different author.
+    """
+    from recval.database import importer
+    v = VersionedString.new('acimos(is)', author=importer)
+    original_id = v.id
+    db.session.add(v)
+    db.session.commit()
+    del v
+
+    original = VersionedString.query.filter_by(value='acimos(is)').one()
+    derived = original.derive(value='acimosis', author=validator)
+    db.session.add(derived)
+    db.session.commit()
+    del derived
+
+    derived = VersionedString.query.filter_by(value='acimosis').one()
+    assert original != derived
+    assert original.provenance == original
+    assert original.previous is None
+    assert derived.previous == original
+    assert derived.provenance == original
+    assert original.author == importer
+    assert derived.author == validator
+    assert original.author != derived.author
+
 
 @pytest.fixture
 def acimosisak(db):

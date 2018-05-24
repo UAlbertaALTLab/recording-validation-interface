@@ -115,7 +115,7 @@ class Phrase(db.Model):  # type: ignore
     def transcription(self, value: str) -> None:
         # TODO: set current author.
         previous = self.transcription_meta
-        self.transcription_meta = previous.derive(value, '<unknown author>')
+        self.transcription_meta = previous.derive(value)
 
     @hybrid_property
     def translation(self) -> str:
@@ -127,7 +127,7 @@ class Phrase(db.Model):  # type: ignore
     def translation(self, value: str) -> None:
         # TODO: set current author.
         previous = self.translation_meta
-        self.translation_meta = previous.derive(value, '<unknown author>')
+        self.translation_meta = previous.derive(value)
 
     @property
     def translation_history(self):
@@ -243,7 +243,7 @@ class Recording(db.Model):  # type: ignore
     id = db.Column(db.Text, primary_key=True)
     speaker = db.Column(db.Text, nullable=True)  # TODO: Versioned String?
     timestamp = db.Column(db.DateTime, nullable=False,
-                          default=datetime.utcnow)
+                          default=datetime.now)
     phrase_id = db.Column(db.Integer, db.ForeignKey('phrase.id'),
                           nullable=False)
     quality = db.Column(db.Enum(RecordingQuality), nullable=True)
@@ -283,14 +283,16 @@ class VersionedString(db.Model):  # type: ignore
                             nullable=True)
     author_id = db.Column(db.Integer(), db.ForeignKey('user.id'),
                           nullable=True)  # TODO: make this not nullable!
-    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.now)
 
     # The very first string in the series.
     provenance = db.relationship('VersionedString',
+                                 remote_side=[id],
                                  foreign_keys=[provenance_id],
                                  uselist=False)
     # The immediately last version of the string.
     previous = db.relationship('VersionedString',
+                               remote_side=[id],
                                foreign_keys=[previous_id],
                                uselist=False)
     author = db.relationship('User', foreign_keys=[author_id])
@@ -310,8 +312,8 @@ class VersionedString(db.Model):  # type: ignore
         return author_id
 
     @property
-    def author_email(self):
-        if not self.author:
+    def author_email(self) -> str:
+        if self.author is None:
             return '<unknown>'
         return self.author.email
 
@@ -329,12 +331,12 @@ class VersionedString(db.Model):  # type: ignore
         """
         def generate():
             if not self.is_root:
+                assert self.previous_id is not None
                 # Yield the provenance ONLY when this is a non-root commit.
                 yield f"provenance {self.provenance_id}"
-            if self.previous_id:
                 yield f"previous {self.previous_id}"
             yield f"author {self.author_email}"
-            yield f"date {self.timestamp:%Y-%m-%dT%H:%M:%S%z}"
+            yield f"date {self.timestamp.isoformat()}"
             yield ''
             yield self.value
         return '\n'.join(generate())
@@ -345,16 +347,14 @@ class VersionedString(db.Model):  # type: ignore
         """
         return sha256(self.show().encode('UTF-8')).hexdigest()
 
-    def derive(self, value: str, author_name: str=None) -> 'VersionedString':
+    def derive(self, value: str, author: 'User'=None) -> 'VersionedString':
         """
         Create a versioned string using this instance as its previous value.
         """
-        # TODO: support for date.
-        child = type(self).new(value)
+        child = type(self).new(value, author)
         child.previous_id = self.id
         child.provenance_id = self.provenance_id
-        # Setting previous and provenance changed the hash,
-        # so recompute it.
+        # Setting previous and provenance changed the hash, so recompute it.
         child.id = child.compute_sha256hash()
         assert child.id != child.provenance_id
         return child
@@ -365,9 +365,20 @@ class VersionedString(db.Model):  # type: ignore
         Create a "root" versioned string.
         That is, it has no history, and its provenance is itself.
         """
+        if author is not None:
+            # This MIGHT be a proxy, so get a reference to the original proxy
+            try:
+                real_author = author._get_current_object()
+            except AttributeError:
+                real_author = author
+            else:
+                assert isinstance(real_author, User)
+        else:
+            real_author = None
         instance = cls(value=normalize_utterance(value),
-                       timestamp=datetime.utcnow(),
-                       author=author)
+                       previous_id=None,
+                       timestamp=datetime.now(),
+                       author=real_author)
 
         # This is the root version.
         instance.id = instance.compute_sha256hash()
