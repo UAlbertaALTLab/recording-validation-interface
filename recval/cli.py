@@ -24,9 +24,14 @@ db_cli = AppGroup('db', help='Initialize and update database')
 @user_cli.command('create')
 @with_appcontext
 @click.argument('email')
-def create_user(email):
+@click.option('--community/--no-community', default=True)
+@click.option('--validator/--no-validator', default=False)
+def create_user(email, community, validator):
     """
     Create a new user with the given email.
+
+    The user will have the 'community' role by default; pass
+    `--validator` to add them to the "validator" role as well.
     """
     from getpass import getpass
     from datetime import datetime
@@ -46,9 +51,16 @@ def create_user(email):
         print("Passwords did not match")
         sys.exit(1)
 
-    print("Creating validator:")
+    roles = []
+    if community:
+        roles.append('community')
+    if validator:
+        roles.append('validator')
+
+    print(f"Creating user:")
     print("  Email:", email)
     print("  Password:", "*" * 8)
+    print("  Roles:", ', '.join(sorted(roles)))
     if not click.confirm("Is this okay?"):
         print("Will NOT create user.")
         sys.exit(1)
@@ -58,15 +70,18 @@ def create_user(email):
         password=hash_password(password),
         active=True,
         confirmed_at=datetime.utcnow(),
-        roles=['validator']
+        roles=roles
     )
     db.session.commit()
 
     # Make sure we stored them!
     stored_user = user_datastore.find_user(email=email)
     assert stored_user is not None
-    assert stored_user.has_role('validator')
+    assert all(stored_user.has_role(r) for r in roles)
 
+
+# TODO: add role
+# TODO: revoke role
 
 @user_cli.command('list')
 @with_appcontext
@@ -79,10 +94,10 @@ def list_users():
     template = "{email:24} | {roles:24}"
     print(template.format(email='Email', roles='Roles'))
     for user in User.query.all():
-          print(template.format(
-              email=user.email,
-              roles=','.join(sorted(role.name for role in user.roles))
-          ))
+        print(template.format(
+            email=user.email,
+            roles=','.join(sorted(role.name for role in user.roles))
+        ))
 
 
 @db_cli.command('init')
