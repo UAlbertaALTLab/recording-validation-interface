@@ -80,9 +80,6 @@ def create_user(email, community, validator):
     assert all(stored_user.has_role(r) for r in roles)
 
 
-# TODO: add role
-# TODO: revoke role
-
 @user_cli.command('list')
 @with_appcontext
 def list_users():
@@ -98,6 +95,58 @@ def list_users():
             email=user.email,
             roles=','.join(sorted(role.name for role in user.roles))
         ))
+
+
+@user_cli.command('assign-role')
+@with_appcontext
+@click.argument('role')
+@click.argument('emails', nargs=-1)
+def assign_role(role, emails):
+    """
+    Add roles to one or more users.
+    """
+
+    from recval.app import user_datastore, db
+    role_obj = user_datastore.find_role(role)
+    if not role_obj:
+        click.secho(f"No such role exists: {role}",
+                    fg="red", err=True)
+        sys.exit(1)
+
+    for email in emails:
+        user = user_datastore.get_user(email)
+        if not user:
+            click.secho(f"No such user: {email}",
+                        fg="red", err=True)
+            sys.exit(1)
+        user_datastore.add_role_to_user(user, role_obj)
+    db.session.commit()
+
+
+@user_cli.command('remove-role')
+@with_appcontext
+@click.argument('role')
+@click.argument('emails', nargs=-1)
+def remove_role(role, emails):
+    """
+    Remove specified role from one or more users.
+    """
+
+    from recval.app import user_datastore, db
+    role_obj = user_datastore.find_role(role)
+    if not role_obj:
+        click.secho(f"No such role exists: {role}",
+                    fg="red", err=True)
+        sys.exit(1)
+
+    for email in emails:
+        user = user_datastore.get_user(email)
+        if not user:
+            click.secho(f"No such user: {email}",
+                        fg="red", err=True)
+            sys.exit(1)
+        user_datastore.remove_role_from_user(user, role_obj)
+    db.session.commit()
 
 
 @db_cli.command('init')
