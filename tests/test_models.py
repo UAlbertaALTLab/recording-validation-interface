@@ -19,7 +19,8 @@ def test_insert_word(db, wave_file_path):
     """
 
     word = Word(transcription=' acimosis', translation='puppy ')
-    recording = Recording.new(phrase=word, input_file=wave_file_path, speaker='NIL')
+    recording = Recording.new(fingerprint='acimosis', phrase=word,
+                              input_file=wave_file_path, speaker='NIL')
     db.session.add(recording)
     db.session.commit()
 
@@ -40,12 +41,14 @@ def test_insert_recording_twice(db, wave_file_path):
     word = Word(transcription='acimosis', translation='puppy')
 
     # Insert it once.
-    rec1 = Recording.new(phrase=word, input_file=wave_file_path, speaker='NIL')
+    rec1 = Recording.new(fingerprint='acimosis', phrase=word,
+                         input_file=wave_file_path, speaker='NIL')
     db.session.add(rec1)
     db.session.commit()
 
     # Insert it again.
-    rec2 = Recording.new(phrase=word, input_file=wave_file_path, speaker='NIL')
+    rec2 = Recording.new(fingerprint='acimosis', phrase=word,
+                         input_file=wave_file_path, speaker='NIL')
     db.session.add(rec1)
     with pytest.raises(SQLAlchemyError):
         db.session.commit()
@@ -57,7 +60,8 @@ def test_transcription_update(db, wave_file_path):
     """
 
     word = Word(transcription='\n aci\u0302mosis \r', translation='puppy')
-    recording = Recording.new(phrase=word, input_file=wave_file_path, speaker='NIL')
+    recording = Recording.new(fingerprint='acimosis', phrase=word,
+                              input_file=wave_file_path, speaker='NIL')
     # Insert it for the first time.
     db.session.add(recording)
     db.session.commit()

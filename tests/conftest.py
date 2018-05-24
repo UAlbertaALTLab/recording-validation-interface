@@ -63,7 +63,10 @@ def acimosis(db, wave_file_path):
     """
     from recval.model import Word, Recording
     word = Word(transcription='acîmosis', translation=' puppy  ')
-    recording = Recording.new(phrase=word, input_file=wave_file_path, speaker='NIL')
+    recording = Recording.new(phrase=word,
+                              fingerprint='acimosis',
+                              input_file=wave_file_path,
+                              speaker='NIL')
     # Insert it for the first time.
     db.session.add(recording)
     db.session.commit()
