@@ -54,6 +54,12 @@ def test_str_is_same_as_filename():
     assert str(s) == s.as_filename()
 
 
+def test_unspecified_subsession():
+    s = SessionID.from_name('2016-01-18-AM-OFF-_')
+    assert s.subsession is None
+    assert str(s) == s.as_filename()
+
+
 def test_parse_dirty():
     actual = SessionID.parse_dirty('2015-04-15-am')
     expected = SessionID(date=date(2015, 4, 15), subsession=None,
@@ -63,3 +69,7 @@ def test_parse_dirty():
 
 def test_parse_csv(metadata_csv_file) -> None:
     metadata = parse_metadata(metadata_csv_file)
+    # Refer to the tests/fixtures/test_metadata.csv for correct numbers.
+    assert 7 == len(metadata)
+    example_session = SessionID.from_name('2015-04-15-PM-___-_')
+    assert example_session in metadata

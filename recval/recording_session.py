@@ -13,7 +13,6 @@ import csv
 from typing import Any, Dict, Optional, List, TextIO
 
 
-
 T = TypeVar('T')
 
 # This a strict pattern, that differs from the one in etc/;
@@ -32,8 +31,8 @@ strict_pattern = re.compile(r'''
         (?P<location> US|DS|KCH|OFF) |  ___
     )
     -
-    (?P<subsession>
-        \d+
+    (?:
+        (?P<subsession> \d+) | _
     )
     \Z
 ''', re.VERBOSE)
