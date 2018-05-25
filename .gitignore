@@ -110,3 +110,4 @@ ENV/
 # Local stuff
 *.db
 .env
+metadata.csv
