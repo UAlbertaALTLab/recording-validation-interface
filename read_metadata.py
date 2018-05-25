@@ -8,7 +8,7 @@ Parse the metadata file.
 import csv
 from typing import Any, Dict, Optional, List
 
-from recval.recording_session import RecordingSession, SessionParseError
+from recval.recording_session import SessionID, SessionParseError
 
 
 def number_from(mic_name: str) -> int:
@@ -33,7 +33,7 @@ def normalize_speaker_name(name: str) -> Optional[str]:
 
 
 class SessionMetadata:
-    def __init__(self, session: RecordingSession, raw_name: str, mics=Dict[int, str]) -> None:
+    def __init__(self, session: SessionID, raw_name: str, mics=Dict[int, str]) -> None:
         self.session = session
         self.raw_name = raw_name
         self.mics = mics
@@ -61,7 +61,7 @@ class SessionMetadata:
         raw_name = row['SESSION']
 
         # Parse a session out of it
-        session = RecordingSession.parse_dirty(raw_name)
+        session = SessionID.parse_dirty(raw_name)
 
         # Who are speaking on the mics?
         mic_names = [key for key in row.keys() if key.startswith('MIC')]
@@ -79,8 +79,7 @@ if __name__ == '__main__':
     with open('metadata.csv') as metadata_file:
         reader = csv.DictReader(metadata_file)
 
-        # change "RecordingSession" to "SessionID" or something?
-        sessions: Dict[RecordingSession, SessionMetadata] = {}
+        sessions: Dict[SessionID, SessionMetadata] = {}
         for row in reader:
             if not row['SESSION']:
                 continue

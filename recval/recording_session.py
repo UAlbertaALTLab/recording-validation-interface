@@ -119,7 +119,7 @@ class Location(Enum):
         raise InvalidLocationError(text)
 
 
-class RecordingSession(NamedTuple):
+class SessionID(NamedTuple):
     date: datetype
     time_of_day: Optional[TimeOfDay]
     subsession: Optional[int]
@@ -138,7 +138,7 @@ class RecordingSession(NamedTuple):
         return self.date.day
 
     @classmethod
-    def from_name(cls, directory_name: str) -> 'RecordingSession':
+    def from_name(cls, directory_name: str) -> 'SessionID':
         m = strict_pattern.match(directory_name)
         if m is None:
             raise SessionParseError(f"directory does not match pattern {directory_name}")
@@ -154,13 +154,25 @@ class RecordingSession(NamedTuple):
                    subsession=subsession,
                    location=location)
 
+    def as_filename(self) -> str:
+        """
+        Returns a standardized filename for any session.
+        """
+        time = (self.time_of_day and self.time_of_day.value) or '__'
+        loc = (self.location and self.location.value) or '___'
+        subsesh = self.subsession or 0
+        return f"{self.date:%Y-%m-%d}-{time}-{loc}-{subsesh:1d}"
+
+    def __str__(self) -> str:
+        return self.as_filename()
+
     @classmethod
-    def parse_dirty(cls, name: str) -> 'RecordingSession':
+    def parse_dirty(cls, name: str) -> 'SessionID':
         """
         Attempts to parse a messy session name.
 
-        >>> RecordingSession.parse_dirty('2015-04-15-am')
-        RecordingSession(date=date(2015, 4, 15), time_of_day=TimeOfDay.MORNING, subsession=None, location=None)
+        >>> SessionID.parse_dirty('2015-04-15-am')
+        SessionID(date=date(2015, 4, 15), time_of_day=TimeOfDay.MORNING, subsession=None, location=None)
         """
         m = dirty_pattern.match(name)
         if m is None:
@@ -176,21 +188,6 @@ class RecordingSession(NamedTuple):
                    time_of_day=time_of_day,
                    subsession=subsession,
                    location=location)
-
-
-
-    def as_filename(self) -> str:
-        """
-        Returns a standardized filename for any session.
-        """
-        time = (self.time_of_day and self.time_of_day.value) or '__'
-        loc = (self.location and self.location.value) or '___'
-        subsesh = self.subsession or 0
-        return f"{self.date:%Y-%m-%d}-{time}-{loc}-{subsesh:1d}"
-
-    def __str__(self) -> str:
-        return self.as_filename()
-
 
 T = TypeVar('T')
 

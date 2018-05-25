@@ -17,7 +17,7 @@ from pydub import AudioSegment  # type: ignore
 from textgrid import IntervalTier, TextGrid  # type: ignore
 
 from recval.normalization import normalize
-from recval.recording_session import RecordingSession
+from recval.recording_session import SessionID
 
 logger = logging.getLogger(__name__)
 info = logger.info
@@ -29,7 +29,7 @@ class RecordingInfo(NamedTuple):
     All the information you could possible want to know about a recorded
     snippet.
     """
-    session: RecordingSession
+    session: SessionID
     speaker: str
     type: str
     timestamp: str
@@ -59,7 +59,7 @@ class RecordingExtractor:
     """
 
     def __init__(self) -> None:
-        self.sessions: Dict[RecordingSession, Path] = {}
+        self.sessions: Dict[SessionID, Path] = {}
 
     def scan(self, root_directory: Path):
         """
@@ -76,7 +76,7 @@ class RecordingExtractor:
             yield from self.extract_session(session_dir)
 
     def extract_session(self, session_dir: Path):
-        session = RecordingSession.from_name(session_dir.stem)
+        session = SessionID.from_name(session_dir.stem)
         if session in self.sessions:
             raise RuntimeError(f"Duplicate session: {session} "
                                f"found at {self.sessions[session]}")
@@ -119,7 +119,7 @@ class PhraseExtractor:
     Extracts recorings from a session directory.
     """
     def __init__(self,
-                 session: RecordingSession,
+                 session: SessionID,
                  sound: AudioSegment,
                  text_grid: TextGrid,
                  speaker: str,  # Something like "ABC"
