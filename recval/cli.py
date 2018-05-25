@@ -151,10 +151,12 @@ def remove_role(role, emails):
 
 @db_cli.command('init')
 @with_appcontext
-@click.argument('directory', type=Path)
+@click.argument('directory', envvar='RECVAL_SESSION_DIRECTORY', type=Path)
 def init_db(directory: Path) -> None:
     """
     Creates the database from scratch.
+
+    TODO: drastically fix this
     """
 
     import logging
@@ -163,6 +165,7 @@ def init_db(directory: Path) -> None:
     from recval.model import Phrase, Recording, Sentence, Word, VersionedString
     from recval.database import init_db
     from recval.transcode_recording import transcode_to_aac
+    from recval.recording_session import parse_metadata
 
     # TODO: have a default place to look for sessions?
 
@@ -219,10 +222,13 @@ def init_db(directory: Path) -> None:
     # Create the schema.
     db = init_db()
 
+    with open('metadata.csv') as metadata_file:
+        metadata = parse_metadata(metadata_file)
+
     # Insert each thing found.
     # TODO: use click.progressbar()?
     logging.basicConfig(level=logging.INFO)
-    ex = RecordingExtractor()
+    ex = RecordingExtractor(metadata)
     for info, audio in ex.scan(root_directory=directory):
         rec_id = info.compute_sha256hash()
         recording_path = dest / f"{rec_id}.m4a"

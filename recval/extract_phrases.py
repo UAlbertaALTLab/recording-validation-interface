@@ -17,7 +17,7 @@ from pydub import AudioSegment  # type: ignore
 from textgrid import IntervalTier, TextGrid  # type: ignore
 
 from recval.normalization import normalize
-from recval.recording_session import SessionID
+from recval.recording_session import SessionID, SessionMetadata
 
 logger = logging.getLogger(__name__)
 info = logger.info
@@ -58,8 +58,9 @@ class RecordingExtractor:
     Extracts recordings from a directory of sessions.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, metadata=Dict[SessionID, SessionMetadata]) -> None:
         self.sessions: Dict[SessionID, Path] = {}
+        self.metadata = metadata
 
     def scan(self, root_directory: Path):
         """
@@ -76,10 +77,12 @@ class RecordingExtractor:
             yield from self.extract_session(session_dir)
 
     def extract_session(self, session_dir: Path):
-        session = SessionID.from_name(session_dir.stem)
-        if session in self.sessions:
-            raise RuntimeError(f"Duplicate session: {session} "
-                               f"found at {self.sessions[session]}")
+        session_id = SessionID.from_name(session_dir.stem)
+        if session_id in self.sessions:
+            raise RuntimeError(f"Duplicate session: {session_id} "
+                               f"found at {self.sessions[session_id]}")
+        if session_id not in self.metadata:
+            raise RuntimeError(f"Missing metadata for {session_id}")
 
         info(' ... Scanning %s for .TextGrid files', session_dir)
         text_grids = list(session_dir.glob('*.TextGrid'))
@@ -96,12 +99,12 @@ class RecordingExtractor:
             assert text_grid.exists() and sound_file.exists()
             info(' ... ... Matching sound file for %s', text_grid)
 
-            # TODO: get speaker from the session-codes table?
-            speaker = '???'
+            mic_id = get_mic_id(text_grid.stem)
+            speaker = self.metadata[session_id][mic_id]
 
             info(' ... ... Extract items from %s using speaker ID %s',
                  sound_file, speaker)
-            extractor = PhraseExtractor(session,
+            extractor = PhraseExtractor(session_id,
                                         AudioSegment.from_file(str(sound_file)),
                                         TextGrid.fromFile(str(text_grid)),
                                         speaker)
@@ -224,3 +227,11 @@ def to_milliseconds(seconds: Decimal) -> int:
     Converts interval times to an integer in milliseconds.
     """
     return int(seconds * 1000)
+
+
+def get_mic_id(name: str) -> int:
+    """
+    Return the microphone number from the filename of the wav file.
+    """
+    m = re.match(r'^Track (\d+)_', name)
+    return int(m.group(1))
