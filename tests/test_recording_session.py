@@ -4,6 +4,7 @@
 # Copyright © Eddie Antonio Santos. All rights reserved.
 
 import pytest  # type: ignore
+from datetime import date
 from recval.recording_session import RecordingSession, TimeOfDay, Location
 from recval.recording_session import SessionParseError
 
@@ -49,3 +50,11 @@ def test_time_of_day_missing():
 def test_str_is_same_as_filename():
     s = RecordingSession.from_name('2016-01-18-AM-OFF-0')
     assert str(s) == s.as_filename()
+
+
+def test_parse_dirty():
+    actual = RecordingSession.parse_dirty('2015-04-15-am')
+    expected = RecordingSession(date=date(2015, 4, 15),
+                                time_of_day=TimeOfDay.MORNING, subsession=None,
+                                location=None)
+    assert actual == expected

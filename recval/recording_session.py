@@ -12,7 +12,7 @@ from typing import AnyStr, Callable, Match, NamedTuple, Optional, TypeVar
 
 # This a strict pattern, that differs from the one in etc/;
 # It matches only directories with the normalized naming conventions.
-directory_pattern = re.compile(r'''
+strict_pattern = re.compile(r'''
     \A
     (?P<isodate>
         \d{4}-\d{1,2}-\d{1,2}   (?# This is slightly inaccurate, but it's okay. )
@@ -31,6 +31,34 @@ directory_pattern = re.compile(r'''
     )
     \Z
 ''', re.VERBOSE)
+
+
+# Pattern that tries to match and parse most folder names.
+dirty_pattern = re.compile(r'''
+    \A
+    (?P<isodate>
+        \d{4}-\d{1,2}-\d{1,2}
+    )
+    (                           (?# More specific information about the session )
+        (
+            (-|_)?
+            (?P<time_of_day>
+                [AaPp][Mm]
+            )
+            (?P<subsession>
+                \d+             (?# Some sessions are split further than just AM/PM )
+            )?
+        )?
+        (
+            (-|_)?
+            (?P<location>
+                \w+
+            )
+        )?
+    )
+    \Z
+''', re.VERBOSE)
+
 
 
 # ############################### Exceptions ############################# #
@@ -111,7 +139,7 @@ class RecordingSession(NamedTuple):
 
     @classmethod
     def from_name(cls, directory_name: str) -> 'RecordingSession':
-        m = directory_pattern.match(directory_name)
+        m = strict_pattern.match(directory_name)
         if m is None:
             raise SessionParseError(f"directory does not match pattern {directory_name}")
 
@@ -125,6 +153,31 @@ class RecordingSession(NamedTuple):
                    time_of_day=time_of_day,
                    subsession=subsession,
                    location=location)
+
+    @classmethod
+    def parse_dirty(cls, name: str) -> 'RecordingSession':
+        """
+        Attempts to parse a messy session name.
+
+        >>> RecordingSession.parse_dirty('2015-04-15-am')
+        RecordingSession(date=date(2015, 4, 15), time_of_day=TimeOfDay.MORNING, subsession=None, location=None)
+        """
+        m = dirty_pattern.match(name)
+        if m is None:
+            raise SessionParseError(f"session could not be parsed: {name!r}")
+
+        # Parse out all the things into appropriate datatypes.
+        date = datetime.strptime(m.group('isodate'), '%Y-%m-%d').date()
+        time_of_day = apply_or_none(TimeOfDay.parse, m.group('time_of_day'))
+        subsession = apply_or_none(int, m.group('subsession'))
+        location = apply_or_none(Location.parse, m.group('location'))
+
+        return cls(date=date,
+                   time_of_day=time_of_day,
+                   subsession=subsession,
+                   location=location)
+
+
 
     def as_filename(self) -> str:
         """
