@@ -10,6 +10,9 @@ import pytest  # type: ignore
 from flask_security import current_user  # type: ignore
 
 
+fixtures_dir = Path(__file__).parent / 'fixtures'
+
+
 @pytest.fixture()
 def app():
     """
@@ -78,7 +81,7 @@ def wave_file_path():
     """
     A recording saying "acimosis" (puppy), for use in test cases.
     """
-    test_wav = Path(__file__).parent / 'fixtures' / 'test.wav'
+    test_wav = fixtures_dir / 'test.wav'
     assert test_wav.exists()
     return test_wav
 
@@ -103,3 +106,13 @@ def validator(user_datastore):
 def user_datastore():
     from recval.model import user_datastore
     return user_datastore
+
+
+@pytest.fixture
+def metadata_csv_file():
+    """
+    Returns a file-like object that is some sample metadata, as downloaded
+    from Google Sheets.
+    """
+    with open(fixtures_dir / 'test_metadata.csv') as csvfile:
+        yield csvfile

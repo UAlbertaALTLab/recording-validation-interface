@@ -3,10 +3,12 @@
 
 # Copyright © Eddie Antonio Santos. All rights reserved.
 
-import pytest  # type: ignore
 from datetime import date
-from recval.recording_session import SessionID, TimeOfDay, Location
-from recval.recording_session import SessionParseError
+
+import pytest  # type: ignore
+
+from recval.recording_session import (Location, SessionID, SessionParseError,
+                                      TimeOfDay, parse_metadata)
 
 
 def test_does_not_parse_arbitrary_directory_name():
@@ -57,3 +59,7 @@ def test_parse_dirty():
     expected = SessionID(date=date(2015, 4, 15), subsession=None,
                          time_of_day=TimeOfDay.MORNING, location=None)
     assert actual == expected
+
+
+def test_parse_csv(metadata_csv_file) -> None:
+    metadata = parse_metadata(metadata_csv_file)
