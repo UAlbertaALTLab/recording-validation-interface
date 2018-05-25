@@ -68,8 +68,14 @@ def test_parse_dirty():
 
 
 def test_parse_csv(metadata_csv_file) -> None:
+    """
+    Parse the metadata file and fetching some speaker codes using it as a
+    dictionary.
+    """
     metadata = parse_metadata(metadata_csv_file)
     # Refer to the tests/fixtures/test_metadata.csv for correct numbers.
     assert 7 == len(metadata)
-    example_session = SessionID.from_name('2015-04-15-PM-___-_')
-    assert example_session in metadata
+    example_session_id = SessionID.from_name('2015-04-15-PM-___-_')
+    assert example_session_id in metadata
+    session = metadata[example_session_id]
+    assert ('LOU', 'MAR', 'JER') == (session[2], session[3], session[4])

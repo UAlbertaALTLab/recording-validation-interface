@@ -224,6 +224,9 @@ class SessionMetadata:
 
     @classmethod
     def parse(cls, row: Dict[str, Any]) -> 'SessionMetadata':
+        """
+        Parses a row from the metadata CSV file.
+        """
         # Extract "raw" name
         raw_name = row['SESSION']
 
