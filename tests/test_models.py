@@ -13,7 +13,7 @@ from recval.app import user_datastore
 from recval.model import (ElicitationOrigin, Phrase, Recording,
                           RecordingSession, RecordingQuality, VersionedString,
                           Word)
-from recval.recording_session import TimeOfDay
+from recval.recording_session import SessionID, TimeOfDay
 
 
 def test_insert_word(db, wave_file_path):
@@ -270,9 +270,16 @@ def test_derived_versioned_string(db, validator):
 
 
 def test_recording_has_session(db):
-    session = RecordingSession(date=date(2015, 12, 4),
-                               time_of_day=TimeOfDay.MORNING)
+    session_id = SessionID(date=date(2015, 12, 4),
+                           time_of_day=TimeOfDay.MORNING,
+                           location=None,
+                           subsession=None)
+    session = RecordingSession.from_session_id(session_id)
 
+    assert session.id == session_id
+    assert session.date == session_id.date
+    assert session.time_of_day == session_id.time_of_day
+    assert session.location == session_id.location
 
 
 @pytest.fixture

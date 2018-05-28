@@ -26,6 +26,7 @@ from sqlalchemy import DDL, event  # type: ignore
 from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
 from sqlalchemy.sql.expression import text  # type: ignore
 from sqlalchemy.orm import validates  # type: ignore
+from sqlalchemy.types import TypeDecorator, Unicode  # type: ignore
 
 from recval.normalization import to_indexable_form, normalize as normalize_utterance
 from recval.recording_session import SessionID, TimeOfDay, Location
@@ -248,6 +249,7 @@ class Recording(db.Model):  # type: ignore
     phrase_id = db.Column(db.Integer, db.ForeignKey('phrase.id'),
                           nullable=False)
     quality = db.Column(db.Enum(RecordingQuality), nullable=True)
+    session_id = db.Column(db.Integer)
 
     phrase = db.relationship('Phrase', back_populates='recordings')
 
@@ -263,6 +265,21 @@ class Recording(db.Model):  # type: ignore
                    speaker=speaker)
 
 
+class DBSessionID(TypeDecorator):
+    """
+    A custom ID type that is essentially just the str() of a SessionID object.
+    """
+    impl = Unicode
+
+    def process_bind_param(self, value: SessionID, _dialect) -> str:
+        # "as_filename()" is a misnomer; it's actually a concise string
+        # describing all of the identifying details of a session.
+        return value.as_filename()
+
+    def process_result_value(self, value: str, _dialect) -> SessionID:
+        return SessionID.from_name(value)
+
+
 class RecordingSession(db.Model):  # type: ignore
     """
     A session during which a number of recordings were made.
@@ -270,13 +287,19 @@ class RecordingSession(db.Model):  # type: ignore
     THis is very similar to SessionID, but explicitly meant to be stored in
     the database.
     """
+    id = db.Column(DBSessionID, primary_key=True)
     date = db.Column(db.Date(), primary_key=True, nullable=False)
-    time_of_day = db.Column(db.Enum(TimeOfDay), primary_key=True,
-                            nullable=True)
-    location = db.Column(db.Enum(Location), primary_key=True,
-                         nullable=True)
-    subsession = db.Column(db.Integer(), primary_key=True,
-                           nullable=True)
+    time_of_day = db.Column(db.Enum(TimeOfDay), nullable=True)
+    location = db.Column(db.Enum(Location), nullable=True)
+    subsession = db.Column(db.Integer(), nullable=True)
+
+    @classmethod
+    def from_session_id(cls, session_id: SessionID) -> 'RecordingSession':
+        return cls(id=session_id,
+                   date=session_id.date,
+                   time_of_day=session_id.time_of_day,
+                   location=session_id.location,
+                   subsession=session_id.subsession)
 
 
 class VersionedString(db.Model):  # type: ignore
