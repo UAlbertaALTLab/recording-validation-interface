@@ -3,6 +3,7 @@
 
 # Copyright © 2018 Eddie Antonio Santos. All rights reserved.
 
+from datetime import date
 from pathlib import Path
 
 import pytest  # type: ignore
@@ -10,7 +11,9 @@ from sqlalchemy.exc import SQLAlchemyError  # type: ignore
 
 from recval.app import user_datastore
 from recval.model import (ElicitationOrigin, Phrase, Recording,
-                          RecordingQuality, VersionedString, Word)
+                          RecordingSession, RecordingQuality, VersionedString,
+                          Word)
+from recval.recording_session import TimeOfDay
 
 
 def test_insert_word(db, wave_file_path):
@@ -264,6 +267,12 @@ def test_derived_versioned_string(db, validator):
     assert original.author == importer
     assert derived.author == validator
     assert original.author != derived.author
+
+
+def test_recording_has_session(db):
+    session = RecordingSession(date=date(2015, 12, 4),
+                               time_of_day=TimeOfDay.MORNING)
+
 
 
 @pytest.fixture

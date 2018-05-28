@@ -28,6 +28,7 @@ from sqlalchemy.sql.expression import text  # type: ignore
 from sqlalchemy.orm import validates  # type: ignore
 
 from recval.normalization import to_indexable_form, normalize as normalize_utterance
+from recval.recording_session import SessionID, TimeOfDay, Location
 
 
 db = SQLAlchemy()
@@ -260,6 +261,22 @@ class Recording(db.Model):  # type: ignore
         return cls(id=fingerprint,
                    phrase=phrase,
                    speaker=speaker)
+
+
+class RecordingSession(db.Model):  # type: ignore
+    """
+    A session during which a number of recordings were made.
+
+    THis is very similar to SessionID, but explicitly meant to be stored in
+    the database.
+    """
+    date = db.Column(db.Date(), primary_key=True, nullable=False)
+    time_of_day = db.Column(db.Enum(TimeOfDay), primary_key=True,
+                            nullable=True)
+    location = db.Column(db.Enum(Location), primary_key=True,
+                         nullable=True)
+    subsession = db.Column(db.Integer(), primary_key=True,
+                           nullable=True)
 
 
 class VersionedString(db.Model):  # type: ignore
