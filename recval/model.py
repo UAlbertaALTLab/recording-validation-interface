@@ -26,10 +26,10 @@ from sqlalchemy import DDL, event  # type: ignore
 from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
 from sqlalchemy.sql.expression import text  # type: ignore
 from sqlalchemy.orm import validates  # type: ignore
-from sqlalchemy.types import TypeDecorator, Unicode  # type: ignore
 
 from recval.normalization import to_indexable_form, normalize as normalize_utterance
 from recval.recording_session import SessionID, TimeOfDay, Location
+from recval.custom_types import DBSessionID
 
 
 db = SQLAlchemy()
@@ -233,21 +233,6 @@ class Sentence(Phrase):
     __mapper_args__ = {
         'polymorphic_identity': 'sentence'
     }
-
-
-class DBSessionID(TypeDecorator):
-    """
-    A custom ID type that is essentially just the str() of a SessionID object.
-    """
-    impl = Unicode
-
-    def process_bind_param(self, value: SessionID, _dialect) -> str:
-        # "as_filename()" is a misnomer; it's actually a concise string
-        # describing all of the identifying details of a session.
-        return value.as_filename()
-
-    def process_result_value(self, value: str, _dialect) -> SessionID:
-        return SessionID.from_name(value)
 
 
 class RecordingSession(db.Model):  # type: ignore
