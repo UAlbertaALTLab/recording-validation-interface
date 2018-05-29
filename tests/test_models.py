@@ -16,14 +16,15 @@ from recval.model import (ElicitationOrigin, Phrase, Recording,
 from recval.recording_session import SessionID, TimeOfDay
 
 
-def test_insert_word(db, wave_file_path):
+def test_insert_word(db, wave_file_path, recording_session):
     """
     Insert a word, and retrieve it again.
     """
 
     word = Word(transcription=' acimosis', translation='puppy ')
     recording = Recording.new(fingerprint='acimosis', phrase=word,
-                              input_file=wave_file_path, speaker='NIL')
+                              input_file=wave_file_path, speaker='NIL',
+                              session=recording_session)
     db.session.add(recording)
     db.session.commit()
 
@@ -287,3 +288,13 @@ def acimosisak(db):
     word = Word(transcription='acimosisak', translation='litter of pups')
     db.session.add(word)
     db.session.commit()
+
+
+@pytest.fixture
+def recording_session():
+    return RecordingSession.from_session_id(SessionID(
+        date=date(2015, 12, 4),
+        time_of_day=TimeOfDay.MORNING,
+        location=None,
+        subsession=None
+    ))

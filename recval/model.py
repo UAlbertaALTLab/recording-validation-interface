@@ -235,36 +235,6 @@ class Sentence(Phrase):
     }
 
 
-class Recording(db.Model):  # type: ignore
-    """
-    A recording of a phrase.
-
-    The id is a SHA-256 sum of either the session, or if session data is
-    missing, the wav file itself.
-    """
-    id = db.Column(db.Text, primary_key=True)
-    speaker = db.Column(db.Text, nullable=True)  # TODO: Versioned String?
-    timestamp = db.Column(db.DateTime, nullable=False,
-                          default=datetime.now)
-    phrase_id = db.Column(db.Integer, db.ForeignKey('phrase.id'),
-                          nullable=False)
-    quality = db.Column(db.Enum(RecordingQuality), nullable=True)
-    session_id = db.Column(db.Integer)
-
-    phrase = db.relationship('Phrase', back_populates='recordings')
-
-    @classmethod
-    def new(cls, phrase: Phrase, input_file: Path, speaker: str=None,
-            fingerprint: str=None) -> 'Recording':
-        """
-        Create a new recording and transcode it for distribution.
-        """
-        assert input_file.exists()
-        return cls(id=fingerprint,
-                   phrase=phrase,
-                   speaker=speaker)
-
-
 class DBSessionID(TypeDecorator):
     """
     A custom ID type that is essentially just the str() of a SessionID object.
@@ -287,6 +257,8 @@ class RecordingSession(db.Model):  # type: ignore
     THis is very similar to SessionID, but explicitly meant to be stored in
     the database.
     """
+    __tablename__ = 'session'
+
     id = db.Column(DBSessionID, primary_key=True)
     date = db.Column(db.Date(), primary_key=True, nullable=False)
     time_of_day = db.Column(db.Enum(TimeOfDay), nullable=True)
@@ -300,6 +272,40 @@ class RecordingSession(db.Model):  # type: ignore
                    time_of_day=session_id.time_of_day,
                    location=session_id.location,
                    subsession=session_id.subsession)
+
+
+class Recording(db.Model):  # type: ignore
+    """
+    A recording of a phrase.
+
+    The id is a SHA-256 sum of either the session, or if session data is
+    missing, the wav file itself.
+    """
+    id = db.Column(db.Text, primary_key=True)
+    speaker = db.Column(db.Text, nullable=True)  # TODO: Versioned String?
+    timestamp = db.Column(db.DateTime, nullable=False,
+                          default=datetime.now)
+    phrase_id = db.Column(db.Integer, db.ForeignKey('phrase.id'),
+                          nullable=False)
+    session_id = db.Column(db.Integer, db.ForeignKey('session.id'))
+
+    quality = db.Column(db.Enum(RecordingQuality), nullable=True)
+
+    phrase = db.relationship('Phrase', back_populates='recordings')
+    session = db.relationship('RecordingSession')
+
+    @classmethod
+    def new(cls, phrase: Phrase,
+            input_file: Path, speaker: str=None,
+            fingerprint: str=None,
+            session: RecordingSession=None) -> 'Recording':
+        """
+        Create a new recording and transcode it for distribution.
+        """
+        assert input_file.exists()
+        return cls(id=fingerprint,
+                   phrase=phrase,
+                   speaker=speaker)
 
 
 class VersionedString(db.Model):  # type: ignore
