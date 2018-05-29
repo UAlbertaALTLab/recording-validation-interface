@@ -162,7 +162,8 @@ def init_db(directory: Path) -> None:
     import logging
 
     from recval.extract_phrases import RecordingExtractor, RecordingInfo
-    from recval.model import Phrase, Recording, Sentence, Word, VersionedString
+    from recval.model import (Phrase, Recording, Sentence, Word, VersionedString,
+                              RecordingSession)
     from recval.database import init_db
     from recval.transcode_recording import transcode_to_aac
     from recval.recording_session import parse_metadata
@@ -244,12 +245,14 @@ def init_db(directory: Path) -> None:
             ))
             assert recording_path.exists()
 
+        session = RecordingSession.query.filter_by(id=info.session).\
+            one_or_none() or RecordingSession.from_session_id(info.session)
         phrase = make_phrase(info)
         # TODO: GENERATE SESSION ID!
-        recording = Recording.new(fingerprint=rec_id,  # type: ignore
+        recording = Recording.new(fingerprint=rec_id,
                                   phrase=phrase,
                                   input_file=recording_path,
-                                  session=...,
+                                  session=session,
                                   speaker=info.speaker)
         db.session.add(recording)
         db.session.commit()

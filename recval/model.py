@@ -289,7 +289,9 @@ class Recording(db.Model):  # type: ignore
         """
         Create a new recording and transcode it for distribution.
         """
-        # Create a datetime
+        # infer the timestamp from the session's date;
+        # Because there's no reliable way to get the time, set it to
+        # 00:00:00
         timestamp = datetime.combine(session.date, time())
         return cls(id=fingerprint, phrase=phrase, speaker=speaker,
                    session=session, timestamp=timestamp)
