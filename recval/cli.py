@@ -245,9 +245,11 @@ def init_db(directory: Path) -> None:
             assert recording_path.exists()
 
         phrase = make_phrase(info)
-        recording = Recording.new(fingerprint=rec_id,
+        # TODO: GENERATE SESSION ID!
+        recording = Recording.new(fingerprint=rec_id,  # type: ignore
                                   phrase=phrase,
                                   input_file=recording_path,
+                                  session=...,
                                   speaker=info.speaker)
         db.session.add(recording)
         db.session.commit()

@@ -60,6 +60,19 @@ def test_insert_recording_twice(db, wave_file_path, recording_session):
         db.session.commit()
 
 
+def test_recording_date_automatically_set(db, recording_session):
+    """
+    Should set the recording's date automatically from the session.
+    """
+    word = Word(transcription='acimosis', translation='puppy')
+    rec = Recording.new(fingerprint='acimosis', phrase=word,
+                        session=recording_session)
+    db.session.add(rec)
+    db.session.commit()
+
+    assert rec.timestamp.date() == recording_session.date
+
+
 def test_transcription_update(db, wave_file_path, recording_session):
     """
     Ensure that a word's transcription can be changed.

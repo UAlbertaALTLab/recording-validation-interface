@@ -12,7 +12,7 @@ Do not use db directly; instead, use database.init_db() instead.
 """
 
 import warnings
-from datetime import datetime
+from datetime import datetime, time
 from enum import Enum, auto
 from hashlib import sha256
 from os import fspath
@@ -284,13 +284,15 @@ class Recording(db.Model):  # type: ignore
 
     @classmethod
     def new(cls, fingerprint: str, phrase: Phrase,
-            session: RecordingSession=None,
+            session: RecordingSession,
             input_file: Path=None, speaker: str=None) -> 'Recording':
         """
         Create a new recording and transcode it for distribution.
         """
+        # Create a datetime
+        timestamp = datetime.combine(session.date, time())
         return cls(id=fingerprint, phrase=phrase, speaker=speaker,
-                   session=session)
+                   session=session, timestamp=timestamp)
 
 
 class VersionedString(db.Model):  # type: ignore
