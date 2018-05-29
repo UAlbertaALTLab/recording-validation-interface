@@ -58,7 +58,7 @@ def client(app, db):
 
 
 @pytest.fixture()
-def acimosis(db, wave_file_path):
+def acimosis(db, wave_file_path, recording_session):
     """
     Inserts the word 'acimosis'/'puppy' into the database.
 
@@ -67,6 +67,7 @@ def acimosis(db, wave_file_path):
     from recval.model import Word, Recording
     word = Word(transcription='acîmosis', translation=' puppy  ')
     recording = Recording.new(phrase=word,
+                              session=recording_session,
                               fingerprint='acimosis',
                               input_file=wave_file_path,
                               speaker='NIL')

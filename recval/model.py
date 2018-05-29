@@ -245,10 +245,12 @@ class RecordingSession(db.Model):  # type: ignore
     __tablename__ = 'session'
 
     id = db.Column(DBSessionID, primary_key=True)
-    date = db.Column(db.Date(), primary_key=True, nullable=False)
+    date = db.Column(db.Date(), nullable=False)
     time_of_day = db.Column(db.Enum(TimeOfDay), nullable=True)
     location = db.Column(db.Enum(Location), nullable=True)
     subsession = db.Column(db.Integer(), nullable=True)
+
+    recordings = db.relationship('Recording')
 
     @classmethod
     def from_session_id(cls, session_id: SessionID) -> 'RecordingSession':
@@ -272,25 +274,23 @@ class Recording(db.Model):  # type: ignore
                           default=datetime.now)
     phrase_id = db.Column(db.Integer, db.ForeignKey('phrase.id'),
                           nullable=False)
-    session_id = db.Column(db.Integer, db.ForeignKey('session.id'))
+    session_id = db.Column(DBSessionID, db.ForeignKey('session.id'),
+                           nullable=False)
 
     quality = db.Column(db.Enum(RecordingQuality), nullable=True)
 
     phrase = db.relationship('Phrase', back_populates='recordings')
-    session = db.relationship('RecordingSession')
+    session = db.relationship('RecordingSession', back_populates='recordings')
 
     @classmethod
-    def new(cls, phrase: Phrase,
-            input_file: Path, speaker: str=None,
-            fingerprint: str=None,
-            session: RecordingSession=None) -> 'Recording':
+    def new(cls, fingerprint: str, phrase: Phrase,
+            session: RecordingSession=None,
+            input_file: Path=None, speaker: str=None) -> 'Recording':
         """
         Create a new recording and transcode it for distribution.
         """
-        assert input_file.exists()
-        return cls(id=fingerprint,
-                   phrase=phrase,
-                   speaker=speaker)
+        return cls(id=fingerprint, phrase=phrase, speaker=speaker,
+                   session=session)
 
 
 class VersionedString(db.Model):  # type: ignore

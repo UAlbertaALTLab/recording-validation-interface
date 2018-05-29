@@ -37,7 +37,7 @@ def test_insert_word(db, wave_file_path, recording_session):
     assert word in result_set
 
 
-def test_insert_recording_twice(db, wave_file_path):
+def test_insert_recording_twice(db, wave_file_path, recording_session):
     """
     Insert the exact SAME recording twice; the second should fail.
     """
@@ -46,26 +46,29 @@ def test_insert_recording_twice(db, wave_file_path):
 
     # Insert it once.
     rec1 = Recording.new(fingerprint='acimosis', phrase=word,
-                         input_file=wave_file_path, speaker='NIL')
+                         input_file=wave_file_path, speaker='NIL',
+                         session=recording_session)
     db.session.add(rec1)
     db.session.commit()
 
     # Insert it again.
     rec2 = Recording.new(fingerprint='acimosis', phrase=word,
-                         input_file=wave_file_path, speaker='NIL')
+                         input_file=wave_file_path, speaker='NIL',
+                         session=recording_session)
     db.session.add(rec1)
     with pytest.raises(SQLAlchemyError):
         db.session.commit()
 
 
-def test_transcription_update(db, wave_file_path):
+def test_transcription_update(db, wave_file_path, recording_session):
     """
     Ensure that a word's transcription can be changed.
     """
 
     word = Word(transcription='\n aci\u0302mosis \r', translation='puppy')
     recording = Recording.new(fingerprint='acimosis', phrase=word,
-                              input_file=wave_file_path, speaker='NIL')
+                              input_file=wave_file_path, speaker='NIL',
+                              session=recording_session)
     # Insert it for the first time.
     db.session.add(recording)
     db.session.commit()
@@ -271,6 +274,9 @@ def test_derived_versioned_string(db, validator):
 
 
 def test_recording_has_session(db):
+    """
+    Ensures that a recording belongs to a session.
+    """
     session_id = SessionID(date=date(2015, 12, 4),
                            time_of_day=TimeOfDay.MORNING,
                            location=None,
@@ -281,6 +287,9 @@ def test_recording_has_session(db):
     assert session.date == session_id.date
     assert session.time_of_day == session_id.time_of_day
     assert session.location == session_id.location
+
+    db.session.add(session)
+    db.session.commit()
 
 
 @pytest.fixture
