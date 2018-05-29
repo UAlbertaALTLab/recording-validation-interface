@@ -288,13 +288,3 @@ def acimosisak(db):
     word = Word(transcription='acimosisak', translation='litter of pups')
     db.session.add(word)
     db.session.commit()
-
-
-@pytest.fixture
-def recording_session():
-    return RecordingSession.from_session_id(SessionID(
-        date=date(2015, 12, 4),
-        time_of_day=TimeOfDay.MORNING,
-        location=None,
-        subsession=None
-    ))

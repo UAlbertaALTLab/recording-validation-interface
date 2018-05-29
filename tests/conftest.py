@@ -76,6 +76,22 @@ def acimosis(db, wave_file_path):
     return word.id
 
 
+@pytest.fixture
+def recording_session():
+    """
+    A session for recordings.
+    """
+    from datetime import date
+    from recval.model import RecordingSession
+    from recval.recording_session import SessionID, TimeOfDay
+    return RecordingSession.from_session_id(SessionID(
+        date=date(2015, 12, 4),
+        time_of_day=TimeOfDay.MORNING,
+        location=None,
+        subsession=None
+    ))
+
+
 @pytest.fixture()
 def wave_file_path():
     """
