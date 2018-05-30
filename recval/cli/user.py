@@ -7,6 +7,8 @@
 List, create, and update user accounts.
 """
 
+import sys
+
 import click
 from flask.cli import AppGroup, with_appcontext  # type: ignore
 
@@ -18,7 +20,7 @@ user_cli = AppGroup('user', help=__doc__.strip())
 @click.argument('email')
 @click.option('--community/--no-community', default=True)
 @click.option('--validator/--no-validator', default=False)
-def create_user(email, community, validator):
+def create_user(email: str, community: bool, validator: bool) -> None:
     """
     Create a new user with the given email.
 
@@ -30,7 +32,7 @@ def create_user(email, community, validator):
 
     from flask_security.utils import hash_password  # type: ignore
 
-    from recval.app import user_datastore, db
+    from recval.model import db, user_datastore
 
     if user_datastore.find_user(email=email):
         print("There is already a user whose email is", email + "!")
