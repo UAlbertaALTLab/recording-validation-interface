@@ -19,7 +19,7 @@ Create a file called `recval_settings.py` based on this template:
 
 ```python
 TRANSCODED_RECORDINGS_PATH = '/path/to/audio/directory'
-SQLALCHEMY_DATABASE_URI = 'sqlite:///path/to/recval.db'
+SQLALCHEMY_DATABASE_URI = 'sqlite:////path/to/recval.db'
 SECRET_KEY =  # generate a cryptographically generated key for this
 SECURITY_PASSWORD_SALT =  # generate a cryptographically generated salt for this
 ```

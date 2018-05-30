@@ -13,7 +13,7 @@ After=syslog.target
 [Service]
 Type=simple
 ExecStart=/bin/sh -c \
-          'cd /src/apps/recval/ && source .venv/bin/activate && flask run'
+          'cd /src/apps/recval/ && . .venv/bin/activate && flask run'
 Restart=on-failure
 StandardError=syslog
 
