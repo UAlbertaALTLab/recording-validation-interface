@@ -210,3 +210,17 @@ def mock_server(db, mock_server_thread):
     """
     with SessionWithUrlBase(url_base=mock_server_thread.url) as s:
         yield s
+
+
+@pytest.fixture
+def url_for(app):
+    """
+    Exactly like flask.url_for, except always ensures an app context is setup.
+    (That is, will never crash in tests).
+    """
+
+    def url_for(*args, **kwargs):
+        from flask import url_for  # type: ignore
+        with app.test_request_context():
+            return url_for(*args, **kwargs)
+    return url_for

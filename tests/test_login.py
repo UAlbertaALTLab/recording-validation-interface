@@ -47,31 +47,6 @@ def test_roles(db) -> None:
     assert {'validator', 'community'}.issubset(roles)
 
 
-@pytest.mark.skip
-def test_login(app, client, db):
-    """
-    Test logging in as users.
-    """
-    from datetime import datetime
-    from flask_security import current_user  # type: ignore
-
-    user1 = user_datastore.create_user(
-        email='user1@example.com',
-        password='password123',
-        active=True,
-        confirmed_at=datetime.utcnow(),
-    )
-    db.session.commit()
-
-    with app.test_request_context():
-        with client:
-            rv = client.post(url_for('security.login'), data=dict(
-                email='user1@example.com',
-                password='password123'
-            ))
-            assert current_user.username == 'user1'
-
-
 def test_database_has_bot_user(db):
     """
     There should be one bot user, the importer.
