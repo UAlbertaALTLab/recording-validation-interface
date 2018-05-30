@@ -1,0 +1,21 @@
+# systemd script for Recordings Validation app (recval).
+#
+# Directory of where the app source code:
+# /srv/apps/recval
+# Do further configuration in
+#   /srv/apps/.env
+# And in its settings.py file.
+# Maintainer: Eddie Antonio Santos <easantos@ualberta.ca>
+[Unit]
+Description=Recording Validation Application
+After=syslog.target
+
+[Service]
+Type=simple
+ExecStart=/bin/sh -c \
+          'cd /src/apps/recval/ && source .venv/bin/activate && flask run'
+Restart=on-failure
+StandardError=syslog
+
+[Install]
+WantedBy=multi-user.target
