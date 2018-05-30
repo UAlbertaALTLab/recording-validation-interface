@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 import re
-import pytest
+import pytest  # type: ignore
 
 
 def test_index(mock_server):
@@ -14,7 +14,6 @@ def test_index(mock_server):
     assert 'Maskwacîs Recording' in r.text
 
 
-@pytest.mark.skip
 def test_login(mock_server, db, user_datastore, url_for):
     """
     Test logging in as users.
@@ -42,7 +41,6 @@ def test_login(mock_server, db, user_datastore, url_for):
     assert email not in r.text
 
     r = mock_server.get(url_for('security.login'))
-    print(r.text)
     csrf_token = get_csrf_token(r.text)
 
     # Login as the user we just created.
@@ -50,7 +48,6 @@ def test_login(mock_server, db, user_datastore, url_for):
         email=email, password=password, csrf_token=csrf_token,
         next=""
     ))
-    print(r.request.body)
     # XXX: Checks for the the Bootstrap error message class,
     # because Flask-Security doesn't know how to HTTP status code.
     assert 'alert-danger' not in r.text

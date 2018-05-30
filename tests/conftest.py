@@ -3,15 +3,21 @@
 
 # Copyright © 2018 Eddie Antonio Santos. All rights reserved.
 
+"""
+Fixtures and magic for pytests.
+"""
+
 import os
 from datetime import datetime
-from pathlib import Path
 from multiprocessing import Process
+from pathlib import Path
+from tempfile import TemporaryDirectory
 
 import pytest  # type: ignore
 import requests
 from flask_security import current_user  # type: ignore
 
+# Where are fixture files located?
 fixtures_dir = Path(__file__).parent / 'fixtures'
 
 
@@ -26,7 +32,18 @@ def app():
 
 
 @pytest.fixture
-def db(app):
+def _temporary_data_directory():
+    """
+    Yields an absolute path to a temporary data directory for storing
+    databases and other files.
+    """
+    with TemporaryDirectory() as tempdir_name:
+        path = Path(tempdir_name).resolve()
+        yield path
+
+
+@pytest.fixture
+def db(app, _temporary_data_directory):
     """
     Yields a database object bound to an active app context.
     The database starts empty, and is cleared of all data at the end of the
@@ -35,9 +52,17 @@ def db(app):
     Based on http://alextechrants.blogspot.ca/2014/01/unit-testing-sqlalchemy-apps-part-2.html
     """
     from recval.database import init_db
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///:memory:'
 
-    # TODO: place audio in temporary directory.
+    # Store the database in a temporary directory.
+    db_filename = _temporary_data_directory / 'recval.db'
+    assert not db_filename.exists()
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_filename}'
+    print("Database in", db_filename)
+
+    # place audio in temporary directory.
+    audio_dir = _temporary_data_directory / 'audio'
+    audio_dir.mkdir()
+    app.config['TRANSCODED_RECORDINGS_PATH'] = audio_dir
 
     # Setup the database.
     db = init_db()
