@@ -53,13 +53,20 @@ export RECVAL_SETTINGS=/path/to/recval_settings.py
 
 ### Creating the database for the first time
 
-Use the `./create_db.py` script to create the initial database. Use it
+Before you import any data, you need the "Recording Sessions MetaData"
+(sic) spreadsheet, available on Google Drive. Either export this
+manually as a CSV file to `./etc/metadata.csv`, or, using the [gdrive][]
+command, run the following script to download it automatically:
+
+    flask data download-metadata
+
+Use `flask db init` to create the initial database. Use it
 like this:
 
-    ./create_db.py /path/to/sessions/
+    flask init db /path/to/sessions
 
-`sessions/` is a directory filled with directories (or symbolic
-links to directories) with filenames in the form of:
+`/path/to/sessions/` should be a directory filled with directories (or
+symbolic links to directories) with filenames in the form of:
 
     {ISOdate}-{AM/PM}-{Location or '___'}-{Subsession or '0'}
 
@@ -84,19 +91,28 @@ Each directory should have `*.TextGrid` files pair with a `*.wav` file:
     2015-05-08-03.wav
     ...
 
+So, in order to create the database on Sapir, I type the following:
+
+    flask data download-metadata
+    flask db init /data/av/backup-mwe/sessions
+
+
+[gdrive]: https://github.com/prasmussen/gdrive
+
 
 ### Creating new users
 
 Once the database is created, you can register new users using the
 `flask user create` command:
 
-    $ flask user create user@domain.net
+    $ flask user create --validator user@domain.net
     Creating user with email user@domain.net
     Enter a new password for user@domain.net: ********
     Re-type password: ********
-    Creating validator:
+    Creating user:
       Email: herp@derp.net
       Password: ********
+      Roles: community, validator
     Is this okay? (y/n) y
 
 
@@ -107,7 +123,7 @@ Type:
 
     flask run
 
-This should use the WSGI app configured in `.env`.
+This will use the WSGI app configured in `.env`.
 
 
 Testing
