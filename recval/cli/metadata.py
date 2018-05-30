@@ -4,7 +4,7 @@
 # Copyright © 2018 Eddie Antonio Santos. All rights reserved.
 
 """
-Download required external data.
+Download external metadata.
 """
 
 import contextlib
@@ -16,14 +16,14 @@ import click
 from flask.cli import AppGroup  # type: ignore
 
 
-data_cli = AppGroup('data', help=__doc__.strip())
+data_cli = AppGroup('metadata', help=__doc__.strip())
 
 MASTER_RECORDINGS_METADATA = '1SlJRJRUiwXibAxFC0uY2sFXFb4IukGjs7Rg_G1vp_y8'
 REMOTE_FILENAME = "Master Recordings MetaData"
 
 
-@data_cli.command('download-metadata')
-def download_metadata() -> None:
+@data_cli.command('download')
+def download() -> None:
     """
     Downloads the "Master Recordings MetaData" file from Google Drive, as a
     CSV file.
@@ -43,7 +43,8 @@ def download_metadata() -> None:
     tmpdir = Path('/tmp/')
     with cd(tmpdir):
         gdrive.export("--force", "--mime", "text/csv",
-                      MASTER_RECORDINGS_METADATA)
+                      MASTER_RECORDINGS_METADATA,
+                      _fg=True)
         exported_csv = (tmpdir / REMOTE_FILENAME).with_suffix('.csv')
         assert exported_csv.exists()
         shutil.copy(exported_csv, destination)
