@@ -58,7 +58,7 @@ Before you import any data, you need the "Recording Sessions MetaData"
 manually as a CSV file to `./etc/metadata.csv`, or, using the [gdrive][]
 command, run the following script to download it automatically:
 
-    flask data download-metadata
+    flask metadata download
 
 Use `flask db init` to create the initial database. Use it
 like this:
@@ -80,7 +80,7 @@ For example, on Sapir, I might have something like this:
     2018-04-18-AM-KCH-0
     ...
 
-Each directory should have `*.TextGrid` files pair with a `*.wav` file:
+Each directory should have `*.TextGrid` files paired with a `*.wav` file:
 
     $ ls -F1 ~/av/backup-mwe/sessions/2015-05-08-AM-___-0/
     2015-05-08-01.TextGrid
@@ -93,7 +93,7 @@ Each directory should have `*.TextGrid` files pair with a `*.wav` file:
 
 So, in order to create the database on Sapir, I type the following:
 
-    flask data download-metadata
+    flask metadata download
     flask db init /data/av/backup-mwe/sessions
 
 
