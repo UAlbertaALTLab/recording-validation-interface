@@ -3,17 +3,19 @@
 
 # Copyright © 2018 Eddie Antonio Santos. All rights reserved.
 
+import os
 from datetime import datetime
 from pathlib import Path
+from multiprocessing import Process
 
 import pytest  # type: ignore
+import requests
 from flask_security import current_user  # type: ignore
-
 
 fixtures_dir = Path(__file__).parent / 'fixtures'
 
 
-@pytest.fixture()
+@pytest.fixture
 def app():
     """
     Yield an active Flask app context.
@@ -23,7 +25,7 @@ def app():
         yield _app
 
 
-@pytest.fixture()
+@pytest.fixture
 def db(app):
     """
     Yields a database object bound to an active app context.
@@ -52,12 +54,12 @@ def db(app):
     db.session.expunge_all()
 
 
-@pytest.fixture()
+@pytest.fixture
 def client(app, db):
     yield app.test_client()
 
 
-@pytest.fixture()
+@pytest.fixture
 def acimosis(db, wave_file_path, recording_session):
     """
     Inserts the word 'acimosis'/'puppy' into the database.
@@ -93,7 +95,7 @@ def recording_session():
     ))
 
 
-@pytest.fixture()
+@pytest.fixture
 def wave_file_path():
     """
     A recording saying "acimosis" (puppy), for use in test cases.
@@ -133,3 +135,78 @@ def metadata_csv_file():
     """
     with open(fixtures_dir / 'test_metadata.csv') as csvfile:
         yield csvfile
+
+
+class MockServer:
+    _process: Process
+
+    def __init__(self, app, port=5000) -> None:
+        super().__init__()
+        self.port = port
+        self.app = app
+        self.url = "http://localhost:%s" % self.port
+
+    def stop(self) -> None:
+        from signal import SIGTERM
+        if not hasattr(self, '_process') or self._process.pid is None:
+            raise RuntimeError('Tried to shutdown server that has not been started')
+        os.killpg(self._process.pid, SIGTERM)
+
+    def start(self):
+        import time
+
+        def start_server():
+            # Set the session ID so that we can terminate ALL of child
+            # processes easily:
+            # See: https://pymotw.com/2/subprocess/#process-groups-sessions
+            os.setsid()
+            self.app.run(port=self.port, use_reloader=False)
+        self._process = Process(target=start_server)
+        self._process.start()
+        # Wait a bit for the server to start
+        time.sleep(0.125)
+
+
+# Derived from: https://stackoverflow.com/a/43882437/6626414
+class SessionWithUrlBase(requests.Session):
+    # In Python 3 you could place `url_base` after `*args`, but not in Python 2.
+    def __init__(self, url_base=None, *args, **kwargs):
+        super(SessionWithUrlBase, self).__init__(*args, **kwargs)
+        self.url_base = url_base
+
+    def request(self, method, url, **kwargs):
+        # Next line of code is here for example purposes only.
+        # You really shouldn't just use string concatenation here,
+        # take a look at urllib.parse.urljoin instead.
+        modified_url = self.url_base + url
+
+        return super(SessionWithUrlBase, self).request(method, modified_url, **kwargs)
+
+
+@pytest.fixture
+def mock_server_thread(app):
+    """
+    Starts a mock development server on port 8008. Yields a thread.
+    Use mock_server as convenient wrapper to make requests to this.
+    """
+    server = MockServer(app, port=8008)
+    server.start()
+    yield server
+    server.stop()
+
+
+@pytest.fixture
+def mock_server(db, mock_server_thread):
+    """
+    Starts a development server with an initialized database, and returns a
+    requests.Session that will prepend the development server URL whenever
+    making a request.
+
+    Usage:
+
+        def test_something(mock_server):
+            r = mock_server.get(url_for('homepage'))
+            assert r.status_code == 200
+    """
+    with SessionWithUrlBase(url_base=mock_server_thread.url) as s:
+        yield s
