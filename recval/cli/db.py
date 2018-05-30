@@ -39,8 +39,6 @@ def init_db(directory: Path) -> None:
     from recval.transcode_recording import transcode_to_aac
     from recval.recording_session import parse_metadata
 
-    # TODO: have a default place to look for sessions?
-
     info2phrase = {}  # type: ignore
 
     dest = Path(app.config['TRANSCODED_RECORDINGS_PATH'])

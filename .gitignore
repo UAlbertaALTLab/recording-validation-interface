@@ -99,7 +99,6 @@ ENV/
 
 # mypy
 .mypy_cache/
-/data/
 
 # pytest
 .pytest_cache/
@@ -111,3 +110,4 @@ ENV/
 *.db
 .env
 metadata.csv
+/data/

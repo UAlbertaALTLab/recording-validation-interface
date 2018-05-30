@@ -11,6 +11,8 @@ from recval.app import app
 
 from .user import user_cli
 from .db import db_cli
+from .data import data_cli
 
-app.cli.add_command(user_cli)  # type: ignore
-app.cli.add_command(db_cli)  # type: ignore
+app.cli.add_command(user_cli)
+app.cli.add_command(db_cli)
+app.cli.add_command(data_cli)
