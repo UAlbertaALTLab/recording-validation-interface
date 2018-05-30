@@ -42,9 +42,11 @@ def init_db(directory: Path) -> None:
     info2phrase = {}  # type: ignore
 
     dest = Path(app.config['TRANSCODED_RECORDINGS_PATH'])
+    metadata_filename = app.config['REPOSITORY_ROOT'] / 'etc' / 'metadata.csv'
 
     assert directory.resolve().is_dir()
     assert dest.resolve().is_dir()
+    assert metadata_filename.resolve().is_file()
 
     def make_phrase(info: RecordingInfo) -> Phrase:
         """
@@ -92,8 +94,8 @@ def init_db(directory: Path) -> None:
     # Create the schema.
     db = init_db()
 
-    with open('metadata.csv') as metadata_file:
-        metadata = parse_metadata(metadata_file)
+    with open(metadata_filename) as metadata_csv:
+        metadata = parse_metadata(metadata_csv)
 
     # Insert each thing found.
     # TODO: use click.progressbar()?
