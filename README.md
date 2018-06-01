@@ -53,7 +53,7 @@ export RECVAL_SETTINGS=/path/to/recval_settings.py
 
 ### Creating the database for the first time
 
-Before you import any data, you need the "Recording Sessions MetaData"
+Before you import any data, you need the "Master Recording MetaData"
 (sic) spreadsheet, available on Google Drive. Either export this
 manually as a CSV file to `./etc/metadata.csv`, or, using the [gdrive][]
 command, run the following script to download it automatically:
