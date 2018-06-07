@@ -280,6 +280,7 @@ def get_mic_id(name: str) -> int:
     """
     Return the microphone number from the filename of the wav file.
 
+    There are at lease five formats in which TextGrid files are named:
     >>> get_mic_id('2_003.TextGrid')
     2
     >>> get_mic_id('2015-05-11am-03.TextGrid')
@@ -288,6 +289,10 @@ def get_mic_id(name: str) -> int:
     2
     >>> get_mic_id('Track 4_001.TextGrid')
     4
+
+    This one is the most annoying format:
+    >>> get_mic_id('2015-03-19-Rain-03')
+    3
     """
     # Match something like '2016-02-24am-Track 2_001.TextGrid'
     m = re.match(r'''
@@ -315,6 +320,10 @@ def get_mic_id(name: str) -> int:
         \d{4}-\d{2}-\d{2}       # ISO date
         (?:[ap]m)?              # Optional AM/PM
         -
+        (?:         # Handle this incredibly specific case:
+            Rain-   # It happens three times and I hate it.
+        )?
+
         (\d+)
         (?:[.]TextGrid)?$
         ''', name, re.VERBOSE)
