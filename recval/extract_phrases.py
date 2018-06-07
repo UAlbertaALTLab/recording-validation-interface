@@ -279,8 +279,45 @@ def to_milliseconds(seconds: Decimal) -> int:
 def get_mic_id(name: str) -> int:
     """
     Return the microphone number from the filename of the wav file.
+
+    >>> get_mic_id('2_003.TextGrid')
+    2
+    >>> get_mic_id('2015-05-11am-03.TextGrid')
+    3
+    >>> get_mic_id('2016-02-24am-Track 2_001.TextGrid')
+    2
+    >>> get_mic_id('Track 4_001.TextGrid')
+    4
     """
-    m = re.match(r'^Track (\d+)_', name)
+    # Match something like '2016-02-24am-Track 2_001.TextGrid'
+    m = re.match(r'''
+        ^
+        (?:                 # An optional "yy-mm-ddtt-Track "
+            (?:             # An optional date/time code
+                \d{4}       # year
+                -
+                \d{2}       # month
+                -
+                \d{2}       # day
+                (?:[ap]m)
+                -
+            )?
+            Track\s
+        )?
+
+        (\d+)               # THE MIC NUMBER!
+
+        _\d{3}
+        (?:[.]TextGrid)?$
+        ''', name, re.VERBOSE)
+    m = m or re.match(r'''
+        ^
+        \d{4}-\d{2}-\d{2}       # ISO date
+        (?:[ap]m)?              # Optional AM/PM
+        -
+        (\d+)
+        (?:[.]TextGrid)?$
+        ''', name, re.VERBOSE)
     if not m:
         raise InvalidTextGridName(name)
-    return int(m.group(1))
+    return int(m.group(1), 10)
