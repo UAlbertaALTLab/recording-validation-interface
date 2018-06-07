@@ -39,6 +39,28 @@ info = logger.info
 warn = logger.warn
 
 
+# ############################### Exceptions ############################### #
+
+class DuplicateSessionError(RuntimeError):
+    """
+    Raised when the session has already been found by another name.
+    """
+
+
+class MissingMetadataError(RuntimeError):
+    """
+    Raise when the cooresponding metadata cannot be found.
+    """
+
+
+class InvalidTextGridName(RuntimeError):
+    """
+    Raised when the TextGrid name does not follow an appropriate pattern.
+    """
+
+# ########################################################################## #
+
+
 class RecordingInfo(NamedTuple):
     """
     All the information you could possible want to know about a recorded
@@ -66,18 +88,6 @@ class RecordingInfo(NamedTuple):
         Compute a hash that can be used as a ID for this recording.
         """
         return sha256(self.signature().encode('UTF-8')).hexdigest()
-
-
-class DuplicateSessionError(RuntimeError):
-    """
-    Raised when the session has already been found by another name.
-    """
-
-
-class MissingMetadataError(RuntimeError):
-    """
-    Raise when the cooresponding metadata cannot be found.
-    """
 
 
 class RecordingExtractor:
@@ -129,7 +139,14 @@ class RecordingExtractor:
             assert text_grid.exists() and sound_file.exists()
             info(' ... ... Matching sound file for %s', text_grid)
 
-            mic_id = get_mic_id(text_grid.stem)
+            try:
+                mic_id = get_mic_id(text_grid.stem)
+            except InvalidTextGridName:
+                if len(text_grids) != 1:
+                    raise  # There's no way to determine the speaker.
+                mic_id = 1
+                warn(' ... ... assuming single text grid is mic 1')
+
             speaker = self.metadata[session_id][mic_id]
 
             info(' ... ... Extract items from %s using speaker ID %s',
@@ -264,4 +281,6 @@ def get_mic_id(name: str) -> int:
     Return the microphone number from the filename of the wav file.
     """
     m = re.match(r'^Track (\d+)_', name)
+    if not m:
+        raise InvalidTextGridName(name)
     return int(m.group(1))
