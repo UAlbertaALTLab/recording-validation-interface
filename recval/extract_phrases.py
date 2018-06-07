@@ -68,6 +68,18 @@ class RecordingInfo(NamedTuple):
         return sha256(self.signature().encode('UTF-8')).hexdigest()
 
 
+class DuplicateSessionError(RuntimeError):
+    """
+    Raised when the session has already been found by another name.
+    """
+
+
+class MissingMetadataError(RuntimeError):
+    """
+    Raise when the cooresponding metadata cannot be found.
+    """
+
+
 class RecordingExtractor:
     """
     Extracts recordings from a directory of sessions.
@@ -89,15 +101,18 @@ class RecordingExtractor:
             if not session_dir.resolve().is_dir():
                 info(' ... rejecting %s; not a directory', session_dir)
                 continue
-            yield from self.extract_session(session_dir)
+            try:
+                yield from self.extract_session(session_dir)
+            except MissingMetadataError:
+                warn(" ... Skipping %s: Missing metadata", session_dir)
 
     def extract_session(self, session_dir: Path):
         session_id = SessionID.from_name(session_dir.stem)
         if session_id in self.sessions:
-            raise RuntimeError(f"Duplicate session: {session_id} "
-                               f"found at {self.sessions[session_id]}")
+            raise DuplicateSessionError(f"Duplicate session: {session_id} "
+                                        f"found at {self.sessions[session_id]}")
         if session_id not in self.metadata:
-            raise RuntimeError(f"Missing metadata for {session_id}")
+            raise MissingMetadataError(f"Missing metadata for {session_id}")
 
         info(' ... Scanning %s for .TextGrid files', session_dir)
         text_grids = list(session_dir.glob('*.TextGrid'))
