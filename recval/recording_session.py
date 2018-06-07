@@ -177,8 +177,8 @@ class SessionID(NamedTuple):
         """
         time = (self.time_of_day and self.time_of_day.value) or '__'
         loc = (self.location and self.location.value) or '___'
-        subsesh = self.subsession or 0
-        return f"{self.date:%Y-%m-%d}-{time}-{loc}-{subsesh:1d}"
+        subsesh = self.subsession or '_'
+        return f"{self.date:%Y-%m-%d}-{time}-{loc}-{subsesh}"
 
     def __str__(self) -> str:
         return self.as_filename()

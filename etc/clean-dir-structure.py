@@ -61,14 +61,18 @@ True
 True
 >>> s.location == Location.DOWNSTAIRS
 True
+>>> s.subsession is None
+True
 >>> s.as_filename()
-'2016-11-07-PM-DS-0'
+'2016-11-07-PM-DS-_'
 
 >>> s = Session.from_name('2016-01-18am')
 >>> s.location is None
 True
+>>> s.subsession is None
+True
 >>> s.as_filename()
-'2016-01-18-AM-___-0'
+'2016-01-18-AM-___-_'
 """
 
 import re
@@ -182,8 +186,8 @@ class Session(NamedTuple):
         """
         time = (self.time_of_day and self.time_of_day.value) or '__'
         loc = (self.location and self.location.value) or '___'
-        subsesh = self.subsession or 0
-        return f"{self.date:%Y-%m-%d}-{time}-{loc}-{subsesh:1d}"
+        subsesh = self.subsession or '_'
+        return f"{self.date:%Y-%m-%d}-{time}-{loc}-{subsesh}"
 
 
 T = TypeVar('T')
@@ -246,6 +250,7 @@ IGNORE = (
     'ahtest',
     'ANNOTATION2015-05-05am',
     'badmeg_annotations',
+    'LING375-annotations',
     'mjerry-annotations',
     'mjtest',
     'My Passport for Mac 1',
