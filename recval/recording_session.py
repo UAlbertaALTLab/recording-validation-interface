@@ -177,7 +177,7 @@ class SessionID(NamedTuple):
         """
         time = (self.time_of_day and self.time_of_day.value) or '__'
         loc = (self.location and self.location.value) or '___'
-        subsesh = self.subsession or '_'
+        subsesh = '_' if self.subsession is None else self.subsession
         return f"{self.date:%Y-%m-%d}-{time}-{loc}-{subsesh}"
 
     def __str__(self) -> str:
