@@ -195,16 +195,3 @@ def audio_url_filter(rec: Recording) -> str:
         <source src="{{ recording | audio_url }}" type="audio/aac" />
     """
     return url_for('send_audio', filename=f"{rec.id}.m4a")
-
-
-@app.context_processor
-def inject_user():
-    """
-    Ensures `user` is usable in the template.
-    """
-    return dict()
-
-
-@app.template_test(name='logged_in')
-def is_logged_in(user):
-    return False
