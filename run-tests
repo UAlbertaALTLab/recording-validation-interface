@@ -9,4 +9,4 @@
 
 . .env || echo "$(tputs bold)Warning$(tputs reset): Did not source .env"
 . .flaskenv || exit 1
-mypy recval && py.test -Wd --driver Firefox "$@"
+mypy recval && py.test -Wd "$@"
