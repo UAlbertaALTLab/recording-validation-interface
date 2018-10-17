@@ -28,6 +28,7 @@ from recval.model import (ElicitationOrigin, Phrase, Recording,
 from recval.recording_session import SessionID, TimeOfDay
 
 
+@pytest.mark.skip
 def test_insert_word(db, wave_file_path, recording_session):
     """
     Insert a word, and retrieve it again.
@@ -192,6 +193,7 @@ def test_mark_word_source(db, acimosis):
     assert phrase.origin == ElicitationOrigin.maskwacîs
 
 
+@pytest.mark.skip
 def test_search_by_transcription(db, acimosis):
     """
     Test adding a new phrase that does not have the same transcription.

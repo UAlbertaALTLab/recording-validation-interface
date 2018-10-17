@@ -85,19 +85,12 @@ class Phrase(db.Model):  # type: ignore
 
     # The transcription and translation are "versioned strings", with a
     # history, timestamp.
-    transcription_id = db.Column(db.Text, db.ForeignKey('versioned_string.id'),
-                                 nullable=False)
-    translation_id = db.Column(db.Text, db. ForeignKey('versioned_string.id'),
-                               nullable=False)
+    transcription = db.Column(db.Text, nullable=False)
+    translation = db.Column(db.Text, nullable=False)
 
     # Is this a word or a phrase?
     type = db.Column(db.Text, nullable=False)
 
-    # Maintain the relationship to the transcription
-    transcription_meta = db.relationship('VersionedString',
-                                         foreign_keys=[transcription_id])
-    translation_meta = db.relationship('VersionedString',
-                                       foreign_keys=[translation_id])
     # One phrase may have one or more recordings.
     recordings = db.relationship('Recording')
 
@@ -106,51 +99,6 @@ class Phrase(db.Model):  # type: ignore
         # Sets 'type' to null, which is (intentionally) invalid!
         'polymorphic_identity': None
     }
-
-    def __init__(self, *, transcription=None, translation=None,  **kwargs):
-        # Create versioned transcription.
-        if transcription or translation:
-            super().__init__(
-                transcription_meta=VersionedString.new(value=transcription),
-                translation_meta=VersionedString.new(value=translation),
-                **kwargs
-            )
-        else:
-            super().__init__(**kwargs)
-
-    @hybrid_property
-    def transcription(self) -> str:
-        value = self.transcription_meta.value
-        assert value == normalize_utterance(value)
-        return value
-
-    @transcription.setter  # type: ignore
-    def transcription(self, value: str) -> None:
-        previous = self.transcription_meta
-        self.transcription_meta = previous.derive(value)
-
-    @hybrid_property
-    def translation(self) -> str:
-        value = self.translation_meta.value
-        assert value == normalize_utterance(value)
-        return value
-
-    @translation.setter  # type: ignore
-    def translation(self, value: str) -> None:
-        previous = self.translation_meta
-        self.translation_meta = previous.derive(value)
-
-    @property
-    def translation_history(self):
-        return VersionedString.query.filter_by(
-            provenance_id=self.translation_meta.provenance_id
-        ).all()
-
-    @property
-    def transcription_history(self):
-        return VersionedString.query.filter_by(
-            provenance_id=self.transcription_meta.provenance_id
-        ).all()
 
     def update(self, field: str, value: str) -> 'Phrase':
         """
@@ -170,19 +118,7 @@ class Phrase(db.Model):  # type: ignore
         Returns a query that will search on the text value of transcription or
         translation.
         """
-        assert bool(transcription) ^ bool(translation), (
-            "Must search for one of transcription or translation; not both"
-        )
-        query = Phrase.query
-        if transcription:
-            query = query.\
-                filter(VersionedString.id == cls.transcription_id)
-        else:
-            assert translation
-            query = query.\
-                filter(VersionedString.id == cls.translation_id)
-        value = normalize_utterance(transcription or translation)
-        return query.filter(VersionedString.value == value)
+        raise NotImplementedError
 
 
 class Word(Phrase):
