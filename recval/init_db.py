@@ -14,19 +14,20 @@ from recval.transcode_recording import transcode_to_aac
 from recval.recording_session import parse_metadata
 
 
+ImportRecording = Callable[[RecordingInfo, str, Path], None]
+
+
 def initialize(directory: Path) -> None:
     from recval.app import app
     return _initialize(
             directory,
             app.config['TRANSCODED_RECORDINGS_PATH'],
-            app.config['REPOSITORY_ROOT']
+            app.config['REPOSITORY_ROOT'],
+            FlaskSQLAlchemyRecordingImporter(),
     )
 
 
-RecordingImporter = Callable[[RecordingInfo, str, Path], None]
-
-
-class FlaskSQLAlchemyImporter:
+class FlaskSQLAlchemyRecordingImporter:
     """
     Naming things is hard
     """
@@ -103,6 +104,7 @@ def _initialize(
         directory: Path,
         transcoded_recordings_path: str,
         repository_root: Path,
+        import_recording: ImportRecording,
         ) -> None:
     """
     Creates the database from scratch.
@@ -119,8 +121,6 @@ def _initialize(
     assert directory.resolve().is_dir()
     assert dest.resolve().is_dir()
     assert metadata_filename.resolve().is_file()
-
-    import_recording = FlaskSQLAlchemyImporter()
 
     with open(metadata_filename) as metadata_csv:
         metadata = parse_metadata(metadata_csv)
