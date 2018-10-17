@@ -42,16 +42,6 @@ SQLALCHEMY_DATABASE_URI = DEFAULT_DATABASE
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
-# ############################# Flask-Security ############################# #
-
-# Password hashing algorithm. Either BCrypt or PBKDF2 are good choices.
-SECURITY_PASSWORD_HASH = 'pbkdf2_sha512'
-
-# Disable CLIs created by Flask-Security
-SECURITY_CLI_USERS_NAME = False
-SECURITY_CLI_ROLES_NAME = False
-
-
 # ################################# RecVal ###################################
 
 TRANSCODED_RECORDINGS_PATH = REPOSITORY_ROOT / 'static' / 'audio'

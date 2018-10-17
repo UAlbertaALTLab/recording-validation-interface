@@ -37,8 +37,6 @@ app.config.from_envvar('RECVAL_SETTINGS')
 # Setup SQLAlchemy
 if app.config['SQLALCHEMY_DATABASE_URI'] == app.config['DEFAULT_DATABASE']:
     app.logger.warning('Using default database: %s', app.config['DEFAULT_DATABASE'])
-
-# Setup SQLAlchemy and Flask-Security
 db.init_app(app)
 from .cli import *  # noqa
 
