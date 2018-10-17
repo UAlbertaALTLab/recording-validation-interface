@@ -28,7 +28,6 @@ from tempfile import TemporaryDirectory
 
 import pytest  # type: ignore
 import requests
-from flask_security import current_user  # type: ignore
 
 # Where are fixture files located?
 fixtures_dir = Path(__file__).parent / 'fixtures'
@@ -141,28 +140,6 @@ def wave_file_path():
     test_wav = fixtures_dir / 'test.wav'
     assert test_wav.exists()
     return test_wav
-
-
-@pytest.fixture
-def validator(user_datastore):
-    """
-    A user that has validation privledges.
-    """
-    validator_role = user_datastore.find_role('validator')
-    assert validator_role is not None
-    return user_datastore.create_user(
-        email='validator@localhost',
-        password=None,
-        active=True,
-        confirmed_at=datetime.utcnow(),
-        roles=[validator_role]
-    )
-
-
-@pytest.fixture
-def user_datastore():
-    from recval.model import user_datastore
-    return user_datastore
 
 
 @pytest.fixture

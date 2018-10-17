@@ -28,36 +28,6 @@ def test_unauthenticated(client):
     assert 200 == rv.status_code
 
 
-def test_change_string_unauthenticated(app, client, acimosis):
-    """
-    Trying to change a transcription or translation unvalidated should be an
-    error.
-    """
-    with app.test_request_context():
-        rv = client.patch(
-            url_for('update_text', phrase_id=1),
-            data=json_body(field='translation',
-                           value='pup pup'),
-            content_type='application/json'
-        )
-        # Ensure the app does not allow us to do this without logging in.
-        assert rv.status_code in (302, 401, 403, 404)
-
-
-def test_roles(db) -> None:
-    """
-    A fresh database should have at miniumum, these roles:
-
-     - validator
-     - community
-
-    """
-    from recval.model import Role
-    roles = set(r.name for r in Role.query.all())
-
-    assert {'validator', 'community'}.issubset(roles)
-
-
 @pytest.mark.skip(reason="It's hard to test logging in...")
 def test_validator_can_change_transcriptions(app, client, acimosis, validator):
     """
