@@ -22,24 +22,11 @@ Defines rountines for creating the database.
 
 import typing
 
-from recval.model import User
-
 
 def init_db():
     """
     Initializes the database for the first time.
     """
-    from recval.model import db, user_datastore
+    from recval.model import db
     db.create_all()
-
-    # Create roles.
-    user_datastore.find_or_create_role(
-        name='validator',
-        description='A user that can change transcriptions and translations'
-    )
-    user_datastore.find_or_create_role(
-        name='community',
-        description='A community member can list phrases and hear recordings',
-    )
-
     return db
