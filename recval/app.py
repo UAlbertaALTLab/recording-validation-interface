@@ -21,12 +21,11 @@ from pathlib import Path
 
 from flask import (Flask, abort, redirect, render_template,  # type: ignore
                    request, send_from_directory, url_for)
-from flask_security import (Security, SQLAlchemyUserDatastore,  # type: ignore
-                            current_user, roles_required)
+from flask_security import roles_required  # type: ignore
 from sqlalchemy.orm import subqueryload  # type: ignore
 from werkzeug.exceptions import NotFound  # type: ignore
 
-from recval.model import Phrase, Recording, db, user_datastore
+from recval.model import Phrase, Recording, db
 from recval.model import ElicitationOrigin, RecordingQuality
 
 # Configure from default settings, then the file specifeied by the environment
@@ -42,7 +41,6 @@ if app.config['SQLALCHEMY_DATABASE_URI'] == app.config['DEFAULT_DATABASE']:
 
 # Setup SQLAlchemy and Flask-Security
 db.init_app(app)
-security = Security(app, user_datastore)
 from .cli import *  # noqa
 
 
@@ -208,16 +206,9 @@ def inject_user():
     """
     Ensures `user` is usable in the template.
     """
-    return dict(user=current_user)
+    return dict()
 
 
 @app.template_test(name='logged_in')
 def is_logged_in(user):
-    from recval.model import User
-    from flask_security import AnonymousUser
-    if isinstance(user, AnonymousUser):
-        return False
-    elif isinstance(user, User):
-        return True
-    else:
-        raise ValueError(f"not a user {user!r}")
+    return False

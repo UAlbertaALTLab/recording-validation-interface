@@ -505,6 +505,3 @@ class User(db.Model, UserMixin):  # type: ignore
     confirmed_at = db.Column(db.DateTime())
     roles = db.relationship('Role', secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
-
-
-user_datastore = SQLAlchemyUserDatastore(db, User, Role)
