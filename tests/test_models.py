@@ -22,7 +22,6 @@ from pathlib import Path
 import pytest  # type: ignore
 from sqlalchemy.exc import SQLAlchemyError  # type: ignore
 
-from recval.app import user_datastore
 from recval.model import (ElicitationOrigin, Phrase, Recording,
                           RecordingSession, RecordingQuality, VersionedString,
                           Word)
@@ -215,16 +214,6 @@ def test_search_by_transcription(db, acimosis):
     assert len(results) == 1
 
 
-def test_authentication(db):
-    from recval.model import User, user_datastore
-    before = User.query.count()
-    user_datastore.create_user(email='test@example.com',
-                               password='<none>')
-    db.session.commit()
-
-    assert User.query.count() == before + 1
-
-
 def test_search_full_translation(db, acimosis, acimosisak):
     """
     Test the full-text search feature for exact words in the translation.
@@ -255,19 +244,6 @@ def test_search_transcription_accents(db, acimosis, acimosisak):
     """
     word = Word.search_by("ÂCIMOS'S").one()
     assert word.translation == 'puppy'
-
-
-def test_versioned_string_author(db, validator):
-    """
-    Ensure that we can set an author for the given versioned string.
-    """
-    v = VersionedString.new('acimosis', author=validator)
-    db.session.add(v)
-    db.session.commit()
-    del v
-
-    v = VersionedString.query.filter_by(author=validator).one()
-    assert v.author == validator
 
 
 def test_recording_has_session(db):
