@@ -24,9 +24,6 @@ import typing
 
 from recval.model import User
 
-# The default email addres of the importer user. It should not really exist.
-_IMPORTER_EMAIL = 'importer@localhost'
-
 
 def init_db():
     """
@@ -36,10 +33,6 @@ def init_db():
     db.create_all()
 
     # Create roles.
-    importer_role = user_datastore.find_or_create_role(
-        name='<importer>',
-        description='A bot that imports recordings and other data.'
-    )
     user_datastore.find_or_create_role(
         name='validator',
         description='A user that can change transcriptions and translations'
@@ -49,12 +42,4 @@ def init_db():
         description='A community member can list phrases and hear recordings',
     )
 
-    # Create the special <importer> account.
-    user_datastore.create_user(
-        email=_IMPORTER_EMAIL,
-        password=None,
-        active=False,
-        confirmed_at=None,
-        roles=[importer_role]
-    )
     return db
