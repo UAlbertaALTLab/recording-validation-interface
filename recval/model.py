@@ -184,33 +184,6 @@ class Phrase(db.Model):  # type: ignore
         value = normalize_utterance(transcription or translation)
         return query.filter(VersionedString.value == value)
 
-    @classmethod
-    def search_by(cls, search_string: str):
-        """
-        Does a full-text search on both transcription and translation
-        columns for the given word.
-        """
-        identity = cls.__mapper_args__['polymorphic_identity']
-
-        # The idea of this query is to get a table of just all the versioned
-        # strings that match the query, and then to join this table with the
-        # phrase table.
-        fts_query = text(f"""
-           SELECT id FROM versioned_string, {VERSIONED_STRING_FTS}
-            WHERE {VERSIONED_STRING_FTS} MATCH :query
-              AND versioned_string.rowid = {VERSIONED_STRING_FTS}.docid
-        """).\
-            columns(id=db.String).\
-            params(query=to_indexable_form(search_string)).\
-            alias('fts_query')
-
-        # Implict join with the search results to recover the phrases that
-        # match EITHER the translation or the transcription.
-        return cls.query.filter(
-            (cls.translation_id == fts_query.c.id) |
-            (cls.transcription_id == fts_query.c.id)
-        )
-
 
 class Word(Phrase):
     """
@@ -399,45 +372,3 @@ class VersionedString(db.Model):  # type: ignore
         instance.id = instance.compute_sha256hash()
         instance.provenance_id = instance.id
         return instance
-
-
-VERSIONED_STRING_FTS = 'versioned_string_fts'
-
-# Create a "content-less" full-text search table using SQLite3's FTS4 module.
-# https://www.sqlite.org/fts3.html#_external_content_fts4_tables_
-event.listen(
-    VersionedString.__table__,
-    'after_create',
-    DDL(f'''
-        CREATE VIRTUAL TABLE {VERSIONED_STRING_FTS}
-        USING fts4(content={VersionedString.__tablename__}, value)
-    ''').execute_if(dialect='sqlite')
-)
-# Make sure we drop the table too.
-event.listen(
-    VersionedString.__table__,
-    'before_drop',
-    DDL(f'''
-        DROP TABLE {VERSIONED_STRING_FTS}
-    ''').execute_if(dialect='sqlite')
-)
-
-
-@event.listens_for(VersionedString, 'after_insert')
-def insert_into_fts_table(mapper, connection, target):
-    """
-    Automatically indexes terms for full-text search when they are inserted
-    into the VersionedString table.
-    """
-    # In order to insert into a "contentless" FTS table, we MUST always insert
-    # the rowid. However, we only know the hash of the versioned string we
-    # just inserted; not the rowid. This insert statement lets the database
-    # engine figure out the value from the rowid it created.
-    connection.execute(
-        f'''
-           INSERT INTO {VERSIONED_STRING_FTS} (docid, value)
-           SELECT rowid, ?
-           FROM {VersionedString.__tablename__}
-           WHERE id = ?
-        ''', (to_indexable_form(target.value), target.id,)
-    )

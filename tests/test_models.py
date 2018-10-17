@@ -214,38 +214,6 @@ def test_search_by_transcription(db, acimosis):
     assert len(results) == 1
 
 
-def test_search_full_translation(db, acimosis, acimosisak):
-    """
-    Test the full-text search feature for exact words in the translation.
-    """
-    word = Word.search_by('puppy').one()
-    assert word.translation == 'puppy'
-
-
-def test_search_full_transcription(db, acimosis, acimosisak):
-    """
-    Test the full-text search feature for exact words in the transcription.
-    """
-    word = Word.search_by('acimosisak').one()
-    assert word.transcription == 'acimosisak'
-
-
-def test_search_phrases(db, acimosis, acimosisak):
-    """
-    Test that you can search on both phrases and sentences.
-    """
-    p = Phrase.search_by('acimosisak').one()
-    assert 'pup' in p.translation
-
-
-def test_search_transcription_accents(db, acimosis, acimosisak):
-    """
-    Test the full-text search for matches with variations in transcription.
-    """
-    word = Word.search_by("ÂCIMOS'S").one()
-    assert word.translation == 'puppy'
-
-
 def test_recording_has_session(db):
     """
     Ensures that a recording belongs to a session.
