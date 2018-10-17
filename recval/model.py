@@ -32,8 +32,6 @@ from os import fspath
 from pathlib import Path
 
 from flask import current_app, url_for  # type: ignore
-from flask_security import (RoleMixin, SQLAlchemyUserDatastore,  # type: ignore
-                            UserMixin)
 from flask_sqlalchemy import SQLAlchemy  # type: ignore
 from sqlalchemy import DDL, event  # type: ignore
 from sqlalchemy.ext.hybrid import hybrid_property  # type: ignore
@@ -86,7 +84,7 @@ class Phrase(db.Model):  # type: ignore
     id = db.Column(db.Integer, primary_key=True)
 
     # The transcription and translation are "versioned strings", with a
-    # history, timestamp, and an author.
+    # history, timestamp.
     transcription_id = db.Column(db.Text, db.ForeignKey('versioned_string.id'),
                                  nullable=False)
     translation_id = db.Column(db.Text, db. ForeignKey('versioned_string.id'),
@@ -128,7 +126,6 @@ class Phrase(db.Model):  # type: ignore
 
     @transcription.setter  # type: ignore
     def transcription(self, value: str) -> None:
-        # TODO: set current author.
         previous = self.transcription_meta
         self.transcription_meta = previous.derive(value)
 
@@ -140,7 +137,6 @@ class Phrase(db.Model):  # type: ignore
 
     @translation.setter  # type: ignore
     def translation(self, value: str) -> None:
-        # TODO: set current author.
         previous = self.translation_meta
         self.translation_meta = previous.derive(value)
 
@@ -329,8 +325,6 @@ class VersionedString(db.Model):  # type: ignore
                               nullable=False)
     previous_id = db.Column(db.String, db.ForeignKey('versioned_string.id'),
                             nullable=True)
-    author_id = db.Column(db.Integer(), db.ForeignKey('user.id'),
-                          nullable=True)  # TODO: make this not nullable!
     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.now)
 
     # The very first string in the series.
@@ -343,27 +337,12 @@ class VersionedString(db.Model):  # type: ignore
                                remote_side=[id],
                                foreign_keys=[previous_id],
                                uselist=False)
-    author = db.relationship('User', foreign_keys=[author_id])
 
     @validates('value')
     def validate_value(self, _key, utterance):
         value = normalize_utterance(utterance)
         assert len(value) > 0
         return value
-
-    @validates('author_id')
-    def validate_author_id(self, _key, author_id):
-        if author_id is None:
-            warnings.warn("Author should not be None, "
-                          "and will be non-nullable in the future",
-                          DeprecationWarning)
-        return author_id
-
-    @property
-    def author_email(self) -> str:
-        if self.author is None:
-            return '<unknown>'
-        return self.author.email
 
     @property
     def is_root(self) -> bool:
@@ -383,7 +362,6 @@ class VersionedString(db.Model):  # type: ignore
                 # Yield the provenance ONLY when this is a non-root commit.
                 yield f"provenance {self.provenance_id}"
                 yield f"previous {self.previous_id}"
-            yield f"author {self.author_email}"
             yield f"date {self.timestamp.isoformat()}"
             yield ''
             yield self.value
@@ -395,11 +373,11 @@ class VersionedString(db.Model):  # type: ignore
         """
         return sha256(self.show().encode('UTF-8')).hexdigest()
 
-    def derive(self, value: str, author: 'User'=None) -> 'VersionedString':
+    def derive(self, value: str) -> 'VersionedString':
         """
         Create a versioned string using this instance as its previous value.
         """
-        child = type(self).new(value, author)
+        child = type(self).new(value)
         child.previous_id = self.id
         child.provenance_id = self.provenance_id
         # Setting previous and provenance changed the hash, so recompute it.
@@ -408,15 +386,14 @@ class VersionedString(db.Model):  # type: ignore
         return child
 
     @classmethod
-    def new(cls, value: str, author: 'User'=None) -> 'VersionedString':
+    def new(cls, value: str) -> 'VersionedString':
         """
         Create a "root" versioned string.
         That is, it has no history, and its provenance is itself.
         """
         instance = cls(value=normalize_utterance(value),
                        previous_id=None,
-                       timestamp=datetime.now(),
-                       author=author)
+                       timestamp=datetime.now())
 
         # This is the root version.
         instance.id = instance.compute_sha256hash()
@@ -464,44 +441,3 @@ def insert_into_fts_table(mapper, connection, target):
            WHERE id = ?
         ''', (to_indexable_form(target.value), target.id,)
     )
-
-
-# Define models required for Flask-Security:
-# https://pythonhosted.org/Flask-Security/quickstart.html
-roles_users = db.Table(
-    'roles_users',
-    db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
-    db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
-)
-
-
-class Role(db.Model, RoleMixin):  # type: ignore
-    """
-    Specifies a user's roles. Possible roles:
-     - site-admin
-     - validator
-     - instructor
-     - <importer>
-
-    Most of this code is boilerplate from:
-    https://pythonhosted.org/Flask-Security/quickstart.html
-    """
-    id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(255), unique=True)
-    description = db.Column(db.String(255))
-
-
-class User(db.Model, UserMixin):  # type: ignore
-    """
-    An author is allowed to create and update VersionedStrings.
-
-    Most of this code is boilerplate from:
-    https://pythonhosted.org/Flask-Security/quickstart.html
-    """
-    id = db.Column(db.Integer(), primary_key=True)
-    email = db.Column(db.String(255), unique=True)
-    password = db.Column(db.String(255))
-    active = db.Column(db.Boolean())
-    confirmed_at = db.Column(db.DateTime())
-    roles = db.relationship('Role', secondary=roles_users,
-                            backref=db.backref('users', lazy='dynamic'))
