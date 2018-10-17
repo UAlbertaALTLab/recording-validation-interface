@@ -25,12 +25,7 @@ def initialize(
         ) -> None:
     """
     Creates the database from scratch.
-
-    TODO: drastically fix this
     """
-
-    from recval.model import (Phrase, Recording, Sentence, Word, VersionedString,
-                              RecordingSession)
 
     dest = Path(transcoded_recordings_path)
     metadata_filename = repository_root / 'etc' / 'metadata.csv'
