@@ -19,8 +19,6 @@
 import pytest  # type: ignore
 from flask import url_for  # type: ignore
 
-from recval.database import special_users
-
 
 def test_unauthenticated(client):
     """
@@ -58,33 +56,6 @@ def test_roles(db) -> None:
     roles = set(r.name for r in Role.query.all())
 
     assert {'validator', 'community'}.issubset(roles)
-
-
-def test_database_has_bot_user(db):
-    """
-    There should be one bot user, the importer.
-    It should have the importer role.
-    """
-    assert special_users.importer.has_role('<importer>')
-
-
-def test_cannot_login_as_importer(client, app):
-    """
-    It should be IMPOSSIBLE to login as the importer!
-    """
-
-    assert special_users.importer.password is None
-
-    # Additionally, logging in should not work.
-    with app.test_request_context():
-        rv = client.post(url_for('security.login'),
-                         follow_redirects=True,
-                         data=dict(
-                             email='importer@localhost',
-                             password=''
-                         ))
-        # TODO: Create a more robust test :/
-        assert b'Password not provided' in rv.data
 
 
 @pytest.mark.skip(reason="It's hard to test logging in...")
