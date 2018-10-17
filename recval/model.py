@@ -187,7 +187,7 @@ class Recording(db.Model):  # type: ignore
     missing, the wav file itself.
     """
     id = db.Column(db.Text, primary_key=True)
-    speaker = db.Column(db.Text, nullable=True)  # TODO: Versioned String?
+    speaker = db.Column(db.Text, nullable=True)
     timestamp = db.Column(db.DateTime, nullable=False,
                           default=datetime.now)
     phrase_id = db.Column(db.Integer, db.ForeignKey('phrase.id'),
@@ -213,98 +213,3 @@ class Recording(db.Model):  # type: ignore
         timestamp = datetime.combine(session.date, time())
         return cls(id=fingerprint, phrase=phrase, speaker=speaker,
                    session=session, timestamp=timestamp)
-
-
-class VersionedString(db.Model):  # type: ignore
-    """
-    A versioned string is is one with a history of what it used to be, and who
-    said it.
-
-    The actual value of a versioned string is ALWAYS normalized.
-    """
-
-    __tablename__ = 'versioned_string'
-
-    # TODO: validator for this.
-    id = db.Column(db.String, primary_key=True)
-    value = db.Column(db.Text, nullable=False)
-
-    # 'provenance' is simply the first string in the series.
-    provenance_id = db.Column(db.String, db.ForeignKey('versioned_string.id'),
-                              nullable=False)
-    previous_id = db.Column(db.String, db.ForeignKey('versioned_string.id'),
-                            nullable=True)
-    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.now)
-
-    # The very first string in the series.
-    provenance = db.relationship('VersionedString',
-                                 remote_side=[id],
-                                 foreign_keys=[provenance_id],
-                                 uselist=False)
-    # The immediately last version of the string.
-    previous = db.relationship('VersionedString',
-                               remote_side=[id],
-                               foreign_keys=[previous_id],
-                               uselist=False)
-
-    @validates('value')
-    def validate_value(self, _key, utterance):
-        value = normalize_utterance(utterance)
-        assert len(value) > 0
-        return value
-
-    @property
-    def is_root(self) -> bool:
-        return self.id == self.provenance_id
-
-    def show(self) -> str:
-        """
-        Returns the VersionedString somewhat like a Git object:
-
-        See: https://gist.github.com/masak/2415865
-
-        TODO: test show() before and after provenance and ID are set.
-        """
-        def generate():
-            if not self.is_root:
-                assert self.previous_id is not None
-                # Yield the provenance ONLY when this is a non-root commit.
-                yield f"provenance {self.provenance_id}"
-                yield f"previous {self.previous_id}"
-            yield f"date {self.timestamp.isoformat()}"
-            yield ''
-            yield self.value
-        return '\n'.join(generate())
-
-    def compute_sha256hash(self) -> str:
-        """
-        Compute a hash that can be used as a ID for this versioned string.
-        """
-        return sha256(self.show().encode('UTF-8')).hexdigest()
-
-    def derive(self, value: str) -> 'VersionedString':
-        """
-        Create a versioned string using this instance as its previous value.
-        """
-        child = type(self).new(value)
-        child.previous_id = self.id
-        child.provenance_id = self.provenance_id
-        # Setting previous and provenance changed the hash, so recompute it.
-        child.id = child.compute_sha256hash()
-        assert child.id != child.provenance_id
-        return child
-
-    @classmethod
-    def new(cls, value: str) -> 'VersionedString':
-        """
-        Create a "root" versioned string.
-        That is, it has no history, and its provenance is itself.
-        """
-        instance = cls(value=normalize_utterance(value),
-                       previous_id=None,
-                       timestamp=datetime.now())
-
-        # This is the root version.
-        instance.id = instance.compute_sha256hash()
-        instance.provenance_id = instance.id
-        return instance

@@ -23,7 +23,7 @@ import pytest  # type: ignore
 from sqlalchemy.exc import SQLAlchemyError  # type: ignore
 
 from recval.model import (ElicitationOrigin, Phrase, Recording,
-                          RecordingSession, RecordingQuality, VersionedString,
+                          RecordingSession, RecordingQuality,
                           Word)
 from recval.recording_session import SessionID, TimeOfDay
 
