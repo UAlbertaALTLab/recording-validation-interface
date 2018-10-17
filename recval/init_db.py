@@ -5,10 +5,22 @@
 Temporary place for database creation glue code.
 """
 from pathlib import Path
-from recval.app import app
 
 
 def initialize(directory: Path) -> None:
+    from recval.app import app
+    return _initialize(
+            directory,
+            app.config['TRANSCODED_RECORDINGS_PATH'],
+            app.config['REPOSITORY_ROOT']
+    )
+
+
+def _initialize(
+        directory: Path,
+        transcoded_recordings_path: str,
+        repository_root: Path,
+        ) -> None:
     """
     Creates the database from scratch.
 
@@ -26,8 +38,8 @@ def initialize(directory: Path) -> None:
 
     info2phrase = {}  # type: ignore
 
-    dest = Path(app.config['TRANSCODED_RECORDINGS_PATH'])
-    metadata_filename = app.config['REPOSITORY_ROOT'] / 'etc' / 'metadata.csv'
+    dest = Path()
+    metadata_filename = repository_root / 'etc' / 'metadata.csv'
 
     assert directory.resolve().is_dir()
     assert dest.resolve().is_dir()
