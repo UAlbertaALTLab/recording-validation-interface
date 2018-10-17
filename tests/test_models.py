@@ -86,6 +86,7 @@ def test_recording_date_automatically_set(db, recording_session):
     assert rec.timestamp.date() == recording_session.date
 
 
+@pytest.mark.skip
 def test_transcription_update(db, wave_file_path, recording_session):
     """
     Ensure that a word's transcription can be changed.
@@ -113,46 +114,6 @@ def test_transcription_update(db, wave_file_path, recording_session):
     # Fetch it one more time, and check that it has changed.
     word = Word.query.filter(Word.id == word_id).one()
     assert word.transcription == 'acimosis'
-
-
-def test_translation_history(db, acimosis):
-    """
-    Checks that the translation has a history, and that updating the
-    translation updates the history.
-    """
-
-    # Fetch the word.
-    word = Word.query.filter(Word.id == acimosis).one()
-    assert word.translation == 'puppy'
-
-    # Now, check its history.
-    assert word.translation_meta.is_root
-    assert len(word.translation_history) == 1
-
-    # Now, update it!
-    word.translation = 'smol doggo'
-    db.session.commit()
-    del word
-
-    # Refetch it.
-    word = Word.query.filter_by(id=acimosis).one()
-    assert word.translation == 'smol doggo'
-
-    # Get the entire translation history.
-    assert not word.translation_meta.is_root
-    assert len(word.translation_history) == 2
-
-    # Update it back to the original. It should create a NEW entry.
-    word.translation = 'puppy'
-    db.session.commit()
-    del word
-
-    # Fetch it one last time.
-    word = Word.query.filter_by(id=acimosis).one()
-    # It should be back to puppy.
-    assert word.translation == 'puppy'
-    assert not word.translation_meta.is_root
-    assert len(word.translation_history) == 3
 
 
 def test_mark_recordings(db, acimosis):
