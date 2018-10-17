@@ -4,9 +4,10 @@
 """
 Temporary place for database creation glue code.
 """
+
 import logging
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable
 
 from recval.extract_phrases import RecordingExtractor, RecordingInfo
 from recval.transcode_recording import transcode_to_aac
@@ -22,7 +23,10 @@ def initialize(directory: Path) -> None:
     )
 
 
-class RecordingImporter:
+RecordingImporter = Callable[[RecordingInfo, str, Path], None]
+
+
+class FlaskSQLAlchemyImporter:
     """
     Naming things is hard
     """
@@ -80,7 +84,7 @@ class RecordingImporter:
         v = VersionedString.new(value=value, author=importer)
         return v
 
-    def import_recording(self, info: RecordingInfo, rec_id: str, recording_path: Path) -> None:
+    def __call__(self, info: RecordingInfo, rec_id: str, recording_path: Path) -> None:
         from recval.model import Recording, RecordingSession
         session = RecordingSession.query.filter_by(id=info.session).\
             one_or_none() or RecordingSession.from_session_id(info.session)
@@ -116,7 +120,7 @@ def _initialize(
     assert dest.resolve().is_dir()
     assert metadata_filename.resolve().is_file()
 
-    importer = RecordingImporter()
+    import_recording = FlaskSQLAlchemyImporter()
 
     with open(metadata_filename) as metadata_csv:
         metadata = parse_metadata(metadata_csv)
@@ -139,4 +143,4 @@ def _initialize(
                 year=info.session.year
             ))
             assert recording_path.exists()
-        importer.import_recording(info, rec_id, recording_path)
+        import_recording(info, rec_id, recording_path)
