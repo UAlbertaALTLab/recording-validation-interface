@@ -21,7 +21,6 @@ from pathlib import Path
 
 from flask import (Flask, abort, redirect, render_template,  # type: ignore
                    request, send_from_directory, url_for)
-from flask_security import roles_required  # type: ignore
 from sqlalchemy.orm import subqueryload  # type: ignore
 from werkzeug.exceptions import NotFound  # type: ignore
 
@@ -91,7 +90,6 @@ def search_phrases():
 
 
 @app.route('/phrase/<int:phrase_id>')
-@roles_required('validator')
 def edit_phrase(phrase_id):
     phrase = Phrase.query.filter_by(id=phrase_id).one()
     return render_template('edit_phrase.html',
@@ -101,7 +99,6 @@ def edit_phrase(phrase_id):
 
 
 @app.route('/phrase/<int:phrase_id>', methods=['PATCH'])
-@roles_required('validator')
 def update_text(phrase_id):
     """
     Changes the text for a field of the given phrase.
@@ -142,7 +139,6 @@ def update_text(phrase_id):
 
 
 @app.route('/recording/<recording_id>', methods=['PATCH'])
-@roles_required('validator')
 def update_recording(recording_id):
     """
     Changes the assigned quality of the recording.
