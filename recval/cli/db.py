@@ -27,6 +27,7 @@ import click
 from flask.cli import AppGroup, with_appcontext  # type: ignore
 
 from recval.app import app
+from recval.utils import delete_audio
 
 
 # Subcommand for database management.
@@ -55,13 +56,11 @@ def destroy_db() -> None:
         f" and all transcoded recordings in {audio_dir}?",
         abort=True
     )
+
     try:
         click.secho(f'Deleting {db_file}', fg='red', bold=True)
         db_file.unlink()
     except FileNotFoundError:
         pass
 
-    click.secho(f'Deleting all *.m4a files in {audio_dir}',
-                fg='red', bold=True)
-    for audio_file in audio_dir.glob('*.m4a'):
-        audio_file.unlink()
+    delete_audio(audio_dir)
