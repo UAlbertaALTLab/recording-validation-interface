@@ -39,11 +39,14 @@ def test_recording_session_model_from_session_id():
     session_id = SessionID.from_name('2017-11-01-AM-OFF-_')
     session = RecordingSession.create_from(session_id)
     assert session.date == session_id.date
-    assert session.time_of_day == session_id.time_of_day.name
-    assert session.location == session_id.location.name
+    assert session.time_of_day == session_id.time_of_day.value
+    assert session.location == session_id.location.value
     assert session.subsession == session_id.subsession
 
     session.clean_fields()
     session.clean()
+
+    new_session_id = session.as_session_id()
+    assert new_session_id == session_id
 
 # TODO: create a recording session from a libreval recording session

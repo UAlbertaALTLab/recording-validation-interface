@@ -18,6 +18,8 @@
 
 from django.db import models
 
+from librecval.recording_session import SessionID, TimeOfDay, Location
+
 
 def choices_from_enum(enum_class):
     """
@@ -25,8 +27,8 @@ def choices_from_enum(enum_class):
     model. Retuns a dictionary suitable for using as keyword arguments for a
     CharField.
     """
-    choices = tuple((x.name, x.value) for x in enum_class)
-    max_length = max(len(x.name) for x in enum_class)
+    choices = tuple((x.value, x.value) for x in enum_class)
+    max_length = max(len(x.value) for x in enum_class)
     return dict(max_length=max_length, choices=choices)
 
 
@@ -41,7 +43,6 @@ class RecordingSession(models.Model):
     """
 
     # See librecval for the appropriate choices:
-    from librecval.recording_session import TimeOfDay, Location
 
     date = models.DateField(help_text="The day the session occured.")
     time_of_day = models.CharField(help_text="The time of day the session occured. May be empty.",
@@ -59,6 +60,13 @@ class RecordingSession(models.Model):
         Create the model from the internal data class.
         """
         return cls(date=session_id.date,
-                   time_of_day=session_id.time_of_day.name,
-                   location=session_id.location.name,
+                   time_of_day=session_id.time_of_day.value,
+                   location=session_id.location.value,
                    subsession=session_id.subsession)
+
+    def as_session_id(self):
+        return SessionID(date=self.date,
+                         # `and` prevents calling .parse() on a None value.
+                         time_of_day=self.time_of_day and TimeOfDay.parse(self.time_of_day),
+                         location=self.location and Location.parse(self.location),
+                         subsession=self.subsession)
