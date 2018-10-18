@@ -21,7 +21,7 @@ from datetime import date as datetype
 import pytest
 from model_mommy import mommy
 from hypothesis import given
-from hypothesis.strategies import composite
+from hypothesis.strategies import builds
 
 from validation.models import RecordingSession
 from librecval.recording_session import TimeOfDay, Location, SessionID
@@ -37,19 +37,7 @@ def test_recording_session():
     assert isinstance(session.subsession, (int, type(None)))
 
 
-@composite
-def session_ids(draw):
-    """
-    Generates random, valid, session IDs.
-    """
-    from hypothesis.strategies import integers, none, dates, sampled_from
-    return SessionID(date=draw(dates()),
-                     time_of_day=draw(sampled_from(TimeOfDay) | none()),
-                     location=draw(sampled_from(Location) | none()),
-                     subsession=draw(integers(min_value=0) | none()))
-
-
-@given(session_ids())
+@given(builds(SessionID))
 def test_recording_session_model_from_session_id(session_id):
     session = RecordingSession.create_from(session_id)
     assert session.date == session_id.date
