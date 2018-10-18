@@ -17,10 +17,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+import pytest
 from model_mommy import mommy
 
 from validation.models import RecordingSession
 
 
+@pytest.mark.django_db
 def test_recording_session():
-    session = mommy.create(RecordingSession)
+    session = mommy.make(RecordingSession)
