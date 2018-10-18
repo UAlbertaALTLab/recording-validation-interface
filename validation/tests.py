@@ -29,9 +29,8 @@ from validation.models import RecordingSession, Speaker
 from librecval.recording_session import TimeOfDay, Location, SessionID
 
 
-@pytest.mark.django_db
 def test_recording_session():
-    session = mommy.make(RecordingSession)
+    session = mommy.prepare(RecordingSession)
     # Check all the fields.
     assert isinstance(session.date, datetype)
     assert session.time_of_day in {m.value for m in TimeOfDay} | {''}
@@ -65,24 +64,22 @@ def test_recording_session_model_from_session_id(session_id):
     assert str(session_id) in str(session)
 
 
-@pytest.mark.django_db
 def test_speaker():
     """
     Check that we can create a speaker.
     """
-    speaker = mommy.make(Speaker)
+    speaker = mommy.prepare(Speaker)
     speaker.clean()
     assert speaker.code.upper() == speaker.code
     assert isinstance(speaker.full_name, str)
     assert speaker.gender in ('M', 'F', None)
 
 
-@pytest.mark.django_db
 def test_speaker_validation():
     """
     Check that we can create a speaker.
     """
-    speaker = Recipe(Speaker, code=' 43!341k43j1k ').make()
+    speaker = Recipe(Speaker, code=' 43!341k43j1k ').prepare()
 
     with pytest.raises(ValidationError):
         speaker.clean()
