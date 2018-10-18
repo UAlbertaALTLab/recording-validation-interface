@@ -15,6 +15,7 @@ pytest = "*"
 hypothesis = "*"
 mypy = "*"
 pycodestyle = "*"
+"e1839a8" = {path = ".", editable = true}
 
 [requires]
 python_version = "3.7"
