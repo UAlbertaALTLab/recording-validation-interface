@@ -21,6 +21,7 @@ Old CLI commands that should be ported to the new framework.
 """
 
 import shutil
+import click
 from pathlib import Path
 
 from recval.utils import cd
@@ -54,3 +55,14 @@ def download() -> None:
         exported_csv = (tmpdir / REMOTE_FILENAME).with_suffix('.csv')
         assert exported_csv.exists()
         shutil.copy(exported_csv, destination)
+
+
+def delete_audio(audio_dir: Path):
+    """
+    Deletes all of the audio in the given audio directory.
+
+    Good for nuking the development environment and starting from scratch.
+    """
+    click.secho(f'Deleting all *.m4a files in {audio_dir}', fg='red', bold=True)
+    for audio_file in audio_dir.glob('*.m4a'):
+        audio_file.unlink()
