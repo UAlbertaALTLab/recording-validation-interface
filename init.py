@@ -15,4 +15,5 @@ if envfilename.exists():
 
 with open(envfilename, 'wt', encoding='UTF-8') as envfile:
     token = token_urlsafe()
-    envfile.write(f'SECRET_KEY="{token}"')
+    print(f'SECRET_KEY="{token}"', file=envfile)
+    print('DEBUG=True', file=envfile)
