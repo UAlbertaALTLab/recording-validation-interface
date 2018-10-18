@@ -25,9 +25,9 @@ import logging
 from pathlib import Path
 from typing import Callable
 
-from recval.extract_phrases import RecordingExtractor, RecordingInfo
-from recval.recording_session import parse_metadata
-from recval.transcode_recording import transcode_to_aac
+from librecval.extract_phrases import RecordingExtractor, RecordingInfo
+from librecval.recording_session import parse_metadata
+from librecval.transcode_recording import transcode_to_aac
 
 ImportRecording = Callable[[RecordingInfo, str, Path], None]
 

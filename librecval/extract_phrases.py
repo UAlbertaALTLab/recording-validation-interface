@@ -31,8 +31,8 @@ from typing import Dict, NamedTuple
 from pydub import AudioSegment  # type: ignore
 from textgrid import IntervalTier, TextGrid  # type: ignore
 
-from recval.normalization import normalize
-from recval.recording_session import SessionID, SessionMetadata
+from librecval.normalization import normalize
+from librecval.recording_session import SessionID, SessionMetadata
 
 logger = logging.getLogger(__name__)
 info = logger.info

@@ -24,7 +24,7 @@ from pathlib import Path
 import pytest  # type: ignore
 from pydub.generators import Square  # type: ignore
 
-from recval.transcode_recording import transcode_to_aac
+from librecval.transcode_recording import transcode_to_aac
 
 
 def test_can_transcode_wave_file(wave_file_path: Path,
