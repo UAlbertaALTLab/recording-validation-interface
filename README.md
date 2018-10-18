@@ -1,7 +1,8 @@
 Maskwacîs recordings validation
 ===============================
 
-An app for viewing and validating recordings done in Maskwacîs.
+A web app for viewing and validating recordings done in Maskwacîs.
+
 
 
 Install
@@ -65,6 +66,7 @@ So, in order to create the database on Sapir, I type the following:
 > **TODO**: create superuser
 
 
+
 Running
 -------
 
@@ -75,6 +77,29 @@ Testing
 -------
 
 > **TODO**: What are the new instructions?
+
+
+Frequently Asked Questions
+--------------------------
+
+### What is “recval”?
+
+It's short for **Rec**ordings **val**idation. I didn't want to type that
+out all the time, and I didn't want to puts spaces, hyphens or
+underscores to refer to it.
+
+### What is `librecval`?
+
+`librecval` is a library for extracting recordings, transcoding
+recordings to a normalized format, and combining the recordings with
+metadata, as well as representing recordings data in an
+framework-agnostic way. This library *should* be devoid of references or
+dependencies on any web framework or database backend.
+
+### What is `recvalsite`?
+
+It's the Django project for the **rec**ording **val**idation **site**.
+This aggregates all of the Django apps under one deployable website.
 
 
 License
