@@ -20,13 +20,13 @@
 Download external metadata.
 """
 
-import contextlib
-import os
 import shutil
 from pathlib import Path
 
 import click
 from flask.cli import AppGroup  # type: ignore
+
+from recval.utils import cd
 
 
 data_cli = AppGroup('metadata', help=__doc__.strip())
@@ -61,14 +61,3 @@ def download() -> None:
         exported_csv = (tmpdir / REMOTE_FILENAME).with_suffix('.csv')
         assert exported_csv.exists()
         shutil.copy(exported_csv, destination)
-
-
-# Copied from: https://stackoverflow.com/a/24469659/6626414
-@contextlib.contextmanager
-def cd(path: Path):
-    old_path = os.getcwd()
-    os.chdir(path)
-    try:
-        yield
-    finally:
-        os.chdir(old_path)
