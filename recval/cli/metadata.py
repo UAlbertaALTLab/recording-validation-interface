@@ -27,6 +27,7 @@ import click
 from flask.cli import AppGroup  # type: ignore
 
 from recval.utils import cd
+from recval import REPOSITORY_ROOT
 
 
 data_cli = AppGroup('metadata', help=__doc__.strip())
@@ -43,7 +44,6 @@ def download() -> None:
 
     This will be downloaded to $REPOSITORY_ROOT/etc/
     """
-    from recval.default_settings import REPOSITORY_ROOT
 
     from sh import gdrive  # type: ignore
     destination = REPOSITORY_ROOT / 'etc' / 'metadata.csv'
