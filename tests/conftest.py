@@ -63,7 +63,7 @@ def db(app, _temporary_data_directory):
 
     Based on http://alextechrants.blogspot.ca/2014/01/unit-testing-sqlalchemy-apps-part-2.html
     """
-    from recval.database import init_db
+    from recval.model import db
 
     # Store the database in a temporary directory.
     db_filename = _temporary_data_directory / 'recval.db'
@@ -77,7 +77,7 @@ def db(app, _temporary_data_directory):
     app.config['TRANSCODED_RECORDINGS_PATH'] = audio_dir
 
     # Setup the database.
-    db = init_db()
+    db.create_all()
     db.session.flush()
     db.session.expunge_all()
     db.session.commit()

@@ -21,7 +21,7 @@ The data models for the validation app.
 
 See database to initialize and create the database.
 
-Do not use db directly; instead, use database.init_db() instead.
+Do not use db directly; instead, use db.create_all() instead.
 """
 
 import warnings
