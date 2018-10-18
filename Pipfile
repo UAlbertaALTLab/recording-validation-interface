@@ -16,6 +16,8 @@ hypothesis = "*"
 mypy = "*"
 pycodestyle = "*"
 "e1839a8" = {path = ".", editable = true}
+pytest-django = "*"
+model-mommy = "*"
 
 [requires]
 python_version = "3.7"
