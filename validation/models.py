@@ -19,6 +19,17 @@
 from django.db import models
 
 
+def choices_from_enum(enum_class):
+    """
+    Utility for converting a Python 3.4+ Enum into a choices for a Django
+    model. Retuns a dictionary suitable for using as keyword arguments for a
+    CharField.
+    """
+    choices = tuple((x.name, x.value) for x in enum_class)
+    max_length = max(len(x.value) for x in enum_class)
+    return dict(max_length=max_length, choices=choices)
+
+
 class RecordingSession(models.Model):
     """
     A session during which a number of recordings were made.
@@ -29,4 +40,14 @@ class RecordingSession(models.Model):
         Happended on the morning of November 1, 2017 in the office.
     """
 
-    date = models.DateTimeField(help_text="The day the session occured")
+    # See librecval for the appropriate choices:
+    from librecval.recording_session import TimeOfDay
+
+    date = models.DateTimeField(help_text="The day the session occured,")
+    time_of_day = models.CharField(help_text="The time of day the session occured. May be null.",
+                                   null=True,
+                                   **choices_from_enum(TimeOfDay))
+
+    time_of_day = models.CharField(help_text="The time of day the session occured. May be null.",
+                                   null=True,
+                                   **choices_from_enum(TimeOfDay))
