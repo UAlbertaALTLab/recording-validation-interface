@@ -26,7 +26,7 @@ def choices_from_enum(enum_class):
     CharField.
     """
     choices = tuple((x.name, x.value) for x in enum_class)
-    max_length = max(len(x.value) for x in enum_class)
+    max_length = max(len(x.name) for x in enum_class)
     return dict(max_length=max_length, choices=choices)
 
 
@@ -44,11 +44,11 @@ class RecordingSession(models.Model):
     from librecval.recording_session import TimeOfDay, Location
 
     date = models.DateField(help_text="The day the session occured.")
-    time_of_day = models.CharField(help_text="The time of day the session occured. May be null.",
-                                   null=True,
+    time_of_day = models.CharField(help_text="The time of day the session occured. May be empty.",
+                                   blank=True, default='',
                                    **choices_from_enum(TimeOfDay))
-    location = models.CharField(help_text="The location of the recordings. May be null.",
-                                null=True,
+    location = models.CharField(help_text="The location of the recordings. May be empty.",
+                                blank=True, default='',
                                 **choices_from_enum(Location))
     subsession = models.IntegerField(help_text="The 'subsession' number, if applicable.",
                                      null=True)
