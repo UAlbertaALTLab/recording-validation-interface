@@ -23,3 +23,4 @@ from pathlib import Path
 __all__ = ['REPOSITORY_ROOT']
 
 REPOSITORY_ROOT = Path(__file__).parent.parent
+assert (REPOSITORY_ROOT / 'setup.py').is_file()

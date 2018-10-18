@@ -18,10 +18,10 @@
 
 from pathlib import Path
 
+from recval import REPOSITORY_ROOT
+
 
 # ################################ General ###################################
-REPOSITORY_ROOT = Path(__file__).parent.parent
-assert (REPOSITORY_ROOT / '.git').is_dir()
 
 # The default database if none exists.
 DEFAULT_DATABASE = 'sqlite:////tmp/recval-temporary.db'
