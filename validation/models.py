@@ -36,6 +36,39 @@ def choices_from_enum(enum_class):
     return dict(max_length=max_length, choices=choices)
 
 
+class Phrase(models.Model):
+    """
+    A recorded phrase. A phrase may either be a word or a sentence with at
+    least one recording. Phrases may be awaiting validation, or may have
+    already be validated.
+    """
+
+    WORD = 'word'
+    SENTENCE = 'sentence'
+    KIND_CHOICES = (
+        (WORD, 'Word'),
+        (SENTENCE, 'Sentence'),
+    )
+
+    transcription = models.CharField(help_text="The transciption of the Cree phrase.",
+                                     blank=False,
+                                     max_length=256)
+    translation = models.CharField(help_text="The English translation of the phrase.",
+                                   blank=False,
+                                   max_length=256)
+    kind = models.CharField(help_text="Is this phrase a word or a sentence?",
+                            choices=KIND_CHOICES,
+                            blank=False,
+                            max_length=len('sentence'))
+    validated = models.BooleanField(help_text="Has this phrase be validated?",
+                                    default=False)
+
+    # TODO: lots of clean()ing!
+
+    def __str__(self) -> str:
+        return self.transcription
+
+
 class Speaker(models.Model):
     """
     A person who spoke at the recording sessions.

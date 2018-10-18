@@ -26,7 +26,7 @@ from model_mommy import mommy
 from model_mommy.recipe import Recipe
 
 from librecval.recording_session import Location, SessionID, TimeOfDay
-from validation.models import RecordingSession, Speaker
+from validation.models import Phrase, RecordingSession, Speaker
 
 
 def test_recording_session():
@@ -83,3 +83,15 @@ def test_speaker_validation():
 
     with pytest.raises(ValidationError):
         speaker.clean()
+
+
+def test_phrase():
+    """
+    Test that we can create a phrase instance.
+    """
+    phrase = mommy.prepare(Phrase)
+    assert isinstance(phrase.transcription, str)
+    assert isinstance(phrase.translation, str)
+    assert phrase.kind in (Phrase.WORD, Phrase.SENTENCE)
+    assert isinstance(phrase.validated, bool)
+    assert phrase.transcription in str(phrase)
