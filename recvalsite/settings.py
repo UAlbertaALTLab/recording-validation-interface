@@ -15,6 +15,7 @@ from pathlib import Path
 
 from decouple import config
 
+
 # Build paths inside the project like this: BASE_DIR / 'path' / 'to' / 'file'
 BASE_DIR = Path(__file__).resolve().parent.parent
 assert (BASE_DIR / 'manage.py').is_file()
@@ -26,7 +27,7 @@ assert (BASE_DIR / 'manage.py').is_file()
 SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = []
 
