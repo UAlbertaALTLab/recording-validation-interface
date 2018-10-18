@@ -20,7 +20,7 @@ import re
 import unicodedata
 
 
-def normalize(utterance):
+def normalize(utterance: str) -> str:
     r"""
     Normalizes utterances (translations, transcriptions, etc.)
     """
