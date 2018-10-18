@@ -51,4 +51,4 @@ class RecordingSession(models.Model):
                                 blank=True, default='',
                                 **choices_from_enum(Location))
     subsession = models.IntegerField(help_text="The 'subsession' number, if applicable.",
-                                     null=True)
+                                     null=True, blank=True)
