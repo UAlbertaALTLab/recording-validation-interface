@@ -20,13 +20,13 @@ from datetime import date as datetype
 
 import pytest
 from django.core.exceptions import ValidationError
-from model_mommy import mommy
-from model_mommy.recipe import Recipe
 from hypothesis import given
 from hypothesis.strategies import builds
+from model_mommy import mommy
+from model_mommy.recipe import Recipe
 
+from librecval.recording_session import Location, SessionID, TimeOfDay
 from validation.models import RecordingSession, Speaker
-from librecval.recording_session import TimeOfDay, Location, SessionID
 
 
 def test_recording_session():

@@ -22,8 +22,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-
-from librecval.recording_session import SessionID, TimeOfDay, Location
+from librecval.recording_session import Location, SessionID, TimeOfDay
 
 
 def choices_from_enum(enum_class):

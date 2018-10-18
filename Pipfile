@@ -18,6 +18,7 @@ pycodestyle = "*"
 "e1839a8" = {path = ".", editable = true}
 pytest-django = "*"
 model-mommy = "*"
+isort = "*"
 
 [requires]
 python_version = "3.7"
