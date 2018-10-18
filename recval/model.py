@@ -162,7 +162,7 @@ class RecordingSession(db.Model):  # type: ignore
     """
     __tablename__ = 'session'
 
-    id = db.Column(DBSessionID, primary_key=True)
+    id = db.Column(db.Text, primary_key=True)
     date = db.Column(db.Date(), nullable=False)
     time_of_day = db.Column(db.Enum(TimeOfDay), nullable=True)
     location = db.Column(db.Enum(Location), nullable=True)
@@ -172,7 +172,7 @@ class RecordingSession(db.Model):  # type: ignore
 
     @classmethod
     def from_session_id(cls, session_id: SessionID) -> 'RecordingSession':
-        return cls(id=session_id,
+        return cls(id=str(session_id),
                    date=session_id.date,
                    time_of_day=session_id.time_of_day,
                    location=session_id.location,
@@ -192,7 +192,7 @@ class Recording(db.Model):  # type: ignore
                           default=datetime.now)
     phrase_id = db.Column(db.Integer, db.ForeignKey('phrase.id'),
                           nullable=False)
-    session_id = db.Column(DBSessionID, db.ForeignKey('session.id'),
+    session_id = db.Column(db.Text, db.ForeignKey('session.id'),
                            nullable=False)
 
     quality = db.Column(db.Enum(RecordingQuality), nullable=True)
