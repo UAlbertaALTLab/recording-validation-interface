@@ -19,7 +19,9 @@
 from datetime import date as datetype
 
 import pytest
+from django.core.exceptions import ValidationError
 from model_mommy import mommy
+from model_mommy.recipe import Recipe
 from hypothesis import given
 from hypothesis.strategies import builds
 
@@ -72,3 +74,15 @@ def test_speaker():
     speaker.clean()
     assert speaker.code.upper() == speaker.code
     assert isinstance(speaker.full_name, str)
+    assert speaker.gender in ('M', 'F', None)
+
+
+@pytest.mark.django_db
+def test_speaker_validation():
+    """
+    Check that we can create a speaker.
+    """
+    speaker = Recipe(Speaker, code=' 43!341k43j1k ').make()
+
+    with pytest.raises(ValidationError):
+        speaker.clean()

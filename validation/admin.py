@@ -15,7 +15,8 @@
 
 from django.contrib import admin
 
-from .models import RecordingSession
+from .models import RecordingSession, Speaker
 
 
 admin.site.register(RecordingSession)
+admin.site.register(Speaker)

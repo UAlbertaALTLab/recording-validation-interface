@@ -16,7 +16,12 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import re
+
+from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils.translation import gettext_lazy as _
+
 
 from librecval.recording_session import SessionID, TimeOfDay, Location
 
@@ -30,6 +35,41 @@ def choices_from_enum(enum_class):
     choices = tuple((x.value, x.value) for x in enum_class)
     max_length = max(len(x.value) for x in enum_class)
     return dict(max_length=max_length, choices=choices)
+
+
+class Speaker(models.Model):
+    """
+    A person who spoke at the recording sessions.
+    """
+
+    # We store gender so that we can categorize how their voice sounds.
+    # The community is interested in hear each word with both a male and a
+    # female voice.
+    # Although I believe gender is a spectrum (and can even be null!),
+    # we personally know all of the speakers, and they all identifiy as either
+    # male or female ().
+    MALE = 'M'
+    FEMALE = 'F'
+    GENDER_CHOICES = (
+        (MALE, 'Male'),
+        (FEMALE, 'Female'),
+    )
+
+    code = models.CharField(help_text='Short code assigned to speaker in the ellicitation metadata.',
+                            max_length=8, primary_key=True)
+    # Initially, gender and full name in the database will be imported as
+    # None/null, but they should ultimately be set manually.
+    full_name = models.CharField(help_text="The speaker's full name.",
+                                 max_length=128)
+    gender = models.CharField(help_text='Gender of the voice.',
+                              max_length=1, choices=GENDER_CHOICES,
+                              null=True)
+
+    def clean(self):
+        self.code = self.code.strip().upper()
+        if not re.match(r'\A[A-Z]+[0-9]?\Z', self.code):
+            raise ValidationError(_('Speaker code must be a single all-caps word, '
+                                    'optionally followed by a digit'))
 
 
 class RecordingSession(models.Model):
