@@ -111,3 +111,4 @@ ENV/
 .env
 metadata.csv
 /data/
+db.sqlite3
