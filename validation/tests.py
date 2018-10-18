@@ -20,6 +20,8 @@ from datetime import date as datetype
 
 import pytest
 from model_mommy import mommy
+from hypothesis import given
+from hypothesis.strategies import one_of, integers, none, dates, sampled_from
 
 from validation.models import RecordingSession
 from librecval.recording_session import TimeOfDay, Location, SessionID
@@ -35,12 +37,16 @@ def test_recording_session():
     assert isinstance(session.subsession, (int, type(None)))
 
 
-def test_recording_session_model_from_session_id():
-    session_id = SessionID.from_name('2017-11-01-AM-OFF-_')
+@given(dates(),
+       one_of(sampled_from(TimeOfDay), none()),
+       one_of(sampled_from(Location), none()),
+       one_of(integers(min_value=0), none()))
+def test_recording_session_model_from_session_id(date, time_of_day, location, subsession):
+    session_id = SessionID(date=date, time_of_day=time_of_day, location=location, subsession=subsession)
     session = RecordingSession.create_from(session_id)
     assert session.date == session_id.date
-    assert session.time_of_day == session_id.time_of_day.value
-    assert session.location == session_id.location.value
+    assert session.time_of_day == (session_id.time_of_day and session_id.time_of_day.value)
+    assert session.location == (session_id.location and session_id.location.value)
     assert session.subsession == session_id.subsession
 
     session.clean_fields()
