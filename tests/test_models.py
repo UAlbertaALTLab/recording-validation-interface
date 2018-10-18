@@ -187,7 +187,7 @@ def test_recording_has_session(db):
                            subsession=None)
     session = RecordingSession.from_session_id(session_id)
 
-    assert session.id == session_id
+    assert SessionID.from_name(session.id) == session_id
     assert session.date == session_id.date
     assert session.time_of_day == session_id.time_of_day
     assert session.location == session_id.location
