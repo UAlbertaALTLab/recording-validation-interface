@@ -52,3 +52,13 @@ class RecordingSession(models.Model):
                                 **choices_from_enum(Location))
     subsession = models.IntegerField(help_text="The 'subsession' number, if applicable.",
                                      null=True, blank=True)
+
+    @classmethod
+    def create_from(cls, session_id):
+        """
+        Create the model from the internal data class.
+        """
+        return cls(date=session_id.date,
+                   time_of_day=session_id.time_of_day.name,
+                   location=session_id.location.name,
+                   subsession=session_id.subsession)

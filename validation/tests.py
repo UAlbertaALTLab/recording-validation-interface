@@ -22,7 +22,7 @@ import pytest
 from model_mommy import mommy
 
 from validation.models import RecordingSession
-from librecval.recording_session import TimeOfDay, Location
+from librecval.recording_session import TimeOfDay, Location, SessionID
 
 
 @pytest.mark.django_db
@@ -33,5 +33,17 @@ def test_recording_session():
     assert session.time_of_day in {m.value for m in TimeOfDay} | {''}
     assert session.location in {m.value for m in Location} | {''}
     assert isinstance(session.subsession, (int, type(None)))
+
+
+def test_recording_session_model_from_session_id():
+    session_id = SessionID.from_name('2017-11-01-AM-OFF-_')
+    session = RecordingSession.create_from(session_id)
+    assert session.date == session_id.date
+    assert session.time_of_day == session_id.time_of_day.name
+    assert session.location == session_id.location.name
+    assert session.subsession == session_id.subsession
+
+    session.clean_fields()
+    session.clean()
 
 # TODO: create a recording session from a libreval recording session
