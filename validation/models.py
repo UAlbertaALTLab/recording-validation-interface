@@ -41,9 +41,14 @@ class RecordingSession(models.Model):
     """
 
     # See librecval for the appropriate choices:
-    from librecval.recording_session import TimeOfDay
+    from librecval.recording_session import TimeOfDay, Location
 
     date = models.DateField(help_text="The day the session occured.")
     time_of_day = models.CharField(help_text="The time of day the session occured. May be null.",
                                    null=True,
                                    **choices_from_enum(TimeOfDay))
+    location = models.CharField(help_text="The location of the recordings. May be null.",
+                                null=True,
+                                **choices_from_enum(Location))
+    subsession = models.IntegerField(help_text="The 'subsession' number, if applicable.",
+                                     null=True)
