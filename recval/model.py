@@ -40,7 +40,6 @@ from sqlalchemy.orm import validates  # type: ignore
 
 from recval.normalization import to_indexable_form, normalize as normalize_utterance
 from recval.recording_session import SessionID, TimeOfDay, Location
-from recval.custom_types import DBSessionID
 
 
 db = SQLAlchemy()
