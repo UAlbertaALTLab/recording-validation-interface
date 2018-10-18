@@ -23,7 +23,7 @@ from model_mommy import mommy
 from hypothesis import given
 from hypothesis.strategies import builds
 
-from validation.models import RecordingSession
+from validation.models import RecordingSession, Speaker
 from librecval.recording_session import TimeOfDay, Location, SessionID
 
 
@@ -63,4 +63,12 @@ def test_recording_session_model_from_session_id(session_id):
     assert str(session_id) in str(session)
 
 
-# TODO: create a recording session from a libreval recording session
+@pytest.mark.django_db
+def test_speaker():
+    """
+    Check that we can create a speaker.
+    """
+    speaker = mommy.make(Speaker)
+    speaker.clean()
+    assert speaker.code.upper() == speaker.code
+    assert isinstance(speaker.full_name, str)
