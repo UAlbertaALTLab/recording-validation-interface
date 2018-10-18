@@ -16,15 +16,14 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import csv
 import re
 from datetime import date as datetype
 from datetime import datetime
 from enum import Enum, auto
 from pathlib import Path
-from typing import AnyStr, Callable, Match, NamedTuple, Optional, TypeVar
-import csv
-from typing import Any, Dict, Optional, List, TextIO
-
+from typing import (Any, AnyStr, Callable, Dict, List, Match, NamedTuple,
+                    Optional, TextIO, TypeVar)
 
 T = TypeVar('T')
 

@@ -1,6 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
+# Copyright (C) 2018 Eddie Antonio Santos <easantos@ualberta.ca>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
 """
 Temporary place for database creation glue code.
 """
@@ -14,6 +30,12 @@ from recval.recording_session import parse_metadata
 from recval.transcode_recording import transcode_to_aac
 
 ImportRecording = Callable[[RecordingInfo, str, Path], None]
+
+# TODO: create report with emoji
+#
+# ✅ 2016-04-23AM-OFF - 3 text grids, 230 words
+# ⚠️  2016-05-06AM-KCH - could not link text grids to audio
+# ⚠️  2016-03-06AM-OFF - could not find mettadata
 
 
 def initialize(
