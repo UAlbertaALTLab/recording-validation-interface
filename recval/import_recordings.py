@@ -7,12 +7,11 @@ Temporary place for database creation glue code.
 
 import logging
 from pathlib import Path
-from typing import TYPE_CHECKING, Callable
+from typing import Callable
 
 from recval.extract_phrases import RecordingExtractor, RecordingInfo
-from recval.transcode_recording import transcode_to_aac
 from recval.recording_session import parse_metadata
-
+from recval.transcode_recording import transcode_to_aac
 
 ImportRecording = Callable[[RecordingInfo, str, Path], None]
 
