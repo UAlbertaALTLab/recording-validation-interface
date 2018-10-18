@@ -1,6 +1,6 @@
 from setuptools import setup
 
 setup(
-    name='recval',
+    name='librecval',
     tests_require=['pytest', 'hypothesis'],
 )

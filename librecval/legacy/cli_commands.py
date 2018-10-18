@@ -24,8 +24,8 @@ import shutil
 import click
 from pathlib import Path
 
-from recval.utils import cd
-from recval import REPOSITORY_ROOT
+from librecval.utils import cd
+from librecval import REPOSITORY_ROOT
 
 MASTER_RECORDINGS_METADATA = '1SlJRJRUiwXibAxFC0uY2sFXFb4IukGjs7Rg_G1vp_y8'
 REMOTE_FILENAME = "Master Recordings MetaData"

@@ -20,7 +20,7 @@ import pytest  # type: ignore
 from hypothesis import given  # type: ignore
 from hypothesis.strategies import text  # type: ignore
 
-from recval.normalization import normalize, to_indexable_form
+from librecval.normalization import normalize, to_indexable_form
 
 
 def test_basic():

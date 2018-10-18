@@ -20,8 +20,8 @@ from datetime import date
 
 import pytest  # type: ignore
 
-from recval.recording_session import (Location, SessionID, SessionParseError,
-                                      TimeOfDay, parse_metadata)
+from librecval.recording_session import (Location, SessionID, SessionParseError,
+                                         TimeOfDay, parse_metadata)
 
 
 def test_does_not_parse_arbitrary_directory_name():
