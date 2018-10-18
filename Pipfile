@@ -9,6 +9,10 @@ sh = "*"
 TextGrid = "*"
 
 [dev-packages]
+pytest = "*"
+hypothesis = "*"
+mypy = "*"
+pycodestyle = "*"
 
 [requires]
 python_version = "3.7"
