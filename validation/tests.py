@@ -39,16 +39,28 @@ def test_recording_session():
 
 @given(builds(SessionID))
 def test_recording_session_model_from_session_id(session_id):
+    """
+    Test that a RecordingSession model can be make from a SessionID, and that
+    it can be converted back.
+    """
+
+    # Create the RecordingSession from the session ID.
     session = RecordingSession.create_from(session_id)
     assert session.date == session_id.date
     assert session.time_of_day == (session_id.time_of_day and session_id.time_of_day.value)
     assert session.location == (session_id.location and session_id.location.value)
     assert session.subsession == session_id.subsession
 
+    # Make sure it passes validation!
     session.clean_fields()
     session.clean()
 
+    # Now convert it back. We should get back an equivillent object.
     new_session_id = session.as_session_id()
     assert new_session_id == session_id
+
+    # Finally, the str() should be based on the str() of the SessionID:
+    assert str(session_id) in str(session)
+
 
 # TODO: create a recording session from a libreval recording session

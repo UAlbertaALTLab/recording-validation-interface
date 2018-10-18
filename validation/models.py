@@ -66,8 +66,14 @@ class RecordingSession(models.Model):
                    subsession=session_id.subsession)
 
     def as_session_id(self):
+        """
+        Converts back into a SessionID object.
+        """
         return SessionID(date=self.date,
                          # `and` prevents calling .parse() on a None value.
                          time_of_day=self.time_of_day and TimeOfDay.parse(self.time_of_day),
                          location=self.location and Location.parse(self.location),
                          subsession=self.subsession)
+
+    def __str__(self):
+        return str(self.as_session_id())
