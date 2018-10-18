@@ -60,8 +60,9 @@ class RecordingSession(models.Model):
         Create the model from the internal data class.
         """
         return cls(date=session_id.date,
-                   time_of_day=session_id.time_of_day.value,
-                   location=session_id.location.value,
+                   # `and` prevents accessing attributes on a None value.
+                   time_of_day=session_id.time_of_day and session_id.time_of_day.value,
+                   location=session_id.location and session_id.location.value,
                    subsession=session_id.subsession)
 
     def as_session_id(self):
