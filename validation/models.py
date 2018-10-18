@@ -43,11 +43,7 @@ class RecordingSession(models.Model):
     # See librecval for the appropriate choices:
     from librecval.recording_session import TimeOfDay
 
-    date = models.DateTimeField(help_text="The day the session occured,")
-    time_of_day = models.CharField(help_text="The time of day the session occured. May be null.",
-                                   null=True,
-                                   **choices_from_enum(TimeOfDay))
-
+    date = models.DateField(help_text="The day the session occured.")
     time_of_day = models.CharField(help_text="The time of day the session occured. May be null.",
                                    null=True,
                                    **choices_from_enum(TimeOfDay))
