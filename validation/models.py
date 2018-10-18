@@ -28,3 +28,5 @@ class RecordingSession(models.Model):
     2017-11-01-AM-OFF-_:
         Happended on the morning of November 1, 2017 in the office.
     """
+
+    date = models.DateTimeField(help_text="The day the session occured")

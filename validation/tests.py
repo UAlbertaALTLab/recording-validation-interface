@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from datetime import date as datetype
 
 import pytest
 from model_mommy import mommy
@@ -26,3 +27,4 @@ from validation.models import RecordingSession
 @pytest.mark.django_db
 def test_recording_session():
     session = mommy.make(RecordingSession)
+    assert isinstance(session.date, datetype)
