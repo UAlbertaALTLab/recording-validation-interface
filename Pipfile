@@ -8,6 +8,7 @@ pydub = "*"
 sh = "*"
 TextGrid = "*"
 django = "*"
+python-decouple = "*"
 
 [dev-packages]
 pytest = "*"
