@@ -99,8 +99,17 @@ def test_phrase():
     assert phrase.origin in (None, Phrase.MASKWACÎS_DICTIONARY, Phrase.NEW_WORD)
 
 
-def test_phrase_validation_nfc():
-    phrase = Recipe(Phrase, transcription='ni\N{COMBINING CIRCUMFLEX ACCENT}piy').prepare()
-    assert phrase.transcription != nfc(phrase.transcription)
+@pytest.mark.parametrize('dirty_transcription', [
+    'ni\N{COMBINING CIRCUMFLEX ACCENT}piy',
+    '  n\N{LATIN SMALL LETTER I WITH CIRCUMFLEX}piy ',
+    '  ni\N{COMBINING CIRCUMFLEX ACCENT}piy ',
+])
+def test_phrase_transcription_normalization(dirty_transcription):
+    """
+    Test that the transcription gets normalized.
+    """
+    phrase = Recipe(Phrase, transcription=dirty_transcription).prepare()
     phrase.clean()
     assert phrase.transcription == nfc(phrase.transcription)
+    assert not phrase.transcription.startswith(' ')
+    assert not phrase.transcription.endswith(' ')
