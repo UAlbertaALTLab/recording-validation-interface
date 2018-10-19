@@ -103,13 +103,18 @@ def test_phrase():
     'ni\N{COMBINING CIRCUMFLEX ACCENT}piy',
     '  n\N{LATIN SMALL LETTER I WITH CIRCUMFLEX}piy ',
     '  ni\N{COMBINING CIRCUMFLEX ACCENT}piy ',
+    ' Maskwacîs ',
 ])
 def test_phrase_transcription_normalization(dirty_transcription):
     """
-    Test that the transcription gets normalized.
+    Test that the transcription gets normalized as a Cree phrase.
     """
     phrase = Recipe(Phrase, transcription=dirty_transcription).prepare()
     phrase.clean()
     assert phrase.transcription == nfc(phrase.transcription)
+    # Should not have any leading spaces
     assert not phrase.transcription.startswith(' ')
+    # Should not have any trailing spaces
     assert not phrase.transcription.endswith(' ')
+    # SRO is ALWAYS lowercase!
+    assert phrase.transcription.lower() == phrase.transcription
