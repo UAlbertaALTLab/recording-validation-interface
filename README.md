@@ -13,7 +13,20 @@ Requires Python 3.7 and [Pipenv][].
 Consult `system-requirements.txt` for other system dependencies you may
 require (e.g., [`ffmpeg`](https://www.ffmpeg.org/)).
 
-> **TODO**: EDDIE! EXPLAIN HOW TO SET THIS UP!
+To setup:
+
+```sh
+pipenv install
+pipenv run python init.py
+```
+
+In addition, when installing for the development or testing environment,
+install the development requirements too:
+
+```sh
+pipenv install --dev
+```
+
 
 [Pipenv]: https://github.com/pypa/pipenv#installation
 
