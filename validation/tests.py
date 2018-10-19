@@ -105,6 +105,8 @@ def test_phrase():
     '  ni\N{COMBINING CIRCUMFLEX ACCENT}piy ',
     ' Maskwacîs ',
     'n\N{LATIN SMALL LETTER I WITH MACRON}piy',
+    'n\N{LATIN CAPITAL LETTER I WITH MACRON}piy',
+    'Amiskwaciy - wâskahikanihk',
 ])
 def test_phrase_transcription_normalization(dirty_transcription):
     """
@@ -127,4 +129,18 @@ def test_phrase_transcription_normalization(dirty_transcription):
         '\N{LATIN SMALL LETTER A WITH MACRON}',
     }
 
+    # Ensure macrons are nowhere to be found in the transcription.
     assert vowels_with_macrons.isdisjoint(phrase.transcription)
+
+
+@pytest.mark.parametrize('dirty_transcription, expected', [
+    ('Amiskwaciy - wâskahikanihk', 'amiskwaciy-wâskahikanihk'),
+])
+def test_phrase_transcription_normalization_hyphenation(dirty_transcription, expected):
+    """
+    Test that words in the transcriptions are separated by exactly one space,
+    and have exactly one hyphen between morphemes.
+    """
+    phrase = Recipe(Phrase, transcription=dirty_transcription).prepare()
+    phrase.clean()
+    assert phrase.transcription == expected
