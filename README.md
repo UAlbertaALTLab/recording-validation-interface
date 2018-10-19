@@ -1,6 +1,8 @@
 Maskwacîs recordings validation
 ===============================
 
+[![Build Status](https://travis-ci.org/UAlbertaALTLab/recording-validation-interface.svg?branch=master)](https://travis-ci.org/UAlbertaALTLab/recording-validation-interface)
+
 A web app for viewing and validating recordings done in Maskwacîs.
 
 
