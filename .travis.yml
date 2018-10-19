@@ -6,5 +6,9 @@ install:
  - pip install pipenv
  - pipenv install --dev
  - pipenv run python init.py
+addons:
+  apt:
+    packages:
+     - ffmpeg
 script:
  - pipenv run py.test
