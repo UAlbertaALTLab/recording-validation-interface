@@ -135,6 +135,7 @@ def test_phrase_transcription_normalization(dirty_transcription):
 
 @pytest.mark.parametrize('dirty_transcription, expected', [
     ('Amiskwaciy - wâskahikanihk', 'amiskwaciy-wâskahikanihk'),
+    (' namôya \n\tninisitohtên  ', 'namôya ninisitohtên'),
 ])
 def test_phrase_transcription_normalization_hyphenation(dirty_transcription, expected):
     """
