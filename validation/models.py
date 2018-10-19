@@ -99,6 +99,7 @@ class Phrase(models.Model):
         # TODO: strict_sro boolean flag?
         self.transcription = normalize(self.transcription).\
             lower().\
+            replace('e', 'ê').\
             translate(self.MACRON_TO_CIRCUMFLEX)
 
         # Ensure hyphens are consistently exactly one hyphen-minus character.
