@@ -103,6 +103,8 @@ class Phrase(models.Model):
 
         # Ensure hyphens are consistently exactly one hyphen-minus character.
         self.transcription = re.sub(r'\s+-\s+', '-', self.transcription)
+        # Ensure there are exactly single spaces between words
+        self.transcription = re.sub(r'\s+', ' ', self.transcription)
 
         assert self.ALLOWED_TRANSCRIPTION_CHARACTERS.issuperset(self.transcription)
 
