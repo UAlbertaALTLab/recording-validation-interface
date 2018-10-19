@@ -104,6 +104,7 @@ def test_phrase():
     '  n\N{LATIN SMALL LETTER I WITH CIRCUMFLEX}piy ',
     '  ni\N{COMBINING CIRCUMFLEX ACCENT}piy ',
     ' Maskwacîs ',
+    'n\N{LATIN SMALL LETTER I WITH MACRON}piy',
 ])
 def test_phrase_transcription_normalization(dirty_transcription):
     """
@@ -118,3 +119,12 @@ def test_phrase_transcription_normalization(dirty_transcription):
     assert not phrase.transcription.endswith(' ')
     # SRO is ALWAYS lowercase!
     assert phrase.transcription.lower() == phrase.transcription
+
+    vowels_with_macrons = {
+        '\N{LATIN SMALL LETTER E WITH MACRON}',
+        '\N{LATIN SMALL LETTER I WITH MACRON}',
+        '\N{LATIN SMALL LETTER O WITH MACRON}',
+        '\N{LATIN SMALL LETTER A WITH MACRON}',
+    }
+
+    assert vowels_with_macrons.isdisjoint(phrase.transcription)
