@@ -145,3 +145,12 @@ def test_phrase_transcription_normalization_hyphenation(dirty_transcription, exp
     phrase = Recipe(Phrase, transcription=dirty_transcription).prepare()
     phrase.clean()
     assert phrase.transcription == expected
+
+
+def test_phrase_transcription_normalize_ê():
+    """
+    Tests that e gets converted to ê.
+    """
+    phrase = Recipe(Phrase, transcription='e-cacâstapiwet').prepare()
+    phrase.clean()
+    assert phrase.transcription == 'ê-cacâstapiwêt'
