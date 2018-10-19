@@ -25,6 +25,7 @@ from hypothesis.strategies import builds
 from model_mommy import mommy
 from model_mommy.recipe import Recipe
 
+from librecval.normalization import nfc
 from librecval.recording_session import Location, SessionID, TimeOfDay
 from validation.models import Phrase, RecordingSession, Speaker
 
@@ -96,3 +97,10 @@ def test_phrase():
     assert isinstance(phrase.validated, bool)
     assert phrase.transcription in str(phrase)
     assert phrase.origin in (None, Phrase.MASKWACÎS_DICTIONARY, Phrase.NEW_WORD)
+
+
+def test_phrase_validation_nfc():
+    phrase = Recipe(Phrase, transcription='ni\N{COMBINING CIRCUMFLEX ACCENT}piy').prepare()
+    assert phrase.transcription != nfc(phrase.transcription)
+    phrase.clean()
+    assert phrase.transcription == nfc(phrase.transcription)

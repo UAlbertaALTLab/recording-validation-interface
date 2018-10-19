@@ -20,6 +20,10 @@ import re
 import unicodedata
 
 
+def nfc(utterance: str) -> str:
+    return unicodedata.normalize('NFC', utterance)
+
+
 def normalize(utterance: str) -> str:
     r"""
     Normalizes utterances (translations, transcriptions, etc.)
