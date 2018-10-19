@@ -86,7 +86,7 @@ class Phrase(models.Model):
 
     # The only characters allowed in the transcription are the Cree SRO
     # alphabet (in circumflexes), and some selected punctuation.
-    ALLOWED_TRANSCRIPTION_CHARACTERS = set('ptkcsmnywh rl êiîoôaâ ()')
+    ALLOWED_TRANSCRIPTION_CHARACTERS = set('ptkcshmn yw rl êiîoôaâ -')
 
     # A translation table to convert macrons to cicumflexes in lowercase, NFC
     # strings.
@@ -100,6 +100,10 @@ class Phrase(models.Model):
         self.transcription = normalize(self.transcription).\
             lower().\
             translate(self.MACRON_TO_CIRCUMFLEX)
+
+        # Ensure hyphens are consistently exactly one hyphen-minus character.
+        self.transcription = re.sub(r'\s+-\s+', '-', self.transcription)
+
         assert self.ALLOWED_TRANSCRIPTION_CHARACTERS.issuperset(self.transcription)
 
     def __str__(self) -> str:
