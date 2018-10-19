@@ -95,3 +95,4 @@ def test_phrase():
     assert phrase.kind in (Phrase.WORD, Phrase.SENTENCE)
     assert isinstance(phrase.validated, bool)
     assert phrase.transcription in str(phrase)
+    assert phrase.origin in (None, Phrase.MASKWACÎS_DICTIONARY, Phrase.NEW_WORD)

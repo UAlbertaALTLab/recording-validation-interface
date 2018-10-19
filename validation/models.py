@@ -50,6 +50,13 @@ class Phrase(models.Model):
         (SENTENCE, 'Sentence'),
     )
 
+    MASKWACÎS_DICTIONARY = 'MD'
+    NEW_WORD = 'new'
+    ORIGIN_CHOICES = (
+        (MASKWACÎS_DICTIONARY, 'Maskwacîs Dictionary'),
+        (NEW_WORD, 'New word'),
+    )
+
     transcription = models.CharField(help_text="The transciption of the Cree phrase.",
                                      blank=False,
                                      max_length=256)
@@ -62,6 +69,11 @@ class Phrase(models.Model):
                             max_length=len('sentence'))
     validated = models.BooleanField(help_text="Has this phrase be validated?",
                                     default=False)
+    # TODO: generate this automatically:
+    origin = models.CharField(help_text="How did we get this phrase?",
+                              null=True, default=None,
+                              choices=ORIGIN_CHOICES,
+                              max_length=len('new'))
 
     # TODO: lots of clean()ing!
 
