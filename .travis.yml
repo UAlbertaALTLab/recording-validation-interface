@@ -8,6 +8,8 @@ install:
  - pipenv run python init.py
 addons:
   apt:
+    sources:
+      - trusty-media
     packages:
      - ffmpeg
 script:
