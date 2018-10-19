@@ -84,13 +84,16 @@ class Phrase(models.Model):
                               null=True, default=NEW_WORD,
                               **arguments_for_choices(ORIGIN_CHOICES))
 
+    ALLOWED_TRANSCRIPTION_CHARACTERS = set('ptkcsmnywh rl êiîoôaâ ()')
+
     def clean(self):
         """
         Cleans the text fields.
 
         TODO: It can also check if the transcription is valid Cree.
         """
-        self.transcription = normalize(self.transcription)
+        self.transcription = normalize(self.transcription).lower()
+        assert all(c in self.ALLOWED_TRANSCRIPTION_CHARACTERS for c in self.transcription)
 
     def __str__(self) -> str:
         return self.transcription
