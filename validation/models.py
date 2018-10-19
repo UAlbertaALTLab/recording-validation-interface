@@ -37,6 +37,15 @@ def choices_from_enum(enum_class):
     return dict(max_length=max_length, choices=choices)
 
 
+def arguments_for_choices(choices):
+    """
+    Given a sequence of choices, generates the appropriate keyword arguments
+    for a CharField.
+    """
+    return dict(choices=choices,
+                max_length=max(len(choice[0]) for choice in choices))
+
+
 class Phrase(models.Model):
     """
     A recorded phrase. A phrase may either be a word or a sentence with at
@@ -65,18 +74,15 @@ class Phrase(models.Model):
                                    blank=False,
                                    max_length=256)
     kind = models.CharField(help_text="Is this phrase a word or a sentence?",
-                            choices=KIND_CHOICES,
                             blank=False,
-                            max_length=len('sentence'))
+                            **arguments_for_choices(KIND_CHOICES))
     validated = models.BooleanField(help_text="Has this phrase be validated?",
                                     default=False)
-    # TODO: generate these fields automatically:
-    origin = models.CharField(help_text="How did we get this phrase?",
-                              null=True, default=NEW_WORD,
-                              choices=ORIGIN_CHOICES,
-                              max_length=len('new'))
     # TODO: during the import process, try to determine automatically whether
     # the word came from the Maswkacîs dictionary.
+    origin = models.CharField(help_text="How did we get this phrase?",
+                              null=True, default=NEW_WORD,
+                              **arguments_for_choices(ORIGIN_CHOICES))
 
     def clean(self):
         """
