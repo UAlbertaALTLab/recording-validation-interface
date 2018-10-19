@@ -84,16 +84,23 @@ class Phrase(models.Model):
                               null=True, default=NEW_WORD,
                               **arguments_for_choices(ORIGIN_CHOICES))
 
+    # The only characters allowed in the transcription are the Cree SRO
+    # alphabet (in circumflexes), and some selected punctuation.
     ALLOWED_TRANSCRIPTION_CHARACTERS = set('ptkcsmnywh rl êiîoôaâ ()')
+
+    # A translation table to convert macrons to cicumflexes in lowercase, NFC
+    # strings.
+    MACRON_TO_CIRCUMFLEX = str.maketrans('ēīōā', 'êîôâ')
 
     def clean(self):
         """
         Cleans the text fields.
-
-        TODO: It can also check if the transcription is valid Cree.
         """
-        self.transcription = normalize(self.transcription).lower()
-        assert all(c in self.ALLOWED_TRANSCRIPTION_CHARACTERS for c in self.transcription)
+        # TODO: strict_sro boolean flag?
+        self.transcription = normalize(self.transcription).\
+            lower().\
+            translate(self.MACRON_TO_CIRCUMFLEX)
+        assert self.ALLOWED_TRANSCRIPTION_CHARACTERS.issuperset(self.transcription)
 
     def __str__(self) -> str:
         return self.transcription
