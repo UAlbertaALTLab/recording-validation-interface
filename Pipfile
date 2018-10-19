@@ -9,6 +9,7 @@ sh = "*"
 TextGrid = "*"
 django = "*"
 python-decouple = "*"
+django-simple-history = "*"
 
 [dev-packages]
 pytest = "*"
