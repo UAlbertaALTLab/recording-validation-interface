@@ -69,11 +69,13 @@ class Phrase(models.Model):
                             max_length=len('sentence'))
     validated = models.BooleanField(help_text="Has this phrase be validated?",
                                     default=False)
-    # TODO: generate this automatically:
+    # TODO: generate these fields automatically:
     origin = models.CharField(help_text="How did we get this phrase?",
-                              null=True, default=None,
+                              null=True, default=NEW_WORD,
                               choices=ORIGIN_CHOICES,
                               max_length=len('new'))
+    # TODO: during the import process, try to determine automatically whether
+    # the word came from the Maswkacîs dictionary.
 
     # TODO: lots of clean()ing!
 
