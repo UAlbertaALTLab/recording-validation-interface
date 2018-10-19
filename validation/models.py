@@ -22,6 +22,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from librecval.normalization import normalize
 from librecval.recording_session import Location, SessionID, TimeOfDay
 
 
@@ -77,7 +78,13 @@ class Phrase(models.Model):
     # TODO: during the import process, try to determine automatically whether
     # the word came from the Maswkacîs dictionary.
 
-    # TODO: lots of clean()ing!
+    def clean(self):
+        """
+        Cleans the text fields.
+
+        TODO: It can also check if the transcription is valid Cree.
+        """
+        self.transcription = normalize(self.transcription)
 
     def __str__(self) -> str:
         return self.transcription
