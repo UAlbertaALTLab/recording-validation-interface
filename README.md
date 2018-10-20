@@ -3,8 +3,7 @@ Maskwacîs recordings validation
 
 [![Build Status](https://travis-ci.org/UAlbertaALTLab/recording-validation-interface.svg?branch=master)](https://travis-ci.org/UAlbertaALTLab/recording-validation-interface)
 
-A web app for viewing and validating recordings done in Maskwacîs.
-
+A Django web app for viewing and validating Cree recordings done in Maskwacîs.
 
 
 Install
@@ -15,18 +14,16 @@ Requires Python 3.7 and [Pipenv][].
 Consult `system-requirements.txt` for other system dependencies you may
 require (e.g., [`ffmpeg`](https://www.ffmpeg.org/)).
 
-To setup:
+To install dependencies (for production):
 
 ```sh
-pipenv install
-pipenv run python init.py
+make install
 ```
 
-In addition, when installing for the development or testing environment,
-install the development requirements too:
+To install dependencies (for development/testing):
 
 ```sh
-pipenv install --dev
+make install-dev
 ```
 
 
@@ -87,11 +84,24 @@ Running
 
 > **TODO**: new instructions
 
+    pipenv run python manage.py runserver
 
 Testing
 -------
 
-> **TODO**: What are the new instructions?
+To run the tests, type:
+
+```
+make test
+```
+
+This will run the [mypy][] static type checker, and then [pytest][].
+
+[mypy]: http://mypy-lang.org/
+[pytest]: https://docs.pytest.org/en/latest/
+
+To edit the tests for `librecval`, see `tests/`. For Django tests, look
+inside the `validation/tests` directory.
 
 
 Frequently Asked Questions
