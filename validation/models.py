@@ -21,6 +21,7 @@ import re
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from simple_history.models import HistoricalRecords
 
 from librecval.normalization import normalize
 from librecval.recording_session import Location, SessionID, TimeOfDay
@@ -84,6 +85,9 @@ class Phrase(models.Model):
                               null=True, default=NEW_WORD,
                               **arguments_for_choices(ORIGIN_CHOICES))
 
+    # Keep track of Phrases' history, so we can review, revert, and inspect them.
+    history = HistoricalRecords()
+
     # The only characters allowed in the transcription are the Cree SRO
     # alphabet (in circumflexes), and some selected punctuation.
     ALLOWED_TRANSCRIPTION_CHARACTERS = set('ptkcshmn yw rl êiîoôaâ -')
@@ -146,6 +150,9 @@ class Speaker(models.Model):
         if not re.match(r'\A[A-Z]+[0-9]?\Z', self.code):
             raise ValidationError(_('Speaker code must be a single all-caps word, '
                                     'optionally followed by a digit'))
+
+    def __str__(self):
+        return self.code
 
 
 class RecordingSession(models.Model):

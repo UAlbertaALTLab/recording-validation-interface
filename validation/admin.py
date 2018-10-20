@@ -14,10 +14,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from django.contrib import admin
+from simple_history.admin import SimpleHistoryAdmin
 
 from .models import Phrase, RecordingSession, Speaker
 
 
-admin.site.register(Phrase)  # TODO: use simple history
+admin.site.register(Phrase, SimpleHistoryAdmin)
 admin.site.register(RecordingSession)
 admin.site.register(Speaker)  # TODO: use simplehistory

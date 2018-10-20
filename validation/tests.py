@@ -74,6 +74,7 @@ def test_speaker():
     assert speaker.code.upper() == speaker.code
     assert isinstance(speaker.full_name, str)
     assert speaker.gender in ('M', 'F', None)
+    assert speaker.code in str(speaker)
 
 
 def test_speaker_validation():
@@ -161,13 +162,11 @@ def test_phrase_has_history():
     """
     Test that we can insert an entry in the database, and that it has history.
     """
-    original = 'ecastapiwet'
     changed = 'ê-cacâstapiwêt'
-    phrase = Recipe(Phrase, transcription=original).prepare()
-    phrase.clean()
 
     # Store a phrase in the database and forget about it.
-    assert Phrase._meta.fields[0].name == 'id' and Phrase._meta.fields[0].primary_key
+    original = 'ecastapiwet'
+    phrase = Recipe(Phrase, transcription=original).prepare()
     # Do NOT call clean, in order to simulate an initial import.
     phrase.save()
     phrase_id = phrase.id
