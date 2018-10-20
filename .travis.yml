@@ -2,14 +2,16 @@ sudo: false
 language: python
 python:
  - '3.7-dev'
-install:
- - pip install pipenv
- - make install-test
+env:
+  - PIPENV_IGNORE_VIRTUALENVS=0
 addons:
   apt:
     sources:
       - trusty-media
     packages:
      - ffmpeg
+install:
+ - pip install pipenv
+ - make install-test
 script:
  - make test
