@@ -154,3 +154,38 @@ def test_phrase_transcription_normalize_ê():
     phrase = Recipe(Phrase, transcription='e-cacâstapiwet').prepare()
     phrase.clean()
     assert phrase.transcription == 'ê-cacâstapiwêt'
+
+
+@pytest.mark.django_db
+def test_phrase_has_history():
+    """
+    Test that we can insert an entry in the database, and that it has history.
+    """
+    original = 'ecastapiwet'
+    changed = 'ê-cacâstapiwêt'
+    phrase = Recipe(Phrase, transcription=original).prepare()
+    phrase.clean()
+
+    # Store a phrase in the database and forget about it.
+    assert Phrase._meta.fields[0].name == 'id' and Phrase._meta.fields[0].primary_key
+    # Do NOT call clean, in order to simulate an initial import.
+    phrase.save()
+    phrase_id = phrase.id
+    del phrase
+
+    # Fetch it and change it, to create a new historical version of it.
+    # and fuggettaboutit.
+    phrase = Phrase.objects.get(id=phrase_id)
+    phrase.transcription = changed
+    phrase.clean()
+    phrase.save()
+    del phrase
+
+    # Time has passed, let's make sure all the historical changes are there:
+    phrase = Phrase.objects.get(id=phrase_id)
+    assert phrase.transcription != original
+    assert phrase.transcription == changed
+
+    # Now, let's check the history!
+    assert len(phrase.history.all()) == 2
+    assert phrase.history.earliest().transcription == original
