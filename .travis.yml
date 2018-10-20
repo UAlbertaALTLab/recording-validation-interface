@@ -4,8 +4,7 @@ python:
  - '3.7-dev'
 install:
  - pip install pipenv
- - pipenv install --dev
- - pipenv run python init.py
+ - make install-test
 addons:
   apt:
     sources:
@@ -13,4 +12,4 @@ addons:
     packages:
      - ffmpeg
 script:
- - pipenv run py.test
+ - make test
