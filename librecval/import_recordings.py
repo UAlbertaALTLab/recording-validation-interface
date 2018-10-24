@@ -41,7 +41,7 @@ ImportRecording = Callable[[RecordingInfo, str, Path], None]
 def initialize(
         directory: Path,
         transcoded_recordings_path: str,
-        repository_root: Path,
+        metadata_filename: Path,
         import_recording: ImportRecording,
         ) -> None:
     """
@@ -49,7 +49,6 @@ def initialize(
     """
 
     dest = Path(transcoded_recordings_path)
-    metadata_filename = repository_root / 'etc' / 'metadata.csv'
 
     assert directory.resolve().is_dir()
     assert dest.resolve().is_dir()
