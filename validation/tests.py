@@ -27,7 +27,7 @@ from model_mommy.recipe import Recipe
 
 from librecval.normalization import nfc
 from librecval.recording_session import Location, SessionID, TimeOfDay
-from validation.models import Phrase, RecordingSession, Speaker
+from validation.models import Phrase, RecordingSession, Speaker, Recording
 
 
 def test_recording_session():
@@ -188,3 +188,15 @@ def test_phrase_has_history():
     # Now, let's check the history!
     assert len(phrase.history.all()) == 2
     assert phrase.history.earliest().transcription == original
+
+
+@pytest.mark.django_db
+def test_recording():
+    recording = mommy.prepare(Recording)
+    # Check all the fields.
+    assert isinstance(recording.speaker, str)
+    assert recording.quality in {Recording.CLEAN, Recording.UNUSABLE, None}
+    assert isinstance(recording.timestamp, (float, int))
+    assert isinstance(recording.phrase, Phrase)
+    assert isinstance(recording.session, RecordingSession)
+    assert isinstance(recording.speaker, Speaker)
