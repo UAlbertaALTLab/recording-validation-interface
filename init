@@ -24,11 +24,14 @@ Options:
 
 import os
 import sys
+import shutil
 from enum import Enum
 from pathlib import Path
 from secrets import token_urlsafe
 
 from docopt import docopt  # type: ignore
+
+from librecval.download_metadata import download_metadata
 
 
 root = Path(__file__).parent
@@ -73,10 +76,24 @@ else:
     print("Assuming", environment, "environment")
     print("Please specify one of --dev, --testing, or --production if this is not the case")
 
+# Figure out if the user has the gdrive executable installed.
+has_gdrive = shutil.which('gdrive') is not None
+
+# Download the metadata (but not on testing!)
+if environment == TESTING:
+    print("Not downloading metadata for tests")
+elif has_gdrive and environment in (DEVELOPMENT, PRODUCTION):
+    print("Using gdrive to download latest metadata...")
+    download_metadata()
+elif not has_gdrive:
+    print("gdrive is not installed.")
+    print("You must manually download the metadata from Google Drive")
+    print("Save the downloaded .csv file as etc/metadata.csv")
+
 
 def get_debug() -> bool:
     """
-    Determine whether debug should be set, depending on flags and enviroment.
+    Determine whether debug should be set, depending on flags and environment.
     """
     if options['--debug'] and environment == PRODUCTION:
         print("Setting debug in production is a REALLY bad idea!")
