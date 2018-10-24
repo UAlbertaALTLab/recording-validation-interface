@@ -194,8 +194,11 @@ def test_phrase_has_history():
 def test_recording():
     recording = mommy.prepare(Recording)
     # Check all the fields.
-    assert recording.quality in {Recording.CLEAN, Recording.UNUSABLE, None}
+    assert recording.quality in {Recording.CLEAN, Recording.UNUSABLE, ''}
+    assert isinstance(recording.timestamp, datetime)
     assert isinstance(recording.timestamp, datetime)
     assert isinstance(recording.phrase, Phrase)
     assert isinstance(recording.session, RecordingSession)
     assert isinstance(recording.speaker, Speaker)
+
+    assert hasattr(recording, 'history')
