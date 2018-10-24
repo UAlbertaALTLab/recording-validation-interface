@@ -50,9 +50,9 @@ def initialize(
 
     dest = Path(transcoded_recordings_path)
 
-    assert directory.resolve().is_dir()
-    assert dest.resolve().is_dir()
-    assert metadata_filename.resolve().is_file()
+    assert directory.resolve().is_dir(), directory
+    assert dest.resolve().is_dir(), dest
+    assert metadata_filename.resolve().is_file(), metadata_filename
 
     with open(metadata_filename) as metadata_csv:
         metadata = parse_metadata(metadata_csv)
