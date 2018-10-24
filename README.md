@@ -14,32 +14,48 @@ Requires Python 3.7 and [Pipenv][].
 Consult `system-requirements.txt` for other system dependencies you may
 require (e.g., [`ffmpeg`](https://www.ffmpeg.org/)).
 
-To install dependencies (for production):
+You may also want to install and initialize [gdrive][] before
+continuing.
 
-```sh
-make install
-```
+[Pipenv]: https://github.com/pypa/pipenv#installation
+[gdrive]: https://github.com/prasmussen/gdrive
 
-To install dependencies (for development/testing):
+
+### Development environment
+
+To install dependencies and setup for development (e.g., your laptop):
 
 ```sh
 make install-dev
 ```
 
 
-[Pipenv]: https://github.com/pypa/pipenv#installation
+### Production
+
+To install dependencies and setup for production (e.g., on the server):
+
+```sh
+make install-prod
+```
+
+
+### Testing
+
+To install dependencies and setup for testing (e.g., on Travis-CI):
+
+```sh
+make install-prod
+```
 
 
 ### Creating the database for the first time
+
+> **WARNING**: This section may be out of date!
 
 Before you import any data, you need the "Master Recording MetaData"
 (sic) spreadsheet, available on Google Drive. Either export this
 manually as a CSV file to `./etc/metadata.csv`, or, using the [gdrive][]
 command, run the following script to download it automatically:
-
-> **TODO**: WHAT'S THE NEW SCRIPT?
-
-> **TODO**: HOW DO WE INIT EVERYTHING?
 
 `/path/to/sessions/` should be a directory filled with directories (or
 symbolic links to directories) with filenames in the form of:
@@ -71,20 +87,32 @@ So, in order to create the database on Sapir, I type the following:
 
 > **TODO** WHAT ARE THE IMPORTING COMMANDS?
 
+### Creating a superuser (admin)
 
-[gdrive]: https://github.com/prasmussen/gdrive
+To access the admin panel, you'll need at least one admin user. To
+create one, run the following command and follow the prompts:
 
+```sh
+pipenv run python manage.py createsuperuser
+```
 
-> **TODO**: create superuser
+For more info, see Django's documentation on [createsuperuser][].
 
+[createsuperuser]: https://docs.djangoproject.com/en/2.1/ref/django-admin/#createsuperuser
 
 
 Running
 -------
 
-> **TODO**: new instructions
+To run a development server, use the following.
 
-    pipenv run python manage.py runserver
+```sh
+pipenv run python manage.py runserver
+```
+
+The main site should be available at <http://localhost:8000/>. The admin
+interface should be available at <http://localhost:8000/admin>.
+
 
 Testing
 -------
