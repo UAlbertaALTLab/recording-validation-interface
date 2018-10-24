@@ -30,7 +30,7 @@ MASTER_RECORDINGS_METADATA = '1SlJRJRUiwXibAxFC0uY2sFXFb4IukGjs7Rg_G1vp_y8'
 REMOTE_FILENAME = "Master Recordings MetaData"
 
 
-def download_metadata() -> None:
+def download_metadata(destination: Path = REPOSITORY_ROOT / 'private' / 'metadata.csv') -> None:
     """
     Downloads the "Master Recordings MetaData" file from Google Drive, as a
     CSV file.
@@ -39,8 +39,6 @@ def download_metadata() -> None:
     """
 
     from sh import gdrive  # type: ignore
-    # TODO: do not hard code this!
-    destination = REPOSITORY_ROOT / 'private' / 'metadata.csv'
     assert destination.parent.is_dir()
 
     # Annoyingly, gdrive's "export" command does not allow you to specify an
