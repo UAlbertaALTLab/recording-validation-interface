@@ -206,7 +206,6 @@ def test_recording():
     assert hasattr(recording, 'history')
 
     # Check its __str__() method.
-    assert str(recording.id) in str(recording)
     assert str(recording.phrase) in str(recording)
     assert str(recording.speaker) in str(recording)
     assert str(recording.session) in str(recording)

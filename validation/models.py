@@ -202,6 +202,10 @@ class RecordingSession(models.Model):
         return str(self.as_session_id())
 
 
+# The length of a SHA 256 hash, as hexadecimal characters.
+SHA256_HEX_LENGTH = len("7ae712853ddbd7cc88597cfd3f1ac13e60ae81d9642677abc60f15b61c121afe")
+
+
 class Recording(models.Model):
     """
     A recording of a phrase.
@@ -214,6 +218,7 @@ class Recording(models.Model):
         (UNUSABLE, _('Unusable')),
     )
 
+    id = models.CharField(primary_key=True, max_length=SHA256_HEX_LENGTH)
     speaker = models.ForeignKey(Speaker, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(help_text="The time at which this recording starts")
     phrase = models.ForeignKey(Phrase, on_delete=models.CASCADE)
@@ -224,3 +229,6 @@ class Recording(models.Model):
 
     # Keep track of the recording's history.
     history = HistoricalRecords()
+
+    def __str__(self):
+        return f'"{self.phrase}" recorded by {self.speaker} during {self.session}'
