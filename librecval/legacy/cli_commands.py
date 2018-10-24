@@ -20,44 +20,11 @@
 Old CLI commands that should be ported to the new framework.
 """
 
-import shutil
 import click
 from pathlib import Path
 
-from librecval.utils import cd
-from librecval import REPOSITORY_ROOT
 
-MASTER_RECORDINGS_METADATA = '1SlJRJRUiwXibAxFC0uY2sFXFb4IukGjs7Rg_G1vp_y8'
-REMOTE_FILENAME = "Master Recordings MetaData"
-
-
-def download() -> None:
-    """
-    Downloads the "Master Recordings MetaData" file from Google Drive, as a
-    CSV file.
-
-    This will be downloaded to $REPOSITORY_ROOT/etc/
-    """
-
-    from sh import gdrive  # type: ignore
-    destination = REPOSITORY_ROOT / 'etc' / 'metadata.csv'
-    assert destination.parent.is_dir()
-
-    # Annoyingly, gdrive's "export" command does not allow you to specify an
-    # output path, so it will create the file with the **REMOTE FILENAME**.
-    # So! Export the file to a temporary directory first, then move it to
-    # where we want it to go.
-    tmpdir = Path('/tmp/')
-    with cd(tmpdir):
-        gdrive.export("--force", "--mime", "text/csv",
-                      MASTER_RECORDINGS_METADATA,
-                      _fg=True)
-        exported_csv = (tmpdir / REMOTE_FILENAME).with_suffix('.csv')
-        assert exported_csv.exists()
-        shutil.copy(exported_csv, destination)
-
-
-def delete_audio(audio_dir: Path):
+def delete_audio(audio_dir: Path) -> None:
     """
     Deletes all of the audio in the given audio directory.
 
