@@ -48,4 +48,4 @@ def django_recording_importer(info: RecordingInfo, rec_id: str, recording_path: 
     """
     Imports a single recording.
     """
-    logger.info(info)
+    logger.debug(info)

@@ -25,6 +25,9 @@ from pathlib import Path
 from typing import (Any, AnyStr, Callable, Dict, List, Match, NamedTuple,
                     Optional, TextIO, TypeVar)
 
+import logme  # type: ignore
+
+
 T = TypeVar('T')
 
 # This a strict pattern, that differs from the one in etc/;
@@ -257,7 +260,8 @@ class SessionMetadata:
         return cls(session=session, raw_name=raw_name, mics=mics)
 
 
-def parse_metadata(metadata_file: TextIO) -> Dict[SessionID, SessionMetadata]:
+@logme.log
+def parse_metadata(metadata_file: TextIO, logger) -> Dict[SessionID, SessionMetadata]:
     """
     Given an opened CSV file, returns a dictionary mapping a session
     identifier to its metadata (e.g., speaker codes, elicitation sheets,
@@ -272,7 +276,8 @@ def parse_metadata(metadata_file: TextIO) -> Dict[SessionID, SessionMetadata]:
         try:
             s = SessionMetadata.parse(row)
         except SessionParseError:
-            print("could not parse: ", row)
+            logger.exception("Could not parse: %s", row)
+            # We'll just skip this...
         else:
             sessions[s.session] = s
     return sessions

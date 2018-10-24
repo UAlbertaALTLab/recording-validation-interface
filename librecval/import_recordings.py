@@ -21,9 +21,10 @@
 Temporary place for database creation glue code.
 """
 
-import logging
 from pathlib import Path
 from typing import Callable
+
+import logme  # type: ignore
 
 from librecval.extract_phrases import RecordingExtractor, RecordingInfo
 from librecval.recording_session import parse_metadata
@@ -38,11 +39,13 @@ ImportRecording = Callable[[RecordingInfo, str, Path], None]
 # ⚠️  2016-03-06AM-OFF - could not find mettadata
 
 
+@logme.log
 def initialize(
         directory: Path,
         transcoded_recordings_path: str,
         metadata_filename: Path,
         import_recording: ImportRecording,
+        logger
         ) -> None:
     """
     Creates the database from scratch.
@@ -59,7 +62,6 @@ def initialize(
 
     # Insert each thing found.
     # TODO: use click.progressbar()?
-    logging.basicConfig(level=logging.INFO)
     ex = RecordingExtractor(metadata)
     for info, audio in ex.scan(root_directory=directory):
         rec_id = info.compute_sha256hash()
