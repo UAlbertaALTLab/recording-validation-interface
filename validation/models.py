@@ -200,3 +200,23 @@ class RecordingSession(models.Model):
 
     def __str__(self):
         return str(self.as_session_id())
+
+
+class Recording(models.Model):
+    """
+    A recording of a phrase.
+    """
+
+    CLEAN = 'clean'
+    UNUSABLE = 'unusable'
+    QUALITY_CHOICES = (
+        (CLEAN, _('Clean')),
+        (UNUSABLE, _('Unusable')),
+    )
+
+    speaker = models.ForeignKey(Speaker, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(help_text="The time at which this recording starts")
+    phrase = models.ForeignKey(Phrase, on_delete=models.CASCADE)
+    session = models.ForeignKey(RecordingSession, on_delete=models.CASCADE)
+    quality = models.CharField(help_text="Is the recording clean and usable publically?",
+                               **arguments_for_choices(QUALITY_CHOICES))

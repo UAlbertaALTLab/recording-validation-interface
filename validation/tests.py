@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from datetime import date as datetype
+from datetime import datetime, date as datetype
 
 import pytest
 from django.core.exceptions import ValidationError
@@ -194,9 +194,8 @@ def test_phrase_has_history():
 def test_recording():
     recording = mommy.prepare(Recording)
     # Check all the fields.
-    assert isinstance(recording.speaker, str)
     assert recording.quality in {Recording.CLEAN, Recording.UNUSABLE, None}
-    assert isinstance(recording.timestamp, (float, int))
+    assert isinstance(recording.timestamp, datetime)
     assert isinstance(recording.phrase, Phrase)
     assert isinstance(recording.session, RecordingSession)
     assert isinstance(recording.speaker, Speaker)
