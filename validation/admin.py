@@ -22,4 +22,4 @@ from .models import Phrase, RecordingSession, Speaker, Recording
 admin.site.register(Phrase, SimpleHistoryAdmin)
 admin.site.register(RecordingSession)
 admin.site.register(Speaker)  # TODO: use simplehistory
-admin.site.register(Recording)  # TODO: use simplehistory
+admin.site.register(Recording, SimpleHistoryAdmin)

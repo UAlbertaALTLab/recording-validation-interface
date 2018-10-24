@@ -218,5 +218,9 @@ class Recording(models.Model):
     timestamp = models.DateTimeField(help_text="The time at which this recording starts")
     phrase = models.ForeignKey(Phrase, on_delete=models.CASCADE)
     session = models.ForeignKey(RecordingSession, on_delete=models.CASCADE)
-    quality = models.CharField(help_text="Is the recording clean and usable publically?",
-                               **arguments_for_choices(QUALITY_CHOICES))
+    quality = models.CharField(help_text="Is the recording clean? Is it suitable to use publically?",
+                               **arguments_for_choices(QUALITY_CHOICES),
+                               blank=True)
+
+    # Keep track of the recording's history.
+    history = HistoricalRecords()
