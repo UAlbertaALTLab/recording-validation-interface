@@ -88,7 +88,7 @@ elif has_gdrive and environment in (DEVELOPMENT, PRODUCTION):
 elif not has_gdrive:
     print("gdrive is not installed.")
     print("You must manually download the metadata from Google Drive")
-    print("Save the downloaded .csv file as etc/metadata.csv")
+    print("Save the downloaded .csv file as private/metadata.csv")
 
 
 def get_debug() -> bool:

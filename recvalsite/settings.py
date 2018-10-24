@@ -136,7 +136,7 @@ STATIC_URL = '/static/'
 RECVAL_AUDIO_DIR = config('RECVAL_AUDIO_DIR', BASE_DIR / 'static' / 'audio', cast=Path)
 
 # Where to find the metadata file.
-RECVAL_METADATA_PATH = config('RECVAL_AUDIO_DIR', BASE_DIR / 'etc' / 'metadata.csv', cast=Path)
+RECVAL_METADATA_PATH = config('RECVAL_AUDIO_DIR', BASE_DIR / 'private' / 'metadata.csv', cast=Path)
 
 # Where the sessions should be extracted from.
 # Expecting a structure like this:

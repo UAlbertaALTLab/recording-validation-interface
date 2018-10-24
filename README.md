@@ -54,7 +54,7 @@ make install-prod
 
 Before you import any data, you need the "Master Recording MetaData"
 (sic) spreadsheet, available on Google Drive. Either export this
-manually as a CSV file to `./etc/metadata.csv`, or, using the [gdrive][]
+manually as a CSV file to `./private/metadata.csv`, or, using the [gdrive][]
 command, run the following script to download it automatically:
 
 `/path/to/sessions/` should be a directory filled with directories (or

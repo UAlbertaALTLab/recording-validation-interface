@@ -35,11 +35,12 @@ def download_metadata() -> None:
     Downloads the "Master Recordings MetaData" file from Google Drive, as a
     CSV file.
 
-    This will be downloaded to $REPOSITORY_ROOT/etc/
+    This will be downloaded to $REPOSITORY_ROOT/private/ by default.
     """
 
     from sh import gdrive  # type: ignore
-    destination = REPOSITORY_ROOT / 'etc' / 'metadata.csv'
+    # TODO: do not hard code this!
+    destination = REPOSITORY_ROOT / 'private' / 'metadata.csv'
     assert destination.parent.is_dir()
 
     # Annoyingly, gdrive's "export" command does not allow you to specify an
