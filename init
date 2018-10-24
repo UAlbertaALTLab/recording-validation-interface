@@ -1,19 +1,117 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
+"""Inititalize the recording-validation Django site.
+
+Usage:
+  init [--prod | --testing | --dev] [--force] [--debug | --no-debug] [--settings FILE]
+  init (-h | --help)
+
+Options:
+    --debug      set DEBUG=True
+    --dev        initialize for developement enviornment
+    --force      overwrite .env if it already exists
+    --no-debug   set DEGUB=False
+    --production initialize for production enviornment
+    --testing    initialize for testing enviornment
+    -h --help    show this help screen
+
+"""
+
+# TODO: download the metadata
+# TODO: set secret key length?
+# TODO: settings file.
+
+import os
 import sys
+from enum import Enum
 from pathlib import Path
 from secrets import token_urlsafe
 
+from docopt import docopt  # type: ignore
+
 
 root = Path(__file__).parent
-
 envfilename = root / '.env'
 
-if envfilename.exists():
-    sys.exit(1)
 
-with open(envfilename, 'wt', encoding='UTF-8') as envfile:
-    token = token_urlsafe()
-    print(f'SECRET_KEY="{token}"', file=envfile)
-    print('DEBUG=True', file=envfile)
+class DeploymentEnvironment(Enum):
+    DEVELOPMENT = 'development'
+    PRODUCTION = 'production'
+    TESTING = 'testing'
+
+    def __str__(self) -> str:
+        return self.value
+
+
+DEVELOPMENT = DeploymentEnvironment.DEVELOPMENT
+PRODUCTION = DeploymentEnvironment.PRODUCTION
+TESTING = DeploymentEnvironment.TESTING
+
+
+# Parse options.
+options = docopt(__doc__)
+
+# Do not overwrite the .env file if it exists.
+if envfilename.exists() and not options['--force']:
+    print("Not overwriting existing `.env` file", file=sys.stderr)
+    print("Use `init --force` to overwrite.", file=sys.stderr)
+    sys.exit(2)
+
+# Figure out the environment
+if options['--prod']:
+    environment = PRODUCTION
+elif options['--dev']:
+    environment = DEVELOPMENT
+elif options['--testing']:
+    environment = TESTING
+else:
+    if os.getenv('CI', None) in ('1', 'true'):
+        environment = TESTING
+    else:
+        environment = PRODUCTION
+    print("Assuming", environment, "environment")
+    print("Please specify one of --dev, --testing, or --production if this is not the case")
+
+
+def get_debug() -> bool:
+    """
+    Determine whether debug should be set, depending on flags and enviroment.
+    """
+    if options['--debug'] and environment == PRODUCTION:
+        print("Setting debug in production is a REALLY bad idea!")
+        print("Refusing to continue.")
+        sys.exit(1)
+    elif options['--no-debug'] and environment == DEVELOPMENT:
+        return False
+    elif environment == DEVELOPMENT:
+        return True
+    elif options['--no-debug']:
+        return False
+    elif options['--debug']:
+        return True
+    else:
+        return False
+
+
+env_contents = dict(
+    # Django NEEDS a secret key before it starts up, so generate one.
+    SECRET_KEY=token_urlsafe(),
+    DEBUG=get_debug(),
+)
+
+# Create the file in shell format.
+env_code = '\n'.join(f'{var}="{param!s}"' for var, param in env_contents.items())
+env_text = f"""# Automatically created .env file.
+# Environment: {environment!s}
+{env_code}
+"""
+
+print("Creating .env file for the", environment, "environment with contents:")
+print()
+print(env_text)
+
+# TODO: prompt to confirm?
+envfilename.write_text(env_text, encoding='UTF-8')
+
+print(f"Wrote {envfilename!s}!")

@@ -10,6 +10,7 @@ TextGrid = "*"
 django = "*"
 python-decouple = "*"
 django-simple-history = "*"
+docopt = "*"
 
 [dev-packages]
 pytest = "*"
