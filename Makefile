@@ -10,7 +10,7 @@ install:
 
 install-test: install
 	pipenv install --dev
-	pipenv run python init.py
+	pipenv run python init
 
 test:
 	mypy librecval
