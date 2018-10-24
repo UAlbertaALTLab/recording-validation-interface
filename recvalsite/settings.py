@@ -131,3 +131,18 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# Where the transcoded audio files should be placed AND served from.
+RECVAL_AUDIO_DIR = config('RECVAL_AUDIO_DIR', BASE_DIR / 'static' / 'audio', cast=Path)
+
+# Where to find the metadata file.
+RECVAL_METADATA_PATH = config('RECVAL_AUDIO_DIR', BASE_DIR / 'etc' / 'metadata.csv', cast=Path)
+
+# Where the sessions should be extracted from.
+# Expecting a structure like this:
+#
+# ${RECVAL_SESSIONS_DIR}/
+# ├── 2015-10-04-AM-KCH-2/
+# ├── ...
+# └── 2016-01-18-PM-___-_/
+RECVAL_SESSIONS_DIR = config('RECVAL_SESSIONS_DIR', BASE_DIR / 'data' / 'sessions', cast=Path)
