@@ -28,15 +28,12 @@ from hashlib import sha256
 from pathlib import Path
 from typing import Dict, NamedTuple
 
+import logme  # type: ignore
 from pydub import AudioSegment  # type: ignore
 from textgrid import IntervalTier, TextGrid  # type: ignore
 
 from librecval.normalization import normalize
 from librecval.recording_session import SessionID, SessionMetadata
-
-logger = logging.getLogger(__name__)
-info = logger.info
-warn = logger.warn
 
 
 # ############################### Exceptions ############################### #
@@ -90,10 +87,13 @@ class RecordingInfo(NamedTuple):
         return sha256(self.signature().encode('UTF-8')).hexdigest()
 
 
+@logme.log
 class RecordingExtractor:
     """
     Extracts recordings from a directory of sessions.
     """
+
+    logger: logging.Logger
 
     def __init__(self, metadata=Dict[SessionID, SessionMetadata]) -> None:
         self.sessions: Dict[SessionID, Path] = {}
@@ -106,15 +106,15 @@ class RecordingExtractor:
         For each session directory found, its TextGrid/.wav file pairs are
         scanned for words and sentences.
         """
-        info('Scanning %s for sessions...', root_directory)
+        self.logger.info('Scanning %s for sessions...', root_directory)
         for session_dir in root_directory.iterdir():
             if not session_dir.resolve().is_dir():
-                info(' ... rejecting %s; not a directory', session_dir)
+                self.logger.info(' ... rejecting %s; not a directory', session_dir)
                 continue
             try:
                 yield from self.extract_session(session_dir)
             except MissingMetadataError:
-                warn(" ... Skipping %s: Missing metadata", session_dir)
+                self.logger.warn(" ... Skipping %s: Missing metadata", session_dir)
 
     def extract_session(self, session_dir: Path):
         session_id = SessionID.from_name(session_dir.stem)
@@ -124,20 +124,19 @@ class RecordingExtractor:
         if session_id not in self.metadata:
             raise MissingMetadataError(f"Missing metadata for {session_id}")
 
-        info(' ... Scanning %s for .TextGrid files', session_dir)
+        self.logger.info(' ... Scanning %s for .TextGrid files', session_dir)
         text_grids = list(session_dir.glob('*.TextGrid'))
-        info(' ... %d text grids', len(text_grids))
+        self.logger.info(' ... %d text grids', len(text_grids))
 
         for text_grid in text_grids:
             sound_file = text_grid.with_suffix('.wav')
             # TODO: tmill's kludge for certain missing filenames???
             if not sound_file.exists():
-                warn(' ... ... could not find cooresponding audio for %s',
-                     text_grid)
+                self.logger.warn(' ... ... could not find cooresponding audio for %s', text_grid)
                 continue
 
             assert text_grid.exists() and sound_file.exists()
-            info(' ... ... Matching sound file for %s', text_grid)
+            self.logger.info(' ... ... Matching sound file for %s', text_grid)
 
             try:
                 mic_id = get_mic_id(text_grid.stem)
@@ -145,12 +144,11 @@ class RecordingExtractor:
                 if len(text_grids) != 1:
                     raise  # There's no way to determine the speaker.
                 mic_id = 1
-                warn(' ... ... assuming single text grid is mic 1')
+                self.logger.warn(' ... ... assuming single text grid is mic 1')
 
             speaker = self.metadata[session_id][mic_id]
 
-            info(' ... ... Extract items from %s using speaker ID %s',
-                 sound_file, speaker)
+            self.logger.info(' ... ... Extract items from %s using speaker ID %s', sound_file, speaker)
             extractor = PhraseExtractor(session_id,
                                         AudioSegment.from_file(str(sound_file)),
                                         TextGrid.fromFile(str(text_grid)),
@@ -164,10 +162,14 @@ SENTENCE_TIER_ENGLISH = 2
 SENTENCE_TIER_CREE = 3
 
 
+@logme.log
 class PhraseExtractor:
     """
     Extracts recorings from a session directory.
     """
+
+    logger: logging.Logger
+
     def __init__(self,
                  session: SessionID,
                  sound: AudioSegment,
@@ -182,13 +184,13 @@ class PhraseExtractor:
     def extract_all(self):
         assert len(self.text_grid.tiers) >= 4, "TextGrid has too few tiers"
 
-        info(' ... ... extracting words')
+        self.logger.info(' ... ... extracting words')
         yield from self.extract_words(
             cree_tier=self.text_grid.tiers[WORD_TIER_CREE],
             english_tier=self.text_grid.tiers[WORD_TIER_ENGLISH]
         )
 
-        info(' ... ... extracting sentences')
+        self.logger.info(' ... ... extracting sentences')
         yield from self.extract_sentences(
             cree_tier=self.text_grid.tiers[SENTENCE_TIER_CREE],
             english_tier=self.text_grid.tiers[SENTENCE_TIER_ENGLISH]
@@ -219,7 +221,7 @@ class PhraseExtractor:
             # Figure out if this word belongs to a sentence.
             if _type == 'word' and self.timestamp_within_sentence(midtime):
                 # It's an example sentence; leave it for the next loop.
-                info(' ... ... ... %r is in a sentence', transcription)
+                self.logger.info(' ... ... ... %r is in a sentence', transcription)
                 continue
 
             # Get the word's English gloss.

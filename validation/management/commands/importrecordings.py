@@ -14,14 +14,17 @@ Its defaults are configured using the following settings:
 See recvalsite/settings.py for more information.
 """
 
+from pathlib import Path
+
+import logme  # type: ignore
+
 from django.conf import settings  # type: ignore
 from django.core.management.base import BaseCommand, CommandError  # type: ignore
-from validation.models import Phrase
 
 from librecval import REPOSITORY_ROOT
 from librecval.import_recordings import initialize as import_recordings
 from librecval.extract_phrases import RecordingInfo
-from pathlib import Path
+from validation.models import Phrase
 
 
 class Command(BaseCommand):
@@ -31,7 +34,6 @@ class Command(BaseCommand):
         parser.add_argument('sessions_dir', nargs='?', type=Path, default=None)
 
     def handle(self, *args, **options) -> None:
-        self.stdout.write(str(options))
         # Get these from settings?
         sessions_dir = options.get('session_dir', settings.RECVAL_SESSIONS_DIR)
         # Now, import all those recordings!
@@ -41,8 +43,9 @@ class Command(BaseCommand):
                           import_recording=django_recording_importer)
 
 
-def django_recording_importer(info: RecordingInfo, rec_id: str, recording_path: Path) -> None:
+@logme.log
+def django_recording_importer(info: RecordingInfo, rec_id: str, recording_path: Path, logger) -> None:
     """
     Imports a single recording.
     """
-    print(info)
+    logger.info(info)
