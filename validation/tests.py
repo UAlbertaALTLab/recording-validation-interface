@@ -192,8 +192,10 @@ def test_phrase_has_history():
 
 @pytest.mark.django_db
 def test_recording():
-    recording = mommy.prepare(Recording)
+    recording = mommy.make(Recording)
+
     # Check all the fields.
+    assert isinstance(recording.id, str)
     assert recording.quality in {Recording.CLEAN, Recording.UNUSABLE, ''}
     assert isinstance(recording.timestamp, datetime)
     assert isinstance(recording.timestamp, datetime)
@@ -202,3 +204,9 @@ def test_recording():
     assert isinstance(recording.speaker, Speaker)
 
     assert hasattr(recording, 'history')
+
+    # Check its __str__() method.
+    assert str(recording.id) in str(recording)
+    assert str(recording.phrase) in str(recording)
+    assert str(recording.speaker) in str(recording)
+    assert str(recording.session) in str(recording)
