@@ -58,3 +58,13 @@ def metadata_csv_file():
     """
     with open(fixtures_dir / 'test_metadata.csv') as csvfile:
         yield csvfile
+
+
+@pytest.fixture
+def skip_metadata_csv_file():
+    """
+    Returns a file-like object that is some sample metadata, with !SKIP, as downloaded
+    from Google Sheets.
+    """
+    with open(fixtures_dir / 'test_metadata_skip.csv') as csvfile:
+        yield csvfile

@@ -36,3 +36,16 @@ def test_parse_csv(metadata_csv_file) -> None:
     assert example_session_id in metadata
     session = metadata[example_session_id]
     assert ('LOU', 'MAR', 'JER') == (session[2], session[3], session[4])
+
+
+def test_metadata_special_codes(skip_metadata_csv_file) -> None:
+    """
+    Parses metadata with special codes.
+    """
+    metadata = parse_metadata(skip_metadata_csv_file)
+    # Refer to the tests/fixtures/test_metadata_skip.csv for correct numbers.
+    # There should be three data rows, but one is marked !SKIP
+    assert SessionD.parse_dirty('2014-12-09') in metadata
+    assert SessionID.parse_dirty('2014-12-10') in metadata
+    assert SessionID.parse_dirty('2014-12-16') not in metadata
+    assert 2 == len(metadata)
