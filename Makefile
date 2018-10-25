@@ -8,7 +8,7 @@
 
 install-prod:
 	pipenv install
-	pipenv run python init --production --no-debug
+	pipenv run python init --prod --no-debug
 
 install-test: install
 	pipenv install --dev

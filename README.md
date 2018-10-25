@@ -50,6 +50,16 @@ make install-prod
 
 ### Creating the database for the first time
 
+Create some directories, and place them in `.env`:
+
+> **TODO**: document these:
+
+`RECVAL_SESSIONS_DIR`
+`RECVAL_AUDIO_DIR`
+`RECVAL_METADATA_PATH`
+
+
+
 > **WARNING**: This section may be out of date!
 
 Before you import any data, you need the "Master Recording MetaData"
