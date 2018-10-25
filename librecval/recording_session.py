@@ -195,7 +195,7 @@ class SessionID(NamedTuple):
         """
         m = dirty_pattern.match(name)
         if m is None:
-            raise SessionParseError(f"session could not be parsed: {name!r}")
+            raise SessionParseError(f"Session could not be parsed: {name!r}")
 
         # Parse out all the things into appropriate datatypes.
         date = datetime.strptime(m.group('isodate'), '%Y-%m-%d').date()
@@ -238,15 +238,23 @@ class SessionMetadata:
         )
 
     @classmethod
-    def parse(cls, row: Dict[str, Any]) -> 'SessionMetadata':
+    def parse(cls, row: Dict[str, Any], session_name: str = None) -> 'SessionMetadata':
         """
         Parses a row from the metadata CSV file.
+
+        Can pass an explicit session name to override what's written in the
+        "SESSION" column.
+
         """
         # Extract "raw" name
         raw_name = row['SESSION']
 
         # Parse a session out of it
-        session = SessionID.parse_dirty(raw_name)
+        effective_name = session_name or raw_name
+        try:
+            session = SessionID.from_name(effective_name)
+        except SessionParseError:
+            session = SessionID.parse_dirty(effective_name)
 
         # Who are speaking on the mics?
         mic_names = [key for key in row.keys() if key.startswith('MIC')]
@@ -275,14 +283,18 @@ def parse_metadata(metadata_file: TextIO, logger) -> Dict[SessionID, SessionMeta
             continue
 
         # Get any overridden settings.
-        override = row.get('RECVAL_OVERRIDE', '').strip().upper()
+        override = row.get('RECVAL_OVERRIDE', '').strip()
 
-        if override == '!SKIP':
-            logger.debug('Skipping %s', row['SESSION'])
+        # A rename starts with a well-formatted Session ID
+        # An options starts with !
+        rename, _, options_text = override.partition('!')
+
+        if options_text == 'SKIP':
+            logger.debug('Skipping %s (marked with !SKIP)', row['SESSION'])
             continue
 
         try:
-            s = SessionMetadata.parse(row)
+            s = SessionMetadata.parse(row, session_name=rename or None)
         except SessionParseError:
             logger.exception("Could not parse: %s", row)
             # We'll just skip this row...
