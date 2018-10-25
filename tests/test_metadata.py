@@ -38,9 +38,9 @@ def test_parse_csv(metadata_csv_file) -> None:
     assert ('LOU', 'MAR', 'JER') == (session[2], session[3], session[4])
 
 
-def test_metadata_special_codes(skip_metadata_csv_file) -> None:
+def test_metadata_with_SKIP_override(skip_metadata_csv_file) -> None:
     """
-    Parses metadata with special codes.
+    Parses metadata with !SKIP code.
     """
     metadata = parse_metadata(skip_metadata_csv_file)
     # Refer to the tests/fixtures/test_metadata_skip.csv for correct numbers.
@@ -48,4 +48,16 @@ def test_metadata_special_codes(skip_metadata_csv_file) -> None:
     assert SessionID.parse_dirty('2014-12-09') in metadata
     assert SessionID.parse_dirty('2014-12-10') in metadata
     assert SessionID.parse_dirty('2014-12-16') not in metadata
+    assert 2 == len(metadata)
+
+
+def test_metadata_with_rename_override(rename_metadata_csv_file) -> None:
+    """
+    Parses metadata with !SKIP code.
+    """
+    metadata = parse_metadata(rename_metadata_csv_file)
+    # Refer to the tests/fixtures/test_metadata_rename.csv for correct numbers.
+    # There should be two data rows and one has a rename.
+    assert SessionID.parse_dirty('2015-02-12') in metadata
+    assert SessionID.from_name('2015-09-21-AM-___-1') in metadata
     assert 2 == len(metadata)
