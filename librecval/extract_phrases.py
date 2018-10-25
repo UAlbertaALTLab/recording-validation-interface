@@ -106,17 +106,22 @@ class RecordingExtractor:
         For each session directory found, its TextGrid/.wav file pairs are
         scanned for words and sentences.
         """
-        self.logger.info('Scanning %s for sessions...', root_directory)
+        self.logger.debug('Scanning %s for sessions...', root_directory)
         for session_dir in root_directory.iterdir():
             if not session_dir.resolve().is_dir():
-                self.logger.info(' ... rejecting %s; not a directory', session_dir)
+                self.logger.debug('Rejecting %s; not a directory', session_dir)
                 continue
             try:
                 yield from self.extract_session(session_dir)
+            except DuplicateSessionError:
+                self.logger.exception("Skipping %s: duplicate", session_dir)
             except MissingMetadataError:
-                self.logger.warn(" ... Skipping %s: Missing metadata", session_dir)
+                self.logger.exception("Skipping %s: Missing metadata", session_dir)
 
     def extract_session(self, session_dir: Path):
+        """
+        Extracts recordings from a single session.
+        """
         session_id = SessionID.from_name(session_dir.stem)
         if session_id in self.sessions:
             raise DuplicateSessionError(f"Duplicate session: {session_id} "
@@ -124,19 +129,19 @@ class RecordingExtractor:
         if session_id not in self.metadata:
             raise MissingMetadataError(f"Missing metadata for {session_id}")
 
-        self.logger.info(' ... Scanning %s for .TextGrid files', session_dir)
+        self.logger.debug('Scanning %s for .TextGrid files', session_dir)
         text_grids = list(session_dir.glob('*.TextGrid'))
-        self.logger.info(' ... %d text grids', len(text_grids))
+        self.logger.debug('%d text grids', len(text_grids))
 
         for text_grid in text_grids:
             sound_file = text_grid.with_suffix('.wav')
             # TODO: tmill's kludge for certain missing filenames???
             if not sound_file.exists():
-                self.logger.warn(' ... ... could not find cooresponding audio for %s', text_grid)
+                self.logger.warn('Could not find cooresponding audio for %s', text_grid)
                 continue
 
             assert text_grid.exists() and sound_file.exists()
-            self.logger.info(' ... ... Matching sound file for %s', text_grid)
+            self.logger.debug('Matching sound file for %s', text_grid)
 
             try:
                 mic_id = get_mic_id(text_grid.stem)
@@ -144,11 +149,12 @@ class RecordingExtractor:
                 if len(text_grids) != 1:
                     raise  # There's no way to determine the speaker.
                 mic_id = 1
-                self.logger.warn(' ... ... assuming single text grid is mic 1')
+                self.logger.warn('Assuming single text grid is mic 1')
 
             speaker = self.metadata[session_id][mic_id]
 
-            self.logger.info(' ... ... Extract items from %s using speaker ID %s', sound_file, speaker)
+            self.logger.debug('Extract items from %s using speaker ID %s', sound_file, speaker)
+            breakpoint()
             extractor = PhraseExtractor(session_id,
                                         AudioSegment.from_file(str(sound_file)),
                                         TextGrid.fromFile(str(text_grid)),
