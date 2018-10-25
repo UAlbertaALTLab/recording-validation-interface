@@ -268,6 +268,52 @@ class SessionMetadata:
         return cls(session=session, raw_name=raw_name, mics=mics)
 
 
+class Overrides:
+    """
+    Any overridden properties when writing the
+    """
+
+    def __init__(self, raw_name: str, **options):
+        self.raw_name = raw_name
+        self._options = options
+
+    @property
+    def effective_name(self) -> str:
+        try:
+            return self._options['name']
+        except KeyError:
+            return self.raw_name
+
+    @property
+    def should_skip(self) -> bool:
+        return self._options.get('skip', False)
+
+    @classmethod
+    def parse(cls, raw_name: str, override_text: str) -> 'Overrides':
+        clean_name = raw_name.strip()
+        override = override_text.strip()
+
+        # Nothing to override, so just have the cleaned name.
+        if not override:
+            return Overrides(clean_name)
+
+        # A rename starts with a well-formatted Session ID
+        # An options starts with !
+        rename, _, raw_options_text = override.partition('!')
+
+        options = {}  # type: Dict[str, Any]
+
+        # Add the rename to the options
+        if rename.strip():
+            options['name'] = rename.strip()
+
+        # For now, options are just boolean flags
+        for option in raw_options_text.split():
+            options[option.lower()] = True
+
+        return Overrides(clean_name, **options)
+
+
 @logme.log
 def parse_metadata(metadata_file: TextIO, logger) -> Dict[SessionID, SessionMetadata]:
     """
@@ -283,18 +329,14 @@ def parse_metadata(metadata_file: TextIO, logger) -> Dict[SessionID, SessionMeta
             continue
 
         # Get any overridden settings.
-        override = row.get('RECVAL_OVERRIDE', '').strip()
+        override = Overrides.parse(row['SESSION'], row.get('RECVAL_OVERRIDE', ''))
 
-        # A rename starts with a well-formatted Session ID
-        # An options starts with !
-        rename, _, options_text = override.partition('!')
-
-        if options_text == 'SKIP':
+        if override.should_skip:
             logger.debug('Skipping %s (marked with !SKIP)', row['SESSION'])
             continue
 
         try:
-            s = SessionMetadata.parse(row, session_name=rename or None)
+            s = SessionMetadata.parse(row, session_name=override.effective_name)
         except SessionParseError:
             logger.exception("Could not parse: %s", row)
             # We'll just skip this row...
