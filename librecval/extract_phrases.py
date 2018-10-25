@@ -25,6 +25,7 @@ import logging
 import re
 from decimal import Decimal
 from hashlib import sha256
+from os import fspath
 from pathlib import Path
 from typing import Dict, NamedTuple
 
@@ -71,6 +72,7 @@ class RecordingInfo(NamedTuple):
     translation: str
 
     def signature(self) -> str:
+        # TODO: make this resilient to changing type, transcription, and speaker.
         return (
             f"session: {self.session}\n"
             f"speaker: {self.speaker}\n"
@@ -131,7 +133,7 @@ class RecordingExtractor:
 
         self.logger.debug('Scanning %s for .TextGrid files', session_dir)
         text_grids = list(session_dir.glob('*.TextGrid'))
-        self.logger.debug('%d text grids', len(text_grids))
+        self.logger.info('%d text grids in %s', len(text_grids), session_dir)
 
         for text_grid in text_grids:
             sound_file = text_grid.with_suffix('.wav')
@@ -153,11 +155,10 @@ class RecordingExtractor:
 
             speaker = self.metadata[session_id][mic_id]
 
-            self.logger.debug('Extract items from %s using speaker ID %s', sound_file, speaker)
-            breakpoint()
+            self.logger.debug('Opening audio and text grid from %s for speaker %s', sound_file, speaker)
             extractor = PhraseExtractor(session_id,
-                                        AudioSegment.from_file(str(sound_file)),
-                                        TextGrid.fromFile(str(text_grid)),
+                                        AudioSegment.from_file(fspath(sound_file)),
+                                        TextGrid.fromFile(fspath(text_grid)),
                                         speaker)
             yield from extractor.extract_all()
 
@@ -190,13 +191,13 @@ class PhraseExtractor:
     def extract_all(self):
         assert len(self.text_grid.tiers) >= 4, "TextGrid has too few tiers"
 
-        self.logger.info(' ... ... extracting words')
+        self.logger.debug('Extracting words from %s/%s', self.session, self.speaker)
         yield from self.extract_words(
             cree_tier=self.text_grid.tiers[WORD_TIER_CREE],
             english_tier=self.text_grid.tiers[WORD_TIER_ENGLISH]
         )
 
-        self.logger.info(' ... ... extracting sentences')
+        self.logger.debug('Extracting sentences from %s/%s', self.session, self.speaker)
         yield from self.extract_sentences(
             cree_tier=self.text_grid.tiers[SENTENCE_TIER_CREE],
             english_tier=self.text_grid.tiers[SENTENCE_TIER_ENGLISH]
@@ -208,7 +209,7 @@ class PhraseExtractor:
     def extract_sentences(self, cree_tier, english_tier):
         yield from self.extract_phrases('sentence', cree_tier, english_tier)
 
-    def extract_phrases(self, _type: str,
+    def extract_phrases(self, type_: str,
                         cree_tier: IntervalTier, english_tier: IntervalTier):
         assert is_cree_tier(cree_tier), cree_tier.name
         assert is_english_tier(english_tier), english_tier.name
@@ -225,9 +226,10 @@ class PhraseExtractor:
             midtime = (interval.minTime + interval.maxTime) / 2
 
             # Figure out if this word belongs to a sentence.
-            if _type == 'word' and self.timestamp_within_sentence(midtime):
+            if type_ == 'word' and self.timestamp_within_sentence(midtime):
                 # It's an example sentence; leave it for the next loop.
-                self.logger.info(' ... ... ... %r is in a sentence', transcription)
+                # TODO: WHY ARE WE SKIPPING IT AGAIN?
+                self.logger.debug('%r is in a sentence', transcription)
                 continue
 
             # Get the word's English gloss.
@@ -239,18 +241,17 @@ class PhraseExtractor:
             # tmills: normalize sound levels (some speakers are very quiet)
             sound_bite = sound_bite.normalize(headroom=0.1)  # dB
 
-            yield self.info_for(_type, transcription, translation,
+            yield self.info_for(type_, transcription, translation,
                                 start, sound_bite)
 
-    def info_for(self, _type, transcription, translation, timestamp,
-                 sound_bite):
+    def info_for(self, type_: str, transcription: str, translation: str, timestamp, sound_bite):
         """
         Return a tuple of the phrase and its audio.
         """
-        assert _type in ('word', 'sentence')
+        assert type_ in ('word', 'sentence')
         info = RecordingInfo(session=self.session,
                              speaker=self.speaker,
-                             type=_type,
+                             type=type_,
                              timestamp=timestamp,
                              transcription=transcription,
                              translation=translation)
