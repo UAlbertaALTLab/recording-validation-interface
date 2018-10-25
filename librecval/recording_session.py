@@ -327,12 +327,13 @@ def parse_metadata(metadata_file: TextIO, logger) -> Dict[SessionID, SessionMeta
     for row in reader:
         if not row['SESSION']:
             continue
+        raw_name = row['SESSION']
 
         # Get any overridden settings.
-        override = Overrides.parse(row['SESSION'], row.get('RECVAL_OVERRIDE', ''))
+        override = Overrides.parse(raw_name, row.get('RECVAL_OVERRIDE', ''))
 
         if override.should_skip:
-            logger.debug('Skipping %s (marked with !SKIP)', row['SESSION'])
+            logger.info('Skipping %s (marked with !SKIP)', row['SESSION'])
             continue
 
         try:
@@ -341,6 +342,8 @@ def parse_metadata(metadata_file: TextIO, logger) -> Dict[SessionID, SessionMeta
             logger.exception("Could not parse: %s", row)
             # We'll just skip this row...
         else:
+            if raw_name != override.effective_name:
+                logger.info('Using renamed session: %r instead of %r', override.effective_name, raw_name)
             sessions[s.session] = s
     return sessions
 
