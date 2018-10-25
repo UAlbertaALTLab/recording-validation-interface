@@ -273,11 +273,19 @@ def parse_metadata(metadata_file: TextIO, logger) -> Dict[SessionID, SessionMeta
     for row in reader:
         if not row['SESSION']:
             continue
+
+        # Get any overridden settings.
+        override = row.get('RECVAL_OVERRIDE', '').strip().upper()
+
+        if override == '!SKIP':
+            logger.debug('Skipping %s', row['SESSION'])
+            continue
+
         try:
             s = SessionMetadata.parse(row)
         except SessionParseError:
             logger.exception("Could not parse: %s", row)
-            # We'll just skip this...
+            # We'll just skip this row...
         else:
             sessions[s.session] = s
     return sessions
