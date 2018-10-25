@@ -20,8 +20,8 @@ from datetime import date
 
 import pytest  # type: ignore
 
-from librecval.recording_session import (Location, SessionID, SessionParseError,
-                                         TimeOfDay, parse_metadata)
+from librecval.recording_session import (Location, SessionID,
+                                         SessionParseError, TimeOfDay)
 
 
 def test_does_not_parse_arbitrary_directory_name():
@@ -78,17 +78,3 @@ def test_parse_dirty():
     expected = SessionID(date=date(2015, 4, 15), subsession=None,
                          time_of_day=TimeOfDay.MORNING, location=None)
     assert actual == expected
-
-
-def test_parse_csv(metadata_csv_file) -> None:
-    """
-    Parse the metadata file and fetching some speaker codes using it as a
-    dictionary.
-    """
-    metadata = parse_metadata(metadata_csv_file)
-    # Refer to the tests/fixtures/test_metadata.csv for correct numbers.
-    assert 7 == len(metadata)
-    example_session_id = SessionID.from_name('2015-04-15-PM-___-_')
-    assert example_session_id in metadata
-    session = metadata[example_session_id]
-    assert ('LOU', 'MAR', 'JER') == (session[2], session[3], session[4])
