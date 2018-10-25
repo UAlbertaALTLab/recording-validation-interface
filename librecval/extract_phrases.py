@@ -136,11 +136,21 @@ class RecordingExtractor:
         self.logger.info('%d text grids in %s', len(text_grids), session_dir)
 
         for text_grid in text_grids:
+            # The text grid may be in the same directory...
             sound_file = text_grid.with_suffix('.wav')
-            # TODO: tmill's kludge for certain missing filenames???
+            self.logger.debug('Looking for %s...', sound_file)
             if not sound_file.exists():
-                self.logger.warn('Could not find cooresponding audio for %s', text_grid)
-                continue
+                # XXX: Gross code to try Adobe Audition recorded files
+                audition, = session_dir.glob('*.sesx')
+                sound_file = session_dir / f'{audition.stem}_Recorded' / f'{text_grid.stem}.wav'
+                self.logger.debug('Looking for %s...', sound_file)
+
+                # TODO: tmill's kludge for certain missing filenames???
+                if not sound_file.exists():
+                    self.logger.warn('Could not find cooresponding audio for %s', text_grid)
+                    continue
+
+            # TODO: tmill's kludge for certain missing filenames???
 
             assert text_grid.exists() and sound_file.exists()
             self.logger.debug('Matching sound file for %s', text_grid)
