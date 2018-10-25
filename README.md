@@ -54,27 +54,44 @@ make install-prod
 
 Before you import any data, you need the "Master Recording MetaData"
 (sic) spreadsheet, available on Google Drive. Either export this
-manually as a CSV file to `./private/metadata.csv`, or, using the [gdrive][]
-command, run the following script to download it automatically:
+manually as a CSV file to `./private/metadata.csv`, or, with the
+[gdrive][] command installed and configured, run the following script to
+download it automatically:
 
-`/path/to/sessions/` should be a directory filled with directories (or
-symbolic links to directories) with filenames in the form of:
+```sh
+pipenv run python manage.py downloadmetadata
+```
 
-    {ISOdate}-{AM/PM}-{Location or '___'}-{Subsession or '0'}
+### Importing recordings
+
+In order to import recordings on Sapir, type the following:
+
+```sh
+pipenv run python manage.py importrecordings
+```
+
+This will automatically scan `$RECVAL_SESSIONS_DIR/` (either set in
+`local_settings.py` or as an environment variable).
+
+`$RECVAL_SESSIONS_DIR/` should be a directory filled with directories
+(or symbolic links to directories) with filenames in the form of:
+
+    {ISOdate}-{AM/PM}-{Location or '___'}-{Subsession or '_'}
 
 For example, on Sapir, I might have something like this:
 
-    $ ls ~/av/backup-mwe/sessions/
-    2015-05-08-AM-___-0
-    2016-05-16-PM-___-0
+    $ export RECVAL_SESSIONS_DIR=/data/av/backup-mwe/sessions
+    $ ls -1 $RECVAL_SESSIONS_DIR
+    2015-05-08-AM-___-_
+    2016-05-16-PM-___-_
     2016-11-28-AM-US-2
     2017-05-25-AM-DS-2
-    2018-04-18-AM-KCH-0
+    2018-04-18-AM-KCH-_
     ...
 
 Each directory should have `*.TextGrid` files paired with a `*.wav` file:
 
-    $ ls -F1 ~/av/backup-mwe/sessions/2015-05-08-AM-___-0/
+    $ ls -F1 $RECVAL_SESSIONS_DIR/2015-05-08-AM-___-_/
     2015-05-08-01.TextGrid
     2015-05-08-01.wav
     2015-05-08-02.TextGrid
@@ -83,9 +100,6 @@ Each directory should have `*.TextGrid` files paired with a `*.wav` file:
     2015-05-08-03.wav
     ...
 
-So, in order to create the database on Sapir, I type the following:
-
-> **TODO** WHAT ARE THE IMPORTING COMMANDS?
 
 ### Creating a superuser (admin)
 
