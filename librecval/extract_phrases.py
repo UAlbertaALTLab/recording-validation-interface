@@ -27,7 +27,7 @@ from decimal import Decimal
 from hashlib import sha256
 from os import fspath
 from pathlib import Path
-from typing import Dict, NamedTuple
+from typing import Dict, NamedTuple, Optional
 
 import logme  # type: ignore
 from pydub import AudioSegment  # type: ignore
@@ -47,7 +47,7 @@ class DuplicateSessionError(RuntimeError):
 
 class MissingMetadataError(RuntimeError):
     """
-    Raise when the cooresponding metadata cannot be found.
+    Raised when the cooresponding metadata cannot be found.
     """
 
 
@@ -136,21 +136,13 @@ class RecordingExtractor:
         self.logger.info('%d text grids in %s', len(text_grids), session_dir)
 
         for text_grid in text_grids:
-            # The text grid may be in the same directory...
-            sound_file = text_grid.with_suffix('.wav')
-            self.logger.debug('Looking for %s...', sound_file)
+            # Find the cooresponding audio with a couple different strategies.
+            sound_file = find_audio_from_audacity_format(text_grid) or\
+                    find_audio_from_audition_format(text_grid)
+
             if not sound_file.exists():
-                # XXX: Gross code to try Adobe Audition recorded files
-                audition, = session_dir.glob('*.sesx')
-                sound_file = session_dir / f'{audition.stem}_Recorded' / f'{text_grid.stem}.wav'
-                self.logger.debug('Looking for %s...', sound_file)
-
-                # TODO: tmill's kludge for certain missing filenames???
-                if not sound_file.exists():
-                    self.logger.warn('Could not find cooresponding audio for %s', text_grid)
-                    continue
-
-            # TODO: tmill's kludge for certain missing filenames???
+                self.logger.warn('Could not find cooresponding audio for %s', text_grid)
+                continue
 
             assert text_grid.exists() and sound_file.exists()
             self.logger.debug('Matching sound file for %s', text_grid)
@@ -171,6 +163,35 @@ class RecordingExtractor:
                                         TextGrid.fromFile(fspath(text_grid)),
                                         speaker)
             yield from extractor.extract_all()
+
+
+@logme.log
+def find_audio_from_audacity_format(text_grid: Path, logger=None) -> Optional[Path]:
+    """
+    Finds the associated audio in Audacity's format.
+    """
+    # TODO: tmill's kludge for certain missing filenames???
+    sound_file = text_grid.with_suffix('.wav')
+    logger.debug('[Audacity Format] Trying %s...', sound_file)
+    return sound_file if sound_file.exists() else None
+
+
+@logme.log
+def find_audio_from_audition_format(text_grid: Path, logger=None) -> Optional[Path]:
+    #  Gross code to try Adobe Audition recorded files
+    session_dir = text_grid.parent
+
+    # If it's in Audition format, there will be exactly ONE file with the
+    # *.sesx extension.
+    try:
+        audition_file, = session_dir.glob('*.sesx')
+    except ValueError:
+        logger.debug('Could not find exactly one *.sesx file in %s', session_dir)
+        return None
+
+    sound_file = session_dir / f'{audition_file.stem}_Recorded' / f'{text_grid.stem}.wav'
+    logger.debug('[Audition Format] Trying %s...', sound_file)
+    return sound_file if sound_file.exists() else None
 
 
 WORD_TIER_ENGLISH = 0
