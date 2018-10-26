@@ -140,7 +140,7 @@ class RecordingExtractor:
             sound_file = find_audio_from_audacity_format(text_grid) or\
                     find_audio_from_audition_format(text_grid)
 
-            if sound_file:
+            if sound_file is None:
                 self.logger.warn('Could not find cooresponding audio for %s', text_grid)
                 continue
 
