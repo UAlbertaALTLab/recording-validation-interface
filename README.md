@@ -23,7 +23,7 @@ continuing.
 
 ### Development environment
 
-To install dependencies and setup for development (e.g., your laptop):
+To install dependencies and setup for development (e.g., on your laptop):
 
 ```sh
 make install-dev
@@ -44,7 +44,7 @@ make install-prod
 To install dependencies and setup for testing (e.g., on Travis-CI):
 
 ```sh
-make install-prod
+make install-test
 ```
 
 
