@@ -26,11 +26,11 @@ from typing import Callable
 
 import logme  # type: ignore
 
-from librecval.extract_phrases import RecordingExtractor, RecordingInfo
+from librecval.extract_phrases import RecordingExtractor, RecordingInfo, AudioSegment
 from librecval.recording_session import parse_metadata
 from librecval.transcode_recording import transcode_to_aac
 
-ImportRecording = Callable[[RecordingInfo, str, Path], None]
+ImportRecording = Callable[[RecordingInfo, Path], None]
 
 # TODO: create report with emoji
 #
@@ -61,20 +61,29 @@ def initialize(
         metadata = parse_metadata(metadata_csv)
 
     # Insert each thing found.
-    # TODO: use click.progressbar()?
     ex = RecordingExtractor(metadata)
     for info, audio in ex.scan(root_directory=directory):
-        rec_id = info.compute_sha256hash()
-        recording_path = dest / f"{rec_id}.m4a"
-        if not recording_path.exists():
-            # https://www.ffmpeg.org/doxygen/3.2/group__metadata__api.html
-            transcode_to_aac(audio, recording_path, tags=dict(
-                title=info.transcription,
-                performer=info.speaker,
-                album=info.session,
-                language="crk",
-                creation_time=f"{info.session.date:%Y-%m-%d}",
-                year=info.session.year
-            ))
-            assert recording_path.exists()
-        import_recording(info, rec_id, recording_path)
+        recording_path = save_recording(dest, info, audio)
+        import_recording(info, recording_path)
+
+
+@logme.log
+def save_recording(dest: Path, info: RecordingInfo, audio: AudioSegment, logger=None) -> Path:
+    rec_id = info.compute_sha256hash()
+    recording_path = dest / f"{rec_id}.m4a"
+    if recording_path.exists():
+        logger.warn('Already exists, not transcoding: %s', recording_path)
+        return recording_path
+
+    # https://www.ffmpeg.org/doxygen/3.2/group__metadata__api.html
+    logger.debug('Writing audio to %s', recording_path)
+    transcode_to_aac(audio, recording_path, tags=dict(
+        title=info.transcription,
+        artist=info.speaker,
+        album=info.session,
+        language="crk",
+        creation_time=f"{info.session.date:%Y-%m-%d}",
+        year=info.session.year
+    ))
+    assert recording_path.exists()
+    return recording_path

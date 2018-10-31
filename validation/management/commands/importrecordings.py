@@ -59,7 +59,7 @@ class Command(BaseCommand):
 
 
 @logme.log
-def django_recording_importer(info: RecordingInfo, rec_id: str, recording_path: Path, logger) -> None:
+def django_recording_importer(info: RecordingInfo, recording_path: Path, logger) -> None:
     """
     Imports a single recording.
     """
