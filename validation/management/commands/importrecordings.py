@@ -39,7 +39,7 @@ from django.core.management.base import BaseCommand, CommandError  # type: ignor
 from librecval import REPOSITORY_ROOT
 from librecval.import_recordings import initialize as import_recordings
 from librecval.extract_phrases import RecordingInfo
-from validation.models import Phrase
+from validation.models import Recording, RecordingSession, Phrase, Speaker
 
 
 class Command(BaseCommand):
@@ -63,4 +63,46 @@ def django_recording_importer(info: RecordingInfo, recording_path: Path, logger)
     """
     Imports a single recording.
     """
-    logger.debug(info)
+
+    # Recording requires a Speaker, a RecordingSession, and a Phrase.
+    # Make those first.
+    speaker, speaker_created = Speaker.objects.get_or_create(
+        code=info.speaker,  # TODO: normalized?
+    )
+    if speaker_created:
+        logger.info("New speaker: %s", speaker)
+
+    # TODO: factor this out to RecordingSession class?
+    tmp_session = RecordingSession.create_from(info.session)
+    session, session_created = RecordingSession.objects.get_or_create(
+        date=tmp_session.date,
+        time_of_day=tmp_session.time_of_day or '',
+        location=tmp_session.location or '',
+        subsession=tmp_session.subsession,
+    )
+    if session_created:
+        logger.info("New session: %s", session)
+
+    phrase, phrase_created = Phrase.objects.get_or_create(
+        transcription=info.transcription,
+        kind=info.type,
+        defaults=dict(translation=info.translation,
+                      validated=False,
+                      origin=None)
+    )
+    if phrase_created:
+        logger.info("New phrase: %s", phrase)
+
+    # Finally, we can create the recording.
+    recording = Recording(
+        id=info.compute_sha256hash(),
+        speaker=speaker,
+        timestamp=info.timestamp,
+        phrase=phrase,
+        session=session,
+        quality=None
+    )
+    recording.clean()
+
+    logger.debug("Saving recording %s", recording)
+    recording.save()

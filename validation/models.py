@@ -165,9 +165,10 @@ class RecordingSession(models.Model):
         Happended on the morning of November 1, 2017 in the office.
     """
 
-    # See librecval for the appropriate choices:
+    # TODO: unique constraint
 
     date = models.DateField(help_text="The day the session occured.")
+    # See librecval for the appropriate choices:
     time_of_day = models.CharField(help_text="The time of day the session occured. May be empty.",
                                    blank=True, default='',
                                    **choices_from_enum(TimeOfDay))
@@ -176,6 +177,8 @@ class RecordingSession(models.Model):
                                 **choices_from_enum(Location))
     subsession = models.IntegerField(help_text="The 'subsession' number, if applicable.",
                                      null=True, blank=True)
+
+    # TODO: what's the deal with NULL?
 
     @classmethod
     def create_from(cls, session_id):
@@ -220,6 +223,7 @@ class Recording(models.Model):
 
     id = models.CharField(primary_key=True, max_length=SHA256_HEX_LENGTH)
     speaker = models.ForeignKey(Speaker, on_delete=models.CASCADE)
+    # TODO: this is NOT a date-time field! Should be a float field "offset".
     timestamp = models.DateTimeField(help_text="The time at which this recording starts")
     phrase = models.ForeignKey(Phrase, on_delete=models.CASCADE)
     session = models.ForeignKey(RecordingSession, on_delete=models.CASCADE)
