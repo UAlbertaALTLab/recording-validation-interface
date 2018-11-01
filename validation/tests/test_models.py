@@ -18,16 +18,18 @@
 
 from datetime import datetime, date as datetype
 
-import pytest
-from django.core.exceptions import ValidationError
+import pytest  # type: ignore
+from django.core.exceptions import ValidationError  # type: ignore
 from hypothesis import given, assume
 from hypothesis.strategies import builds
-from model_mommy import mommy
-from model_mommy.recipe import Recipe
+from model_mommy import mommy  # type: ignore
+from model_mommy.recipe import Recipe  # type: ignore
 
 from librecval.normalization import nfc
 from librecval.recording_session import Location, SessionID, TimeOfDay
 from validation.models import Phrase, RecordingSession, Speaker, Recording
+
+from librecval.test_utils.strategies import session_ids
 
 
 def test_recording_session():
@@ -39,7 +41,7 @@ def test_recording_session():
     assert isinstance(session.subsession, (int, type(None)))
 
 
-@given(builds(SessionID))
+@given(session_ids())
 def test_recording_session_model_from_session_id(session_id):
     """
     Test that a RecordingSession model can be make from a SessionID, and that
