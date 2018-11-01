@@ -17,6 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from datetime import datetime, date as datetype
+from math import inf
 
 import pytest  # type: ignore
 from django.core.exceptions import ValidationError  # type: ignore
@@ -241,8 +242,8 @@ def test_recording():
     # Check all the fields.
     assert isinstance(recording.id, str)
     assert recording.quality in {Recording.CLEAN, Recording.UNUSABLE, ''}
-    assert isinstance(recording.timestamp, datetime)
-    assert isinstance(recording.timestamp, datetime)
+    assert isinstance(recording.timestamp, float)
+    assert 0.0 <= recording.timestamp < inf
     assert isinstance(recording.phrase, Phrase)
     assert isinstance(recording.session, RecordingSession)
     assert isinstance(recording.speaker, Speaker)
