@@ -72,11 +72,7 @@ def django_recording_importer(info: RecordingInfo, recording_path: Path, logger)
     if speaker_created:
         logger.info("New speaker: %s", speaker)
 
-    session, session_created = RecordingSession.objects_by_id(info.session).\
-        get_or_create(date=info.session.date,
-                      time_of_day=info.session.time_of_day or '',
-                      location=info.session.location or '',
-                      subsession=info.session.subsession)
+    session, session_created = RecordingSession.get_or_create_by_session_id(info.session)
     if session_created:
         logger.info("New session: %s", session)
 
@@ -97,9 +93,11 @@ def django_recording_importer(info: RecordingInfo, recording_path: Path, logger)
         timestamp=info.timestamp,
         phrase=phrase,
         session=session,
-        quality=None
+        quality=''
     )
     recording.clean()
+
+    # TODO: ensure this is matching the ORIGNAL
 
     logger.debug("Saving recording %s", recording)
     recording.save()
