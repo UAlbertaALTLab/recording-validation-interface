@@ -16,8 +16,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from datetime import datetime, date as datetype
+import random
 from math import inf
+from datetime import datetime, date as datetype
 
 import pytest  # type: ignore
 from django.core.exceptions import ValidationError  # type: ignore
@@ -237,7 +238,8 @@ def test_phrase_has_history():
 
 @pytest.mark.django_db
 def test_recording():
-    recording = mommy.make(Recording)
+    recording = Recipe(Recording,
+                       timestamp=random_float).make()
 
     # Check all the fields.
     assert isinstance(recording.id, str)
@@ -254,3 +256,23 @@ def test_recording():
     assert str(recording.phrase) in str(recording)
     assert str(recording.speaker) in str(recording)
     assert str(recording.session) in str(recording)
+
+
+def random_float() -> float:
+    """
+    Returns a random float f in 0 <= f < inf.
+    """
+    MAX_11_BIT_INT = 0x7FF
+    # See: https://en.wikipedia.org/wiki/Double-precision_floating-point_format
+    significand = random.getrandbits(52)
+    exponent = random.getrandbits(11)
+
+    # When exponent is all ones, we get inf and a whole lot of NaNs. Don't
+    # generate those! Instead, bias it toward denormalized numbers (zero and
+    # numbers /very/ close to zero).
+    if exponent == MAX_11_BIT_INT:
+        exponent = 0
+    assert 0 <= exponent < MAX_11_BIT_INT
+    exponent -= 1023
+
+    return float.fromhex(f'0x{significand:013x}p{exponent:d}')
