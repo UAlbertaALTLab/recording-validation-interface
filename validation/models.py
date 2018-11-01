@@ -178,8 +178,6 @@ class RecordingSession(models.Model):
     subsession = models.IntegerField(help_text="The 'subsession' number, if applicable.",
                                      null=True, blank=True)
 
-    # TODO: what's the deal with NULL?
-
     @classmethod
     def create_from(cls, session_id):
         """
@@ -187,8 +185,8 @@ class RecordingSession(models.Model):
         """
         return cls(date=session_id.date,
                    # `and` prevents accessing attributes on a None value.
-                   time_of_day=session_id.time_of_day and session_id.time_of_day.value,
-                   location=session_id.location and session_id.location.value,
+                   time_of_day=(session_id.time_of_day and session_id.time_of_day.value) or '',
+                   location=(session_id.location and session_id.location.value) or '',
                    subsession=session_id.subsession)
 
     def as_session_id(self):
@@ -197,8 +195,8 @@ class RecordingSession(models.Model):
         """
         return SessionID(date=self.date,
                          # `and` prevents calling .parse() on a None value.
-                         time_of_day=self.time_of_day and TimeOfDay.parse(self.time_of_day),
-                         location=self.location and Location.parse(self.location),
+                         time_of_day=(self.time_of_day and TimeOfDay.parse(self.time_of_day)) or None,
+                         location=(self.location and Location.parse(self.location)) or None,
                          subsession=self.subsession)
 
     def __str__(self):
