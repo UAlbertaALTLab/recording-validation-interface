@@ -286,16 +286,18 @@ def random_float() -> float:
     # See: https://en.wikipedia.org/wiki/Double-precision_floating-point_format
     MAX_11_BIT_INT = 0x7FF
     DOUBLE_BIAS = -1023
-    significand = random.getrandbits(52)
-    exponent = random.getrandbits(11)
+    EXPONENT_BITS = 11
+    SIGNIFICAND_BITS = 52
+    significand = random.getrandbits(SIGNIFICAND_BITS)
+    exponent = random.getrandbits(EXPONENT_BITS)
 
     # When exponent is all ones, we get inf and a whole lot of NaNs. Don't
-    # generate those! Instead, bias it toward denormalized numbers (zero and
-    # numbers /very/ close to zero).
+    # generate those! Instead, just generate 0. It's okay to generate a lot of
+    # zeros!
     if exponent == MAX_11_BIT_INT:
-        exponent = 0
+        return 0.0
     else:
         # Bias the exponent, as IEEE wants us to.
         exponent = exponent + DOUBLE_BIAS
 
-    return float.fromhex(f'0x{significand:013x}p{exponent:d}')
+    return float.fromhex(f'0x1.{significand:013x}p{exponent:+d}')
