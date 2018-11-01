@@ -22,7 +22,7 @@ from datetime import datetime, date as datetype
 
 import pytest  # type: ignore
 from django.core.exceptions import ValidationError  # type: ignore
-from hypothesis import given
+from hypothesis import given, assume
 from model_mommy import mommy  # type: ignore
 from model_mommy.recipe import Recipe  # type: ignore
 
@@ -74,7 +74,7 @@ def test_recording_session_model_from_session_id(session_id):
     assert str(session_id) in str(session)
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db(transaction=True)
 @given(session_ids())
 def test_inserting_duplicate_session(session_id: SessionID):
     """
@@ -94,13 +94,12 @@ def test_inserting_duplicate_session(session_id: SessionID):
         duplicate.save()
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db(transaction=True)
 @given(session_ids())
 def test_fetching_by_session_id(session_id: SessionID):
     """
     Check that we can create a RecordingSession, then fetch it by session ID.
     """
-
     original = RecordingSession.create_from(session_id)
     original.save()
     del original
@@ -111,20 +110,25 @@ def test_fetching_by_session_id(session_id: SessionID):
     assert fetched.as_session_id() == session_id
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db(transaction=True)
 @given(session_ids())
 def test_get_or_create_recording_session(session_id: SessionID):
     """
     Test get or creating a recording session.
     """
 
+    # Skip any session already inserted.
+    assume(len(RecordingSession.objects_by_id(session_id)) == 0)
+
+    # Try fetching for the first time; it should be created.
     original, created = RecordingSession.get_or_create_by_session_id(session_id)
-    assert created is False
+    assert created is True
     assert original.as_session_id() == session_id
     del original
 
+    # Try fetching it again; it should fetch the old version.
     fetched, created = RecordingSession.get_or_create_by_session_id(session_id)
-    assert created
+    assert created is False
     assert fetched.as_session_id() == session_id
 
 
@@ -279,9 +283,9 @@ def random_float() -> float:
     """
     Returns a random float f in 0 <= f < inf.
     """
+    # See: https://en.wikipedia.org/wiki/Double-precision_floating-point_format
     MAX_11_BIT_INT = 0x7FF
     DOUBLE_BIAS = -1023
-    # See: https://en.wikipedia.org/wiki/Double-precision_floating-point_format
     significand = random.getrandbits(52)
     exponent = random.getrandbits(11)
 

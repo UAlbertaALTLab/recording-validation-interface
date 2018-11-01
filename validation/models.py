@@ -214,7 +214,7 @@ class RecordingSession(models.Model):
         """
         try:
             obj, = cls.objects_by_id(session_id)
-        except ValueErorr:
+        except ValueError:
             obj = cls.create_from(session_id)
             obj.save()
             return obj, True
