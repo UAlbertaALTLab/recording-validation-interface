@@ -180,6 +180,15 @@ class RecordingSession(models.Model):
     subsession = models.IntegerField(help_text="The 'subsession' number, if applicable.",
                                      null=True, blank=True)
 
+    def as_session_id(self) -> str:
+        """
+        Converts back into a SessionID object.
+        """
+        return SessionID(date=self.date,
+                         time_of_day=parse_or_none(TimeOfDay, self.time_of_day),
+                         location=parse_or_none(Location, self.location),
+                         subsession=self.subsession)
+
     @classmethod
     def create_from(cls, session_id):
         """
@@ -191,14 +200,12 @@ class RecordingSession(models.Model):
                    location=enum_value_or_blank(session_id.location),
                    subsession=session_id.subsession)
 
-    def as_session_id(self) -> str:
+    @classmethod
+    def objects_by_id(cls, session_id: SessionID):
         """
-        Converts back into a SessionID object.
+        Fetch a RecordingSession by its Session ID.
         """
-        return SessionID(date=self.date,
-                         time_of_day=parse_or_none(TimeOfDay, self.time_of_day),
-                         location=parse_or_none(Location, self.location),
-                         subsession=self.subsession)
+        return cls.objects.filter(id=str(session_id))
 
     def __str__(self):
         return str(self.as_session_id())
