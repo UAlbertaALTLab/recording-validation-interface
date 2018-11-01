@@ -92,6 +92,23 @@ def test_inserting_duplicate_session(session_id: SessionID):
         duplicate.save()
 
 
+@pytest.mark.django_db
+@given(session_ids())
+def test_fetching_by_session_id(session_id: SessionID):
+    """
+    Check that we can create a RecordingSession, then fetch it by session ID.
+    """
+
+    original = RecordingSession.create_from(session_id)
+    original.save()
+    del original
+
+    query = RecordingSession.objects_by_id(session_id)
+    assert len(query) == 1
+    fetched = query.first()
+    assert fetched.as_session_id() == session_id
+
+
 def test_speaker():
     """
     Check that we can create a speaker.
