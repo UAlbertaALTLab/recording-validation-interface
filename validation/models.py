@@ -184,9 +184,8 @@ class RecordingSession(models.Model):
         Create the model from the internal data class.
         """
         return cls(date=session_id.date,
-                   # `and` prevents accessing attributes on a None value.
-                   time_of_day=(session_id.time_of_day and session_id.time_of_day.value) or '',
-                   location=(session_id.location and session_id.location.value) or '',
+                   time_of_day=enum_value_or_blank(session_id.time_of_day),
+                   location=enum_value_or_blank(session_id.location),
                    subsession=session_id.subsession)
 
     def as_session_id(self):
@@ -194,9 +193,8 @@ class RecordingSession(models.Model):
         Converts back into a SessionID object.
         """
         return SessionID(date=self.date,
-                         # `and` prevents calling .parse() on a None value.
-                         time_of_day=(self.time_of_day and TimeOfDay.parse(self.time_of_day)) or None,
-                         location=(self.location and Location.parse(self.location)) or None,
+                         time_of_day=parse_or_none(TimeOfDay, self.time_of_day),
+                         location=parse_or_none(Location, self.location),
                          subsession=self.subsession)
 
     def __str__(self):
@@ -234,3 +232,24 @@ class Recording(models.Model):
 
     def __str__(self):
         return f'"{self.phrase}" recorded by {self.speaker} during {self.session}'
+
+
+# ############################### Utitlities ############################### #
+
+def enum_value_or_blank(enum) -> str:
+    """
+    Returns either the value of the enumerated property, or blank (the empty string).
+    """
+    # `and` prevents accessing attributes on a None value.
+    return (enum and enum.value) or ''
+
+
+def parse_or_none(cls, value):
+    """
+    Given a value from a db.CharField(choices=...) field, returns the parsed
+    value according to the enumeration or None.
+
+    Is it just me, or is it getting monadic in here?
+    """
+    # `and` prevents calling .parse() on a None value.
+    return (value and cls.parse(value)) or None
