@@ -111,6 +111,23 @@ def test_fetching_by_session_id(session_id: SessionID):
     assert fetched.as_session_id() == session_id
 
 
+@pytest.mark.django_db
+@given(session_ids())
+def test_get_or_create_recording_session(session_id: SessionID):
+    """
+    Test get or creating a recording session.
+    """
+
+    original, created = RecordingSession.get_or_create_by_session_id(session_id)
+    assert created is False
+    assert original.as_session_id() == session_id
+    del original
+
+    fetched, created = RecordingSession.get_or_create_by_session_id(session_id)
+    assert created
+    assert fetched.as_session_id() == session_id
+
+
 def test_speaker():
     """
     Check that we can create a speaker.
