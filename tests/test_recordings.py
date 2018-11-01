@@ -67,7 +67,7 @@ def test_can_recover_metadata(wave_file_path: Path,
     acimosis = "ᐊᒋᒧᓯᐢ"
     transcode_to_aac(wave_file_path, destination, tags=dict(
         title=acimosis,
-        performer="SPEAKER",
+        artist="SPEAKER",
         album=creation_time,
         language="crk",
         creation_time=creation_time,
@@ -79,10 +79,7 @@ def test_can_recover_metadata(wave_file_path: Path,
     blob = destination.read_bytes()
     assert acimosis.encode('UTF-8') in blob
     assert creation_time.encode('UTF-8') in blob
-    if b'crk' not in blob:
-        warnings.warn("Did not find language in .m4a file!")
-    if b'SPEAKER' not in blob:
-        warnings.warn("Did not find speaker in .m4a file!")
+    assert b'SPEAKER' in blob
     assert b'2015' in blob
 
 
