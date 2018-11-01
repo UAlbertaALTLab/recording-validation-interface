@@ -16,12 +16,16 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from hypothesis.strategies import builds
+from hypothesis.strategies import builds, composite, integers, none
 
 from librecval.recording_session import SessionID
 
 __all__ = ['session_ids']
 
 
-def session_ids():
-    return builds(SessionID)
+@composite
+def session_ids(draw, subsession=none() | integers(min_value=0, max_value=9)):
+    """
+    Builds valid SessionIDs.
+    """
+    return draw(builds(SessionID, subsession=subsession))
