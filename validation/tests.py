@@ -63,12 +63,31 @@ def test_recording_session_model_from_session_id(session_id):
     session.clean_fields()
     session.clean()
 
-    # Now convert it back. We should get back an equivillent object.
+    # Now convert it back. We should get back an equivalent object.
     new_session_id = session.as_session_id()
     assert new_session_id == session_id
 
     # Finally, the str() should be based on the str() of the SessionID:
     assert str(session_id) in str(session)
+
+
+@pytest.mark.django_db
+@given(builds(SessionID))
+def test_inserting_duplicate_session(session_id: SessionID):
+    """
+    Check that we can't insert the same session in the database.
+    """
+    original = RecordingSession.create_from(session_id)
+    duplicate = RecordingSession.create_from(session_id)
+    # This tests assumes that the duplicate is equivalent, but is not the SAME object!
+    assert original.as_session_id() == duplicate.as_session_id()
+    assert original is not duplicate
+
+    original.save()
+    with pytest.raises(ValidationError):
+        # This is required on SQLite3, which will not check this for you (???)
+        duplicate.validate_unique()
+        duplicate.save()
 
 
 def test_speaker():
