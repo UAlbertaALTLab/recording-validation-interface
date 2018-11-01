@@ -280,6 +280,7 @@ def random_float() -> float:
     Returns a random float f in 0 <= f < inf.
     """
     MAX_11_BIT_INT = 0x7FF
+    DOUBLE_BIAS = -1023
     # See: https://en.wikipedia.org/wiki/Double-precision_floating-point_format
     significand = random.getrandbits(52)
     exponent = random.getrandbits(11)
@@ -289,7 +290,8 @@ def random_float() -> float:
     # numbers /very/ close to zero).
     if exponent == MAX_11_BIT_INT:
         exponent = 0
-    assert 0 <= exponent < MAX_11_BIT_INT
-    exponent -= 1023
+    else:
+        # Bias the exponent, as IEEE wants us to.
+        exponent = exponent + DOUBLE_BIAS
 
     return float.fromhex(f'0x{significand:013x}p{exponent:d}')

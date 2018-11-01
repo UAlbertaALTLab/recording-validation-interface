@@ -72,14 +72,11 @@ def django_recording_importer(info: RecordingInfo, recording_path: Path, logger)
     if speaker_created:
         logger.info("New speaker: %s", speaker)
 
-    # TODO: factor this out to RecordingSession class?
-    tmp_session = RecordingSession.create_from(info.session)
-    session, session_created = RecordingSession.objects.get_or_create(
-        date=tmp_session.date,
-        time_of_day=tmp_session.time_of_day or '',
-        location=tmp_session.location or '',
-        subsession=tmp_session.subsession,
-    )
+    session, session_created = RecordingSession.objects_by_id(info.session).\
+        get_or_create(date=info.session.date,
+                      time_of_day=info.session.time_of_day or '',
+                      location=info.session.location or '',
+                      subsession=info.session.subsession)
     if session_created:
         logger.info("New session: %s", session)
 

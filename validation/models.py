@@ -207,6 +207,20 @@ class RecordingSession(models.Model):
         """
         return cls.objects.filter(id=str(session_id))
 
+    @classmethod
+    def get_or_create_by_session_id(cls, session_id: SessionID):
+        """
+        Same as cls.objects.get_or_create(), but only deals with session IDs.
+        """
+        try:
+            obj, = cls.objects_by_id(session_id)
+        except ValueErorr:
+            obj = cls.create_from(session_id)
+            obj.save()
+            return obj, True
+        else:
+            return obj, False
+
     def __str__(self):
         return str(self.as_session_id())
 
