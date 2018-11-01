@@ -20,7 +20,7 @@ from datetime import datetime, date as datetype
 
 import pytest
 from django.core.exceptions import ValidationError
-from hypothesis import given
+from hypothesis import given, assume
 from hypothesis.strategies import builds
 from model_mommy import mommy
 from model_mommy.recipe import Recipe
@@ -45,6 +45,8 @@ def test_recording_session_model_from_session_id(session_id):
     Test that a RecordingSession model can be make from a SessionID, and that
     it can be converted back.
     """
+
+    assume(session_id.subsession is None or 0 <= session_id.subsession <= 9)
 
     # Create the RecordingSession from the session ID.
     session = RecordingSession.create_from(session_id)
@@ -77,6 +79,8 @@ def test_inserting_duplicate_session(session_id: SessionID):
     """
     Check that we can't insert the same session in the database.
     """
+    assume(session_id.subsession is None or 0 <= session_id.subsession <= 9)
+
     original = RecordingSession.create_from(session_id)
     duplicate = RecordingSession.create_from(session_id)
     # This tests assumes that the duplicate is equivalent, but is not the SAME object!

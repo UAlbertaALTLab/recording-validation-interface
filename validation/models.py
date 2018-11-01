@@ -20,6 +20,8 @@ import re
 
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
 
@@ -162,10 +164,10 @@ class RecordingSession(models.Model):
     Example sessions:
 
     2017-11-01-AM-OFF-_:
-        Happended on the morning of November 1, 2017 in the office.
+        Happened on the morning of November 1, 2017 in the office.
     """
 
-    # TODO: unique constraint
+    id = models.CharField(primary_key=True, max_length=len('2000-01-01-__-___-_'))
 
     date = models.DateField(help_text="The day the session occured.")
     # See librecval for the appropriate choices:
@@ -183,12 +185,13 @@ class RecordingSession(models.Model):
         """
         Create the model from the internal data class.
         """
-        return cls(date=session_id.date,
+        return cls(id=str(session_id),
+                   date=session_id.date,
                    time_of_day=enum_value_or_blank(session_id.time_of_day),
                    location=enum_value_or_blank(session_id.location),
                    subsession=session_id.subsession)
 
-    def as_session_id(self):
+    def as_session_id(self) -> str:
         """
         Converts back into a SessionID object.
         """
@@ -199,6 +202,11 @@ class RecordingSession(models.Model):
 
     def __str__(self):
         return str(self.as_session_id())
+
+
+@receiver(pre_save, sender=RecordingSession)
+def generate_primary_key(sender, instance, **kwargs):
+    instance.id = str(instance.as_session_id())
 
 
 # The length of a SHA 256 hash, as hexadecimal characters.
@@ -223,7 +231,7 @@ class Recording(models.Model):
     timestamp = models.DateTimeField(help_text="The time at which this recording starts")
     phrase = models.ForeignKey(Phrase, on_delete=models.CASCADE)
     session = models.ForeignKey(RecordingSession, on_delete=models.CASCADE)
-    quality = models.CharField(help_text="Is the recording clean? Is it suitable to use publically?",
+    quality = models.CharField(help_text="Is the recording clean? Is it suitable to use publicly?",
                                **arguments_for_choices(QUALITY_CHOICES),
                                blank=True)
 
@@ -234,7 +242,7 @@ class Recording(models.Model):
         return f'"{self.phrase}" recorded by {self.speaker} during {self.session}'
 
 
-# ############################### Utitlities ############################### #
+# ############################### Utilities ############################### #
 
 def enum_value_or_blank(enum) -> str:
     """
