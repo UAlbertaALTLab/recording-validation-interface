@@ -49,8 +49,14 @@ def test_recording_session_model_from_session_id(session_id):
     # Create the RecordingSession from the session ID.
     session = RecordingSession.create_from(session_id)
     assert session.date == session_id.date
-    assert session.time_of_day == (session_id.time_of_day and session_id.time_of_day.value)
-    assert session.location == (session_id.location and session_id.location.value)
+    if session_id.time_of_day is None:
+        assert session.time_of_day == ''
+    else:
+        assert session.time_of_day == session_id.time_of_day.value
+    if session_id.location is None:
+        assert session.location == ''
+    else:
+        assert session.location == session_id.location.value
     assert session.subsession == session_id.subsession
 
     # Make sure it passes validation!
