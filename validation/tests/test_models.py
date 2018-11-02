@@ -281,3 +281,22 @@ def test_recording():
     assert str(recording.phrase) in str(recording)
     assert str(recording.speaker) in str(recording)
     assert str(recording.session) in str(recording)
+
+
+@pytest.mark.django_db
+def test_phrase_recordings():
+    # Keep it in a 32 bit signed integer
+    MAX_RECORDING_LENGTH = 2 ** 31 - 1
+
+    phrase = mommy.make(Phrase)
+
+    r1 = Recipe(Recording,
+                phrase=phrase,
+                timestamp=lambda: random.randint(0, MAX_RECORDING_LENGTH)).make()
+    r2 = Recipe(Recording,
+                phrase=phrase,
+                timestamp=lambda: random.randint(0, MAX_RECORDING_LENGTH)).make()
+
+    assert len(phrase.recordings) == 2
+    assert r1 in phrase.recordings
+    assert r2 in phrase.recordings
