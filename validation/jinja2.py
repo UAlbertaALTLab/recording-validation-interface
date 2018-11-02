@@ -11,16 +11,23 @@ from jinja2 import Environment
 def environment(**options):
     env = Environment(**options)
     env.globals.update({
-        # Enables use of {% static ... %}
+        # Enables use of {{ static(...) }}
         'static': staticfiles_storage.url,
-        # Enables use of {% url ... %}
-        'url': reverse,
+        # Enables use of {{ url(...) }}
+        'url': url,
     })
 
     # Register filters
     env.filters['audio_url'] = audio_url_filter
 
     return env
+
+
+def url(name, *args, **kwargs):
+    """
+    Small wrapper for Django's reverse() filter.
+    """
+    return reverse(name, args=args, kwargs=kwargs)
 
 
 def audio_url_filter(rec) -> str:

@@ -19,8 +19,8 @@
  # Displays a list of phrases.
  #}
 
-{% extends '_base.html' %}
-{% import '_macros.html' as macros %}
+{% extends 'validation/_base.html' %}
+{% import 'validation/_macros.html' as macros %}
 
 {% block content %}
 <div class="table-responsive">
@@ -32,8 +32,8 @@
         <th scope="col"> Recordings </th>
       </tr>
     </thead>
-    {% for phrase in page.items %}
-    <tr data-update-uri="{{ url_for('update_text', phrase_id=phrase.id) }}">
+    {% for phrase in phrases %}
+    <tr data-update-uri="{{ url('validation:update_text', phrase_id=phrase.id) }}">
       {{ macros.td_transcription(user, phrase) }}
       {{ macros.td_translation(user, phrase) }}
       <td>
@@ -47,12 +47,12 @@
         </ul>
       </td>
     </tr>
-    {% endfor %}{# for phrase in page.phrases#}
+    {% endfor %}{# for phrase in phrases #}
   </table>
 </div>
 
 <nav>
-  {{ macros.pagination(page, 'list_phrases') }}
+  {{ macros.pagination(phrases, 'list_phrases') }}
 </nav>
 {% endblock content %}
 

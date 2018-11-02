@@ -26,4 +26,5 @@ urlpatterns = [
     path('', views.index, name='index'),
     # TODO: phrases/<int:phrases_id>/<slug>
     path('phrases', views.search_phrases, name='search_phrases'),
+    path('phrases/<int:phrase_id>/', views.update_text, name='update_text'),
 ]

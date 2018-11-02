@@ -32,10 +32,17 @@ def index(request):
     page_no = request.GET.get('page', 1)
     phrases = paginator.get_page(page_no)
     context = dict(phrases=phrases)
-    return render(request, 'validation/search.html', context)
+    return render(request, 'validation/list_phrases.html', context)
 
 
 def search_phrases(request):
+    """
+    The search results for pages.
+    """
+    return HttpResponse(501)
+
+
+def update_text(request):
     """
     The search results for pages.
     """
