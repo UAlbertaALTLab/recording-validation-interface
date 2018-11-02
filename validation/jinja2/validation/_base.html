@@ -36,7 +36,7 @@
 
   {# The header #}
   <nav class="navbar navbar-expand-md navbar-dark bg-dark">
-    <a class="navbar-brand" href="{{ url_for('index') }}">
+    <a class="navbar-brand" href="{{ url('validation:index') }}">
       <span lang="en" class="d-none d-sm-inline"> Maskwacîs </span>
       <span lang="crk" class="d-sm-none"> ᒪᐢᑿᒋᐢ </span>
       Recordings Validation
@@ -48,7 +48,7 @@
     {# The navbar #}
     <div class="navbar-collapse collapse justify-content-stretch" id="navbarSupportedContent">
       <form class="form-inline ml-2 my-2 my-lg-0" method="GET" action="{{
-        url_for('search_phrases')
+        url('validation:search_phrases')
       }}">
         <input class="form-control mr-sm-2" name="q" type="search" placeholder="Search" aria-label="Search">
         <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>

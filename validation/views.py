@@ -17,10 +17,26 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from django.http import HttpResponse
+from django.core.paginator import Paginator
 from django.shortcuts import render
 
+from .models import Phrase
 
-# Create your views here.
+
 def index(request):
-    context = {}
+    """
+    The home page.
+    """
+    all_phrases = Phrase.objects.all()
+    paginator = Paginator(all_phrases, 30)
+
+    phrases = paginator.get_page(1)
+    context = dict(phrases=phrases)
     return render(request, 'validation/search.html', context)
+
+
+def search_phrases(request):
+    """
+    The search results for pages.
+    """
+    return HttpResponse(501)

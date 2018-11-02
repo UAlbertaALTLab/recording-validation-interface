@@ -16,4 +16,18 @@ def environment(**options):
         # Enables use of {% url ... %}
         'url': reverse,
     })
+
+    # Register filters
+    env.filters['audio_url'] = audio_url_filter
+
     return env
+
+
+def audio_url_filter(rec) -> str:
+    """
+    Filter that returns a url to the compressed audio file for this particular
+    recording.
+     Usage (in a template):
+         <source src="{{ recording | audio_url }}" type="audio/aac" />
+    """
+    return reverse('validation:send_audio', filename=f"{rec.id}.m4a")

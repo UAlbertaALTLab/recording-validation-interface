@@ -19,8 +19,8 @@
  # Displays search results for phrases.
  #}
 
-{% extends '_base.html' %}
-{% import '_macros.html' as macros %}
+{% extends 'validation/_base.html' %}
+{% import 'validation/_macros.html' as macros %}
 
 
 {% block content %}
@@ -35,7 +35,7 @@
         <th scope="col"> Recordings </th>
       </tr>
     </thead>
-    {% for phrase in page.items %}
+    {% for phrase in phrases %}
     <tr>
       {{ macros.td_transcription(user, phrase) }}
       {{ macros.td_translation(user, phrase) }}
@@ -44,7 +44,7 @@
         {% for recording in phrase.recordings %}
           <li>
             <audio controls preload=none>
-              <source src="{{ recording | audio_url }}" type="audio/aac"/>
+              <source src="{{ recording | audio_url }}" type="audio/aac" />
             </audio>
           </li>
 
@@ -57,7 +57,7 @@
 </div>
 
 <nav>
-  {{ macros.pagination(page, 'search_phrases') }}
+  {# {{ macros.pagination(page, 'search_phrases') }} #}
 </nav>
 {% endblock content %}
 
