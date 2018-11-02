@@ -98,6 +98,13 @@ class Phrase(models.Model):
     # strings.
     MACRON_TO_CIRCUMFLEX = str.maketrans('ēīōā', 'êîôâ')
 
+    @property
+    def recordings(self):
+        """
+        A query set of the current recordings.
+        """
+        return self.recording_set.all()
+
     def clean(self):
         """
         Cleans the text fields.
