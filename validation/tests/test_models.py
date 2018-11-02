@@ -259,14 +259,19 @@ def test_phrase_has_history():
 
 @pytest.mark.django_db
 def test_recording():
-    recording = Recipe(Recording,
-                       timestamp=random_float).make()
+    # Keep it in a 32 bit signed integer
+    MAX_RECORDING_LENGTH = 2 ** 31 - 1
+
+    recording = Recipe(
+        Recording,
+        timestamp=lambda: random.randint(0, MAX_RECORDING_LENGTH)
+    ).make()
 
     # Check all the fields.
     assert isinstance(recording.id, str)
     assert recording.quality in {Recording.CLEAN, Recording.UNUSABLE, ''}
-    assert isinstance(recording.timestamp, float)
-    assert 0.0 <= recording.timestamp < inf
+    assert isinstance(recording.timestamp, int)
+    assert 0 <= recording.timestamp < MAX_RECORDING_LENGTH
     assert isinstance(recording.phrase, Phrase)
     assert isinstance(recording.session, RecordingSession)
     assert isinstance(recording.speaker, Speaker)
@@ -277,27 +282,3 @@ def test_recording():
     assert str(recording.phrase) in str(recording)
     assert str(recording.speaker) in str(recording)
     assert str(recording.session) in str(recording)
-
-
-def random_float() -> float:
-    """
-    Returns a random float f in 0 <= f < inf.
-    """
-    # See: https://en.wikipedia.org/wiki/Double-precision_floating-point_format
-    MAX_11_BIT_INT = 0x7FF
-    DOUBLE_BIAS = -1023
-    EXPONENT_BITS = 11
-    SIGNIFICAND_BITS = 52
-    significand = random.getrandbits(SIGNIFICAND_BITS)
-    exponent = random.getrandbits(EXPONENT_BITS)
-
-    # When exponent is all ones, we get inf and a whole lot of NaNs. Don't
-    # generate those! Instead, just generate 0. It's okay to generate a lot of
-    # zeros!
-    if exponent == MAX_11_BIT_INT:
-        return 0.0
-    else:
-        # Bias the exponent, as IEEE wants us to.
-        exponent = exponent + DOUBLE_BIAS
-
-    return float.fromhex(f'0x1.{significand:013x}p{exponent:+d}')
