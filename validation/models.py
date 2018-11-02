@@ -248,7 +248,7 @@ class Recording(models.Model):
 
     id = models.CharField(primary_key=True, max_length=SHA256_HEX_LENGTH)
     speaker = models.ForeignKey(Speaker, on_delete=models.CASCADE)
-    timestamp = models.FloatField(help_text="The time at which this recording starts")
+    timestamp = models.IntegerField(help_text="The offset (in milliseconds) when the phrase starts in the master file")
     phrase = models.ForeignKey(Phrase, on_delete=models.CASCADE)
     session = models.ForeignKey(RecordingSession, on_delete=models.CASCADE)
     quality = models.CharField(help_text="Is the recording clean? Is it suitable to use publicly?",
