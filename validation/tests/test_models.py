@@ -17,20 +17,19 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import random
-from math import inf
-from datetime import datetime, date as datetype
+from datetime import date as datetype
+from datetime import datetime
 
 import pytest  # type: ignore
 from django.core.exceptions import ValidationError  # type: ignore
-from hypothesis import given, assume
+from hypothesis import assume, given
 from model_mommy import mommy  # type: ignore
 from model_mommy.recipe import Recipe  # type: ignore
 
 from librecval.normalization import nfc
 from librecval.recording_session import Location, SessionID, TimeOfDay
-from validation.models import Phrase, RecordingSession, Speaker, Recording
-
 from librecval.test_utils.strategies import session_ids
+from validation.models import Phrase, Recording, RecordingSession, Speaker
 
 
 def test_recording_session():
