@@ -191,7 +191,7 @@ class SessionID(NamedTuple):
         Attempts to parse a messy session name.
 
         >>> SessionID.parse_dirty('2015-04-15-am')
-        SessionID(date=date(2015, 4, 15), time_of_day=TimeOfDay.MORNING, subsession=None, location=None)
+        SessionID(date=datetime.date(2015, 4, 15), time_of_day=TimeOfDay.MORNING, subsession=None, location=None)
         """
         m = dirty_pattern.match(name)
         if m is None:

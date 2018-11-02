@@ -67,7 +67,7 @@ class RecordingInfo(NamedTuple):
     session: SessionID
     speaker: str
     type: str
-    timestamp: str
+    timestamp: int  # in milliseconds
     transcription: str
     translation: str
 
@@ -275,7 +275,7 @@ class PhraseExtractor:
             yield self.info_for(type_, transcription, translation,
                                 start, sound_bite)
 
-    def info_for(self, type_: str, transcription: str, translation: str, timestamp, sound_bite):
+    def info_for(self, type_: str, transcription: str, translation: str, timestamp: int, sound_bite: AudioSegment):
         """
         Return a tuple of the phrase and its audio.
         """
