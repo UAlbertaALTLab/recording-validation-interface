@@ -29,8 +29,8 @@ def index(request):
     """
     all_phrases = Phrase.objects.all()
     paginator = Paginator(all_phrases, 30)
-
-    phrases = paginator.get_page(1)
+    page_no = request.GET.get('page', 1)
+    phrases = paginator.get_page(page_no)
     context = dict(phrases=phrases)
     return render(request, 'validation/search.html', context)
 
