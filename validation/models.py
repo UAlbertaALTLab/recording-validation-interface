@@ -154,6 +154,9 @@ class Speaker(models.Model):
                               max_length=1, choices=GENDER_CHOICES,
                               null=True)
 
+    # TODO: add field for speaker bio (en)
+    # TODO: add field for speaker bio (crk)
+
     def clean(self):
         self.code = self.code.strip().upper()
         if not re.match(r'\A[A-Z]+[0-9]?\Z', self.code):

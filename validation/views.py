@@ -47,3 +47,6 @@ def update_text(request):
     The search results for pages.
     """
     return HttpResponse(501)
+
+
+# TODO: Speaker bio page like https://ojibwe.lib.umn.edu/about/voices
