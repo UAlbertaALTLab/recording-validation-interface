@@ -30,12 +30,11 @@ MAX_RECORDING_LENGTH = 2 ** 31 - 1
 
 
 @pytest.mark.django_db
-def test_serve_recording(exported_recording):
+def test_serve_recording(client, exported_recording):
     """
     Test that a recording is served properly.
     """
     recording, file_contents = exported_recording
-    client = Client()
     page = client.get(reverse('validation:recording', kwargs={'recording_id': recording.id}))
     assert page.status_code == 200
     assert page.get('Content-Type') == 'audio/m4a'
