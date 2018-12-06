@@ -37,6 +37,4 @@ def audio_url_filter(rec) -> str:
      Usage (in a template):
          <source src="{{ recording | audio_url }}" type="audio/aac" />
     """
-    # TODO: Unhardcode this path!
-    # TODO: use MEDIA_URL
-    return f"/validation/media/audio/{rec.id}.m4a"
+    return reverse('validation:recording', kwargs={'recording_id': rec.id})
