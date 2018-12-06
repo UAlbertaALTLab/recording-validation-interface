@@ -44,6 +44,12 @@ def test_serve_recording(client, exported_recording):
     assert page.content == file_contents
     assert page.content[4:12] == b'ftypM4A ', "Did not serve an .m4a file."
 
+    # Check stuff involving caching.
+    assert 'max-age=' in page.get('Cache-Control')
+    assert 'public' in page.get('Cache-Control')
+    assert 'must-revalidate' not in page.get('Cache-Control')
+    assert page.get('ETag') == recording.id
+
 
 @pytest.fixture
 def exported_recording(settings):
