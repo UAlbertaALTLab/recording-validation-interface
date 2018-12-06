@@ -16,11 +16,12 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from django.conf import settings
 from django.http import HttpResponse
 from django.core.paginator import Paginator
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 
-from .models import Phrase
+from .models import Phrase, Recording
 
 
 def index(request):
@@ -55,7 +56,9 @@ def serve_recording(request, recording_id):
     Note: To make things ~~WEB SCALE~~, we should NOT be doing this in Django;
     instead, Apache/Nginx should be doing this for us.
     """
-    return HttpResponse(501)
+    recording = get_object_or_404(Recording, id=recording_id)
+    audio = (settings.RECVAL_AUDIO_DIR / f'{recording.id}.m4a').read_bytes()
+    return HttpResponse(audio, content_type='audio/m4a')
 
 
 # TODO: Speaker bio page like https://ojibwe.lib.umn.edu/about/voices
