@@ -56,8 +56,17 @@ def test_serve_recording(client, exported_recording):
 @pytest.mark.django_db
 def test_search_recordings(client):
     phrase = 'ê-nipât'
-    page = client.get(reverse('validation:search_recordings',
-                              kwargs={'query': phrase}))
+    response = client.get(reverse('validation:search_recordings',
+                                  kwargs={'query': phrase}))
+    # It should have a JSON response
+    recordings = response.json()
+    assert len(recordings) == 2
+    # The JSON response is a list. Check each of its members.
+    for recording in recordings:
+        assert recording.get('wordform') == phrase
+        assert 'speaker' in rec.keys()
+        assert recording.get('gender') in 'MF'
+        assert recording.get('recording').endswith('.m4a')
 
 
 @pytest.fixture
