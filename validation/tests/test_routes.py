@@ -30,25 +30,34 @@ MAX_RECORDING_LENGTH = 2 ** 31 - 1
 
 
 @pytest.mark.django_db
-def test_serve_recording():
+def test_serve_recording(exported_recording):
     """
     Test that a recording is served properly.
     """
+    recording, file_contents = exported_recording
+    client = Client()
+    page = client.get(reverse('validation:recording', kwargs={'recording_id': recording.id}))
+    assert page.status_code == 200
+    assert page.get('Content-Type') == 'audio/m4a'
+    assert page.content == file_contents
 
+
+@pytest.fixture
+def exported_recording():
     recording = Recipe(Recording, timestamp=random_timestamp).make()
 
-    # Create a REAL audio recording.
+    # Create a REAL audio recording, saved on disk.
     # XXX: bad, temporary, figure out a better way!
     from django.conf import settings  # type: ignore
     audio = AudioSegment.empty()
     filename = settings.RECVAL_AUDIO_DIR / f'{recording.id}.m4a'
     audio.export(str(filename))
+    file_contents = filename.read_bytes()
 
-    client = Client()
-    page = client.get(reverse('validation:recording', kwargs={'recording_id': recording.id}))
-    assert page.status_code == 200
-    assert page.get('Content-Type') == 'audio/m4a'
-    assert page.content == filename.read_bytes()
+    yield recording, file_contents
+
+    # Clean up!
+    filename.unlink()
 
 
 def random_timestamp():
