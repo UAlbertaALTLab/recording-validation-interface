@@ -35,10 +35,7 @@ def test_serve_recording():
     Test that a recording is served properly.
     """
 
-    recording = Recipe(
-        Recording,
-        timestamp=lambda: random.randint(0, MAX_RECORDING_LENGTH)  # todo: refactor
-    ).make()
+    recording = Recipe(Recording, timestamp=random_timestamp).make()
 
     # Create a REAL audio recording.
     # XXX: bad, temporary, figure out a better way!
@@ -52,3 +49,7 @@ def test_serve_recording():
     assert page.status_code == 200
     assert page.get('Content-Type') == 'audio/m4a'
     assert page.content == filename.read_bytes()
+
+
+def random_timestamp():
+    return random.randint(0, MAX_RECORDING_LENGTH)
