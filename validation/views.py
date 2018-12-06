@@ -49,4 +49,13 @@ def update_text(request):
     return HttpResponse(501)
 
 
+def serve_recording(request, recording_id):
+    """
+    Serve a (transcoded) recording audio file.
+    Note: To make things ~~WEB SCALE~~, we should NOT be doing this in Django;
+    instead, Apache/Nginx should be doing this for us.
+    """
+    return HttpResponse(501)
+
+
 # TODO: Speaker bio page like https://ojibwe.lib.umn.edu/about/voices
