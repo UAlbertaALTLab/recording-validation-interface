@@ -58,7 +58,12 @@ def serve_recording(request, recording_id):
     """
     recording = get_object_or_404(Recording, id=recording_id)
     audio = (settings.RECVAL_AUDIO_DIR / f'{recording.id}.m4a').read_bytes()
-    return HttpResponse(audio, content_type='audio/m4a')
+    response = HttpResponse(audio, content_type='audio/m4a')
+    # The recording files basically never change, so tell everybody to cache
+    # the dookey out these files (or at very least, a year).
+    response['Cache-Control'] = f'public, max-age={60 * 60 * 24 * 365}'
+    response['ETag'] = recording.id
+    return response
 
 
 # TODO: Speaker bio page like https://ojibwe.lib.umn.edu/about/voices
