@@ -56,13 +56,17 @@ def serve_recording(request, recording_id):
     Note: To make things ~~WEB SCALE~~, we should NOT be doing this in Django;
     instead, Apache/Nginx should be doing this for us.
     """
+    # How many digits of the hash to include in the ETag.
+    # Practically, we do not need to make the entire hash part of the etag;
+    # just a part of it. Note: GitHub uses 7 digits.
+    HASH_PREFIX_LENGTH = 7
     recording = get_object_or_404(Recording, id=recording_id)
     audio = (settings.RECVAL_AUDIO_DIR / f'{recording.id}.m4a').read_bytes()
     response = HttpResponse(audio, content_type='audio/m4a')
     # The recording files basically never change, so tell everybody to cache
     # the dookey out these files (or at very least, a year).
     response['Cache-Control'] = f'public, max-age={60 * 60 * 24 * 365}'
-    response['ETag'] = recording.id
+    response['ETag'] = f'"{recording.id[:HASH_PREFIX_LENGTH]}"'
     return response
 
 
