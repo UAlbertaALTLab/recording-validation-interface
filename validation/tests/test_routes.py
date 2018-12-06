@@ -39,3 +39,7 @@ def test_serve_recording():
 
     client = Client()
     page = client.get(reverse('validation:recording', kwargs={'recording_id': recording.id}))
+    assert page.status_code == 200
+    assert page.get('Content-Type') == 'audio/m4a'
+    # TODO: How do I assert the content of the audio?
+    assert page.content[4:9] == b'ftypM4A '
