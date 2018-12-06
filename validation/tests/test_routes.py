@@ -22,6 +22,7 @@ import pytest  # type: ignore
 from django.shortcuts import reverse  # type: ignore
 from django.test import Client  # type: ignore
 from model_mommy.recipe import Recipe  # type: ignore
+from pydub import AudioSegment  # type: ignore
 
 from validation.models import Recording
 
@@ -31,15 +32,23 @@ MAX_RECORDING_LENGTH = 2 ** 31 - 1
 @pytest.mark.django_db
 def test_serve_recording():
     """
+    Test that a recording is served properly.
     """
+
     recording = Recipe(
         Recording,
-        timestamp=lambda: random.randint(0, MAX_RECORDING_LENGTH)
+        timestamp=lambda: random.randint(0, MAX_RECORDING_LENGTH)  # todo: refactor
     ).make()
+
+    # Create a REAL audio recording.
+    # XXX: bad, temporary, figure out a better way!
+    from django.conf import settings  # type: ignore
+    audio = AudioSegment.empty()
+    filename = settings.RECVAL_AUDIO_DIR / f'{recording.id}.m4a'
+    audio.export(str(filename))
 
     client = Client()
     page = client.get(reverse('validation:recording', kwargs={'recording_id': recording.id}))
     assert page.status_code == 200
     assert page.get('Content-Type') == 'audio/m4a'
-    # TODO: How do I assert the content of the audio?
-    assert page.content[4:9] == b'ftypM4A '
+    assert page.content == filename.read_bytes()
