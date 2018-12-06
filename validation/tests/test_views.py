@@ -55,6 +55,12 @@ def test_serve_recording(client, exported_recording):
 
 @pytest.fixture
 def exported_recording(settings):
+    """
+    Yields a recording that has been physically saved on a storage medium.
+
+    Yields a tuple of the Recording instance, and a bytes instance of the
+    recording's transcoded audio.
+    """
     recording = Recipe(Recording, timestamp=random_timestamp).make()
 
     # Create a REAL audio recording, saved on disk.
