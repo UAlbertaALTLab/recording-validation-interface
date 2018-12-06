@@ -53,6 +53,13 @@ def test_serve_recording(client, exported_recording):
     assert page.get('ETag').strip('"') in recording.id, "The ETag should be based on the recording ID"
 
 
+@pytest.mark.django_db
+def test_search_recordings(client):
+    phrase = 'ê-nipât'
+    client.get(reverse('validation:search_recordings',
+                       kwargs={'query': phrase}))
+
+
 @pytest.fixture
 def exported_recording(settings):
     """
