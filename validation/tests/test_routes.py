@@ -48,7 +48,9 @@ def test_serve_recording(client, exported_recording):
     assert 'max-age=' in page.get('Cache-Control')
     assert 'public' in page.get('Cache-Control')
     assert 'must-revalidate' not in page.get('Cache-Control')
-    assert page.get('ETag') == recording.id
+    assert page.get('ETag').startswith('"'), "Incorrect ETag syntax"
+    assert page.get('ETag').endswith('"'), "Incorrect ETag syntax"
+    assert page.get('ETag').strip('"') in recording.id, "The ETag should be based on the recording ID"
 
 
 @pytest.fixture
