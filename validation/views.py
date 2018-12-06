@@ -70,4 +70,12 @@ def serve_recording(request, recording_id):
     return response
 
 
+def search_recordings(request, query):
+    """
+    Searches for recordings whose phrase matches the query. The response is
+    JSON that can be used by external apps.
+    """
+    return HttpResponse(status=501)
+
+
 # TODO: Speaker bio page like https://ojibwe.lib.umn.edu/about/voices

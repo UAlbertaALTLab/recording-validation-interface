@@ -56,8 +56,8 @@ def test_serve_recording(client, exported_recording):
 @pytest.mark.django_db
 def test_search_recordings(client):
     phrase = 'ê-nipât'
-    client.get(reverse('validation:search_recordings',
-                       kwargs={'query': phrase}))
+    page = client.get(reverse('validation:search_recordings',
+                              kwargs={'query': phrase}))
 
 
 @pytest.fixture
