@@ -25,7 +25,7 @@ from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
 
-from librecval.normalization import normalize
+from librecval.normalization import normalize_sro
 from librecval.recording_session import Location, SessionID, TimeOfDay
 
 
@@ -94,10 +94,6 @@ class Phrase(models.Model):
     # alphabet (in circumflexes), and some selected punctuation.
     ALLOWED_TRANSCRIPTION_CHARACTERS = set('ptkcshmn yw rl êiîoôaâ -')
 
-    # A translation table to convert macrons to cicumflexes in lowercase, NFC
-    # strings.
-    MACRON_TO_CIRCUMFLEX = str.maketrans('ēīōā', 'êîôâ')
-
     @property
     def recordings(self):
         """
@@ -109,17 +105,8 @@ class Phrase(models.Model):
         """
         Cleans the text fields.
         """
-        # TODO: strict_sro boolean flag?
-        self.transcription = normalize(self.transcription).\
-            lower().\
-            replace('e', 'ê').\
-            translate(self.MACRON_TO_CIRCUMFLEX)
-
-        # Ensure hyphens are consistently exactly one hyphen-minus character.
-        self.transcription = re.sub(r'\s+-\s+', '-', self.transcription)
-        # Ensure there are exactly single spaces between words
-        self.transcription = re.sub(r'\s+', ' ', self.transcription)
-
+        # TODO: add a strict_sro boolean flag?
+        self.transcription = normalize_sro(self.transcription)
         assert self.ALLOWED_TRANSCRIPTION_CHARACTERS.issuperset(self.transcription)
 
     def __str__(self) -> str:

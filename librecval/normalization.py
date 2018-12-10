@@ -20,6 +20,11 @@ import re
 import unicodedata
 
 
+# A translation table to convert macrons to cicumflexes in lowercase, NFC
+# strings.
+MACRON_TO_CIRCUMFLEX = str.maketrans('ēīōā', 'êîôâ')
+
+
 def nfc(utterance: str) -> str:
     return unicodedata.normalize('NFC', utterance)
 
@@ -29,6 +34,49 @@ def normalize(utterance: str) -> str:
     Normalizes utterances (translations, transcriptions, etc.)
     """
     return unicodedata.normalize('NFC', utterance.strip())
+
+
+def normalize_sro(utterance: str) -> str:
+    """
+    Normalizes Plains Cree text written in the standard Roman orthography.
+
+    The following are the normalizations applied:
+
+    Lower-cased:
+
+    >>> normalize_sro('Maskêkosihk')
+    'maskêkosihk'
+
+    No extraneous whitespace on either edge of the string:
+
+    >>> normalize_sro('  maskêkosihk ')
+    'maskêkosihk'
+
+    Exactly one U+0020 SPACE character between words:
+
+    >>> normalize_sro('nisto  nêwo  kapakihtikta    nipiy')
+    'nisto nêwo kapakihtikta nipiy'
+
+    All <ê> are long:
+
+    >>> normalize_sro('kecikwasakew')
+    'kêcikwasakêw'
+    """
+
+    # TODO: (i)-elision, (o)-elision, '-elision, ’-elision
+    # TODO: nin's'tohtên
+    # TODO: nin(i)s(i)tohtên
+
+    utterance = nfc(utterance).\
+        strip().\
+        lower().\
+        replace('e', 'ê').\
+        translate(MACRON_TO_CIRCUMFLEX)
+
+    # Ensure hyphens are consistently exactly one hyphen-minus character.
+    utterance = re.sub(r'\s+-\s+', '-', utterance)
+    # Ensure there are exactly single spaces between words
+    return re.sub(r'\s+', ' ', utterance)
 
 
 def to_indexable_form(text: str) -> str:
