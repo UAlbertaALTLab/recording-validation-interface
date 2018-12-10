@@ -28,7 +28,7 @@ from model_mommy import mommy  # type: ignore
 from model_mommy.recipe import Recipe  # type: ignore
 from pydub import AudioSegment  # type: ignore
 
-from validation.models import Phrase, Recording
+from validation.models import Phrase, Recording, Speaker
 
 MAX_RECORDING_LENGTH = 2 ** 31 - 1
 
@@ -57,8 +57,12 @@ def test_serve_recording(client, exported_recording):
 @pytest.mark.django_db
 def test_search_recordings(client):
     phrase = mommy.make(Phrase, transcription='ê-nipat')
+    speaker = mommy.make(Speaker, gender=random_gender)
+
+    # Make two recordings. We want to make sure the query actually works by
+    # only retrieving the *relevant* recording.
     recipe = Recipe(Recording, timestamp=random_timestamp)
-    recording = recipe.make(phrase=phrase)
+    recording = recipe.make(phrase=phrase, speaker=speaker)
     unrelated_recording = recipe.make()
 
     assert recording.phrase != unrelated_recording.phrase
@@ -105,3 +109,7 @@ def exported_recording(settings):
 
 def random_timestamp():
     return random.randint(0, MAX_RECORDING_LENGTH)
+
+
+def random_gender():
+    return random.choice('MF')
