@@ -77,7 +77,8 @@ def test_search_recordings(client):
     assert recording.get('wordform') == phrase.transcription
     assert 'speaker' in recording.keys()
     assert recording.get('gender') in 'MF'
-    assert recording.get('recording').endswith('.m4a')
+    assert recording.get('recording_url').startswith(('http://', 'https://'))
+    assert recording.get('recording_url').endswith('.m4a')
 
 
 # ################################ Fixtures ################################ #
