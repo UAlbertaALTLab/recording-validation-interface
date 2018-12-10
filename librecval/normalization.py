@@ -73,8 +73,6 @@ def normalize_sro(utterance: str) -> str:
         replace('e', 'ê').\
         translate(MACRON_TO_CIRCUMFLEX)
 
-    # Ensure hyphens are consistently exactly one hyphen-minus character.
-    utterance = re.sub(r'\s+-\s+', '-', utterance)
     # Ensure there are exactly single spaces between words
     return re.sub(r'\s+', ' ', utterance)
 
