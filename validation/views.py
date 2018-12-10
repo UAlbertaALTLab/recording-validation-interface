@@ -85,11 +85,15 @@ def search_recordings(request, query):
     result_set = Recording.objects.filter(phrase__transcription=transcription,
                                           speaker__gender__isnull=False)
 
+    def make_absolute_uri_for_recording(rec_id: str) -> str:
+        relative_uri = reverse('validation:recording', kwargs={'recording_id': rec_id})
+        return request.build_absolute_uri(relative_uri)
+
     recordings = [{
         'wordform': rec.phrase.transcription,
         'speaker': rec.speaker.code,
         'gender': rec.speaker.gender,
-        'recording': reverse('validation:recording', kwargs={'recording_id': rec.id})
+        'recording_url': make_absolute_uri_for_recording(rec.id),
     } for rec in result_set]
 
     return JsonResponse(recordings, safe=False)
