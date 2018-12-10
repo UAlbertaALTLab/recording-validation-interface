@@ -65,6 +65,7 @@ def serve_recording(request, recording_id):
     HASH_PREFIX_LENGTH = 7
     recording = get_object_or_404(Recording, id=recording_id)
     audio = (settings.RECVAL_AUDIO_DIR / f'{recording.id}.m4a').read_bytes()
+    # TODO: Use FileResponse?
     response = HttpResponse(audio, content_type='audio/m4a')
     # The recording files basically never change, so tell everybody to cache
     # the dookey out these files (or at very least, a year).
@@ -84,6 +85,12 @@ def search_recordings(request, query):
 
     result_set = Recording.objects.filter(phrase__transcription=transcription,
                                           speaker__gender__isnull=False)
+
+    if len(result_set) == 0:
+        # No matches. Return an empty JSON response
+        response = JsonResponse([], safe=False)
+        response.status_code = 404
+        return response
 
     def make_absolute_uri_for_recording(rec_id: str) -> str:
         relative_uri = reverse('validation:recording', kwargs={'recording_id': rec_id})
