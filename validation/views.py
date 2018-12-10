@@ -17,9 +17,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from django.conf import settings
+from django.urls import reverse
 from django.http import HttpResponse, JsonResponse
 from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404
+
+from librecval.normalization import normalize_sro
 
 from .models import Phrase, Recording
 
@@ -75,8 +78,20 @@ def search_recordings(request, query):
     Searches for recordings whose phrase matches the query. The response is
     JSON that can be used by external apps.
     """
-    # TODO: ensure payload is a list
-    return JsonResponse([], safe=False)
+
+    # Assume the query is an SRO transcription
+    transcription = normalize_sro(query)
+
+    result_set = Recording.objects.filter(phrase__transcription=transcription)
+
+    recordings = [{
+        'wordform': rec.phrase.transcription,
+        'speaker': rec.speaker.code,
+        'gender': rec.speaker.gender,
+        'recording': reverse('validation:recording', kwargs={'recording_id': rec.id})
+    } for rec in result_set]
+
+    return JsonResponse(recordings, safe=False)
 
 
 # TODO: Speaker bio page like https://ojibwe.lib.umn.edu/about/voices

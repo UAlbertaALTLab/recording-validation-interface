@@ -71,7 +71,7 @@ def test_search_recordings(client):
     assert len(recordings) == 1
     recording = recordings[0]
     assert recording.get('wordform') == phrase.transcription
-    assert 'speaker' in rec.keys()
+    assert 'speaker' in recording.keys()
     assert recording.get('gender') in 'MF'
     assert recording.get('recording').endswith('.m4a')
 
