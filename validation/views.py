@@ -82,7 +82,8 @@ def search_recordings(request, query):
     # Assume the query is an SRO transcription
     transcription = normalize_sro(query)
 
-    result_set = Recording.objects.filter(phrase__transcription=transcription)
+    result_set = Recording.objects.filter(phrase__transcription=transcription,
+                                          speaker__gender__isnull=False)
 
     recordings = [{
         'wordform': rec.phrase.transcription,
