@@ -24,10 +24,11 @@ from tempfile import TemporaryDirectory
 import pytest  # type: ignore
 from django.shortcuts import reverse  # type: ignore
 from django.test import Client  # type: ignore
+from model_mommy import mommy  # type: ignore
 from model_mommy.recipe import Recipe  # type: ignore
 from pydub import AudioSegment  # type: ignore
 
-from validation.models import Recording
+from validation.models import Phrase, Recording
 
 MAX_RECORDING_LENGTH = 2 ** 31 - 1
 
@@ -55,14 +56,21 @@ def test_serve_recording(client, exported_recording):
 
 @pytest.mark.django_db
 def test_search_recordings(client):
-    phrase = 'ê-nipât'
+    phrase = mommy.make(Phrase, transcription='ê-nipat')
+    recipe = Recipe(Recording, timestamp=random_timestamp)
+    recording = recipe.make(phrase=phrase)
+    unrelated_recording = recipe.make()
+
+    assert recording.phrase != unrelated_recording.phrase
+
     response = client.get(reverse('validation:search_recordings',
-                                  kwargs={'query': phrase}))
-    # It should have a JSON response
+                                  kwargs={'query': phrase.transcription}))
+
     recordings = response.json()
+    assert isinstance(recordings, list)
     assert len(recordings) == 1
     recording = recordings[0]
-    assert recording.get('wordform') == phrase
+    assert recording.get('wordform') == phrase.transcription
     assert 'speaker' in rec.keys()
     assert recording.get('gender') in 'MF'
     assert recording.get('recording').endswith('.m4a')
