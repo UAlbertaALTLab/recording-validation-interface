@@ -119,11 +119,11 @@ class Speaker(models.Model):
     """
 
     # We store gender so that we can categorize how their voice sounds.
-    # The community is interested in hear each word with both a male and a
+    # The community is interested in hearing each word with both a male and a
     # female voice.
     # Although I believe gender is a spectrum (and can even be null!),
     # we personally know all of the speakers, and they all identifiy as either
-    # male or female ().
+    # male or female.
     MALE = 'M'
     FEMALE = 'F'
     GENDER_CHOICES = (
