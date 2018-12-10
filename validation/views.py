@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from django.conf import settings
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404
 
@@ -75,7 +75,8 @@ def search_recordings(request, query):
     Searches for recordings whose phrase matches the query. The response is
     JSON that can be used by external apps.
     """
-    return HttpResponse(status=501)
+    # TODO: ensure payload is a list
+    return JsonResponse([], safe=False)
 
 
 # TODO: Speaker bio page like https://ojibwe.lib.umn.edu/about/voices
