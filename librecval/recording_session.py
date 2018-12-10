@@ -190,8 +190,15 @@ class SessionID(NamedTuple):
         """
         Attempts to parse a messy session name.
 
-        >>> SessionID.parse_dirty('2015-04-15-am')
-        SessionID(date=datetime.date(2015, 4, 15), time_of_day=TimeOfDay.MORNING, subsession=None, location=None)
+        >>> sid = SessionID.parse_dirty('2015-04-15-am')
+        >>> sid.date
+        datetime.date(2015, 4, 15)
+        >>> sid.time_of_day == TimeOfDay.MORNING
+        True
+        >>> sid.subsession is None
+        True
+        >>> sid.location is None
+        True
         """
         m = dirty_pattern.match(name)
         if m is None:
