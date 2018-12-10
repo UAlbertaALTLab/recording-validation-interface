@@ -56,6 +56,10 @@ class Phrase(models.Model):
     already be validated.
     """
 
+    # The only characters allowed in the transcription are the Cree SRO
+    # alphabet (in circumflexes), and some selected punctuation.
+    ALLOWED_TRANSCRIPTION_CHARACTERS = set('ptkcshmn yw rl êiîoôaâ -')
+
     WORD = 'word'
     SENTENCE = 'sentence'
     KIND_CHOICES = (
@@ -90,9 +94,11 @@ class Phrase(models.Model):
     # Keep track of Phrases' history, so we can review, revert, and inspect them.
     history = HistoricalRecords()
 
-    # The only characters allowed in the transcription are the Cree SRO
-    # alphabet (in circumflexes), and some selected punctuation.
-    ALLOWED_TRANSCRIPTION_CHARACTERS = set('ptkcshmn yw rl êiîoôaâ -')
+    class Meta:
+        indexes = [
+            # Allow for rapid look-up on the transcription
+            models.Index(fields=('transcription',), name='transcription_idx'),
+        ]
 
     @property
     def recordings(self):
