@@ -81,6 +81,23 @@ def test_search_recordings(client):
     assert recording.get('recording_url').endswith('.m4a')
 
 
+@pytest.mark.django_db
+def test_search_recording_not_found(client):
+    # Create a valid recording, but make sure we never match it.
+    speaker = mommy.make(Speaker, gender=random_gender)
+    recording = mommy.make(Recording, speaker=speaker, timestamp=random_timestamp)
+
+    # Make the query never matches the only recording in the database:
+    query = recording.phrase.transcription + 'h'
+    response = client.get(reverse('validation:search_recordings',
+                                  kwargs={'query': query}))
+
+    recordings = response.json()
+    assert isinstance(recordings, list)
+    assert len(recordings) == 0
+    assert response.status_code == 404
+
+
 # ################################ Fixtures ################################ #
 
 @pytest.fixture
