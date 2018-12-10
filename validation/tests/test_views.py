@@ -53,7 +53,6 @@ def test_serve_recording(client, exported_recording):
     assert page.get('ETag').strip('"') in recording.id, "The ETag should be based on the recording ID"
 
 
-@pytest.mark.skip
 @pytest.mark.django_db
 def test_search_recordings(client):
     phrase = 'ê-nipât'
@@ -61,14 +60,15 @@ def test_search_recordings(client):
                                   kwargs={'query': phrase}))
     # It should have a JSON response
     recordings = response.json()
-    assert len(recordings) == 2
-    # The JSON response is a list. Check each of its members.
-    for recording in recordings:
-        assert recording.get('wordform') == phrase
-        assert 'speaker' in rec.keys()
-        assert recording.get('gender') in 'MF'
-        assert recording.get('recording').endswith('.m4a')
+    assert len(recordings) == 1
+    recording = recordings[0]
+    assert recording.get('wordform') == phrase
+    assert 'speaker' in rec.keys()
+    assert recording.get('gender') in 'MF'
+    assert recording.get('recording').endswith('.m4a')
 
+
+# ################################ Fixtures ################################ #
 
 @pytest.fixture
 def exported_recording(settings):
