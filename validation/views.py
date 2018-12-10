@@ -76,8 +76,8 @@ def serve_recording(request, recording_id):
 
 def search_recordings(request, query):
     """
-    Searches for recordings whose phrase matches the query. The response is
-    JSON that can be used by external apps.
+    Searches for recordings whose phrase's transcription matches the query.
+    The response is JSON that can be used by external apps (i.e., itwêwina).
     """
 
     # Assume the query is an SRO transcription
