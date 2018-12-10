@@ -96,7 +96,7 @@ ls -F $RECVAL_SESSIONS_DIR
 If I then inspect the directory for 2018-01-07am:
 
 ```sh
-ls 
+ls
 ls -F $RECVAL_SESSIONS_DIR/2018-01-07-AM-___-_/
 ```
 
@@ -112,7 +112,7 @@ I should get a directory containing files like this.
 
 **NOTE**: The `*.wav` files may be in a subdirectory called
 `${SESSION_NAME}_Recorded`, if the recordings where done with Adobe
-Audition. In this example, the `.wav` files would be in 
+Audition. In this example, the `.wav` files would be in
 `2018-01-07am_Recorded`.
 
 
@@ -142,7 +142,7 @@ total 21056
 For best web serving response time, this directory should be directly
 served by the web server (e.g., Apache or Nginx). Place this on a file
 system that is fast at reads. It should only be written to when new
-recording sessions are imported. 
+recording sessions are imported.
 
 The only required permissions on each file are for reading by the web
 server process. The directory must be writable by the import process.
@@ -267,6 +267,76 @@ dependencies on any web framework or database backend.
 
 It's the Django project for the **rec**ording **val**idation **site**.
 This aggregates all of the Django apps under one deployable website.
+
+Web API
+-------
+
+There is one API call:
+
+    /recording/_search/{wordform}
+
+Where `{wordform}` is replaced by a Cree word form, written in SRO.
+
+This will return a JSON array of recordings of that word form.
+
+Each entry in the returned array is a JSON object with the following
+properties:
+
+ - **wordform**: the word form that was matched by the query
+ - **speaker**: the speaker's short code
+ - **gender**: the speaker's gender: either 'M' or 'F'—all our speakers identify as male or female).
+ - **recording_url**: Absolute URI to the recording audio (encoded as AAC in an MP4 container).
+
+### Example
+
+Finding recordings of 'nikiskisin':
+
+```http
+GET /recording/_search/nikiskisin
+```
+
+This will return:
+
+```json
+[
+    {
+        "gender": "F",
+        "recording_url": "http://localhost:8000/recording/7353dda3d48799325ee62de0eceb4b50839382cfcf0ebf96c70d84fd37881201.m4a",
+        "speaker": "ROS",
+        "wordform": "nikiskisin"
+    },
+    {
+        "gender": "F",
+        "recording_url": "http://localhost:8000/recording/dac08c374354594b7a77195daa4fd2e12a88acc5acf4e4894dd612354c1e7a92.m4a",
+        "speaker": "ROS",
+        "wordform": "nikiskisin"
+    },
+    {
+        "gender": "M",
+        "recording_url": "http://localhost:8000/recording/1576034645a6b765ab40275a67390fa197ee3c7ed8cc949907d132df3c0f1c9e.m4a",
+        "speaker": "GOR",
+        "wordform": "nikiskisin"
+    },
+    {
+        "gender": "M",
+        "recording_url": "http://localhost:8000/recording/a86939d888ff908d091538b2c1a3dc4fb383167b781b5dddddd4253342b0dace.m4a",
+        "speaker": "GOR",
+        "wordform": "nikiskisin"
+    },
+    {
+        "gender": "F",
+        "recording_url": "http://localhost:8000/recording/2198ff134107ff474115cdb48ee36f88c17168e215fe424da4cc414bab0f4582.m4a",
+        "speaker": "LOU",
+        "wordform": "nikiskisin"
+    },
+    {
+        "gender": "F",
+        "recording_url": "http://localhost:8000/recording/e8dd10846601861c1e9c4edf944b1e4da7670ed669fe027bd0b27e0af954e031.m4a",
+        "speaker": "LOU",
+        "wordform": "nikiskisin"
+    }
+]
+```
 
 
 License
