@@ -23,6 +23,8 @@ import unicodedata
 # A translation table to convert macrons to cicumflexes in lowercase, NFC
 # strings.
 MACRON_TO_CIRCUMFLEX = str.maketrans('ēīōā', 'êîôâ')
+# Translates apostrophes and pretty quotes to <i>.
+QUOTE_TO_SHORT_I = str.maketrans("'’", 'ii')
 
 
 def nfc(utterance: str) -> str:
@@ -38,7 +40,7 @@ def normalize(utterance: str) -> str:
 
 def normalize_sro(utterance: str) -> str:
     """
-    Normalizes Plains Cree text written in the standard Roman orthography.
+    Normalizes Plains Cree utterances written in the standard Roman orthography.
 
     The following are the normalizations applied:
 
@@ -61,17 +63,26 @@ def normalize_sro(utterance: str) -> str:
 
     >>> normalize_sro('kecikwasakew')
     'kêcikwasakêw'
-    """
 
-    # TODO: (i)-elision, (o)-elision, '-elision, ’-elision
-    # TODO: nin's'tohtên
-    # TODO: nin(i)s(i)tohtên
+    Undo short-i elision (with apostrophe or quotes):
+
+    >>> normalize_sro("tân’si/tân'si")
+    'tânisi/tânisi'
+
+    Undo vowel elision using parentheses:
+
+    >>> normalize_sro("mostos(o)wiyâs/nin(i)s(i)tohtên")
+    'mostosowiyâs/ninisitohtên'
+    """
 
     utterance = nfc(utterance).\
         strip().\
         lower().\
         replace('e', 'ê').\
-        translate(MACRON_TO_CIRCUMFLEX)
+        translate(MACRON_TO_CIRCUMFLEX).\
+        translate(QUOTE_TO_SHORT_I)
+
+    utterance = re.sub(r'[(]([ioa])[)]', r'\1', utterance)
 
     # Ensure there are exactly single spaces between words
     return re.sub(r'\s+', ' ', utterance)
