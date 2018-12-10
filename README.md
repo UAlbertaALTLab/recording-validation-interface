@@ -268,6 +268,7 @@ dependencies on any web framework or database backend.
 It's the Django project for the **rec**ording **val**idation **site**.
 This aggregates all of the Django apps under one deployable website.
 
+
 Web API
 -------
 
@@ -282,17 +283,18 @@ This will return a JSON array of recordings of that word form.
 Each entry in the returned array is a JSON object with the following
 properties:
 
- - **wordform**: the word form that was matched by the query
- - **speaker**: the speaker's short code
- - **gender**: the speaker's gender: either 'M' or 'F'—all our speakers identify as male or female).
- - **recording_url**: Absolute URI to the recording audio (encoded as AAC in an MP4 container).
+ - `wordform`: the word form that was matched by the query
+ - `speaker`: the speaker's short code (e.g., something like `"ROS"` or `"JER"`)
+ - `gender`: the speaker's gender: either `"M"` or `"F"` (all our speakers identify as male or female).
+ - `recording_url`: Absolute URI to the audio, encoded as AAC in an MP4
+   container (a `*.m4a` file). This can be used in an `<audio>` tag.
 
 ### Errors
 
-Will responds with HTTP 404 if no recordings match the query. Note that
-the recordings' speaker's _must_ have a non-null gender before they
-appear in search results. So make sure all Speaker instances have
-a non-null value for `gender`.
+Will responds with HTTP **404** if no recordings match the query. Note
+that the recordings' speaker's _must_ have a non-null gender before they
+appear in search results. So make sure all `Speaker` instances have
+a non-null value for `gender`!
 
 
 ### Example
