@@ -42,8 +42,9 @@ def test_serve_recording(client, exported_recording):
     page = client.get(reverse('validation:recording', kwargs={'recording_id': recording.id}))
     assert page.status_code == 200
     assert page.get('Content-Type') == 'audio/m4a'
-    assert page.content == file_contents
-    assert page.content[4:12] == b'ftypM4A ', "Did not serve an .m4a file."
+    content = b''.join(page.streamig_content)
+    assert content == file_contents
+    assert content[4:12] == b'ftypM4A ', "Did not serve an .m4a file."
 
     # Check stuff involving caching.
     assert 'max-age=' in page.get('Cache-Control')

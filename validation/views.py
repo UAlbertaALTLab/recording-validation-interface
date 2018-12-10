@@ -18,7 +18,7 @@
 
 from django.conf import settings
 from django.urls import reverse
-from django.http import HttpResponse, JsonResponse
+from django.http import FileResponse, HttpResponse, JsonResponse
 from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404
 
@@ -64,9 +64,8 @@ def serve_recording(request, recording_id):
     # just a part of it. Note: GitHub uses 7 digits.
     HASH_PREFIX_LENGTH = 7
     recording = get_object_or_404(Recording, id=recording_id)
-    audio = (settings.RECVAL_AUDIO_DIR / f'{recording.id}.m4a').read_bytes()
-    # TODO: Use FileResponse?
-    response = HttpResponse(audio, content_type='audio/m4a')
+    response = FileResponse(open(settings.RECVAL_AUDIO_DIR / f'{recording.id}.m4a', 'rb'),
+                            content_type='audio/m4a')
     # The recording files basically never change, so tell everybody to cache
     # the dookey out these files (or at very least, a year).
     response['Cache-Control'] = f'public, max-age={60 * 60 * 24 * 365}'
