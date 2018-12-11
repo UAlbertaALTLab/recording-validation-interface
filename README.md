@@ -32,6 +32,10 @@ make install-dev
 
 ### Production
 
+> **NOTE**: Before you continue, you may want to run
+> `export PIPENV_VENV_IN_PROJECT=True` so that you can find the
+> virtual environment later!
+
 To install dependencies and setup for production (e.g., on the server):
 
 ```sh
@@ -199,8 +203,7 @@ In order to import recordings on Sapir, type the following:
 pipenv run python manage.py importrecordings
 ```
 
-This will automatically scan `$RECVAL_SESSIONS_DIR/` (either set in
-`local_settings.py` or as an environment variable).
+This will automatically scan `$RECVAL_SESSIONS_DIR/` (defined in `.env`).
 
 `$RECVAL_SESSIONS_DIR/` should be a directory filled with directories
 (or symbolic links to directories) with filenames in the form of:
