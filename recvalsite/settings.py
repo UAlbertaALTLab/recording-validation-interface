@@ -25,11 +25,12 @@ assert (BASE_DIR / 'manage.py').is_file()
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY')
+print(len(SECRET_KEY), SECRET_KEY)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'sapir.artsrn.ualberta.ca']
 
 
 # Application definition
@@ -157,6 +158,13 @@ TEMPLATES = [
     }
 ]
 
+# Security
+# Should we send the X-XSS-Protection header
+SECURE_BROWSER_XSS_FILTER = True
+# Should the browser NOT try to detect the content type of unmarked content?
+SECURE_CONTENT_TYPE_NOSNIFF = True
+# Should we allow hosting in an <iframe>?
+X_FRAME_OPTIONS = 'DENY'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/

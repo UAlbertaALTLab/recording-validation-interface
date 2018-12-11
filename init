@@ -111,7 +111,7 @@ def get_debug() -> bool:
 
 env_contents = dict(
     # Django NEEDS a secret key before it starts up, so generate one.
-    SECRET_KEY=token_urlsafe(),
+    SECRET_KEY=token_urlsafe(nbytes=64),
     DEBUG=get_debug(),
 )
 
