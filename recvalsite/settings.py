@@ -166,8 +166,8 @@ STATIC_URL = '/static/'
 # Where the transcoded audio files should be placed AND served from.
 RECVAL_AUDIO_DIR = config('RECVAL_AUDIO_DIR', BASE_DIR / 'data' / 'audio', cast=Path)
 
-# Where to find the metadata file.
-RECVAL_METADATA_PATH = config('RECVAL_AUDIO_DIR', BASE_DIR / 'private' / 'metadata.csv', cast=Path)
+# Where to find the metadata CSV file.
+RECVAL_METADATA_PATH = config('RECVAL_METADATA_PATH', BASE_DIR / 'private' / 'metadata.csv', cast=Path)
 
 # Where the sessions should be extracted from.
 # Expecting a structure like this:
