@@ -55,14 +55,22 @@ The app needs to know:
  - where the raw recording sessions are
  - where to find the "Recordings Master MetaData" CSV file
  - where to place transcoded audio files
+ - where to place transcoded audio files
 
-This is configured by creating a file called `.env` in the root of this
-repository following this template:
+
+This is configured in a file called `.env` in the root of this
+repository.
+
+> **NOTE**: `make install-*` should have created a `.env` for you to
+> append to.
+
+The additional configuration should following this template:
 
 ```sh
 RECVAL_SESSIONS_DIR=/absolute/path/to/recording/sessions/
 RECVAL_METADATA_PATH=/absolute/path/to/master-recordings-metadata.csv
 RECVAL_AUDIO_DIR=/absolute/path/to/transcoded/audio/directory/
+RECVAL_SQLITE_DB_PATH=/absolute/path/to/sqlite3/database.sqlite3
 ```
 
 Replace the paths as appropriate.
@@ -148,6 +156,18 @@ The only required permissions on each file are for reading by the web
 server process. The directory must be writable by the import process.
 
 
+#### `RECVAL_SQLITE_DB_PATH`
+
+This is the absolute path to the SQLite3 database---where all the
+validation data, and user data will be stored. This file will be written
+and read to *a lot*. It should not become terribly large, however; at
+most, it might grow to be 1 GiB, but I expect it to stay much, much
+lower.
+
+Make sure this path is configured before running
+`pipenv run python ./manage.py migrate`
+
+
 ### Creating the database for the first time
 
 [Creating the database for the first time]: #creating-the-database-for-the-first-time
@@ -161,6 +181,15 @@ download it automatically:
 ```sh
 pipenv run python manage.py downloadmetadata
 ```
+
+Then, initialize the database using the following command:
+
+```sh
+pipenv run python manage.py migrate
+```
+
+This will create all the necessary tables in the SQLite3 database.
+
 
 ### Importing recordings
 
