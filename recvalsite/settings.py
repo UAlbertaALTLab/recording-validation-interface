@@ -86,10 +86,13 @@ WSGI_APPLICATION = 'recvalsite.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
+# Where to place the SQLite3 database file:
+RECVAL_SQLITE_DB_PATH = config('RECVAL_SQLITE_DB_PATH', default=BASE_DIR / 'db.sqlite3', cast=Path)
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.fspath(BASE_DIR / 'db.sqlite3'),
+        'NAME': os.fspath(RECVAL_SQLITE_DB_PATH),
     }
 }
 
