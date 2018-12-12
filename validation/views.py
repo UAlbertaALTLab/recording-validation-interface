@@ -102,7 +102,9 @@ def search_recordings(request, query):
         'recording_url': make_absolute_uri_for_recording(rec.id),
     } for rec in result_set]
 
-    return JsonResponse(recordings, safe=False)
-
+    response = JsonResponse(recordings, safe=False)
+    # TODO: should be more specific than this, but :/
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
 
 # TODO: Speaker bio page like https://ojibwe.lib.umn.edu/about/voices
