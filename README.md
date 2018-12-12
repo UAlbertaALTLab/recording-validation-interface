@@ -42,6 +42,8 @@ To install dependencies and setup for production (e.g., on the server):
 make install-prod
 ```
 
+Find configuration files and templates in `private/`.
+
 
 ### Testing
 
@@ -60,7 +62,7 @@ The app needs to know:
  - where to find the "Recordings Master MetaData" CSV file
  - where to place transcoded audio files
  - where to place transcoded audio files
- - (production only) where to collect static files
+ - (production only) where to collect (copy) static files
 
 
 This is configured in a file called `.env` in the root of this
@@ -76,6 +78,7 @@ RECVAL_SESSIONS_DIR=/absolute/path/to/recording/sessions/
 RECVAL_METADATA_PATH=/absolute/path/to/master-recordings-metadata.csv
 RECVAL_AUDIO_DIR=/absolute/path/to/transcoded/audio/directory/
 RECVAL_SQLITE_DB_PATH=/absolute/path/to/sqlite3/database.sqlite3
+STATIC_ROOT=/absolute/path/to/static/files/directory/  # (production-only)
 ```
 
 Replace the paths as appropriate.
@@ -175,10 +178,10 @@ Make sure this path is configured before running
 
 ### `STATIC_ROOT`
 
-Note: this does not need to be configured in development mode.
+> **Note**: this does not need to be configured in development mode.
 
-Where to collect static assets. This is need to place CSS and JavaScript in the
-right place.
+Where to collect (i.e., copy) static assets. This is needed to place CSS and
+JavaScript in the right place so that the static web server can find them.
 
 Set this to path that your web server can... well, serve from! Whenever you
 change any static files, or update Django, remember to run:
