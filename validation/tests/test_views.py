@@ -71,6 +71,8 @@ def test_search_recordings(client):
     response = client.get(reverse('validation:search_recordings',
                                   kwargs={'query': phrase.transcription}))
 
+    assert 'Access-Control-Allow-Origin' in response, "Missing requried CORS headers"
+
     recordings = response.json()
     assert isinstance(recordings, list)
     assert len(recordings) == 1
@@ -94,6 +96,7 @@ def test_search_recording_not_found(client):
                                   kwargs={'query': query}))
 
     recordings = response.json()
+    assert 'Access-Control-Allow-Origin' in response, "Missing requried CORS headers"
     assert isinstance(recordings, list)
     assert len(recordings) == 0
     assert response.status_code == 404
