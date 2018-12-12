@@ -89,6 +89,7 @@ def search_recordings(request, query):
         # No matches. Return an empty JSON response
         response = JsonResponse([], safe=False)
         response.status_code = 404
+        response['Access-Control-Allow-Origin'] = '*'
         return response
 
     def make_absolute_uri_for_recording(rec_id: str) -> str:
