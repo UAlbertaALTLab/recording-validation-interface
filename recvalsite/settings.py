@@ -168,7 +168,13 @@ X_FRAME_OPTIONS = 'DENY'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
-STATIC_URL = '/static/'
+# Derive the static path from WSGI SCRIPT_NAME variable
+# e.g.,  if SCRIPT_NAME=/validation,
+#        then static file URLs will point to /validation/static/
+STATIC_URL = config('SCRIPT_NAME', default='') + '/static/'
+
+# Remember to run manage.py collectstatic!
+STATIC_ROOT = config('STATIC_ROOT', default='/var/www/recvalsite/static')
 
 # Where the transcoded audio files should be placed AND served from.
 RECVAL_AUDIO_DIR = config('RECVAL_AUDIO_DIR', BASE_DIR / 'data' / 'audio', cast=Path)

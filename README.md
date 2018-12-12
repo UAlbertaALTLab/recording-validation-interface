@@ -42,6 +42,8 @@ To install dependencies and setup for production (e.g., on the server):
 make install-prod
 ```
 
+Find configuration files and templates in `private/`.
+
 
 ### Testing
 
@@ -60,6 +62,7 @@ The app needs to know:
  - where to find the "Recordings Master MetaData" CSV file
  - where to place transcoded audio files
  - where to place transcoded audio files
+ - (production only) where to collect (copy) static files
 
 
 This is configured in a file called `.env` in the root of this
@@ -75,6 +78,7 @@ RECVAL_SESSIONS_DIR=/absolute/path/to/recording/sessions/
 RECVAL_METADATA_PATH=/absolute/path/to/master-recordings-metadata.csv
 RECVAL_AUDIO_DIR=/absolute/path/to/transcoded/audio/directory/
 RECVAL_SQLITE_DB_PATH=/absolute/path/to/sqlite3/database.sqlite3
+STATIC_ROOT=/absolute/path/to/static/files/directory/  # (production-only)
 ```
 
 Replace the paths as appropriate.
@@ -172,14 +176,32 @@ Make sure this path is configured before running
 `pipenv run python ./manage.py migrate`
 
 
+### `STATIC_ROOT`
+
+> **Note**: this does not need to be configured in development mode.
+
+Where to collect (i.e., copy) static assets. This is needed to place CSS and
+JavaScript in the right place so that the static web server can find them.
+
+Set this to path that your web server can... well, serve from! Whenever you
+change any static files, or update Django, remember to run:
+
+    python manage.py collectstatic
+
+This will copy all of the various static files to the configured directory.
+
+See more: <https://docs.djangoproject.com/en/2.1/ref/settings/#std:setting-STATIC_ROOT>
+
+
 ### Creating the database for the first time
 
 [Creating the database for the first time]: #creating-the-database-for-the-first-time
 
-Before you import any data, you need the "Master Recording MetaData"
-(sic) spreadsheet, available on Google Drive. Either export this
-manually as a CSV file as `$RECVAL_METADATA_PATH`, or, with the
-[gdrive][] command installed and configured, run the following script to
+Before you import any data, you need the "Master Recording MetaData" (sic)
+spreadsheet, available on Google Drive. This should have been downloaded using
+the `./init` script from earlier, but if you still don't have, either download
+it manually as a CSV file as `$RECVAL_METADATA_PATH`, or — if you have the
+[gdrive][] command installed and configured — run the following script to
 download it automatically:
 
 ```sh
@@ -232,6 +254,19 @@ Each directory should have `*.TextGrid` files paired with a `*.wav` file:
     2015-05-08-03.wav
     ...
 
+### Collecting the static files
+
+> **NOTE**: this is not relevant when in development mode or when `DEBUG=True`
+
+In the production server, you must copy all of the static files to a single
+folder where the web server (e.g., Apache, Nginx) can serve them without even
+consulting the Django app.
+
+To copy the files, ensure `STATIC_ROOT` is configured properly, then run:
+
+```sh
+pipenv run python manage.py collectstatic
+```
 
 ### Creating a superuser (admin)
 

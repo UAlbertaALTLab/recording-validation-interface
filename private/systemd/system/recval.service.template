@@ -1,0 +1,29 @@
+# Service for the Maskwacîs Recordings Validation Interface (recval)
+# This should be linked in /etc/systemd/system/recval.service
+
+#! NOTE: This is a template. Copy-paste and modifiy as appropriate.
+#! Search and replace the following values:
+#!
+#!   ${RECVAL_USER} 	-- user running the Python (Gunicorn/Django) processes
+#!   ${RECVAL_GROUP} 	-- group running the Python (Gunicorn/Django) processes
+#!   ${RECVAL_REPO} 	-- where the repository is cloned to
+#!   ${RECVAL_SOCKET} 	-- location to UNIX domain socket. This is arbitrary, but
+#!			   it must be set to something www-data can read/write to.
+
+[Unit]
+
+Description=recval service
+After=network.target
+   
+[Service]
+User=${RECVAL_USER}
+Group=${RECVAL_GROUP}
+WorkingDirectory=${RECVAL_REPO}
+# Note: `--env SCRIPT_NAME=/validation` means the site is supposed to be mounted on http://domain.tld/validation/
+# See the WSGI documentation on SCRIPT_NAME.
+ExecStart=${RECVAL_REPO}/.venv/bin/gunicorn --access-logfile - --env SCRIPT_NAME=/validation --workers 3 --bind unix:${RECVAL_SOCKET} recvalsite.wsgi:application
+   
+[Install]
+WantedBy=multi-user.target
+
+# vim: set ft=systemd :
