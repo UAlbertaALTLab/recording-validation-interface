@@ -79,33 +79,34 @@ def search_recordings(request, query):
     The response is JSON that can be used by external apps (i.e., itwêwina).
     """
 
-    # Assume the query is an SRO transcription
-    transcription = normalize_sro(query)
-
-    result_set = Recording.objects.filter(phrase__transcription=transcription,
-                                          speaker__gender__isnull=False)
-
-    if len(result_set) == 0:
-        # No matches. Return an empty JSON response
-        response = JsonResponse([], safe=False)
-        response.status_code = 404
-        response['Access-Control-Allow-Origin'] = '*'
-        return response
+    # TODO: let there be a max amount of forms; give back ERROR URI
+    word_forms = query.split(',')
 
     def make_absolute_uri_for_recording(rec_id: str) -> str:
         relative_uri = reverse('validation:recording', kwargs={'recording_id': rec_id})
         return request.build_absolute_uri(relative_uri)
 
-    recordings = [{
-        'wordform': rec.phrase.transcription,
-        'speaker': rec.speaker.code,
-        'gender': rec.speaker.gender,
-        'recording_url': make_absolute_uri_for_recording(rec.id),
-    } for rec in result_set]
+    recordings = []
+    for form in word_forms:
+        # Assume the query is an SRO transcription
+        transcription = normalize_sro(form)
+
+        result_set = Recording.objects.filter(phrase__transcription=transcription,
+                                              speaker__gender__isnull=False)
+        recordings.extend({
+            'wordform': rec.phrase.transcription,
+            'speaker': rec.speaker.code,
+            'gender': rec.speaker.gender,
+            'recording_url': make_absolute_uri_for_recording(rec.id),
+        } for rec in result_set)
 
     response = JsonResponse(recordings, safe=False)
-    # TODO: should be more specific than this, but :/
     response['Access-Control-Allow-Origin'] = '*'
+
+    if len(recordings) == 0:
+        # No matches. Return an empty JSON response
+        response.status_code = 404
+
     return response
 
 # TODO: Speaker bio page like https://ojibwe.lib.umn.edu/about/voices
