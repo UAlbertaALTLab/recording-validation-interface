@@ -317,11 +317,13 @@ Web API
 
 There is one API call:
 
-    /recording/_search/{wordform}
+    /recording/_search/{query}
 
-Where `{wordform}` is replaced by a Cree word form, written in SRO.
+Where `{query}` is replaced by one ore more Cree word forms, written in
+SRO. If more than one word form is supplied, each word form must be
+separated by a single comma (`,`).
 
-This will return a JSON array of recordings of that word form.
+This will return a JSON array of recordings of those word forms.
 
 Each entry in the returned array is a JSON object with the following
 properties:
@@ -342,13 +344,14 @@ a non-null value for `gender`!
 
 ### Example
 
-Finding recordings of 'nikiskisin':
+Finding recordings of 'nikiskisin' and 'kiskisiw':
 
 ```http
-GET /recording/_search/nikiskisin
+GET /recording/_search/nikiskisin,kiskisiw
 ```
 
-This will return:
+Assume there are six recordings for `nikiskisin`, and none for
+`kiskisiw`, this will return:
 
 ```json
 [
