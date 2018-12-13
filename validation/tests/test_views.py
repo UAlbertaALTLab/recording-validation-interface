@@ -96,7 +96,7 @@ def test_search_multiple_recordings(client):
     MAX_FORMS = 3
 
     # Create more phrases (and recordings) than queried forms.
-    phrases = mommy.make(Phrase, _quantity=MAX_FORMS + 2)
+    phrases = mommy.make(Phrase, transcription=random_transcription, _quantity=MAX_FORMS + 2)
     # We only want three of these word forms
     query_forms = [phrase.transcription for phrase in phrases][:MAX_FORMS]
 
@@ -172,6 +172,15 @@ def exported_recording(settings):
 
 def random_timestamp():
     return random.randint(0, MAX_RECORDING_LENGTH)
+
+
+def random_transcription():
+    """
+    Create a random phrase out of the Cree alphabet.
+    """
+    alphabet = 'ptkcsmnywrlêioaîôâ'
+    quantity = random.randint(2, 64)
+    return ''.join(random.choice(alphabet) for _ in range(quantity))
 
 
 def random_gender():
