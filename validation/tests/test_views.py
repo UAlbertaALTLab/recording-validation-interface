@@ -85,6 +85,47 @@ def test_search_recordings(client):
 
 
 @pytest.mark.django_db
+def test_search_multiple_recordings(client):
+    """
+    Test for finding multiple recordings by having a comma in the URI.
+    e.g.,
+
+        /recording/_search/form1,form2,form3
+
+    """
+    MAX_FORMS = 3
+
+    # Create more phrases (and recordings) than queried forms.
+    phrases = mommy.make(Phrase, _quantity=MAX_FORMS + 2)
+    # We only want three of these word forms
+    query_forms = [phrase.transcription for phrase in phrases][:MAX_FORMS]
+
+    # Ensure each phrase has a recording. Only a subset of these recordings
+    # should be returned.
+    recipe = Recipe(Recording, timestamp=random_timestamp)
+    speaker = mommy.make(Speaker, gender=random_gender)
+    recordings = [recipe.make(phrase=phrase, speaker=speaker) for phrase in phrases]
+
+    response = client.get(reverse('validation:search_recordings',
+                                  kwargs={'query': ','.join(query_forms)}))
+
+    assert 'Access-Control-Allow-Origin' in response, "Missing requried CORS headers"
+
+    matched_recordings = response.json()
+    assert isinstance(matched_recordings, list)
+    assert len(matched_recordings) == MAX_FORMS
+    for recording in matched_recordings:
+        assert recording.get('wordform') in query_forms
+        assert 'speaker' in recording.keys()
+        assert recording.get('gender') in 'MF'
+        assert recording.get('recording_url').startswith(('http://', 'https://'))
+        assert recording.get('recording_url').endswith('.m4a')
+
+    # The word forms in the response should match ALL of the word forms queried.
+    assert set(r['wordform'] for r in matched_recordings) == set(query_forms)
+
+
+@pytest.mark.django_db
 def test_search_recording_not_found(client):
     # Create a valid recording, but make sure we never match it.
     speaker = mommy.make(Speaker, gender=random_gender)
