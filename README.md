@@ -61,11 +61,10 @@ The app needs to know:
  - where the raw recording sessions are
  - where to find the "Recordings Master MetaData" CSV file
  - where to place transcoded audio files
- - where to place transcoded audio files
- - (production only) where to collect (copy) static files
+ - where to place SQLite3 database
+ - [production-only] where to collect (i.e., copy) static files
 
-
-This is configured in a file called `.env` in the root of this
+These are configured in a file called `.env` in the root of this
 repository.
 
 > **NOTE**: `make install-*` should have created a `.env` for you to
@@ -313,29 +312,6 @@ To edit the tests for `librecval`, see `tests/`. For Django tests, look
 inside the `validation/tests` directory.
 
 
-Frequently Asked Questions
---------------------------
-
-### What is “recval”?
-
-It's short for **Rec**ordings **val**idation. I didn't want to type that
-out all the time, and I didn't want to puts spaces, hyphens or
-underscores to refer to it.
-
-### What is `librecval`?
-
-`librecval` is a library for extracting recordings, transcoding
-recordings to a normalized format, and combining the recordings with
-metadata, as well as representing recordings data in an
-framework-agnostic way. This library *should* be devoid of references or
-dependencies on any web framework or database backend.
-
-### What is `recvalsite`?
-
-It's the Django project for the **rec**ording **val**idation **site**.
-This aggregates all of the Django apps under one deployable website.
-
-
 Web API
 -------
 
@@ -414,6 +390,29 @@ This will return:
     }
 ]
 ```
+
+
+Frequently Asked Questions
+--------------------------
+
+### What is “recval”?
+
+It's short for **Rec**ordings **val**idation. I didn't want to type that
+out all the time, and I didn't want to puts spaces, hyphens or
+underscores to refer to it.
+
+### What is `librecval`?
+
+`librecval` is a library for extracting recordings, transcoding
+recordings to a normalized format, and combining the recordings with
+metadata, as well as representing recordings data in an
+framework-agnostic way. This library *should* be devoid of references or
+dependencies on any web framework or database backend.
+
+### What is `recvalsite`?
+
+It's the Django project for the **rec**ording **val**idation **site**.
+This aggregates all of the Django apps under one deployable website.
 
 
 License
