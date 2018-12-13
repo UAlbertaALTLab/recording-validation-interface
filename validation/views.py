@@ -91,6 +91,14 @@ def search_recordings(request, query):
         # Assume the query is an SRO transcription
         transcription = normalize_sro(form)
 
+        # HACK: remove the first hyphen in 'ê-' conjuct verbs:
+        # I happen to know that the current database content consistently uses
+        # ê with no hyphen for conjuct verbs, so we get rid of it here to get
+        # more search results.
+        # TODO: remove this hack.
+        if transcription.startswith('ê-'):
+            transcription = transcription.replace('-', '', 1)
+
         result_set = Recording.objects.filter(phrase__transcription=transcription,
                                               speaker__gender__isnull=False)
         recordings.extend({
