@@ -86,8 +86,7 @@ def search_recordings(request, query):
     if query.count(',') >= MAX_RECORDING_QUERY_TERMS:
         response = JsonResponse((), safe=False)
         response.status_code = 414
-        response['Access-Control-Allow-Origin'] = '*'
-        return response
+        return add_cors_headers(response)
 
     word_forms = query.split(',')
 
@@ -118,12 +117,18 @@ def search_recordings(request, query):
         } for rec in result_set)
 
     response = JsonResponse(recordings, safe=False)
-    response['Access-Control-Allow-Origin'] = '*'
 
     if len(recordings) == 0:
         # No matches. Return an empty JSON response
         response.status_code = 404
 
-    return response
+    return add_cors_headers(response)
 
+
+def add_cors_headers(response):
+    """
+    Adds appropriate Access-Control-* headers for cross-origin XHR responses.
+    """
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
 # TODO: Speaker bio page like https://ojibwe.lib.umn.edu/about/voices
