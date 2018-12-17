@@ -168,7 +168,6 @@ def test_search_max_queries(client):
                                   kwargs={'query': query}))
 
     # The request should be denied.
-    recordings = response.json()
     assert 'Access-Control-Allow-Origin' in response, "Missing requried CORS headers"
     assert response.status_code == 414
 

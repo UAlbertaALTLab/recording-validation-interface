@@ -79,7 +79,16 @@ def search_recordings(request, query):
     The response is JSON that can be used by external apps (i.e., itwêwina).
     """
 
-    # TODO: let there be a max amount of forms; give back ERROR URI
+    # Maximum amount of comma-separated query terms.
+    MAX_RECORDING_QUERY_TERMS = 3
+
+    # Commas are fence posts: there will be one less comma than query terms.
+    if query.count(',') >= MAX_RECORDING_QUERY_TERMS:
+        response = JsonResponse((), safe=False)
+        response.status_code = 414
+        response['Access-Control-Allow-Origin'] = '*'
+        return response
+
     word_forms = query.split(',')
 
     def make_absolute_uri_for_recording(rec_id: str) -> str:
