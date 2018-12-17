@@ -25,6 +25,10 @@ WorkingDirectory=${RECVAL_REPO}
 # Note: `--env SCRIPT_NAME=/validation` means the site is supposed to be mounted on http://domain.tld/validation/
 # See the WSGI documentation on SCRIPT_NAME.
 ExecStart=${RECVAL_REPO}/.venv/bin/gunicorn --access-logfile - --env SCRIPT_NAME=/validation --workers 3 --bind unix:${RECVAL_SOCKET} recvalsite.wsgi:application
+# Gunicorn will reload if you send SIGHUP to the master PID.
+ExecReload=/bin/kill -HUP $MAINPID
+# Create a PID file somewhere, as it's useful for sending signals to the main process.
+PIDFile=${REVAL_PIDFILE}
 
 [Install]
 WantedBy=multi-user.target
