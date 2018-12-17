@@ -144,20 +144,22 @@ def test_search_recording_not_found(client):
     assert response.status_code == 404
 
 
+MAX_RECORDING_QUERY_TERMS = 3  # TODO: will this be a configuration option?
+
+
 @pytest.mark.django_db
 def test_search_max_queries(client):
-    MAX_RECORDINGS = 3  # TODO: will this be a configuration option?
     # Create valid recordings, one per phrase, but make too many of them.
     speaker = mommy.make(Speaker, gender=random_gender)
     phrases = mommy.make(Phrase, transcription=random_transcription,
-                         _quantity=MAX_RECORDINGS + 1)
+                         _quantity=MAX_RECORDING_QUERY_TERMS + 1)
     recordings = [
         mommy.make(Recording, speaker=speaker, timestamp=random_timestamp, phrase=phrase)
         for phrase in phrases
     ]
 
     # Try fetching the maximum
-    query = ','.join(phrase.transcription for phrase in phrases[:MAX_RECORDINGS])
+    query = ','.join(phrase.transcription for phrase in phrases[:MAX_RECORDING_QUERY_TERMS])
     response = client.get(reverse('validation:search_recordings',
                                   kwargs={'query': query}))
     assert response.status_code == 200
@@ -172,7 +174,28 @@ def test_search_max_queries(client):
     assert response.status_code == 414
 
 
-# TODO: test query treated like set of word forms.
+@pytest.mark.django_db
+def test_search_unique_word_forms(client):
+    """
+    Searching for a word form more than once in a single quert should return
+    results as if the word form was requested only once.
+    """
+    # We need a valid phrase/recording
+    phrase = mommy.make(Phrase, transcription=random_transcription)
+    speaker = mommy.make(Speaker, gender=random_gender)
+    recording = mommy.make(Recording, speaker=speaker, phrase=phrase, timestamp=random_timestamp)
+
+    # The query will have the term more than once.
+    assert MAX_RECORDING_QUERY_TERMS > 1
+    query = ','.join(phrase.transcription for _ in
+                     range(MAX_RECORDING_QUERY_TERMS))
+
+    response = client.get(reverse('validation:search_recordings',
+                                  kwargs={'query': query}))
+    assert response.status_code == 200
+    recordings = response.json()
+    assert len(recordings) == 1
+    assert recordings[0]['wordform'] == phrase.transcription
 
 
 # ################################ Fixtures ################################ #
