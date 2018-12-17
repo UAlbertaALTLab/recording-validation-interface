@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# Script that redeploys the recording validation interface. This script should
+# be run on the server, by the user that is running the Gunicorn process.
+#
+# Run this script, and the latest code will be pulled, and the Gunicorn will
+# reload the code.
+#
+# For safety, make sure only the owner can run this script by setting
+# permissions:
+#
+#	chmod 700 redeploy-recval
+
+set -ex
+
+BASEDIR=/data/texts/recval
+
+cd ${BASEDIR}/recording-validation-interface &&\
+	git pull &&\
+	kill -HUP "$(cat ${BASEDIR}/recval.pid)"
