@@ -88,7 +88,7 @@ def search_recordings(request, query):
         response.status_code = 414
         return add_cors_headers(response)
 
-    word_forms = query.split(',')
+    word_forms = frozenset(query.split(','))
 
     def make_absolute_uri_for_recording(rec_id: str) -> str:
         relative_uri = reverse('validation:recording', kwargs={'recording_id': rec_id})
