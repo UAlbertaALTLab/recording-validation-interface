@@ -144,6 +144,38 @@ def test_search_recording_not_found(client):
     assert response.status_code == 404
 
 
+@pytest.mark.django_db
+def test_search_max_queries(client):
+    MAX_RECORDINGS = 3  # TODO: will this be a configuration option?
+    # Create valid recordings, one per phrase, but make too many of them.
+    speaker = mommy.make(Speaker, gender=random_gender)
+    phrases = mommy.make(Phrase, transcription=random_transcription,
+                         _quantity=MAX_RECORDINGS + 1)
+    recordings = [
+        mommy.make(Recording, speaker=speaker, timestamp=random_timestamp, phrase=phrase)
+        for phrase in phrases
+    ]
+
+    # Try fetching the maximum
+    query = ','.join(phrase.transcription for phrase in phrases[:MAX_RECORDINGS])
+    response = client.get(reverse('validation:search_recordings',
+                                  kwargs={'query': query}))
+    assert response.status_code == 200
+
+    # Fetch them!
+    query = ','.join(phrase.transcription for phrase in phrases)
+    response = client.get(reverse('validation:search_recordings',
+                                  kwargs={'query': query}))
+
+    # The request should be denied.
+    recordings = response.json()
+    assert 'Access-Control-Allow-Origin' in response, "Missing requried CORS headers"
+    assert response.status_code == 414
+
+
+# TODO: test query treated like set of word forms.
+
+
 # ################################ Fixtures ################################ #
 
 @pytest.fixture
