@@ -1,7 +1,9 @@
 # Service for the Maskwacîs Recordings Validation Interface (recval)
 #
-# After modifications, this should be symbolically linked from
-# /etc/systemd/system/recval.service
+# After modifications, let systemd create a symlink to the final file:
+# 
+#    sudo systemctl link $PWD/recval.service
+#    sudo systemctl daemon-reload
 #
 
 #! NOTE: This is a template. Copy-paste and modify as appropriate.
