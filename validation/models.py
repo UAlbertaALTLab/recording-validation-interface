@@ -147,6 +147,14 @@ class Speaker(models.Model):
                               max_length=1, choices=GENDER_CHOICES,
                               null=True)
 
+    @property
+    def anonymous(self):
+        """
+        TODO: implement this attribute
+        """
+        # XXX: For now, all speakers are NOT anonymous.
+        return False
+
     # TODO: add field for speaker bio (en)
     # TODO: add field for speaker bio (crk)
 

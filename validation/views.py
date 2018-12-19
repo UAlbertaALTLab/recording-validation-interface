@@ -112,6 +112,8 @@ def search_recordings(request, query):
         recordings.extend({
             'wordform': rec.phrase.transcription,
             'speaker': rec.speaker.code,
+            'speaker_name': rec.speaker.full_name,
+            'anonymous': rec.speaker.anonymous,
             'gender': rec.speaker.gender,
             'recording_url': make_absolute_uri_for_recording(rec.id),
         } for rec in result_set)
