@@ -79,10 +79,13 @@ def test_search_recordings(client):
     assert len(recordings) == 1
     recording = recordings[0]
     assert recording.get('wordform') == phrase.transcription
+    # TODO: Change field to speaker code?
     assert 'speaker' in recording.keys()
     assert recording.get('gender') in 'MF'
     assert recording.get('recording_url').startswith(('http://', 'https://'))
     assert recording.get('recording_url').endswith('.m4a')
+    assert recording.get('speaker_name') == speaker.full_name
+    assert recording.get('anonymous') is False
 
 
 @pytest.mark.django_db
