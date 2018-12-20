@@ -25,6 +25,8 @@ import unicodedata
 MACRON_TO_CIRCUMFLEX = str.maketrans('ēīōā', 'êîôâ')
 # Translates apostrophes and pretty quotes to <i>.
 QUOTE_TO_SHORT_I = str.maketrans("'’", 'ii')
+# Removes long vowel diacritics on NORMALIZED SRO!
+REMOVE_LONG_VOWELS = str.maketrans('êîôâ', 'eioa')
 
 
 def nfc(utterance: str) -> str:
@@ -93,12 +95,8 @@ def to_indexable_form(text: str) -> str:
     Converts text in SRO to a string to an indexable (searchable) form.
     """
 
-    # Decompose the text...
-    text = unicodedata.normalize('NFD', text)
-    # So that we can rip off combining accents (e.g., circumflex or macron)
-    text = re.sub(r"[\u0300-\u03ff]", '', text)
-    # From now on, we operate on lowercase text only.
-    text = text.lower()
+    text = normalize_sro(text).\
+        translate(REMOVE_LONG_VOWELS)
     # Undo short-i elision
     text = re.sub(r"(?<=[qwrtpsdfghjklzxcvbnm])'", "i", text)
     return text
