@@ -24,14 +24,17 @@ See: https://model-mommy.readthedocs.io/en/latest/recipes.html
 """
 
 import random
-from model_mommy.recipe import Recipe
-from validation.models import Speaker, Phrase
+from model_mommy.recipe import Recipe, foreign_key
+from validation.models import Recording, Speaker, Phrase
 
 
-# What's the shortest a transcription can be?
+# What's the shortest a transcription can be (characters)?
 MIN_TRANSCRIPTION_LENGTH = 2
-# What's the longest a transcription can be?
+# What's the longest a transcription can be (characters)?
 MAX_TRANSCRIPTION_LENGTH = 64
+
+# What's the longest a recording can be, in milliseconds?
+MAX_RECORDING_LENGTH = 2 ** 31 - 1
 
 
 def random_gender():
@@ -44,6 +47,13 @@ def random_gender():
     return code
 
 
+def random_timestamp():
+    """
+    Create a valid timestamp for when a recording starts.
+    """
+    return random.randint(0, MAX_RECORDING_LENGTH)
+
+
 def random_transcription():
     """
     Create a random phrase out of the Cree alphabet.
@@ -54,6 +64,8 @@ def random_transcription():
     return ''.join(random.choice(alphabet) for _ in range(quantity))
 
 
+# ################################ Recipes ################################ #
+
 # A Speaker with a non-null gender.
 speaker = Recipe(Speaker,
                  gender=random_gender())
@@ -62,3 +74,8 @@ speaker = Recipe(Speaker,
 # A phrase with an SRO-ish transcription.
 phrase = Recipe(Phrase,
                 transcription=random_transcription)
+
+recording = Recipe(Recording,
+                   timestamp=random_timestamp,
+                   phrase=foreign_key(phrase),
+                   speaker=foreign_key(speaker))

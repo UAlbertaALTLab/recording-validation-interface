@@ -132,8 +132,7 @@ def test_search_multiple_recordings(client):
 @pytest.mark.django_db
 def test_search_recording_not_found(client):
     # Create a valid recording, but make sure we never match it.
-    speaker = mommy.make_recipe('validation.speaker')
-    recording = mommy.make(Recording, speaker=speaker, timestamp=random_timestamp)
+    recording = mommy.make_recipe('validation.recording')
 
     # Make the query never matches the only recording in the database:
     query = recording.phrase.transcription + 'h'
@@ -155,7 +154,7 @@ def test_search_max_queries(client):
     # Create valid recordings, one per phrase, but make too many of them.
     speaker = mommy.make_recipe('validation.speaker')
     phrases = mommy.make_recipe('validation.phrase',
-                         _quantity=MAX_RECORDING_QUERY_TERMS + 1)
+                                _quantity=MAX_RECORDING_QUERY_TERMS + 1)
     recordings = [
         mommy.make(Recording, speaker=speaker, timestamp=random_timestamp, phrase=phrase)
         for phrase in phrases
@@ -184,9 +183,8 @@ def test_search_unique_word_forms(client):
     results as if the word form was requested only once.
     """
     # We need a valid phrase/recording
-    phrase = mommy.make_recipe('validation.phrase')
-    speaker = mommy.make_recipe('validation.speaker')
-    recording = mommy.make(Recording, speaker=speaker, phrase=phrase, timestamp=random_timestamp)
+    recording = mommy.make_recipe('validation.recording')
+    phrase = recording.phrase
 
     # The query will have the term more than once.
     assert MAX_RECORDING_QUERY_TERMS > 1
@@ -211,7 +209,7 @@ def exported_recording(settings):
     Yields a tuple of the Recording instance, and a bytes instance of the
     recording's transcoded audio.
     """
-    recording = Recipe(Recording, timestamp=random_timestamp).make()
+    recording = mommy.make_recipe('validation.recording')
 
     # Create a REAL audio recording, saved on disk.
     with TemporaryDirectory() as temp_dir_name:
