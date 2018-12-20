@@ -25,7 +25,13 @@ See: https://model-mommy.readthedocs.io/en/latest/recipes.html
 
 import random
 from model_mommy.recipe import Recipe
-from validation.models import Speaker
+from validation.models import Speaker, Phrase
+
+
+# What's the shortest a transcription can be?
+MIN_TRANSCRIPTION_LENGTH = 2
+# What's the longest a transcription can be?
+MAX_TRANSCRIPTION_LENGTH = 64
 
 
 def random_gender():
@@ -37,6 +43,22 @@ def random_gender():
     code, _label = random.choice(Speaker.GENDER_CHOICES)
     return code
 
-# Create a speaker instance.
+
+def random_transcription():
+    """
+    Create a random phrase out of the Cree alphabet.
+    """
+    alphabet = 'ptkcsmnywrlêioaîôâ'
+    quantity = random.randint(MIN_TRANSCRIPTION_LENGTH,
+                              MAX_TRANSCRIPTION_LENGTH)
+    return ''.join(random.choice(alphabet) for _ in range(quantity))
+
+
+# A Speaker with a non-null gender.
 speaker = Recipe(Speaker,
                  gender=random_gender())
+
+
+# A phrase with an SRO-ish transcription.
+phrase = Recipe(Phrase,
+                transcription=random_transcription)

@@ -28,7 +28,7 @@ from model_mommy import mommy  # type: ignore
 from model_mommy.recipe import Recipe  # type: ignore
 from pydub import AudioSegment  # type: ignore
 
-from validation.models import Phrase, Recording
+from validation.models import Recording
 
 MAX_RECORDING_LENGTH = 2 ** 31 - 1
 
@@ -58,7 +58,7 @@ def test_serve_recording(client, exported_recording):
 @pytest.mark.django_db
 def test_search_recordings(client):
     # TODO: change this to ê-nipat when there is better database matching.
-    phrase = mommy.make(Phrase, transcription='ênipat')
+    phrase = mommy.make_recipe('validation.phrase', transcription='ênipat')
     speaker = mommy.make_recipe('validation.speaker')
 
     # Make two recordings. We want to make sure the query actually works by
@@ -100,7 +100,7 @@ def test_search_multiple_recordings(client):
     MAX_FORMS = 3
 
     # Create more phrases (and recordings) than queried forms.
-    phrases = mommy.make(Phrase, transcription=random_transcription, _quantity=MAX_FORMS + 2)
+    phrases = mommy.make_recipe('validation.phrase', _quantity=MAX_FORMS + 2)
     # We only want three of these word forms
     query_forms = [phrase.transcription for phrase in phrases][:MAX_FORMS]
 
@@ -154,7 +154,7 @@ MAX_RECORDING_QUERY_TERMS = 3  # TODO: will this be a configuration option?
 def test_search_max_queries(client):
     # Create valid recordings, one per phrase, but make too many of them.
     speaker = mommy.make_recipe('validation.speaker')
-    phrases = mommy.make(Phrase, transcription=random_transcription,
+    phrases = mommy.make_recipe('validation.phrase',
                          _quantity=MAX_RECORDING_QUERY_TERMS + 1)
     recordings = [
         mommy.make(Recording, speaker=speaker, timestamp=random_timestamp, phrase=phrase)
@@ -184,7 +184,7 @@ def test_search_unique_word_forms(client):
     results as if the word form was requested only once.
     """
     # We need a valid phrase/recording
-    phrase = mommy.make(Phrase, transcription=random_transcription)
+    phrase = mommy.make_recipe('validation.phrase')
     speaker = mommy.make_recipe('validation.speaker')
     recording = mommy.make(Recording, speaker=speaker, phrase=phrase, timestamp=random_timestamp)
 
@@ -230,16 +230,3 @@ def exported_recording(settings):
 
 def random_timestamp():
     return random.randint(0, MAX_RECORDING_LENGTH)
-
-
-def random_transcription():
-    """
-    Create a random phrase out of the Cree alphabet.
-    """
-    alphabet = 'ptkcsmnywrlêioaîôâ'
-    quantity = random.randint(2, 64)
-    return ''.join(random.choice(alphabet) for _ in range(quantity))
-
-
-def random_gender():
-    return random.choice('MF')
