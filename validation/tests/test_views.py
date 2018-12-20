@@ -28,7 +28,7 @@ from model_mommy import mommy  # type: ignore
 from model_mommy.recipe import Recipe  # type: ignore
 from pydub import AudioSegment  # type: ignore
 
-from validation.models import Phrase, Recording, Speaker
+from validation.models import Phrase, Recording
 
 MAX_RECORDING_LENGTH = 2 ** 31 - 1
 
@@ -59,7 +59,7 @@ def test_serve_recording(client, exported_recording):
 def test_search_recordings(client):
     # TODO: change this to ê-nipat when there is better database matching.
     phrase = mommy.make(Phrase, transcription='ênipat')
-    speaker = mommy.make(Speaker, gender=random_gender)
+    speaker = mommy.make_recipe('validation.speaker')
 
     # Make two recordings. We want to make sure the query actually works by
     # only retrieving the *relevant* recording.
@@ -107,7 +107,7 @@ def test_search_multiple_recordings(client):
     # Ensure each phrase has a recording. Only a subset of these recordings
     # should be returned.
     recipe = Recipe(Recording, timestamp=random_timestamp)
-    speaker = mommy.make(Speaker, gender=random_gender)
+    speaker = mommy.make_recipe('validation.speaker')
     recordings = [recipe.make(phrase=phrase, speaker=speaker) for phrase in phrases]
 
     response = client.get(reverse('validation:search_recordings',
@@ -132,7 +132,7 @@ def test_search_multiple_recordings(client):
 @pytest.mark.django_db
 def test_search_recording_not_found(client):
     # Create a valid recording, but make sure we never match it.
-    speaker = mommy.make(Speaker, gender=random_gender)
+    speaker = mommy.make_recipe('validation.speaker')
     recording = mommy.make(Recording, speaker=speaker, timestamp=random_timestamp)
 
     # Make the query never matches the only recording in the database:
@@ -153,7 +153,7 @@ MAX_RECORDING_QUERY_TERMS = 3  # TODO: will this be a configuration option?
 @pytest.mark.django_db
 def test_search_max_queries(client):
     # Create valid recordings, one per phrase, but make too many of them.
-    speaker = mommy.make(Speaker, gender=random_gender)
+    speaker = mommy.make_recipe('validation.speaker')
     phrases = mommy.make(Phrase, transcription=random_transcription,
                          _quantity=MAX_RECORDING_QUERY_TERMS + 1)
     recordings = [
@@ -185,7 +185,7 @@ def test_search_unique_word_forms(client):
     """
     # We need a valid phrase/recording
     phrase = mommy.make(Phrase, transcription=random_transcription)
-    speaker = mommy.make(Speaker, gender=random_gender)
+    speaker = mommy.make_recipe('validation.speaker')
     recording = mommy.make(Recording, speaker=speaker, phrase=phrase, timestamp=random_timestamp)
 
     # The query will have the term more than once.
