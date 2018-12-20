@@ -17,7 +17,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-import random
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -25,12 +24,7 @@ import pytest  # type: ignore
 from django.shortcuts import reverse  # type: ignore
 from django.test import Client  # type: ignore
 from model_mommy import mommy  # type: ignore
-from model_mommy.recipe import Recipe  # type: ignore
 from pydub import AudioSegment  # type: ignore
-
-from validation.models import Recording
-
-MAX_RECORDING_LENGTH = 2 ** 31 - 1
 
 
 @pytest.mark.django_db
@@ -63,9 +57,8 @@ def test_search_recordings(client):
 
     # Make two recordings. We want to make sure the query actually works by
     # only retrieving the *relevant* recording.
-    recipe = Recipe(Recording, timestamp=random_timestamp)
-    recording = recipe.make(phrase=phrase, speaker=speaker)
-    unrelated_recording = recipe.make()
+    recording = mommy.make_recipe('validation.recording', phrase=phrase, speaker=speaker)
+    unrelated_recording = mommy.make_recipe('validation.recording')
 
     assert recording.phrase != unrelated_recording.phrase
 
@@ -106,9 +99,9 @@ def test_search_multiple_recordings(client):
 
     # Ensure each phrase has a recording. Only a subset of these recordings
     # should be returned.
-    recipe = Recipe(Recording, timestamp=random_timestamp)
     speaker = mommy.make_recipe('validation.speaker')
-    recordings = [recipe.make(phrase=phrase, speaker=speaker) for phrase in phrases]
+    recordings = [mommy.make_recipe('validation.recording', phrase=phrase, speaker=speaker)
+                  for phrase in phrases]
 
     response = client.get(reverse('validation:search_recordings',
                                   kwargs={'query': ','.join(query_forms)}))
@@ -156,7 +149,7 @@ def test_search_max_queries(client):
     phrases = mommy.make_recipe('validation.phrase',
                                 _quantity=MAX_RECORDING_QUERY_TERMS + 1)
     recordings = [
-        mommy.make(Recording, speaker=speaker, timestamp=random_timestamp, phrase=phrase)
+        mommy.make_recipe('validation.recording', speaker=speaker, phrase=phrase)
         for phrase in phrases
     ]
 
@@ -224,7 +217,3 @@ def exported_recording(settings):
         file_contents = filename.read_bytes()
 
         yield recording, file_contents
-
-
-def random_timestamp():
-    return random.randint(0, MAX_RECORDING_LENGTH)
