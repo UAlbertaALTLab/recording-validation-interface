@@ -93,10 +93,20 @@ def normalize_sro(utterance: str) -> str:
 def to_indexable_form(text: str) -> str:
     """
     Converts text in SRO to a string to an indexable (searchable) form.
+
+    A note about -iw and -ow endings.
+
+    Since sources tend to mix between spelling these in either -iw or -ow
+    (and it's pronouned more like /u/ in either case), they are both
+    normalized to <U>, which would never normally appear in SRO text.
     """
 
     text = normalize_sro(text).\
         translate(REMOVE_LONG_VOWELS)
+
     # Undo short-i elision
     text = re.sub(r"(?<=[qwrtpsdfghjklzxcvbnm])'", "i", text)
+    # -iw/-ow -> U (people spell it two different ways but pronounce it /u/)
+    text = re.sub(r'[oi]w\b', 'U', text)
+
     return text
