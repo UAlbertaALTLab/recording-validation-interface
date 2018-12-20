@@ -102,6 +102,7 @@ def to_indexable_form(text: str) -> str:
     """
 
     text = normalize_sro(text).\
+        replace('-', '').\
         translate(REMOVE_LONG_VOWELS)
 
     # Undo short-i elision
