@@ -53,7 +53,8 @@ def test_idempotence(s):
     ("TaN'SI", 'tanisi'),
 
     # Indexing MUST treat -iw and -ow as the same.
-    # TODO: this
+    ('kiskisiw', 'kiskisU'),
+    ('kiskisow', 'kiskisU'),
 
     # Indexing MUST treat all forms of vowel elision the same.
     ('tân(i)si', 'tanisi'),
