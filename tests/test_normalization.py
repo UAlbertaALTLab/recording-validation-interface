@@ -61,6 +61,10 @@ def test_idempotence(s):
     ('mostos(o)wiyâs', 'mostosowiyas'),
     ("n(a)môya n'n(i)s(i)tohtên", 'namoya ninisitohten'),
 
+    # Indexing MUST ignore hyphens in input
+    ('ê-nipat', 'enipat'),
+    ('ka-kiyâskiskiw', 'kakiyaskiskU'),
+
     # ############################## Regressions ############################ #
 
     # Addressing a few cases here:
