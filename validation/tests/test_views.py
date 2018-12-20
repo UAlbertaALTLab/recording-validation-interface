@@ -16,6 +16,10 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+Unit/Integration tests for views.
+"""
+
 import os
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -25,6 +29,9 @@ from django.shortcuts import reverse  # type: ignore
 from django.test import Client  # type: ignore
 from model_mommy import mommy  # type: ignore
 from pydub import AudioSegment  # type: ignore
+
+
+MAX_RECORDING_QUERY_TERMS = 3  # TODO: will this be a configuration option?
 
 
 @pytest.mark.django_db
@@ -40,10 +47,11 @@ def test_serve_recording(client, exported_recording):
     assert content == file_contents
     assert content[4:12] == b'ftypM4A ', "Did not serve an .m4a file."
 
-    # Check stuff involving caching.
+    # Make sure that caching is set up, and sufficiently aggressive.
     assert 'max-age=' in page.get('Cache-Control')
     assert 'public' in page.get('Cache-Control')
     assert 'must-revalidate' not in page.get('Cache-Control')
+    # TODO: last modified date?
     assert page.get('ETag').startswith('"'), "Incorrect ETag syntax"
     assert page.get('ETag').endswith('"'), "Incorrect ETag syntax"
     assert page.get('ETag').strip('"') in recording.id, "The ETag should be based on the recording ID"
@@ -72,7 +80,7 @@ def test_search_recordings(client):
     assert len(recordings) == 1
     recording = recordings[0]
     assert recording.get('wordform') == phrase.transcription
-    # TODO: Change field to speaker code?
+    # TODO: Change field name to "speaker_code"?
     assert 'speaker' in recording.keys()
     assert recording.get('gender') in 'MF'
     assert recording.get('recording_url').startswith(('http://', 'https://'))
@@ -90,12 +98,12 @@ def test_search_multiple_recordings(client):
         /recording/_search/form1,form2,form3
 
     """
-    MAX_FORMS = 3
 
     # Create more phrases (and recordings) than queried forms.
-    phrases = mommy.make_recipe('validation.phrase', _quantity=MAX_FORMS + 2)
+    phrases = mommy.make_recipe('validation.phrase',
+                                _quantity=MAX_RECORDING_QUERY_TERMS + 2)
     # We only want three of these word forms
-    query_forms = [phrase.transcription for phrase in phrases][:MAX_FORMS]
+    query_forms = [phrase.transcription for phrase in phrases][:MAX_RECORDING_QUERY_TERMS]
 
     # Ensure each phrase has a recording. Only a subset of these recordings
     # should be returned.
@@ -110,7 +118,7 @@ def test_search_multiple_recordings(client):
 
     matched_recordings = response.json()
     assert isinstance(matched_recordings, list)
-    assert len(matched_recordings) == MAX_FORMS
+    assert len(matched_recordings) == MAX_RECORDING_QUERY_TERMS
     for recording in matched_recordings:
         assert recording.get('wordform') in query_forms
         assert 'speaker' in recording.keys()
@@ -137,9 +145,6 @@ def test_search_recording_not_found(client):
     assert isinstance(recordings, list)
     assert len(recordings) == 0
     assert response.status_code == 404
-
-
-MAX_RECORDING_QUERY_TERMS = 3  # TODO: will this be a configuration option?
 
 
 @pytest.mark.django_db
