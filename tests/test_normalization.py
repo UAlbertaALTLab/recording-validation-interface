@@ -61,6 +61,14 @@ def test_idempotence(s):
     ('mostos(o)wiyâs', 'mostosowiyas'),
     ("n(a)môya n'n(i)s(i)tohtên", 'namoya ninisitohten'),
 
+    # ############################## Regressions ############################ #
+
+    # Addressing a few cases here:
+    # https://github.com/UAlbertaALTLab/recording-validation-interface/issues/37#issuecomment-448155202
+    ('pwâwîw', 'pwawU'),
+    ('kostâcinâkosiw', 'kostacinakosU'),
+    ('iskwêsis', 'iskwesis'),
+
     # ####################################################################### #
 
     # The following are tests I got from some spell-relax .regex file,
