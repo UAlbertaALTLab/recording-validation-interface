@@ -43,11 +43,22 @@ def test_idempotence(s):
 
 @pytest.mark.parametrize('original,expected', [
     # Indexing MUST ignore vowel length
+    ('tânisi', 'tanisi'),
+    ('tānisi', 'tanisi'),
+
     # Indexing MUST remove extraneous whitespace
+    ('    tanisi   ',  'tanisi'),
+
     # Indexing MUST lowercase all the things
-    # Indexing MUST be ASCII
+    ("TaN'SI", 'tanisi'),
+
     # Indexing MUST treat -iw and -ow as the same.
+    # TODO: this
+
     # Indexing MUST treat all forms of vowel elision the same.
+    ('tân(i)si', 'tanisi'),
+    ('mostos(o)wiyâs', 'mostosowiyas'),
+    ("n(a)môya n'n(i)s(i)tohtên", 'namoya ninisitohten'),
 
     # ####################################################################### #
 
@@ -104,3 +115,5 @@ def test_idempotence(s):
 ])
 def test_index(original, expected):
     assert to_indexable_form(original) == expected
+    # Indexing MUST be ASCII
+    assert to_indexable_form(original).isprintable()
