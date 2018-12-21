@@ -25,7 +25,7 @@ from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
 
-from librecval.normalization import normalize_sro
+from librecval.normalization import normalize_sro, to_indexable_form
 from librecval.recording_session import Location, SessionID, TimeOfDay
 
 
@@ -60,6 +60,8 @@ class Phrase(models.Model):
     # alphabet (in circumflexes), and some selected punctuation.
     ALLOWED_TRANSCRIPTION_CHARACTERS = set('ptkcshmn yw rl êiîoôaâ -')
 
+    MAX_TRANSCRIPTION_LENGTH = 256
+
     WORD = 'word'
     SENTENCE = 'sentence'
     KIND_CHOICES = (
@@ -76,7 +78,7 @@ class Phrase(models.Model):
 
     transcription = models.CharField(help_text="The transciption of the Cree phrase.",
                                      blank=False,
-                                     max_length=256)
+                                     max_length=MAX_TRANSCRIPTION_LENGTH)
     translation = models.CharField(help_text="The English translation of the phrase.",
                                    blank=False,
                                    max_length=256)
@@ -91,12 +93,29 @@ class Phrase(models.Model):
                               null=True, default=NEW_WORD,
                               **arguments_for_choices(ORIGIN_CHOICES))
 
+    # A hidden field that will be indexed to make fuzzy matching easier.
+    fuzzy_transcription = models.CharField(
+        help_text="The indexed form of the transcription to facilitate "
+                  "fuzzy matching (automatically managed).",
+        null=False,
+        blank=False,
+        max_length=MAX_TRANSCRIPTION_LENGTH,
+        editable=False,
+        # Nothing in the database should have this form.
+        default='<UNINDEXABLE>',
+    )
+
     # Keep track of Phrases' history, so we can review, revert, and inspect them.
     history = HistoricalRecords()
 
     class Meta:
         indexes = [
-            # Allow for rapid look-up on the transcription
+            # An index to support O(log n) matches on FUZZY transcriptions.
+            # To search, query on fuzzy_transcriptions, and use
+            # librecval.normalization.to_indexable_form() on the query.
+            models.Index(fields=('fuzzy_transcription',), name='fuzzy_transcription_idx'),
+
+            # DEPRECATED: Allow for rapid look-up on the transcription
             models.Index(fields=('transcription',), name='transcription_idx'),
         ]
 
@@ -111,9 +130,13 @@ class Phrase(models.Model):
         """
         Cleans the text fields.
         """
-        # TODO: add a strict_sro boolean flag?
         self.transcription = normalize_sro(self.transcription)
         assert self.ALLOWED_TRANSCRIPTION_CHARACTERS.issuperset(self.transcription)
+
+    def save(self, *args, **kwargs):
+        # Make sure the fuzzy match is always up to date
+        self.fuzzy_transcription = to_indexable_form(self.transcription)
+        super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return self.transcription
