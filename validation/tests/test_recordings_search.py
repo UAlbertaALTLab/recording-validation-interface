@@ -154,7 +154,7 @@ def test_search_max_queries(client):
 @pytest.mark.django_db
 def test_search_unique_word_forms(client):
     """
-    Searching for a word form more than once in a single quert should return
+    Searching for a word form more than once in a single query should return
     results as if the word form was requested only once.
     """
     # We need a valid phrase/recording
@@ -172,3 +172,42 @@ def test_search_unique_word_forms(client):
     recordings = response.json()
     assert len(recordings) == 1
     assert recordings[0]['wordform'] == phrase.transcription
+
+
+@pytest.mark.django_db
+def test_search_fuzzy_match(client):
+    """
+    The search should make fuzzy matches with respect to the transcription.
+    """
+
+    RECORDINGS_PER_PHRASE = 2
+
+    # First, insert some unvalidated phrases, with non-standard orthography.
+    phrases = {
+        # 'query': model,
+        'pwâwiw': mommy.make_recipe('validation.phrase', transcription='pwawiw'),
+        'kostâcinâkosiw': mommy.make_recipe('validation.phrase', transcription='kostacinakosow'),
+        'iskwêsis': mommy.make_recipe('validation.phrase', transcription='iskwesis')
+    }
+
+    # Make them searchable by adding a couple recordings.
+    recordings = [
+        mommy.make_recipe('validation.recording', phrase=phrase) for phrase in phrases.values()
+        # Repeat recordings per phrase, to emulate a real recording session
+        for _ in range(RECORDINGS_PER_PHRASE)
+    ]
+    assert len(recordings) == len(phrases) * RECORDINGS_PER_PHRASE
+
+    # Search for the phrases!
+    query = ','.join(key for key in phrases)
+    response = client.get(reverse('validation:search_recordings', kwargs={'query': query}))
+
+    assert response.status_code == 200
+    actual_recordings = response.json()
+    assert len(actual_recordings) == len(recordings)
+
+    # Make sure all the results are there.
+    for query, phrase in phrases.items():
+        resultant_recordings = [result for result in actual_recordings
+                                if result['wordform'] == phrase.transcription]
+        assert len(resultant_recordings) == RECORDINGS_PER_PHRASE
