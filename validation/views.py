@@ -22,7 +22,7 @@ from django.http import FileResponse, HttpResponse, JsonResponse
 from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404
 
-from librecval.normalization import normalize_sro
+from librecval.normalization import to_indexable_form
 
 from .models import Phrase, Recording
 
@@ -96,19 +96,13 @@ def search_recordings(request, query):
 
     recordings = []
     for form in word_forms:
-        # Assume the query is an SRO transcription
-        transcription = normalize_sro(form)
+        # Assume the query is an SRO transcription; prepare it for a fuzzy match.
+        fuzzy_transcription = to_indexable_form(form)
+        result_set = Recording.objects.filter(
+                phrase__fuzzy_transcription=fuzzy_transcription,
+                speaker__gender__isnull=False
+        )
 
-        # HACK: remove the first hyphen in 'ê-' conjuct verbs:
-        # I happen to know that the current database content consistently uses
-        # ê with no hyphen for conjuct verbs, so we get rid of it here to get
-        # more search results.
-        # TODO: remove this hack.
-        if transcription.startswith('ê-'):
-            transcription = transcription.replace('-', '', 1)
-
-        result_set = Recording.objects.filter(phrase__transcription=transcription,
-                                              speaker__gender__isnull=False)
         recordings.extend({
             'wordform': rec.phrase.transcription,
             'speaker': rec.speaker.code,
