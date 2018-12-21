@@ -30,8 +30,14 @@ MAX_RECORDING_QUERY_TERMS = 3  # TODO: will this be a configuration option?
 
 @pytest.mark.django_db
 def test_search_recordings(client):
-    # TODO: change this to ê-nipat when there is better database matching.
-    phrase = mommy.make_recipe('validation.phrase', transcription='ênipat')
+    """
+    General test of the recorings search, in the happy case.
+    """
+
+    # Store <enipat>, but search for the normatized form (as itwêwina would
+    # offer).
+    query = 'ê-nipat'
+    phrase = mommy.make_recipe('validation.phrase', transcription='enipat')
     speaker = mommy.make_recipe('validation.speaker')
 
     # Make two recordings. We want to make sure the query actually works by
@@ -42,7 +48,7 @@ def test_search_recordings(client):
     assert recording.phrase != unrelated_recording.phrase
 
     response = client.get(reverse('validation:search_recordings',
-                                  kwargs={'query': 'ê-nipat'}))
+                                  kwargs={'query': query}))
 
     assert 'Access-Control-Allow-Origin' in response, "Missing requried CORS headers"
 
@@ -166,5 +172,3 @@ def test_search_unique_word_forms(client):
     recordings = response.json()
     assert len(recordings) == 1
     assert recordings[0]['wordform'] == phrase.transcription
-
-
