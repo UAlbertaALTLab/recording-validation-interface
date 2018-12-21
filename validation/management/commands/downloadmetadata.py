@@ -26,10 +26,6 @@ Its defaults are configured using the following settings:
 See recvalsite/settings.py for more information.
 """
 
-from pathlib import Path
-
-import logme  # type: ignore
-
 from django.conf import settings  # type: ignore
 from django.core.management.base import BaseCommand  # type: ignore
 
