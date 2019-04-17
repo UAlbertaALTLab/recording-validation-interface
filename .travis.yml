@@ -1,10 +1,9 @@
+dist: xenial  # required for Python >= 3.7
 language: python
 python:
  - '3.7'
 addons:
   apt:
-    sources:
-      - trusty-media
     packages:
      - ffmpeg
 install:
