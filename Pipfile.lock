@@ -114,11 +114,10 @@
         },
         "pydub": {
             "hashes": [
-                "sha256:07d5eec305110cf1dfe1a0c45eed84bc31f889b1b19feab3859a05dc45b70e7b",
-                "sha256:c703e220917be686fc83d24231849a11c95ba540963ffb3ae5bb322788974d79"
+                "sha256:c362fa02da1eebd1d08bd47aa9b0102582dff7ca2269dbe9e043d228a0c1ea93",
+                "sha256:d29901a486fb421c5d7b0f3d5d3a60527179204d8ffb20e74e1ae81c17e81b46"
             ],
-            "index": "pypi",
-            "version": "==0.23.0"
+            "version": "==0.23.1"
         },
         "python-decouple": {
             "hashes": [
