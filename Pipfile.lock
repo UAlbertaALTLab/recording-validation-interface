@@ -178,12 +178,11 @@
         },
         "hypothesis": {
             "hashes": [
-                "sha256:251d4cf1345cc094dd661dd164fe2ef14293e3735c4816dc28050c9adaa27363",
-                "sha256:691363dc2e8563d1818184547ffcbbfa687c29b15540fd125789d20bd07cd03a",
-                "sha256:81235c2fa20f2e753bb90ace17ea484ca7e989f410864cd49fa954203e23bd6f"
+                "sha256:4801b8175e2047abc8034fa1d4bce1a686225aefcfa3e0011d6c08f0324a807d",
+                "sha256:db7d64776d7c0fd04c874c5ab7d32d1b45c7d5d434fd130ce7746ec30c64bfc2",
+                "sha256:e86040269da16622fcc2771a211f93ce93e10fc8fb1f6f622dcd4507ae5670a4"
             ],
-            "index": "pypi",
-            "version": "==3.82.6"
+            "version": "==4.17.1"
         },
         "isort": {
             "hashes": [
