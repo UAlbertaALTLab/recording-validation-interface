@@ -11,7 +11,7 @@ django = "*"
 python-decouple = "*"
 django-simple-history = "*"
 docopt = "*"
-"e1839a8" = {path = ".", editable = true}
+e1839a8 = {path = ".",editable = true}
 logme = "*"
 "jinja2" = "*"
 gunicorn = "*"
