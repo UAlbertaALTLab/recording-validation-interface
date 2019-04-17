@@ -18,10 +18,10 @@
     "default": {
         "bnmutils": {
             "hashes": [
-                "sha256:09d4fe9ec208b7f244a7d1954fc36209b84a1b7bbb87d85dc2cc69cb2fbccaa0",
-                "sha256:5ba31ba38f0aa99b559d2b5459edd69f30eb86a31d624b338e28cbdd8f2337df"
+                "sha256:62fef049f3b83d120573c5eb823862a746cc2d9e6c50ebd95976ab2ffb831c0f",
+                "sha256:bf21ac21e04aa1db35160bb38690e22d8d10571b6dd1364c331cdb7031f14021"
             ],
-            "version": "==1.0.2"
+            "version": "==1.0.3"
         },
         "click": {
             "hashes": [
