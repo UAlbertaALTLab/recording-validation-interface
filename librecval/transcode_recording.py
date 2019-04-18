@@ -49,7 +49,10 @@ def transcode_to_aac(
     # This assumes ffmpeg as the backend. This will save
     # a mono audio stream encoded in AAC, in an MP4 container.
     audio.export(
-        destination, format='ipod', codec='aac', **kwargs
+        destination, format='ipod', codec='aac', **kwargs,
+        # On Ubuntu's ffmpeg, the aac codec is experimental,
+        # so enable experimental codecs!
+        parameters=['-strict', '-2']
     ).close()
 
 
