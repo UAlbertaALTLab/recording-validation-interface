@@ -77,7 +77,9 @@ def exported_recording(settings):
         audio = AudioSegment.empty()
         filename = audio_dir / f'{recording.id}.m4a'
         # Create an actual, bona fide M4A file.
-        audio.export(os.fspath(filename), format='ipod')
+        # TODO: use librecval.transcode_recording?
+        audio.export(os.fspath(filename), format='ipod',
+                     parameters=['-strict', '-2'])
         file_contents = filename.read_bytes()
 
         yield recording, file_contents
