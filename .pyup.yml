@@ -1,4 +1,10 @@
 update: insecure
+branch: master
+schedule: "every two weeks on wednesday"
+search: False
 requirements:
-  - Pipfile
-  - Pipfile.lock
+  - Pipfile:
+    update: insecure
+  - Pipfile.lock:
+    update: insecure
+    pin: True
