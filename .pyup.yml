@@ -4,7 +4,7 @@ schedule: "every two weeks on wednesday"
 search: False
 requirements:
   - Pipfile:
-    update: insecure
+      update: insecure
   - Pipfile.lock:
-    update: insecure
-    pin: True
+      update: insecure
+      pin: True
