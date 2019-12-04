@@ -10,4 +10,4 @@ install:
  - pip install pipenv
  - make install-test
 script:
- - make test
+ - pipenv run make test
