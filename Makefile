@@ -22,8 +22,7 @@ install-dev: init
 
 test:
 	pipenv run mypy librecval
-	pipenv run py.test --version
-	pipenv run python3 -m pytest
+	pipenv run pytest
 
 init:
 	git config core.hooksPath .githooks
