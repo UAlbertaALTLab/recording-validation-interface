@@ -11,17 +11,14 @@ A Django web app for viewing and validating Cree recordings done in Maskwacîs.
 Install
 -------
 
-Requires Python 3.7 and [Pipenv][].
-
-Consult `system-requirements.txt` for other system dependencies you may
-require (e.g., [`ffmpeg`](https://www.ffmpeg.org/)).
+Requires Python 3.7, [Pipenv][], and [ffmpeg].
 
 You may also want to install and initialize [gdrive][] before
 continuing.
 
 [Pipenv]: https://github.com/pypa/pipenv#installation
 [gdrive]: https://github.com/prasmussen/gdrive
-
+[ffmpeg]: https://www.ffmpeg.org/
 
 ### Development environment
 
