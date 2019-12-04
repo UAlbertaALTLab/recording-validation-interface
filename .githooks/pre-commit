@@ -1,0 +1,2 @@
+make reformat
+git ls-files | grep '*.py' | xargs git add

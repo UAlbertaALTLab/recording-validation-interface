@@ -31,6 +31,7 @@ To install dependencies and setup for development (e.g., on your laptop):
 make install-dev
 ```
 
+This will also setup the [git pre-commit hook](https://www.viget.com/articles/two-ways-to-share-git-hooks-with-your-team/).
 
 ### Production
 
