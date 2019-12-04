@@ -17,7 +17,6 @@ logme = "*"
 gunicorn = "*"
 mypy = "*"
 black = "*"
-pytest = "*"
 
 [dev-packages]
 pytest = "*"
