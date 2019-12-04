@@ -33,10 +33,10 @@ def index(request):
     """
     all_phrases = Phrase.objects.all()
     paginator = Paginator(all_phrases, 30)
-    page_no = request.GET.get('page', 1)
+    page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)
     context = dict(phrases=phrases)
-    return render(request, 'validation/list_phrases.html', context)
+    return render(request, "validation/list_phrases.html", context)
 
 
 def search_phrases(request):
@@ -64,12 +64,14 @@ def serve_recording(request, recording_id):
     # just a part of it. Note: GitHub uses 7 digits.
     HASH_PREFIX_LENGTH = 7
     recording = get_object_or_404(Recording, id=recording_id)
-    response = FileResponse(open(settings.RECVAL_AUDIO_DIR / f'{recording.id}.m4a', 'rb'),
-                            content_type='audio/m4a')
+    response = FileResponse(
+        open(settings.RECVAL_AUDIO_DIR / f"{recording.id}.m4a", "rb"),
+        content_type="audio/m4a",
+    )
     # The recording files basically never change, so tell everybody to cache
     # the dookey out these files (or at very least, a year).
-    response['Cache-Control'] = f'public, max-age={60 * 60 * 24 * 365}'
-    response['ETag'] = f'"{recording.id[:HASH_PREFIX_LENGTH]}"'
+    response["Cache-Control"] = f"public, max-age={60 * 60 * 24 * 365}"
+    response["ETag"] = f'"{recording.id[:HASH_PREFIX_LENGTH]}"'
     return response
 
 
@@ -83,15 +85,15 @@ def search_recordings(request, query):
     MAX_RECORDING_QUERY_TERMS = 3
 
     # Commas are fence posts: there will be one less comma than query terms.
-    if query.count(',') >= MAX_RECORDING_QUERY_TERMS:
+    if query.count(",") >= MAX_RECORDING_QUERY_TERMS:
         response = JsonResponse((), safe=False)
         response.status_code = 414
         return add_cors_headers(response)
 
-    word_forms = frozenset(query.split(','))
+    word_forms = frozenset(query.split(","))
 
     def make_absolute_uri_for_recording(rec_id: str) -> str:
-        relative_uri = reverse('validation:recording', kwargs={'recording_id': rec_id})
+        relative_uri = reverse("validation:recording", kwargs={"recording_id": rec_id})
         return request.build_absolute_uri(relative_uri)
 
     recordings = []
@@ -99,18 +101,21 @@ def search_recordings(request, query):
         # Assume the query is an SRO transcription; prepare it for a fuzzy match.
         fuzzy_transcription = to_indexable_form(form)
         result_set = Recording.objects.filter(
-                phrase__fuzzy_transcription=fuzzy_transcription,
-                speaker__gender__isnull=False
+            phrase__fuzzy_transcription=fuzzy_transcription,
+            speaker__gender__isnull=False,
         )
 
-        recordings.extend({
-            'wordform': rec.phrase.transcription,
-            'speaker': rec.speaker.code,
-            'speaker_name': rec.speaker.full_name,
-            'anonymous': rec.speaker.anonymous,
-            'gender': rec.speaker.gender,
-            'recording_url': make_absolute_uri_for_recording(rec.id),
-        } for rec in result_set)
+        recordings.extend(
+            {
+                "wordform": rec.phrase.transcription,
+                "speaker": rec.speaker.code,
+                "speaker_name": rec.speaker.full_name,
+                "anonymous": rec.speaker.anonymous,
+                "gender": rec.speaker.gender,
+                "recording_url": make_absolute_uri_for_recording(rec.id),
+            }
+            for rec in result_set
+        )
 
     response = JsonResponse(recordings, safe=False)
 
@@ -125,6 +130,8 @@ def add_cors_headers(response):
     """
     Adds appropriate Access-Control-* headers for cross-origin XHR responses.
     """
-    response['Access-Control-Allow-Origin'] = '*'
+    response["Access-Control-Allow-Origin"] = "*"
     return response
+
+
 # TODO: Speaker bio page like https://ojibwe.lib.umn.edu/about/voices

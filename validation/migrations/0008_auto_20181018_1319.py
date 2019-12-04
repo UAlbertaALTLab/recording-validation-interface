@@ -5,24 +5,41 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('validation', '0007_auto_20181018_1313'),
-    ]
+    dependencies = [("validation", "0007_auto_20181018_1313")]
 
     operations = [
         migrations.AlterField(
-            model_name='recordingsession',
-            name='location',
-            field=models.CharField(blank=True, choices=[('DOWNSTAIRS', 'DS'), ('UPSTAIRS', 'US'), ('KITCHEN', 'KCH'), ('OFFICE', 'OFF')], default='', help_text='The location of the recordings. May be empty.', max_length=10),
+            model_name="recordingsession",
+            name="location",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ("DOWNSTAIRS", "DS"),
+                    ("UPSTAIRS", "US"),
+                    ("KITCHEN", "KCH"),
+                    ("OFFICE", "OFF"),
+                ],
+                default="",
+                help_text="The location of the recordings. May be empty.",
+                max_length=10,
+            ),
         ),
         migrations.AlterField(
-            model_name='recordingsession',
-            name='subsession',
-            field=models.IntegerField(help_text="The 'subsession' number, if applicable.", null=True),
+            model_name="recordingsession",
+            name="subsession",
+            field=models.IntegerField(
+                help_text="The 'subsession' number, if applicable.", null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='recordingsession',
-            name='time_of_day',
-            field=models.CharField(blank=True, choices=[('MORNING', 'AM'), ('AFTERNOON', 'PM')], default='', help_text='The time of day the session occured. May be empty.', max_length=9),
+            model_name="recordingsession",
+            name="time_of_day",
+            field=models.CharField(
+                blank=True,
+                choices=[("MORNING", "AM"), ("AFTERNOON", "PM")],
+                default="",
+                help_text="The time of day the session occured. May be empty.",
+                max_length=9,
+            ),
         ),
     ]

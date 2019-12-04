@@ -26,7 +26,7 @@ from tempfile import TemporaryDirectory
 import pytest  # type: ignore
 
 # Where are fixture files located?
-fixtures_dir = Path(__file__).parent / 'fixtures'
+fixtures_dir = Path(__file__).parent / "fixtures"
 
 
 @pytest.fixture
@@ -45,7 +45,7 @@ def wave_file_path():
     """
     A recording saying "acimosis" (puppy), for use in test cases.
     """
-    test_wav = fixtures_dir / 'test.wav'
+    test_wav = fixtures_dir / "test.wav"
     assert test_wav.exists()
     return test_wav
 
@@ -56,7 +56,7 @@ def metadata_csv_file():
     Returns a file-like object that is some sample metadata, as downloaded
     from Google Sheets.
     """
-    with open(fixtures_dir / 'test_metadata.csv') as csvfile:
+    with open(fixtures_dir / "test_metadata.csv") as csvfile:
         yield csvfile
 
 
@@ -66,7 +66,7 @@ def skip_metadata_csv_file():
     Returns a file-like object that is some sample metadata, with !SKIP, as downloaded
     from Google Sheets.
     """
-    with open(fixtures_dir / 'test_metadata_skip.csv') as csvfile:
+    with open(fixtures_dir / "test_metadata_skip.csv") as csvfile:
         yield csvfile
 
 
@@ -76,5 +76,5 @@ def rename_metadata_csv_file():
     Returns a file-like object that is some sample metadata, with a session rename, as downloaded
     from Google Sheets.
     """
-    with open(fixtures_dir / 'test_metadata_rename.csv') as csvfile:
+    with open(fixtures_dir / "test_metadata_rename.csv") as csvfile:
         yield csvfile

@@ -58,24 +58,23 @@ def random_transcription():
     """
     Create a random phrase out of the Cree alphabet.
     """
-    alphabet = 'ptkcsmnywrlêioaîôâ'
-    quantity = random.randint(MIN_TRANSCRIPTION_LENGTH,
-                              MAX_TRANSCRIPTION_LENGTH)
-    return ''.join(random.choice(alphabet) for _ in range(quantity))
+    alphabet = "ptkcsmnywrlêioaîôâ"
+    quantity = random.randint(MIN_TRANSCRIPTION_LENGTH, MAX_TRANSCRIPTION_LENGTH)
+    return "".join(random.choice(alphabet) for _ in range(quantity))
 
 
 # ################################ Recipes ################################ #
 
 # A Speaker with a non-null gender.
-speaker = Recipe(Speaker,
-                 gender=random_gender())
+speaker = Recipe(Speaker, gender=random_gender())
 
 
 # A phrase with an SRO-ish transcription.
-phrase = Recipe(Phrase,
-                transcription=random_transcription)
+phrase = Recipe(Phrase, transcription=random_transcription)
 
-recording = Recipe(Recording,
-                   timestamp=random_timestamp,
-                   phrase=foreign_key(phrase),
-                   speaker=foreign_key(speaker))
+recording = Recipe(
+    Recording,
+    timestamp=random_timestamp,
+    phrase=foreign_key(phrase),
+    speaker=foreign_key(speaker),
+)

@@ -39,24 +39,29 @@ def test_serve_recording(client, exported_recording):
     Test that a recording is served properly.
     """
     recording, file_contents = exported_recording
-    page = client.get(reverse('validation:recording', kwargs={'recording_id': recording.id}))
+    page = client.get(
+        reverse("validation:recording", kwargs={"recording_id": recording.id})
+    )
     assert page.status_code == 200
-    assert page.get('Content-Type') == 'audio/m4a'
-    content = b''.join(page.streaming_content)
+    assert page.get("Content-Type") == "audio/m4a"
+    content = b"".join(page.streaming_content)
     assert content == file_contents
-    assert content[4:12] == b'ftypM4A ', "Did not serve an .m4a file."
+    assert content[4:12] == b"ftypM4A ", "Did not serve an .m4a file."
 
     # Make sure that caching is set up, and sufficiently aggressive.
-    assert 'max-age=' in page.get('Cache-Control')
-    assert 'public' in page.get('Cache-Control')
-    assert 'must-revalidate' not in page.get('Cache-Control')
+    assert "max-age=" in page.get("Cache-Control")
+    assert "public" in page.get("Cache-Control")
+    assert "must-revalidate" not in page.get("Cache-Control")
     # TODO: last modified date?
-    assert page.get('ETag').startswith('"'), "Incorrect ETag syntax"
-    assert page.get('ETag').endswith('"'), "Incorrect ETag syntax"
-    assert page.get('ETag').strip('"') in recording.id, "The ETag should be based on the recording ID"
+    assert page.get("ETag").startswith('"'), "Incorrect ETag syntax"
+    assert page.get("ETag").endswith('"'), "Incorrect ETag syntax"
+    assert (
+        page.get("ETag").strip('"') in recording.id
+    ), "The ETag should be based on the recording ID"
 
 
 # ################################ Fixtures ################################ #
+
 
 @pytest.fixture
 def exported_recording(settings):
@@ -66,7 +71,7 @@ def exported_recording(settings):
     Yields a tuple of the Recording instance, and a bytes instance of the
     recording's transcoded audio.
     """
-    recording = mommy.make_recipe('validation.recording')
+    recording = mommy.make_recipe("validation.recording")
 
     # Create a REAL audio recording, saved on disk.
     with TemporaryDirectory() as temp_dir_name:
@@ -75,11 +80,10 @@ def exported_recording(settings):
         # Temporarily override the audio directory name.
         settings.RECVAL_AUDIO_DIR = audio_dir
         audio = AudioSegment.empty()
-        filename = audio_dir / f'{recording.id}.m4a'
+        filename = audio_dir / f"{recording.id}.m4a"
         # Create an actual, bona fide M4A file.
         # TODO: use librecval.transcode_recording?
-        audio.export(os.fspath(filename), format='ipod',
-                     parameters=['-strict', '-2'])
+        audio.export(os.fspath(filename), format="ipod", parameters=["-strict", "-2"])
         file_contents = filename.read_bytes()
 
         yield recording, file_contents

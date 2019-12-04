@@ -5,19 +5,22 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('validation', '0003_auto_20181018_1242'),
-    ]
+    dependencies = [("validation", "0003_auto_20181018_1242")]
 
     operations = [
         migrations.AddField(
-            model_name='recordingsession',
-            name='time_of_day',
-            field=models.CharField(choices=[('MORNING', 'AM'), ('AFTERNOON', 'PM')], help_text='The time of day the session occured. May be null.', max_length=2, null=True),
+            model_name="recordingsession",
+            name="time_of_day",
+            field=models.CharField(
+                choices=[("MORNING", "AM"), ("AFTERNOON", "PM")],
+                help_text="The time of day the session occured. May be null.",
+                max_length=2,
+                null=True,
+            ),
         ),
         migrations.AlterField(
-            model_name='recordingsession',
-            name='date',
-            field=models.DateTimeField(help_text='The day the session occured,'),
+            model_name="recordingsession",
+            name="date",
+            field=models.DateTimeField(help_text="The day the session occured,"),
         ),
     ]

@@ -39,6 +39,7 @@ from librecval.recording_session import SessionID, SessionMetadata
 
 # ############################### Exceptions ############################### #
 
+
 class DuplicateSessionError(RuntimeError):
     """
     Raised when the session has already been found by another name.
@@ -56,6 +57,7 @@ class InvalidTextGridName(RuntimeError):
     Raised when the TextGrid name does not follow an appropriate pattern.
     """
 
+
 # ########################################################################## #
 
 
@@ -64,6 +66,7 @@ class RecordingInfo(NamedTuple):
     All the information you could possible want to know about a recorded
     snippet.
     """
+
     session: SessionID
     speaker: str
     type: str
@@ -86,7 +89,7 @@ class RecordingInfo(NamedTuple):
         """
         Compute a hash that can be used as a ID for this recording.
         """
-        return sha256(self.signature().encode('UTF-8')).hexdigest()
+        return sha256(self.signature().encode("UTF-8")).hexdigest()
 
 
 @logme.log
@@ -108,10 +111,10 @@ class RecordingExtractor:
         For each session directory found, its TextGrid/.wav file pairs are
         scanned for words and sentences.
         """
-        self.logger.debug('Scanning %s for sessions...', root_directory)
+        self.logger.debug("Scanning %s for sessions...", root_directory)
         for session_dir in root_directory.iterdir():
             if not session_dir.resolve().is_dir():
-                self.logger.debug('Rejecting %s; not a directory', session_dir)
+                self.logger.debug("Rejecting %s; not a directory", session_dir)
                 continue
             try:
                 yield from self.extract_session(session_dir)
@@ -126,26 +129,29 @@ class RecordingExtractor:
         """
         session_id = SessionID.from_name(session_dir.stem)
         if session_id in self.sessions:
-            raise DuplicateSessionError(f"Duplicate session: {session_id} "
-                                        f"found at {self.sessions[session_id]}")
+            raise DuplicateSessionError(
+                f"Duplicate session: {session_id} "
+                f"found at {self.sessions[session_id]}"
+            )
         if session_id not in self.metadata:
             raise MissingMetadataError(f"Missing metadata for {session_id}")
 
-        self.logger.debug('Scanning %s for .TextGrid files', session_dir)
-        text_grids = list(session_dir.glob('*.TextGrid'))
-        self.logger.info('%d text grids in %s', len(text_grids), session_dir)
+        self.logger.debug("Scanning %s for .TextGrid files", session_dir)
+        text_grids = list(session_dir.glob("*.TextGrid"))
+        self.logger.info("%d text grids in %s", len(text_grids), session_dir)
 
         for text_grid in text_grids:
             # Find the cooresponding audio with a couple different strategies.
-            sound_file = find_audio_from_audacity_format(text_grid) or\
-                    find_audio_from_audition_format(text_grid)
+            sound_file = find_audio_from_audacity_format(
+                text_grid
+            ) or find_audio_from_audition_format(text_grid)
 
             if sound_file is None:
-                self.logger.warn('Could not find cooresponding audio for %s', text_grid)
+                self.logger.warn("Could not find cooresponding audio for %s", text_grid)
                 continue
 
             assert text_grid.exists() and sound_file.exists()
-            self.logger.debug('Matching sound file for %s', text_grid)
+            self.logger.debug("Matching sound file for %s", text_grid)
 
             try:
                 mic_id = get_mic_id(text_grid.stem)
@@ -153,15 +159,21 @@ class RecordingExtractor:
                 if len(text_grids) != 1:
                     raise  # There's no way to determine the speaker.
                 mic_id = 1
-                self.logger.warn('Assuming single text grid is mic 1')
+                self.logger.warn("Assuming single text grid is mic 1")
 
             speaker = self.metadata[session_id][mic_id]
 
-            self.logger.debug('Opening audio and text grid from %s for speaker %s', sound_file, speaker)
-            extractor = PhraseExtractor(session_id,
-                                        AudioSegment.from_file(fspath(sound_file)),
-                                        TextGrid.fromFile(fspath(text_grid)),
-                                        speaker)
+            self.logger.debug(
+                "Opening audio and text grid from %s for speaker %s",
+                sound_file,
+                speaker,
+            )
+            extractor = PhraseExtractor(
+                session_id,
+                AudioSegment.from_file(fspath(sound_file)),
+                TextGrid.fromFile(fspath(text_grid)),
+                speaker,
+            )
             yield from extractor.extract_all()
 
 
@@ -171,8 +183,8 @@ def find_audio_from_audacity_format(text_grid: Path, logger=None) -> Optional[Pa
     Finds the associated audio in Audacity's format.
     """
     # TODO: tmill's kludge for certain missing filenames???
-    sound_file = text_grid.with_suffix('.wav')
-    logger.debug('[Audacity Format] Trying %s...', sound_file)
+    sound_file = text_grid.with_suffix(".wav")
+    logger.debug("[Audacity Format] Trying %s...", sound_file)
     return sound_file if sound_file.exists() else None
 
 
@@ -184,13 +196,15 @@ def find_audio_from_audition_format(text_grid: Path, logger=None) -> Optional[Pa
     # If it's in Audition format, there will be exactly ONE file with the
     # *.sesx extension.
     try:
-        audition_file, = session_dir.glob('*.sesx')
+        (audition_file,) = session_dir.glob("*.sesx")
     except ValueError:
-        logger.debug('Could not find exactly one *.sesx file in %s', session_dir)
+        logger.debug("Could not find exactly one *.sesx file in %s", session_dir)
         return None
 
-    sound_file = session_dir / f'{audition_file.stem}_Recorded' / f'{text_grid.stem}.wav'
-    logger.debug('[Audition Format] Trying %s...', sound_file)
+    sound_file = (
+        session_dir / f"{audition_file.stem}_Recorded" / f"{text_grid.stem}.wav"
+    )
+    logger.debug("[Audition Format] Trying %s...", sound_file)
     return sound_file if sound_file.exists() else None
 
 
@@ -208,12 +222,13 @@ class PhraseExtractor:
 
     logger: logging.Logger
 
-    def __init__(self,
-                 session: SessionID,
-                 sound: AudioSegment,
-                 text_grid: TextGrid,
-                 speaker: str,  # Something like "ABC"
-                 ) -> None:
+    def __init__(
+        self,
+        session: SessionID,
+        sound: AudioSegment,
+        text_grid: TextGrid,
+        speaker: str,  # Something like "ABC"
+    ) -> None:
         self.session = session
         self.sound = sound
         self.text_grid = text_grid
@@ -222,31 +237,32 @@ class PhraseExtractor:
     def extract_all(self):
         assert len(self.text_grid.tiers) >= 4, "TextGrid has too few tiers"
 
-        self.logger.debug('Extracting words from %s/%s', self.session, self.speaker)
+        self.logger.debug("Extracting words from %s/%s", self.session, self.speaker)
         yield from self.extract_words(
             cree_tier=self.text_grid.tiers[WORD_TIER_CREE],
-            english_tier=self.text_grid.tiers[WORD_TIER_ENGLISH]
+            english_tier=self.text_grid.tiers[WORD_TIER_ENGLISH],
         )
 
-        self.logger.debug('Extracting sentences from %s/%s', self.session, self.speaker)
+        self.logger.debug("Extracting sentences from %s/%s", self.session, self.speaker)
         yield from self.extract_sentences(
             cree_tier=self.text_grid.tiers[SENTENCE_TIER_CREE],
-            english_tier=self.text_grid.tiers[SENTENCE_TIER_ENGLISH]
+            english_tier=self.text_grid.tiers[SENTENCE_TIER_ENGLISH],
         )
 
     def extract_words(self, cree_tier, english_tier):
-        yield from self.extract_phrases('word', cree_tier, english_tier)
+        yield from self.extract_phrases("word", cree_tier, english_tier)
 
     def extract_sentences(self, cree_tier, english_tier):
-        yield from self.extract_phrases('sentence', cree_tier, english_tier)
+        yield from self.extract_phrases("sentence", cree_tier, english_tier)
 
-    def extract_phrases(self, type_: str,
-                        cree_tier: IntervalTier, english_tier: IntervalTier):
+    def extract_phrases(
+        self, type_: str, cree_tier: IntervalTier, english_tier: IntervalTier
+    ):
         assert is_cree_tier(cree_tier), cree_tier.name
         assert is_english_tier(english_tier), english_tier.name
 
         for interval in cree_tier:
-            if not interval.mark or interval.mark.strip() == '':
+            if not interval.mark or interval.mark.strip() == "":
                 # This interval is empty, for some reason.
                 continue
 
@@ -257,10 +273,10 @@ class PhraseExtractor:
             midtime = (interval.minTime + interval.maxTime) / 2
 
             # Figure out if this word belongs to a sentence.
-            if type_ == 'word' and self.timestamp_within_sentence(midtime):
+            if type_ == "word" and self.timestamp_within_sentence(midtime):
                 # It's an example sentence; leave it for the next loop.
                 # TODO: WHY ARE WE SKIPPING IT AGAIN?
-                self.logger.debug('%r is in a sentence', transcription)
+                self.logger.debug("%r is in a sentence", transcription)
                 continue
 
             # Get the word's English gloss.
@@ -272,20 +288,28 @@ class PhraseExtractor:
             # tmills: normalize sound levels (some speakers are very quiet)
             sound_bite = sound_bite.normalize(headroom=0.1)  # dB
 
-            yield self.info_for(type_, transcription, translation,
-                                start, sound_bite)
+            yield self.info_for(type_, transcription, translation, start, sound_bite)
 
-    def info_for(self, type_: str, transcription: str, translation: str, timestamp: int, sound_bite: AudioSegment):
+    def info_for(
+        self,
+        type_: str,
+        transcription: str,
+        translation: str,
+        timestamp: int,
+        sound_bite: AudioSegment,
+    ):
         """
         Return a tuple of the phrase and its audio.
         """
-        assert type_ in ('word', 'sentence')
-        info = RecordingInfo(session=self.session,
-                             speaker=self.speaker,
-                             type=type_,
-                             timestamp=timestamp,
-                             transcription=transcription,
-                             translation=translation)
+        assert type_ in ("word", "sentence")
+        info = RecordingInfo(
+            session=self.session,
+            speaker=self.speaker,
+            type=type_,
+            timestamp=timestamp,
+            transcription=transcription,
+            translation=translation,
+        )
         return info, sound_bite
 
     def timestamp_within_sentence(self, timestamp: Decimal):
@@ -294,11 +318,11 @@ class PhraseExtractor:
         """
         sentences = self.text_grid.tiers[SENTENCE_TIER_CREE]
         sentence = sentences.intervalContaining(timestamp)
-        return sentence and sentence.mark != ''
+        return sentence and sentence.mark != ""
 
 
-cree_pattern = re.compile(r'\b(?:cree|crk)\b', re.IGNORECASE)
-english_pattern = re.compile(r'\b(?:english|eng|en)\b', re.IGNORECASE)
+cree_pattern = re.compile(r"\b(?:cree|crk)\b", re.IGNORECASE)
+english_pattern = re.compile(r"\b(?:english|eng|en)\b", re.IGNORECASE)
 
 
 def is_english_tier(tier: IntervalTier) -> bool:
@@ -335,7 +359,8 @@ def get_mic_id(name: str) -> int:
     3
     """
     # Match something like '2016-02-24am-Track 2_001.TextGrid'
-    m = re.match(r'''
+    m = re.match(
+        r"""
         ^
         (?:                 # An optional "yy-mm-ddtt-Track "
             (?:             # An optional date/time code
@@ -354,8 +379,12 @@ def get_mic_id(name: str) -> int:
 
         _\d{3}
         (?:[.]TextGrid)?$
-        ''', name, re.VERBOSE)
-    m = m or re.match(r'''
+        """,
+        name,
+        re.VERBOSE,
+    )
+    m = m or re.match(
+        r"""
         ^
         \d{4}-\d{2}-\d{2}       # ISO date
         (?:[ap]m)?              # Optional AM/PM
@@ -366,7 +395,10 @@ def get_mic_id(name: str) -> int:
 
         (\d+)
         (?:[.]TextGrid)?$
-        ''', name, re.VERBOSE)
+        """,
+        name,
+        re.VERBOSE,
+    )
     if not m:
         raise InvalidTextGridName(name)
     return int(m.group(1), 10)

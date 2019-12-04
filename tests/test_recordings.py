@@ -27,8 +27,9 @@ from pydub.generators import Square  # type: ignore
 from librecval.transcode_recording import transcode_to_aac
 
 
-def test_can_transcode_wave_file(wave_file_path: Path,
-                                 temporary_directory: Path) -> None:
+def test_can_transcode_wave_file(
+    wave_file_path: Path, temporary_directory: Path
+) -> None:
     destination = temporary_directory / f"{uuid4()}.m4a"
 
     # Check that transcoding creates a new file, at least.
@@ -38,8 +39,8 @@ def test_can_transcode_wave_file(wave_file_path: Path,
 
     # Check that it's has an MP4 header, at least.
     blob = destination.read_bytes()
-    assert b'ftyp' == blob[4:8]
-    assert b'M4A ' == blob[8:12]
+    assert b"ftyp" == blob[4:8]
+    assert b"M4A " == blob[8:12]
 
 
 def test_can_transcode_audio_in_memory(temporary_directory: Path) -> None:
@@ -53,34 +54,37 @@ def test_can_transcode_audio_in_memory(temporary_directory: Path) -> None:
 
     # Check that it's has an MP4 header, at least.
     blob = destination.read_bytes()
-    assert b'ftyp' == blob[4:8]
-    assert b'M4A ' == blob[8:12]
+    assert b"ftyp" == blob[4:8]
+    assert b"M4A " == blob[8:12]
 
 
-def test_can_recover_metadata(wave_file_path: Path,
-                              temporary_directory: Path) -> None:
+def test_can_recover_metadata(wave_file_path: Path, temporary_directory: Path) -> None:
     destination = temporary_directory / f"{uuid4()}.m4a"
 
     # Check that transcoding creates a new file, at least.
     assert not destination.exists()
     creation_time = "2015-12-03"
     acimosis = "ᐊᒋᒧᓯᐢ"
-    transcode_to_aac(wave_file_path, destination, tags=dict(
-        title=acimosis,
-        artist="SPEAKER",
-        album=creation_time,
-        language="crk",
-        creation_time=creation_time,
-        year=2015
-    ))
+    transcode_to_aac(
+        wave_file_path,
+        destination,
+        tags=dict(
+            title=acimosis,
+            artist="SPEAKER",
+            album=creation_time,
+            language="crk",
+            creation_time=creation_time,
+            year=2015,
+        ),
+    )
     assert destination.exists()
 
     # Check that it's has an MP4 header, at least.
     blob = destination.read_bytes()
-    assert acimosis.encode('UTF-8') in blob
-    assert creation_time.encode('UTF-8') in blob
-    assert b'SPEAKER' in blob
-    assert b'2015' in blob
+    assert acimosis.encode("UTF-8") in blob
+    assert creation_time.encode("UTF-8") in blob
+    assert b"SPEAKER" in blob
+    assert b"2015" in blob
 
 
 @pytest.fixture

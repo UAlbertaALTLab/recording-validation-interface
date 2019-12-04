@@ -10,30 +10,81 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('validation', '0014_auto_20181019_0856'),
+        ("validation", "0014_auto_20181019_0856"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='HistoricalPhrase',
+            name="HistoricalPhrase",
             fields=[
-                ('id', models.IntegerField(auto_created=True, blank=True, db_index=True, verbose_name='ID')),
-                ('transcription', models.CharField(help_text='The transciption of the Cree phrase.', max_length=256)),
-                ('translation', models.CharField(help_text='The English translation of the phrase.', max_length=256)),
-                ('kind', models.CharField(choices=[('word', 'Word'), ('sentence', 'Sentence')], help_text='Is this phrase a word or a sentence?', max_length=8)),
-                ('validated', models.BooleanField(default=False, help_text='Has this phrase be validated?')),
-                ('origin', models.CharField(choices=[('MD', 'Maskwacîs Dictionary'), ('new', 'New word')], default='new', help_text='How did we get this phrase?', max_length=3, null=True)),
-                ('history_id', models.AutoField(primary_key=True, serialize=False)),
-                ('history_change_reason', models.CharField(max_length=100, null=True)),
-                ('history_date', models.DateTimeField()),
-                ('history_type', models.CharField(choices=[('+', 'Created'), ('~', 'Changed'), ('-', 'Deleted')], max_length=1)),
-                ('history_user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.IntegerField(
+                        auto_created=True, blank=True, db_index=True, verbose_name="ID"
+                    ),
+                ),
+                (
+                    "transcription",
+                    models.CharField(
+                        help_text="The transciption of the Cree phrase.", max_length=256
+                    ),
+                ),
+                (
+                    "translation",
+                    models.CharField(
+                        help_text="The English translation of the phrase.",
+                        max_length=256,
+                    ),
+                ),
+                (
+                    "kind",
+                    models.CharField(
+                        choices=[("word", "Word"), ("sentence", "Sentence")],
+                        help_text="Is this phrase a word or a sentence?",
+                        max_length=8,
+                    ),
+                ),
+                (
+                    "validated",
+                    models.BooleanField(
+                        default=False, help_text="Has this phrase be validated?"
+                    ),
+                ),
+                (
+                    "origin",
+                    models.CharField(
+                        choices=[("MD", "Maskwacîs Dictionary"), ("new", "New word")],
+                        default="new",
+                        help_text="How did we get this phrase?",
+                        max_length=3,
+                        null=True,
+                    ),
+                ),
+                ("history_id", models.AutoField(primary_key=True, serialize=False)),
+                ("history_change_reason", models.CharField(max_length=100, null=True)),
+                ("history_date", models.DateTimeField()),
+                (
+                    "history_type",
+                    models.CharField(
+                        choices=[("+", "Created"), ("~", "Changed"), ("-", "Deleted")],
+                        max_length=1,
+                    ),
+                ),
+                (
+                    "history_user",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="+",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'historical phrase',
-                'ordering': ('-history_date', '-history_id'),
-                'get_latest_by': 'history_date',
+                "verbose_name": "historical phrase",
+                "ordering": ("-history_date", "-history_id"),
+                "get_latest_by": "history_date",
             },
             bases=(simple_history.models.HistoricalChanges, models.Model),
-        ),
+        )
     ]

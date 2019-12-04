@@ -20,7 +20,7 @@ from hypothesis.strategies import builds, composite, integers, none
 
 from librecval.recording_session import SessionID
 
-__all__ = ['session_ids']
+__all__ = ["session_ids"]
 
 
 @composite

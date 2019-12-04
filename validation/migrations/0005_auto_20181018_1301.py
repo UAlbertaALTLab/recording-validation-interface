@@ -5,14 +5,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('validation', '0004_auto_20181018_1258'),
-    ]
+    dependencies = [("validation", "0004_auto_20181018_1258")]
 
     operations = [
         migrations.AlterField(
-            model_name='recordingsession',
-            name='date',
-            field=models.DateField(help_text='The day the session occured.'),
-        ),
+            model_name="recordingsession",
+            name="date",
+            field=models.DateField(help_text="The day the session occured."),
+        )
     ]

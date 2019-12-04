@@ -41,4 +41,4 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options) -> None:
         download_metadata(destination=settings.RECVAL_METADATA_PATH)
-        self.stdout.write('Succesfully downloaded metadata!')
+        self.stdout.write("Succesfully downloaded metadata!")

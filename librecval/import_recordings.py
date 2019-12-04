@@ -41,12 +41,12 @@ ImportRecording = Callable[[RecordingInfo, Path], None]
 
 @logme.log
 def initialize(
-        directory: Path,
-        transcoded_recordings_path: str,
-        metadata_filename: Path,
-        import_recording: ImportRecording,
-        logger
-        ) -> None:
+    directory: Path,
+    transcoded_recordings_path: str,
+    metadata_filename: Path,
+    import_recording: ImportRecording,
+    logger,
+) -> None:
     """
     Creates the database from scratch.
     """
@@ -68,22 +68,28 @@ def initialize(
 
 
 @logme.log
-def save_recording(dest: Path, info: RecordingInfo, audio: AudioSegment, logger=None) -> Path:
+def save_recording(
+    dest: Path, info: RecordingInfo, audio: AudioSegment, logger=None
+) -> Path:
     rec_id = info.compute_sha256hash()
     recording_path = dest / f"{rec_id}.m4a"
     if recording_path.exists():
-        logger.warn('Already exists, not transcoding: %s', recording_path)
+        logger.warn("Already exists, not transcoding: %s", recording_path)
         return recording_path
 
     # https://www.ffmpeg.org/doxygen/3.2/group__metadata__api.html
-    logger.debug('Writing audio to %s', recording_path)
-    transcode_to_aac(audio, recording_path, tags=dict(
-        title=info.transcription,
-        artist=info.speaker,
-        album=info.session,
-        language="crk",
-        creation_time=f"{info.session.date:%Y-%m-%d}",
-        year=info.session.year
-    ))
+    logger.debug("Writing audio to %s", recording_path)
+    transcode_to_aac(
+        audio,
+        recording_path,
+        tags=dict(
+            title=info.transcription,
+            artist=info.speaker,
+            album=info.session,
+            language="crk",
+            creation_time=f"{info.session.date:%Y-%m-%d}",
+            year=info.session.year,
+        ),
+    )
     assert recording_path.exists()
     return recording_path

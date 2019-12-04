@@ -21,12 +21,16 @@ from django.urls import path
 from . import views
 
 
-app_name = 'validation'
+app_name = "validation"
 urlpatterns = [
-    path('', views.index, name='index'),
+    path("", views.index, name="index"),
     # TODO: phrases/<int:phrases_id>/<slug>
-    path('phrases', views.search_phrases, name='search_phrases'),
-    path('phrases/<int:phrase_id>/', views.update_text, name='update_text'),
-    path('recording/<str:recording_id>.m4a', views.serve_recording, name='recording'),
-    path('recording/_search/<str:query>', views.search_recordings, name='search_recordings'),
+    path("phrases", views.search_phrases, name="search_phrases"),
+    path("phrases/<int:phrase_id>/", views.update_text, name="update_text"),
+    path("recording/<str:recording_id>.m4a", views.serve_recording, name="recording"),
+    path(
+        "recording/_search/<str:query>",
+        views.search_recordings,
+        name="search_recordings",
+    ),
 ]

@@ -5,13 +5,11 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('validation', '0019_auto_20181024_1601'),
-    ]
+    dependencies = [("validation", "0019_auto_20181024_1601")]
 
     operations = [
         migrations.AlterUniqueTogether(
-            name='recordingsession',
-            unique_together={('date', 'time_of_day', 'location', 'subsession')},
-        ),
+            name="recordingsession",
+            unique_together={("date", "time_of_day", "location", "subsession")},
+        )
     ]

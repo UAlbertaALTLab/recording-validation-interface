@@ -5,17 +5,36 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('validation', '0010_auto_20181018_1337'),
-    ]
+    dependencies = [("validation", "0010_auto_20181018_1337")]
 
     operations = [
         migrations.CreateModel(
-            name='Speaker',
+            name="Speaker",
             fields=[
-                ('code', models.CharField(help_text='Short code assigned to speaker in the ellicitation metadata.', max_length=8, primary_key=True, serialize=False)),
-                ('full_name', models.CharField(help_text="The speaker's full name.", max_length=128)),
-                ('gender', models.CharField(choices=[('M', 'Male'), ('F', 'Female')], help_text='Gender of the voice.', max_length=1, null=True)),
+                (
+                    "code",
+                    models.CharField(
+                        help_text="Short code assigned to speaker in the ellicitation metadata.",
+                        max_length=8,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                (
+                    "full_name",
+                    models.CharField(
+                        help_text="The speaker's full name.", max_length=128
+                    ),
+                ),
+                (
+                    "gender",
+                    models.CharField(
+                        choices=[("M", "Male"), ("F", "Female")],
+                        help_text="Gender of the voice.",
+                        max_length=1,
+                        null=True,
+                    ),
+                ),
             ],
-        ),
+        )
     ]

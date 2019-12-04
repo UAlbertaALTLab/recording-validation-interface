@@ -10,15 +10,17 @@ from jinja2 import Environment
 
 def environment(**options):
     env = Environment(**options)
-    env.globals.update({
-        # Enables use of {{ static(...) }}
-        'static': staticfiles_storage.url,
-        # Enables use of {{ url(...) }}
-        'url': url,
-    })
+    env.globals.update(
+        {
+            # Enables use of {{ static(...) }}
+            "static": staticfiles_storage.url,
+            # Enables use of {{ url(...) }}
+            "url": url,
+        }
+    )
 
     # Register filters
-    env.filters['audio_url'] = audio_url_filter
+    env.filters["audio_url"] = audio_url_filter
 
     return env
 
@@ -37,4 +39,4 @@ def audio_url_filter(rec) -> str:
      Usage (in a template):
          <source src="{{ recording | audio_url }}" type="audio/aac" />
     """
-    return reverse('validation:recording', kwargs={'recording_id': rec.id})
+    return reverse("validation:recording", kwargs={"recording_id": rec.id})

@@ -5,19 +5,17 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('validation', '0018_historicalrecording'),
-    ]
+    dependencies = [("validation", "0018_historicalrecording")]
 
     operations = [
         migrations.AlterField(
-            model_name='historicalrecording',
-            name='id',
+            model_name="historicalrecording",
+            name="id",
             field=models.CharField(db_index=True, max_length=64),
         ),
         migrations.AlterField(
-            model_name='recording',
-            name='id',
+            model_name="recording",
+            name="id",
             field=models.CharField(max_length=64, primary_key=True, serialize=False),
         ),
     ]

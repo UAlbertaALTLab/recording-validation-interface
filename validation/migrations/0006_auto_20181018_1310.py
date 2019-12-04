@@ -5,19 +5,29 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('validation', '0005_auto_20181018_1301'),
-    ]
+    dependencies = [("validation", "0005_auto_20181018_1301")]
 
     operations = [
         migrations.AddField(
-            model_name='recordingsession',
-            name='location',
-            field=models.CharField(choices=[('DOWNSTAIRS', 'DS'), ('UPSTAIRS', 'US'), ('KITCHEN', 'KCH'), ('OFFICE', 'OFF')], help_text='The location of the recordings. May be null.', max_length=3, null=True),
+            model_name="recordingsession",
+            name="location",
+            field=models.CharField(
+                choices=[
+                    ("DOWNSTAIRS", "DS"),
+                    ("UPSTAIRS", "US"),
+                    ("KITCHEN", "KCH"),
+                    ("OFFICE", "OFF"),
+                ],
+                help_text="The location of the recordings. May be null.",
+                max_length=3,
+                null=True,
+            ),
         ),
         migrations.AddField(
-            model_name='recordingsession',
-            name='subsession',
-            field=models.IntegerField(help_text="The 'subsession' number, if applicable.", null=True),
+            model_name="recordingsession",
+            name="subsession",
+            field=models.IntegerField(
+                help_text="The 'subsession' number, if applicable.", null=True
+            ),
         ),
     ]

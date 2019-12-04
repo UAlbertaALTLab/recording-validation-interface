@@ -22,17 +22,28 @@ from datetime import date as datetype
 from datetime import datetime
 from enum import Enum, auto
 from pathlib import Path
-from typing import (Any, AnyStr, Callable, Dict, List, Match, NamedTuple,
-                    Optional, TextIO, TypeVar)
+from typing import (
+    Any,
+    AnyStr,
+    Callable,
+    Dict,
+    List,
+    Match,
+    NamedTuple,
+    Optional,
+    TextIO,
+    TypeVar,
+)
 
 import logme  # type: ignore
 
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 # This a strict pattern, that differs from the one in etc/;
 # It matches only directories with the normalized naming conventions.
-strict_pattern = re.compile(r'''
+strict_pattern = re.compile(
+    r"""
     \A
     (?P<isodate>
         \d{4}-\d{1,2}-\d{1,2}   (?# This is slightly inaccurate, but it's okay. )
@@ -50,11 +61,14 @@ strict_pattern = re.compile(r'''
         (?P<subsession> \d+) | _
     )
     \Z
-''', re.VERBOSE)
+""",
+    re.VERBOSE,
+)
 
 
 # Pattern that tries to match and parse most folder names.
-dirty_pattern = re.compile(r'''
+dirty_pattern = re.compile(
+    r"""
     \A
     (?P<isodate>
         \d{4}-\d{1,2}-\d{1,2}
@@ -77,7 +91,9 @@ dirty_pattern = re.compile(r'''
         )?
     )
     \Z
-''', re.VERBOSE)
+""",
+    re.VERBOSE,
+)
 
 
 # ############################### Exceptions ############################# #
@@ -96,44 +112,44 @@ class InvalidTimeOfDayError(SessionParseError):
 
 class InvalidLocationError(SessionParseError):
     def __init__(self, code: str) -> None:
-        super().__init__(f'Unknown location code: {code!r}')
+        super().__init__(f"Unknown location code: {code!r}")
 
 
 # ############################## Enumerations ############################ #
 
 
 class TimeOfDay(Enum):
-    MORNING = 'AM'
-    AFTERNOON = 'PM'
+    MORNING = "AM"
+    AFTERNOON = "PM"
 
     @staticmethod
-    def parse(text: str) -> 'TimeOfDay':
+    def parse(text: str) -> "TimeOfDay":
         code = text.upper()
-        if code == 'AM':
+        if code == "AM":
             return TimeOfDay.MORNING
-        elif code == 'PM':
+        elif code == "PM":
             return TimeOfDay.AFTERNOON
         raise InvalidTimeOfDayError(text)
 
 
 class Location(Enum):
     # For the first three years of recording:
-    DOWNSTAIRS = 'DS'  # Downstairs in Sohki house
-    UPSTAIRS = 'US'  # Upstairs in Sohki house
+    DOWNSTAIRS = "DS"  # Downstairs in Sohki house
+    UPSTAIRS = "US"  # Upstairs in Sohki house
     # For the last academic year of recording:
-    KITCHEN = 'KCH'  # Kitchen in Miyo head office
-    OFFICE = 'OFF'  # Office in Miyo head office
+    KITCHEN = "KCH"  # Kitchen in Miyo head office
+    OFFICE = "OFF"  # Office in Miyo head office
 
     @staticmethod
-    def parse(text: str) -> 'Location':
+    def parse(text: str) -> "Location":
         code = text.upper()
-        if code in ('KCH', 'KIT'):
+        if code in ("KCH", "KIT"):
             return Location.KITCHEN
-        elif code == 'OFF':
+        elif code == "OFF":
             return Location.OFFICE
-        elif code in ('DS', 'DOWNSTAIRS'):
+        elif code in ("DS", "DOWNSTAIRS"):
             return Location.DOWNSTAIRS
-        elif code in ('US', 'UPSTAIRS'):
+        elif code in ("US", "UPSTAIRS"):
             return Location.UPSTAIRS
         raise InvalidLocationError(text)
 
@@ -157,36 +173,37 @@ class SessionID(NamedTuple):
         return self.date.day
 
     @classmethod
-    def from_name(cls, directory_name: str) -> 'SessionID':
+    def from_name(cls, directory_name: str) -> "SessionID":
         m = strict_pattern.match(directory_name)
         if m is None:
-            raise SessionParseError(f"directory does not match pattern {directory_name}")
+            raise SessionParseError(
+                f"directory does not match pattern {directory_name}"
+            )
 
         # Parse out all the things into appropriate datatypes.
-        date = datetime.strptime(m.group('isodate'), '%Y-%m-%d').date()
-        time_of_day = apply_or_none(TimeOfDay.parse, m.group('time_of_day'))
-        subsession = apply_or_none(int, m.group('subsession'))
-        location = apply_or_none(Location.parse, m.group('location'))
+        date = datetime.strptime(m.group("isodate"), "%Y-%m-%d").date()
+        time_of_day = apply_or_none(TimeOfDay.parse, m.group("time_of_day"))
+        subsession = apply_or_none(int, m.group("subsession"))
+        location = apply_or_none(Location.parse, m.group("location"))
 
-        return cls(date=date,
-                   time_of_day=time_of_day,
-                   subsession=subsession,
-                   location=location)
+        return cls(
+            date=date, time_of_day=time_of_day, subsession=subsession, location=location
+        )
 
     def as_filename(self) -> str:
         """
         Returns a standardized filename for any session.
         """
-        time = (self.time_of_day and self.time_of_day.value) or '__'
-        loc = (self.location and self.location.value) or '___'
-        subsesh = '_' if self.subsession is None else self.subsession
+        time = (self.time_of_day and self.time_of_day.value) or "__"
+        loc = (self.location and self.location.value) or "___"
+        subsesh = "_" if self.subsession is None else self.subsession
         return f"{self.date:%Y-%m-%d}-{time}-{loc}-{subsesh}"
 
     def __str__(self) -> str:
         return self.as_filename()
 
     @classmethod
-    def parse_dirty(cls, name: str) -> 'SessionID':
+    def parse_dirty(cls, name: str) -> "SessionID":
         """
         Attempts to parse a messy session name.
 
@@ -205,15 +222,14 @@ class SessionID(NamedTuple):
             raise SessionParseError(f"Session could not be parsed: {name!r}")
 
         # Parse out all the things into appropriate datatypes.
-        date = datetime.strptime(m.group('isodate'), '%Y-%m-%d').date()
-        time_of_day = apply_or_none(TimeOfDay.parse, m.group('time_of_day'))
-        subsession = apply_or_none(int, m.group('subsession'))
-        location = apply_or_none(Location.parse, m.group('location'))
+        date = datetime.strptime(m.group("isodate"), "%Y-%m-%d").date()
+        time_of_day = apply_or_none(TimeOfDay.parse, m.group("time_of_day"))
+        subsession = apply_or_none(int, m.group("subsession"))
+        location = apply_or_none(Location.parse, m.group("location"))
 
-        return cls(date=date,
-                   time_of_day=time_of_day,
-                   subsession=subsession,
-                   location=location)
+        return cls(
+            date=date, time_of_day=time_of_day, subsession=subsession, location=location
+        )
 
 
 class SessionMetadata:
@@ -245,7 +261,7 @@ class SessionMetadata:
         )
 
     @classmethod
-    def parse(cls, row: Dict[str, Any], session_name: str = None) -> 'SessionMetadata':
+    def parse(cls, row: Dict[str, Any], session_name: str = None) -> "SessionMetadata":
         """
         Parses a row from the metadata CSV file.
 
@@ -254,7 +270,7 @@ class SessionMetadata:
 
         """
         # Extract "raw" name
-        raw_name = row['SESSION']
+        raw_name = row["SESSION"]
 
         # Parse a session out of it
         effective_name = session_name or raw_name
@@ -264,10 +280,12 @@ class SessionMetadata:
             session = SessionID.parse_dirty(effective_name)
 
         # Who are speaking on the mics?
-        mic_names = [key for key in row.keys() if key.startswith('MIC')]
+        mic_names = [key for key in row.keys() if key.startswith("MIC")]
         assert len(mic_names) >= 3
-        mics = {number_from(mic): normalize_speaker_name(row[mic])
-                for mic in sorted(mic_names)}
+        mics = {
+            number_from(mic): normalize_speaker_name(row[mic])
+            for mic in sorted(mic_names)
+        }
 
         # TODO: parse the elicitation sheets
         # TODO: parse the rapidwords sesction(s)
@@ -287,16 +305,16 @@ class Overrides:
     @property
     def effective_name(self) -> str:
         try:
-            return self._options['name']
+            return self._options["name"]
         except KeyError:
             return self.raw_name
 
     @property
     def should_skip(self) -> bool:
-        return self._options.get('skip', False)
+        return self._options.get("skip", False)
 
     @classmethod
-    def parse(cls, raw_name: str, override_text: str) -> 'Overrides':
+    def parse(cls, raw_name: str, override_text: str) -> "Overrides":
         clean_name = raw_name.strip()
         override = override_text.strip()
 
@@ -306,13 +324,13 @@ class Overrides:
 
         # A rename starts with a well-formatted Session ID
         # An options starts with !
-        rename, _, raw_options_text = override.partition('!')
+        rename, _, raw_options_text = override.partition("!")
 
         options = {}  # type: Dict[str, Any]
 
         # Add the rename to the options
         if rename.strip():
-            options['name'] = rename.strip()
+            options["name"] = rename.strip()
 
         # For now, options are just boolean flags
         for option in raw_options_text.split():
@@ -332,15 +350,15 @@ def parse_metadata(metadata_file: TextIO, logger) -> Dict[SessionID, SessionMeta
 
     sessions: Dict[SessionID, SessionMetadata] = {}
     for row in reader:
-        if not row['SESSION']:
+        if not row["SESSION"]:
             continue
-        raw_name = row['SESSION']
+        raw_name = row["SESSION"]
 
         # Get any overridden settings.
-        override = Overrides.parse(raw_name, row.get('RECVAL_OVERRIDE', ''))
+        override = Overrides.parse(raw_name, row.get("RECVAL_OVERRIDE", ""))
 
         if override.should_skip:
-            logger.info('Skipping %s (marked with !SKIP)', row['SESSION'])
+            logger.info("Skipping %s (marked with !SKIP)", row["SESSION"])
             continue
 
         try:
@@ -350,13 +368,16 @@ def parse_metadata(metadata_file: TextIO, logger) -> Dict[SessionID, SessionMeta
             # We'll just skip this row...
         else:
             if raw_name != override.effective_name:
-                logger.info('Using renamed session: %r instead of %r', override.effective_name, raw_name)
+                logger.info(
+                    "Using renamed session: %r instead of %r",
+                    override.effective_name,
+                    raw_name,
+                )
             sessions[s.session] = s
     return sessions
 
 
-def apply_or_none(fn: Callable[[AnyStr], T],
-                  match: Optional[AnyStr]) -> Optional[T]:
+def apply_or_none(fn: Callable[[AnyStr], T], match: Optional[AnyStr]) -> Optional[T]:
     """
     Applies fn to the match ONLY if the match is not None.
 
@@ -371,7 +392,7 @@ def number_from(mic_name: str) -> int:
     """
     Return the mic number.
     """
-    assert mic_name.startswith('MIC')
+    assert mic_name.startswith("MIC")
     n = int(mic_name.split()[1])
     assert 1 <= n <= 10
     return n
@@ -383,6 +404,6 @@ def normalize_speaker_name(name: str) -> Optional[str]:
     If the speaker is N/A or not specified, returns None.
     """
     cleaned = name.strip()
-    if cleaned.upper() in ('N/A', ''):
+    if cleaned.upper() in ("N/A", ""):
         return None
     return cleaned.upper()

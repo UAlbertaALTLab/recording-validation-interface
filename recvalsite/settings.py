@@ -18,81 +18,81 @@ from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'path' / 'to' / 'file'
 BASE_DIR = Path(__file__).resolve().parent.parent
-assert (BASE_DIR / 'manage.py').is_file()
+assert (BASE_DIR / "manage.py").is_file()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY')
+SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=False, cast=bool)
+DEBUG = config("DEBUG", default=False, cast=bool)
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'sapir.artsrn.ualberta.ca']
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "sapir.artsrn.ualberta.ca"]
 
 
 # Application definition
 
 INSTALLED_APPS = [
     # Apps defined in this repository.
-    'validation',
-
+    "validation",
     # Django built-in apps.
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
     # Dependencies.
-    'simple_history',
+    "simple_history",
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
     # Automatically insert user that changed a model with history.
-    'simple_history.middleware.HistoryRequestMiddleware',
+    "simple_history.middleware.HistoryRequestMiddleware",
 ]
 
-ROOT_URLCONF = 'recvalsite.urls'
+ROOT_URLCONF = "recvalsite.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+            ]
         },
-    },
+    }
 ]
 
-WSGI_APPLICATION = 'recvalsite.wsgi.application'
+WSGI_APPLICATION = "recvalsite.wsgi.application"
 
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
 # Where to place the SQLite3 database file:
-RECVAL_SQLITE_DB_PATH = config('RECVAL_SQLITE_DB_PATH', default=BASE_DIR / 'db.sqlite3', cast=Path)
+RECVAL_SQLITE_DB_PATH = config(
+    "RECVAL_SQLITE_DB_PATH", default=BASE_DIR / "db.sqlite3", cast=Path
+)
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.fspath(RECVAL_SQLITE_DB_PATH),
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": os.fspath(RECVAL_SQLITE_DB_PATH),
     }
 }
 
@@ -102,26 +102,20 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
     },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-CA'
+LANGUAGE_CODE = "en-CA"
 
-TIME_ZONE = 'America/Edmonton'
+TIME_ZONE = "America/Edmonton"
 
 USE_I18N = True
 
@@ -135,26 +129,24 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/topics/templates/#django.template.backends.jinja2.Jinja2
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.jinja2.Jinja2',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'environment': 'validation.jinja2.environment'
-        },
+        "BACKEND": "django.template.backends.jinja2.Jinja2",
+        "DIRS": [],
+        "APP_DIRS": True,
+        "OPTIONS": {"environment": "validation.jinja2.environment"},
     },
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+            ]
         },
-    }
+    },
 ]
 
 # Security
@@ -163,7 +155,7 @@ SECURE_BROWSER_XSS_FILTER = True
 # Should the browser NOT try to detect the content type of unmarked content?
 SECURE_CONTENT_TYPE_NOSNIFF = True
 # Should we allow hosting in an <iframe>?
-X_FRAME_OPTIONS = 'DENY'
+X_FRAME_OPTIONS = "DENY"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
@@ -171,16 +163,18 @@ X_FRAME_OPTIONS = 'DENY'
 # Derive the static path from WSGI SCRIPT_NAME variable
 # e.g.,  if SCRIPT_NAME=/validation,
 #        then static file URLs will point to /validation/static/
-STATIC_URL = config('SCRIPT_NAME', default='') + '/static/'
+STATIC_URL = config("SCRIPT_NAME", default="") + "/static/"
 
 # Remember to run manage.py collectstatic!
-STATIC_ROOT = config('STATIC_ROOT', default='/var/www/recvalsite/static')
+STATIC_ROOT = config("STATIC_ROOT", default="/var/www/recvalsite/static")
 
 # Where the transcoded audio files should be placed AND served from.
-RECVAL_AUDIO_DIR = config('RECVAL_AUDIO_DIR', BASE_DIR / 'data' / 'audio', cast=Path)
+RECVAL_AUDIO_DIR = config("RECVAL_AUDIO_DIR", BASE_DIR / "data" / "audio", cast=Path)
 
 # Where to find the metadata CSV file.
-RECVAL_METADATA_PATH = config('RECVAL_METADATA_PATH', BASE_DIR / 'private' / 'metadata.csv', cast=Path)
+RECVAL_METADATA_PATH = config(
+    "RECVAL_METADATA_PATH", BASE_DIR / "private" / "metadata.csv", cast=Path
+)
 
 # Where the sessions should be extracted from.
 # Expecting a structure like this:
@@ -189,4 +183,6 @@ RECVAL_METADATA_PATH = config('RECVAL_METADATA_PATH', BASE_DIR / 'private' / 'me
 # ├── 2015-10-04-AM-KCH-2/
 # ├── ...
 # └── 2016-01-18-PM-___-_/
-RECVAL_SESSIONS_DIR = config('RECVAL_SESSIONS_DIR', BASE_DIR / 'data' / 'sessions', cast=Path)
+RECVAL_SESSIONS_DIR = config(
+    "RECVAL_SESSIONS_DIR", BASE_DIR / "data" / "sessions", cast=Path
+)

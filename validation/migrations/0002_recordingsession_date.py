@@ -6,15 +6,13 @@ import django.utils.timezone
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('validation', '0001_initial'),
-    ]
+    dependencies = [("validation", "0001_initial")]
 
     operations = [
         migrations.AddField(
-            model_name='recordingsession',
-            name='date',
+            model_name="recordingsession",
+            name="date",
             field=models.DateTimeField(default=django.utils.timezone.now),
             preserve_default=False,
-        ),
+        )
     ]

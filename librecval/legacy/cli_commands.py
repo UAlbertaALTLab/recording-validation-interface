@@ -30,6 +30,6 @@ def delete_audio(audio_dir: Path) -> None:
 
     Good for nuking the development environment and starting from scratch.
     """
-    click.secho(f'Deleting all *.m4a files in {audio_dir}', fg='red', bold=True)
-    for audio_file in audio_dir.glob('*.m4a'):
+    click.secho(f"Deleting all *.m4a files in {audio_dir}", fg="red", bold=True)
+    for audio_file in audio_dir.glob("*.m4a"):
         audio_file.unlink()

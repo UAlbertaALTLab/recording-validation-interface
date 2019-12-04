@@ -22,22 +22,22 @@ import unicodedata
 
 # A translation table to convert macrons to cicumflexes in lowercase, NFC
 # strings.
-MACRON_TO_CIRCUMFLEX = str.maketrans('ēīōā', 'êîôâ')
+MACRON_TO_CIRCUMFLEX = str.maketrans("ēīōā", "êîôâ")
 # Translates apostrophes and pretty quotes to <i>.
-QUOTE_TO_SHORT_I = str.maketrans("'’", 'ii')
+QUOTE_TO_SHORT_I = str.maketrans("'’", "ii")
 # Removes long vowel diacritics on NORMALIZED SRO!
-REMOVE_LONG_VOWELS = str.maketrans('êîôâ', 'eioa')
+REMOVE_LONG_VOWELS = str.maketrans("êîôâ", "eioa")
 
 
 def nfc(utterance: str) -> str:
-    return unicodedata.normalize('NFC', utterance)
+    return unicodedata.normalize("NFC", utterance)
 
 
 def normalize(utterance: str) -> str:
     r"""
     Normalizes utterances (translations, transcriptions, etc.)
     """
-    return unicodedata.normalize('NFC', utterance.strip())
+    return unicodedata.normalize("NFC", utterance.strip())
 
 
 def normalize_sro(utterance: str) -> str:
@@ -77,17 +77,19 @@ def normalize_sro(utterance: str) -> str:
     'mostosowiyâs/ninisitohtên'
     """
 
-    utterance = nfc(utterance).\
-        strip().\
-        lower().\
-        replace('e', 'ê').\
-        translate(MACRON_TO_CIRCUMFLEX).\
-        translate(QUOTE_TO_SHORT_I)
+    utterance = (
+        nfc(utterance)
+        .strip()
+        .lower()
+        .replace("e", "ê")
+        .translate(MACRON_TO_CIRCUMFLEX)
+        .translate(QUOTE_TO_SHORT_I)
+    )
 
-    utterance = re.sub(r'[(]([ioa])[)]', r'\1', utterance)
+    utterance = re.sub(r"[(]([ioa])[)]", r"\1", utterance)
 
     # Ensure there are exactly single spaces between words
-    return re.sub(r'\s+', ' ', utterance)
+    return re.sub(r"\s+", " ", utterance)
 
 
 def to_indexable_form(text: str) -> str:
@@ -101,13 +103,11 @@ def to_indexable_form(text: str) -> str:
     normalized to <U>, which would never normally appear in SRO text.
     """
 
-    text = normalize_sro(text).\
-        replace('-', '').\
-        translate(REMOVE_LONG_VOWELS)
+    text = normalize_sro(text).replace("-", "").translate(REMOVE_LONG_VOWELS)
 
     # Undo short-i elision
     text = re.sub(r"(?<=[qwrtpsdfghjklzxcvbnm])'", "i", text)
     # -iw/-ow -> U (people spell it two different ways but pronounce it /u/)
-    text = re.sub(r'[oi]w\b', 'U', text)
+    text = re.sub(r"[oi]w\b", "U", text)
 
     return text

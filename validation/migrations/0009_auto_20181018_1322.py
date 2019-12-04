@@ -5,14 +5,16 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('validation', '0008_auto_20181018_1319'),
-    ]
+    dependencies = [("validation", "0008_auto_20181018_1319")]
 
     operations = [
         migrations.AlterField(
-            model_name='recordingsession',
-            name='subsession',
-            field=models.IntegerField(blank=True, help_text="The 'subsession' number, if applicable.", null=True),
-        ),
+            model_name="recordingsession",
+            name="subsession",
+            field=models.IntegerField(
+                blank=True,
+                help_text="The 'subsession' number, if applicable.",
+                null=True,
+            ),
+        )
     ]

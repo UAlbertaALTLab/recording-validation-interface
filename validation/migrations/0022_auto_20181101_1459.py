@@ -5,29 +5,41 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('validation', '0021_auto_20181101_1104'),
-    ]
+    dependencies = [("validation", "0021_auto_20181101_1104")]
 
     operations = [
         migrations.AlterField(
-            model_name='historicalrecording',
-            name='quality',
-            field=models.CharField(blank=True, choices=[('clean', 'Clean'), ('unusable', 'Unusable')], help_text='Is the recording clean? Is it suitable to use publicly?', max_length=8),
+            model_name="historicalrecording",
+            name="quality",
+            field=models.CharField(
+                blank=True,
+                choices=[("clean", "Clean"), ("unusable", "Unusable")],
+                help_text="Is the recording clean? Is it suitable to use publicly?",
+                max_length=8,
+            ),
         ),
         migrations.AlterField(
-            model_name='historicalrecording',
-            name='timestamp',
-            field=models.FloatField(help_text='The time at which this recording starts'),
+            model_name="historicalrecording",
+            name="timestamp",
+            field=models.FloatField(
+                help_text="The time at which this recording starts"
+            ),
         ),
         migrations.AlterField(
-            model_name='recording',
-            name='quality',
-            field=models.CharField(blank=True, choices=[('clean', 'Clean'), ('unusable', 'Unusable')], help_text='Is the recording clean? Is it suitable to use publicly?', max_length=8),
+            model_name="recording",
+            name="quality",
+            field=models.CharField(
+                blank=True,
+                choices=[("clean", "Clean"), ("unusable", "Unusable")],
+                help_text="Is the recording clean? Is it suitable to use publicly?",
+                max_length=8,
+            ),
         ),
         migrations.AlterField(
-            model_name='recording',
-            name='timestamp',
-            field=models.FloatField(help_text='The time at which this recording starts'),
+            model_name="recording",
+            name="timestamp",
+            field=models.FloatField(
+                help_text="The time at which this recording starts"
+            ),
         ),
     ]

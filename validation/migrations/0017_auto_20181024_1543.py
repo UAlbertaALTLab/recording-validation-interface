@@ -5,14 +5,17 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('validation', '0016_recording'),
-    ]
+    dependencies = [("validation", "0016_recording")]
 
     operations = [
         migrations.AlterField(
-            model_name='recording',
-            name='quality',
-            field=models.CharField(blank=True, choices=[('clean', 'Clean'), ('unusable', 'Unusable')], help_text='Is the recording clean? Is it suitable to use publically?', max_length=8),
-        ),
+            model_name="recording",
+            name="quality",
+            field=models.CharField(
+                blank=True,
+                choices=[("clean", "Clean"), ("unusable", "Unusable")],
+                help_text="Is the recording clean? Is it suitable to use publically?",
+                max_length=8,
+            ),
+        )
     ]

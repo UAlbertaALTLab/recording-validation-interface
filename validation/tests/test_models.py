@@ -36,8 +36,8 @@ def test_recording_session():
     session = mommy.prepare(RecordingSession)
     # Check all the fields.
     assert isinstance(session.date, datetype)
-    assert session.time_of_day in {m.value for m in TimeOfDay} | {''}
-    assert session.location in {m.value for m in Location} | {''}
+    assert session.time_of_day in {m.value for m in TimeOfDay} | {""}
+    assert session.location in {m.value for m in Location} | {""}
     assert isinstance(session.subsession, (int, type(None)))
 
 
@@ -52,11 +52,11 @@ def test_recording_session_model_from_session_id(session_id):
     session = RecordingSession.create_from(session_id)
     assert session.date == session_id.date
     if session_id.time_of_day is None:
-        assert session.time_of_day == ''
+        assert session.time_of_day == ""
     else:
         assert session.time_of_day == session_id.time_of_day.value
     if session_id.location is None:
-        assert session.location == ''
+        assert session.location == ""
     else:
         assert session.location == session_id.location.value
     assert session.subsession == session_id.subsession
@@ -139,7 +139,7 @@ def test_speaker():
     speaker.clean()
     assert speaker.code.upper() == speaker.code
     assert isinstance(speaker.full_name, str)
-    assert speaker.gender in ('M', 'F', None)
+    assert speaker.gender in ("M", "F", None)
     assert speaker.code in str(speaker)
 
 
@@ -147,7 +147,7 @@ def test_speaker_validation():
     """
     Check that we can create a speaker.
     """
-    speaker = Recipe(Speaker, code=' 43!341k43j1k ').prepare()
+    speaker = Recipe(Speaker, code=" 43!341k43j1k ").prepare()
 
     with pytest.raises(ValidationError):
         speaker.clean()
@@ -166,15 +166,18 @@ def test_phrase():
     assert phrase.origin in (None, Phrase.MASKWACÎS_DICTIONARY, Phrase.NEW_WORD)
 
 
-@pytest.mark.parametrize('dirty_transcription', [
-    'ni\N{COMBINING CIRCUMFLEX ACCENT}piy',
-    '  n\N{LATIN SMALL LETTER I WITH CIRCUMFLEX}piy ',
-    '  ni\N{COMBINING CIRCUMFLEX ACCENT}piy ',
-    ' Maskwacîs ',
-    'n\N{LATIN SMALL LETTER I WITH MACRON}piy',
-    'n\N{LATIN CAPITAL LETTER I WITH MACRON}piy',
-    'Amiskwaciy - wâskahikanihk',
-])
+@pytest.mark.parametrize(
+    "dirty_transcription",
+    [
+        "ni\N{COMBINING CIRCUMFLEX ACCENT}piy",
+        "  n\N{LATIN SMALL LETTER I WITH CIRCUMFLEX}piy ",
+        "  ni\N{COMBINING CIRCUMFLEX ACCENT}piy ",
+        " Maskwacîs ",
+        "n\N{LATIN SMALL LETTER I WITH MACRON}piy",
+        "n\N{LATIN CAPITAL LETTER I WITH MACRON}piy",
+        "Amiskwaciy - wâskahikanihk",
+    ],
+)
 def test_phrase_transcription_normalization(dirty_transcription):
     """
     Test that the transcription gets normalized as a Cree phrase.
@@ -183,27 +186,30 @@ def test_phrase_transcription_normalization(dirty_transcription):
     phrase.clean()
     assert phrase.transcription == nfc(phrase.transcription)
     # Should not have any leading spaces
-    assert not phrase.transcription.startswith(' ')
+    assert not phrase.transcription.startswith(" ")
     # Should not have any trailing spaces
-    assert not phrase.transcription.endswith(' ')
+    assert not phrase.transcription.endswith(" ")
     # SRO is ALWAYS lowercase!
     assert phrase.transcription.lower() == phrase.transcription
 
     vowels_with_macrons = {
-        '\N{LATIN SMALL LETTER E WITH MACRON}',
-        '\N{LATIN SMALL LETTER I WITH MACRON}',
-        '\N{LATIN SMALL LETTER O WITH MACRON}',
-        '\N{LATIN SMALL LETTER A WITH MACRON}',
+        "\N{LATIN SMALL LETTER E WITH MACRON}",
+        "\N{LATIN SMALL LETTER I WITH MACRON}",
+        "\N{LATIN SMALL LETTER O WITH MACRON}",
+        "\N{LATIN SMALL LETTER A WITH MACRON}",
     }
 
     # Ensure macrons are nowhere to be found in the transcription.
     assert vowels_with_macrons.isdisjoint(phrase.transcription)
 
 
-@pytest.mark.parametrize('dirty_transcription, expected', [
-    ('Amiskwaciy-wâskahikanihk', 'amiskwaciy-wâskahikanihk'),
-    (' namôya \n\tninisitohtên  ', 'namôya ninisitohtên'),
-])
+@pytest.mark.parametrize(
+    "dirty_transcription, expected",
+    [
+        ("Amiskwaciy-wâskahikanihk", "amiskwaciy-wâskahikanihk"),
+        (" namôya \n\tninisitohtên  ", "namôya ninisitohtên"),
+    ],
+)
 def test_phrase_transcription_normalization_hyphenation(dirty_transcription, expected):
     """
     Test that words in the transcriptions are separated by exactly one space,
@@ -218,9 +224,9 @@ def test_phrase_transcription_normalize_ê():
     """
     Tests that e gets converted to ê.
     """
-    phrase = Recipe(Phrase, transcription='e-cacâstapiwet').prepare()
+    phrase = Recipe(Phrase, transcription="e-cacâstapiwet").prepare()
     phrase.clean()
-    assert phrase.transcription == 'ê-cacâstapiwêt'
+    assert phrase.transcription == "ê-cacâstapiwêt"
 
 
 @pytest.mark.django_db
@@ -228,10 +234,10 @@ def test_phrase_has_history():
     """
     Test that we can insert an entry in the database, and that it has history.
     """
-    changed = 'ê-cacâstapiwêt'
+    changed = "ê-cacâstapiwêt"
 
     # Store a phrase in the database and forget about it.
-    original = 'ecastapiwet'
+    original = "ecastapiwet"
     phrase = Recipe(Phrase, transcription=original).prepare()
     # Do NOT call clean, in order to simulate an initial import.
     phrase.save()
@@ -262,20 +268,19 @@ def test_recording():
     MAX_RECORDING_LENGTH = 2 ** 31 - 1
 
     recording = Recipe(
-        Recording,
-        timestamp=lambda: random.randint(0, MAX_RECORDING_LENGTH)
+        Recording, timestamp=lambda: random.randint(0, MAX_RECORDING_LENGTH)
     ).make()
 
     # Check all the fields.
     assert isinstance(recording.id, str)
-    assert recording.quality in {Recording.CLEAN, Recording.UNUSABLE, ''}
+    assert recording.quality in {Recording.CLEAN, Recording.UNUSABLE, ""}
     assert isinstance(recording.timestamp, int)
     assert 0 <= recording.timestamp < MAX_RECORDING_LENGTH
     assert isinstance(recording.phrase, Phrase)
     assert isinstance(recording.session, RecordingSession)
     assert isinstance(recording.speaker, Speaker)
 
-    assert hasattr(recording, 'history')
+    assert hasattr(recording, "history")
 
     # Check its __str__() method.
     assert str(recording.phrase) in str(recording)
@@ -290,12 +295,16 @@ def test_phrase_recordings():
 
     phrase = mommy.make(Phrase)
 
-    r1 = Recipe(Recording,
-                phrase=phrase,
-                timestamp=lambda: random.randint(0, MAX_RECORDING_LENGTH)).make()
-    r2 = Recipe(Recording,
-                phrase=phrase,
-                timestamp=lambda: random.randint(0, MAX_RECORDING_LENGTH)).make()
+    r1 = Recipe(
+        Recording,
+        phrase=phrase,
+        timestamp=lambda: random.randint(0, MAX_RECORDING_LENGTH),
+    ).make()
+    r2 = Recipe(
+        Recording,
+        phrase=phrase,
+        timestamp=lambda: random.randint(0, MAX_RECORDING_LENGTH),
+    ).make()
 
     assert len(phrase.recordings) == 2
     assert r1 in phrase.recordings

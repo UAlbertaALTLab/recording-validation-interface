@@ -46,20 +46,24 @@ class Command(BaseCommand):
     help = "imports recordings into the database"
 
     def add_arguments(self, parser):
-        parser.add_argument('sessions_dir', nargs='?', type=Path, default=None)
+        parser.add_argument("sessions_dir", nargs="?", type=Path, default=None)
 
     def handle(self, *args, **options) -> None:
         # Get these from settings?
-        sessions_dir = options.get('session_dir', settings.RECVAL_SESSIONS_DIR)
+        sessions_dir = options.get("session_dir", settings.RECVAL_SESSIONS_DIR)
         # Now, import all those recordings!
-        import_recordings(directory=sessions_dir,
-                          transcoded_recordings_path=settings.RECVAL_AUDIO_DIR,
-                          metadata_filename=settings.RECVAL_METADATA_PATH,
-                          import_recording=django_recording_importer)
+        import_recordings(
+            directory=sessions_dir,
+            transcoded_recordings_path=settings.RECVAL_AUDIO_DIR,
+            metadata_filename=settings.RECVAL_METADATA_PATH,
+            import_recording=django_recording_importer,
+        )
 
 
 @logme.log
-def django_recording_importer(info: RecordingInfo, recording_path: Path, logger) -> None:
+def django_recording_importer(
+    info: RecordingInfo, recording_path: Path, logger
+) -> None:
     """
     Imports a single recording.
     """
@@ -67,21 +71,21 @@ def django_recording_importer(info: RecordingInfo, recording_path: Path, logger)
     # Recording requires a Speaker, a RecordingSession, and a Phrase.
     # Make those first.
     speaker, speaker_created = Speaker.objects.get_or_create(
-        code=info.speaker,  # TODO: normalized?
+        code=info.speaker  # TODO: normalized?
     )
     if speaker_created:
         logger.info("New speaker: %s", speaker)
 
-    session, session_created = RecordingSession.get_or_create_by_session_id(info.session)
+    session, session_created = RecordingSession.get_or_create_by_session_id(
+        info.session
+    )
     if session_created:
         logger.info("New session: %s", session)
 
     phrase, phrase_created = Phrase.objects.get_or_create(
         transcription=info.transcription,
         kind=info.type,
-        defaults=dict(translation=info.translation,
-                      validated=False,
-                      origin=None)
+        defaults=dict(translation=info.translation, validated=False, origin=None),
     )
     if phrase_created:
         logger.info("New phrase: %s", phrase)
@@ -93,7 +97,7 @@ def django_recording_importer(info: RecordingInfo, recording_path: Path, logger)
         timestamp=info.timestamp,
         phrase=phrase,
         session=session,
-        quality=''
+        quality="",
     )
     recording.clean()
 

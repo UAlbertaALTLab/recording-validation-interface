@@ -5,14 +5,18 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('validation', '0012_phrase'),
-    ]
+    dependencies = [("validation", "0012_phrase")]
 
     operations = [
         migrations.AddField(
-            model_name='phrase',
-            name='origin',
-            field=models.CharField(choices=[('MD', 'Maskwacîs Dictionary'), ('new', 'New word')], default=None, help_text='How did we get this phrase?', max_length=3, null=True),
-        ),
+            model_name="phrase",
+            name="origin",
+            field=models.CharField(
+                choices=[("MD", "Maskwacîs Dictionary"), ("new", "New word")],
+                default=None,
+                help_text="How did we get this phrase?",
+                max_length=3,
+                null=True,
+            ),
+        )
     ]

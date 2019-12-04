@@ -5,23 +5,33 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('validation', '0024_auto_20181210_1342'),
-    ]
+    dependencies = [("validation", "0024_auto_20181210_1342")]
 
     operations = [
         migrations.AddField(
-            model_name='historicalphrase',
-            name='fuzzy_transcription',
-            field=models.CharField(default='<UNINDEXABLE>', editable=False, help_text='The indexed form of the transcription to facilitate fuzzy matching (automatically managed).', max_length=256),
+            model_name="historicalphrase",
+            name="fuzzy_transcription",
+            field=models.CharField(
+                default="<UNINDEXABLE>",
+                editable=False,
+                help_text="The indexed form of the transcription to facilitate fuzzy matching (automatically managed).",
+                max_length=256,
+            ),
         ),
         migrations.AddField(
-            model_name='phrase',
-            name='fuzzy_transcription',
-            field=models.CharField(default='<UNINDEXABLE>', editable=False, help_text='The indexed form of the transcription to facilitate fuzzy matching (automatically managed).', max_length=256),
+            model_name="phrase",
+            name="fuzzy_transcription",
+            field=models.CharField(
+                default="<UNINDEXABLE>",
+                editable=False,
+                help_text="The indexed form of the transcription to facilitate fuzzy matching (automatically managed).",
+                max_length=256,
+            ),
         ),
         migrations.AddIndex(
-            model_name='phrase',
-            index=models.Index(fields=['fuzzy_transcription'], name='fuzzy_transcription_idx'),
+            model_name="phrase",
+            index=models.Index(
+                fields=["fuzzy_transcription"], name="fuzzy_transcription_idx"
+            ),
         ),
     ]

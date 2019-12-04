@@ -23,9 +23,8 @@ from pydub import AudioSegment  # type: ignore
 
 
 def transcode_to_aac(
-        recording: Union[Path, AudioSegment],
-        destination: Path,
-        **kwargs) -> None:
+    recording: Union[Path, AudioSegment], destination: Path, **kwargs
+) -> None:
     """
     Transcodes an audio file to an .m4a file.
 
@@ -35,7 +34,7 @@ def transcode_to_aac(
 
     if isinstance(recording, Path):
         assert recording.exists(), f"Could not stat {recording}"
-        with open(recording, 'rb') as recording_file:
+        with open(recording, "rb") as recording_file:
             audio = AudioSegment.from_file(recording_file)
     elif isinstance(recording, AudioSegment):
         audio = recording
@@ -44,15 +43,18 @@ def transcode_to_aac(
 
     assert audio.channels == 1, "Recording is not mono"
     assert len(audio) > 0, "Recording is empty"
-    assert destination.suffix == '.m4a', "Don't you want an .m4a file?"
+    assert destination.suffix == ".m4a", "Don't you want an .m4a file?"
 
     # This assumes ffmpeg as the backend. This will save
     # a mono audio stream encoded in AAC, in an MP4 container.
     audio.export(
-        destination, format='ipod', codec='aac', **kwargs,
+        destination,
+        format="ipod",
+        codec="aac",
+        **kwargs,
         # On Ubuntu's ffmpeg, the aac codec is experimental,
         # so enable experimental codecs!
-        parameters=['-strict', '-2']
+        parameters=["-strict", "-2"],
     ).close()
 
 

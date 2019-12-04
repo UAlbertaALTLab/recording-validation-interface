@@ -42,7 +42,7 @@ class Command(BaseCommand):
         # .save(). So... we'll fetch every single item, and call its .save()
         # method. It's silly, but it works!
         phrases = Phrase.objects.all()
-        default = Phrase._meta.get_field('fuzzy_transcription').get_default()
+        default = Phrase._meta.get_field("fuzzy_transcription").get_default()
         for phrase in phrases:
             phrase.save()
             assert phrase.fuzzy_transcription != default

@@ -26,11 +26,13 @@ from pathlib import Path
 from librecval import REPOSITORY_ROOT
 from librecval.utils import cd
 
-MASTER_RECORDINGS_METADATA = '1SlJRJRUiwXibAxFC0uY2sFXFb4IukGjs7Rg_G1vp_y8'
+MASTER_RECORDINGS_METADATA = "1SlJRJRUiwXibAxFC0uY2sFXFb4IukGjs7Rg_G1vp_y8"
 REMOTE_FILENAME = "Master Recordings MetaData"
 
 
-def download_metadata(destination: Path = REPOSITORY_ROOT / 'private' / 'metadata.csv') -> None:
+def download_metadata(
+    destination: Path = REPOSITORY_ROOT / "private" / "metadata.csv",
+) -> None:
     """
     Downloads the "Master Recordings MetaData" file from Google Drive, as a
     CSV file.
@@ -39,17 +41,18 @@ def download_metadata(destination: Path = REPOSITORY_ROOT / 'private' / 'metadat
     """
 
     from sh import gdrive  # type: ignore
+
     assert destination.parent.is_dir()
 
     # Annoyingly, gdrive's "export" command does not allow you to specify an
     # output path, so it will create the file with the **REMOTE FILENAME**.
     # So! Export the file to a temporary directory first, then move it to
     # where we want it to go.
-    tmpdir = Path('/tmp/')
+    tmpdir = Path("/tmp/")
     with cd(tmpdir):
-        gdrive.export("--force", "--mime", "text/csv",
-                      MASTER_RECORDINGS_METADATA,
-                      _fg=True)
-        exported_csv = (tmpdir / REMOTE_FILENAME).with_suffix('.csv')
+        gdrive.export(
+            "--force", "--mime", "text/csv", MASTER_RECORDINGS_METADATA, _fg=True
+        )
+        exported_csv = (tmpdir / REMOTE_FILENAME).with_suffix(".csv")
         assert exported_csv.exists()
         shutil.copy(exported_csv, destination)

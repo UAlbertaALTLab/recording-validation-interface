@@ -36,34 +36,37 @@ def test_search_recordings(client):
 
     # Store <enipat>, but search for the normatized form (as itwêwina would
     # offer).
-    query = 'ê-nipat'
-    phrase = mommy.make_recipe('validation.phrase', transcription='enipat')
-    speaker = mommy.make_recipe('validation.speaker')
+    query = "ê-nipat"
+    phrase = mommy.make_recipe("validation.phrase", transcription="enipat")
+    speaker = mommy.make_recipe("validation.speaker")
 
     # Make two recordings. We want to make sure the query actually works by
     # only retrieving the *relevant* recording.
-    recording = mommy.make_recipe('validation.recording', phrase=phrase, speaker=speaker)
-    unrelated_recording = mommy.make_recipe('validation.recording')
+    recording = mommy.make_recipe(
+        "validation.recording", phrase=phrase, speaker=speaker
+    )
+    unrelated_recording = mommy.make_recipe("validation.recording")
 
     assert recording.phrase != unrelated_recording.phrase
 
-    response = client.get(reverse('validation:search_recordings',
-                                  kwargs={'query': query}))
+    response = client.get(
+        reverse("validation:search_recordings", kwargs={"query": query})
+    )
 
-    assert 'Access-Control-Allow-Origin' in response, "Missing requried CORS headers"
+    assert "Access-Control-Allow-Origin" in response, "Missing requried CORS headers"
 
     recordings = response.json()
     assert isinstance(recordings, list)
     assert len(recordings) == 1
     recording = recordings[0]
-    assert recording.get('wordform') == phrase.transcription
+    assert recording.get("wordform") == phrase.transcription
     # TODO: Change field name to "speaker_code"?
-    assert 'speaker' in recording.keys()
-    assert recording.get('gender') in 'MF'
-    assert recording.get('recording_url').startswith(('http://', 'https://'))
-    assert recording.get('recording_url').endswith('.m4a')
-    assert recording.get('speaker_name') == speaker.full_name
-    assert recording.get('anonymous') is False
+    assert "speaker" in recording.keys()
+    assert recording.get("gender") in "MF"
+    assert recording.get("recording_url").startswith(("http://", "https://"))
+    assert recording.get("recording_url").endswith(".m4a")
+    assert recording.get("speaker_name") == speaker.full_name
+    assert recording.get("anonymous") is False
 
 
 @pytest.mark.django_db
@@ -77,48 +80,55 @@ def test_search_multiple_recordings(client):
     """
 
     # Create more phrases (and recordings) than queried forms.
-    phrases = mommy.make_recipe('validation.phrase',
-                                _quantity=MAX_RECORDING_QUERY_TERMS + 2)
+    phrases = mommy.make_recipe(
+        "validation.phrase", _quantity=MAX_RECORDING_QUERY_TERMS + 2
+    )
     # We only want three of these word forms
-    query_forms = [phrase.transcription for phrase in phrases][:MAX_RECORDING_QUERY_TERMS]
+    query_forms = [phrase.transcription for phrase in phrases][
+        :MAX_RECORDING_QUERY_TERMS
+    ]
 
     # Ensure each phrase has a recording. Only a subset of these recordings
     # should be returned.
-    speaker = mommy.make_recipe('validation.speaker')
-    recordings = [mommy.make_recipe('validation.recording', phrase=phrase, speaker=speaker)
-                  for phrase in phrases]
+    speaker = mommy.make_recipe("validation.speaker")
+    recordings = [
+        mommy.make_recipe("validation.recording", phrase=phrase, speaker=speaker)
+        for phrase in phrases
+    ]
 
-    response = client.get(reverse('validation:search_recordings',
-                                  kwargs={'query': ','.join(query_forms)}))
+    response = client.get(
+        reverse("validation:search_recordings", kwargs={"query": ",".join(query_forms)})
+    )
 
-    assert 'Access-Control-Allow-Origin' in response, "Missing requried CORS headers"
+    assert "Access-Control-Allow-Origin" in response, "Missing requried CORS headers"
 
     matched_recordings = response.json()
     assert isinstance(matched_recordings, list)
     assert len(matched_recordings) == MAX_RECORDING_QUERY_TERMS
     for recording in matched_recordings:
-        assert recording.get('wordform') in query_forms
-        assert 'speaker' in recording.keys()
-        assert recording.get('gender') in 'MF'
-        assert recording.get('recording_url').startswith(('http://', 'https://'))
-        assert recording.get('recording_url').endswith('.m4a')
+        assert recording.get("wordform") in query_forms
+        assert "speaker" in recording.keys()
+        assert recording.get("gender") in "MF"
+        assert recording.get("recording_url").startswith(("http://", "https://"))
+        assert recording.get("recording_url").endswith(".m4a")
 
     # The word forms in the response should match ALL of the word forms queried.
-    assert set(r['wordform'] for r in matched_recordings) == set(query_forms)
+    assert set(r["wordform"] for r in matched_recordings) == set(query_forms)
 
 
 @pytest.mark.django_db
 def test_search_recording_not_found(client):
     # Create a valid recording, but make sure we never match it.
-    recording = mommy.make_recipe('validation.recording')
+    recording = mommy.make_recipe("validation.recording")
 
     # Make the query never matches the only recording in the database:
-    query = recording.phrase.transcription + 'h'
-    response = client.get(reverse('validation:search_recordings',
-                                  kwargs={'query': query}))
+    query = recording.phrase.transcription + "h"
+    response = client.get(
+        reverse("validation:search_recordings", kwargs={"query": query})
+    )
 
     recordings = response.json()
-    assert 'Access-Control-Allow-Origin' in response, "Missing requried CORS headers"
+    assert "Access-Control-Allow-Origin" in response, "Missing requried CORS headers"
     assert isinstance(recordings, list)
     assert len(recordings) == 0
     assert response.status_code == 404
@@ -127,27 +137,32 @@ def test_search_recording_not_found(client):
 @pytest.mark.django_db
 def test_search_max_queries(client):
     # Create valid recordings, one per phrase, but make too many of them.
-    speaker = mommy.make_recipe('validation.speaker')
-    phrases = mommy.make_recipe('validation.phrase',
-                                _quantity=MAX_RECORDING_QUERY_TERMS + 1)
+    speaker = mommy.make_recipe("validation.speaker")
+    phrases = mommy.make_recipe(
+        "validation.phrase", _quantity=MAX_RECORDING_QUERY_TERMS + 1
+    )
     recordings = [
-        mommy.make_recipe('validation.recording', speaker=speaker, phrase=phrase)
+        mommy.make_recipe("validation.recording", speaker=speaker, phrase=phrase)
         for phrase in phrases
     ]
 
     # Try fetching the maximum
-    query = ','.join(phrase.transcription for phrase in phrases[:MAX_RECORDING_QUERY_TERMS])
-    response = client.get(reverse('validation:search_recordings',
-                                  kwargs={'query': query}))
+    query = ",".join(
+        phrase.transcription for phrase in phrases[:MAX_RECORDING_QUERY_TERMS]
+    )
+    response = client.get(
+        reverse("validation:search_recordings", kwargs={"query": query})
+    )
     assert response.status_code == 200
 
     # Fetch them!
-    query = ','.join(phrase.transcription for phrase in phrases)
-    response = client.get(reverse('validation:search_recordings',
-                                  kwargs={'query': query}))
+    query = ",".join(phrase.transcription for phrase in phrases)
+    response = client.get(
+        reverse("validation:search_recordings", kwargs={"query": query})
+    )
 
     # The request should be denied.
-    assert 'Access-Control-Allow-Origin' in response, "Missing requried CORS headers"
+    assert "Access-Control-Allow-Origin" in response, "Missing requried CORS headers"
     assert response.status_code == 414
 
 
@@ -158,20 +173,20 @@ def test_search_unique_word_forms(client):
     results as if the word form was requested only once.
     """
     # We need a valid phrase/recording
-    recording = mommy.make_recipe('validation.recording')
+    recording = mommy.make_recipe("validation.recording")
     phrase = recording.phrase
 
     # The query will have the term more than once.
     assert MAX_RECORDING_QUERY_TERMS > 1
-    query = ','.join(phrase.transcription for _ in
-                     range(MAX_RECORDING_QUERY_TERMS))
+    query = ",".join(phrase.transcription for _ in range(MAX_RECORDING_QUERY_TERMS))
 
-    response = client.get(reverse('validation:search_recordings',
-                                  kwargs={'query': query}))
+    response = client.get(
+        reverse("validation:search_recordings", kwargs={"query": query})
+    )
     assert response.status_code == 200
     recordings = response.json()
     assert len(recordings) == 1
-    assert recordings[0]['wordform'] == phrase.transcription
+    assert recordings[0]["wordform"] == phrase.transcription
 
 
 @pytest.mark.django_db
@@ -185,22 +200,27 @@ def test_search_fuzzy_match(client):
     # First, insert some unvalidated phrases, with non-standard orthography.
     phrases = {
         # 'query': model,
-        'pwâwiw': mommy.make_recipe('validation.phrase', transcription='pwawiw'),
-        'kostâcinâkosiw': mommy.make_recipe('validation.phrase', transcription='kostacinakosow'),
-        'iskwêsis': mommy.make_recipe('validation.phrase', transcription='iskwesis')
+        "pwâwiw": mommy.make_recipe("validation.phrase", transcription="pwawiw"),
+        "kostâcinâkosiw": mommy.make_recipe(
+            "validation.phrase", transcription="kostacinakosow"
+        ),
+        "iskwêsis": mommy.make_recipe("validation.phrase", transcription="iskwesis"),
     }
 
     # Make them searchable by adding a couple recordings.
     recordings = [
-        mommy.make_recipe('validation.recording', phrase=phrase) for phrase in phrases.values()
+        mommy.make_recipe("validation.recording", phrase=phrase)
+        for phrase in phrases.values()
         # Repeat recordings per phrase, to emulate a real recording session
         for _ in range(RECORDINGS_PER_PHRASE)
     ]
     assert len(recordings) == len(phrases) * RECORDINGS_PER_PHRASE
 
     # Search for the phrases!
-    query = ','.join(key for key in phrases)
-    response = client.get(reverse('validation:search_recordings', kwargs={'query': query}))
+    query = ",".join(key for key in phrases)
+    response = client.get(
+        reverse("validation:search_recordings", kwargs={"query": query})
+    )
 
     assert response.status_code == 200
     actual_recordings = response.json()
@@ -208,6 +228,9 @@ def test_search_fuzzy_match(client):
 
     # Make sure all the results are there.
     for query, phrase in phrases.items():
-        resultant_recordings = [result for result in actual_recordings
-                                if result['wordform'] == phrase.transcription]
+        resultant_recordings = [
+            result
+            for result in actual_recordings
+            if result["wordform"] == phrase.transcription
+        ]
         assert len(resultant_recordings) == RECORDINGS_PER_PHRASE
