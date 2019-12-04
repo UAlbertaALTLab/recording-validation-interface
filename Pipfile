@@ -16,6 +16,7 @@ logme = "*"
 "jinja2" = "*"
 gunicorn = "*"
 mypy = "*"
+black = "*"
 
 [dev-packages]
 pytest = "*"
@@ -28,3 +29,6 @@ isort = "*"
 
 [requires]
 python_version = "3.7"
+
+[pipenv]
+allow_prereleases = true
