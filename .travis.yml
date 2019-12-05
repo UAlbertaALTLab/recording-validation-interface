@@ -1,13 +1,19 @@
-dist: xenial  # required for Python >= 3.7
+dist: xenial
 language: python
 python:
- - '3.7'
+- '3.7'
 addons:
   apt:
     packages:
-     - ffmpeg
+    - ffmpeg
 install:
- - pip install pipenv
- - make install-test
+- pip install pipenv
+- make install-test
 script:
- - make test
+- make test
+
+deploy:
+  provider: script
+  before_install:
+  - openssl aes-256-cbc -K $encrypted_cf988b8ff923_key -iv $encrypted_cf988b8ff923_iv -in recval.key.enc -out recval.key -d
+  script: curl --data-urlencode secret@recval.key https://sapir.artsrn.ualberta.ca/redeploy/recval
