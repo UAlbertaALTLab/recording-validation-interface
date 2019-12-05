@@ -9,11 +9,11 @@
 .PHONY: init install-test install-dev install-prod test
 
 install-prod:
-	pipenv install
+	pipenv install --deploy
 	pipenv run python init --prod --no-debug
 
 install-test:
-	pipenv install --dev
+	pipenv install --ignore-pipfile --dev
 	pipenv run python init --test
 
 install-dev: init
