@@ -1,6 +1,0 @@
-#!/bin/sh
-
-# Run this locally to redeploy recval on the server.
-# This assumes the redeloy-recval script is in the user's home folder.
-
-ssh sapir.artsrn.ualberta.ca "\$HOME/redeploy-recval"
