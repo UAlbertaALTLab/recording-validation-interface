@@ -23,8 +23,8 @@ from datetime import datetime
 import pytest  # type: ignore
 from django.core.exceptions import ValidationError  # type: ignore
 from hypothesis import assume, given
-from model_mommy import mommy  # type: ignore
-from model_mommy.recipe import Recipe  # type: ignore
+from model_bakery import baker  # type: ignore
+from model_bakery.recipe import Recipe  # type: ignore
 
 from librecval.normalization import nfc
 from librecval.recording_session import Location, SessionID, TimeOfDay
@@ -33,7 +33,7 @@ from validation.models import Phrase, Recording, RecordingSession, Speaker
 
 
 def test_recording_session():
-    session = mommy.prepare(RecordingSession)
+    session = baker.prepare(RecordingSession)
     # Check all the fields.
     assert isinstance(session.date, datetype)
     assert session.time_of_day in {m.value for m in TimeOfDay} | {""}
@@ -135,7 +135,7 @@ def test_speaker():
     """
     Check that we can create a speaker.
     """
-    speaker = mommy.prepare(Speaker)
+    speaker = baker.prepare(Speaker)
     speaker.clean()
     assert speaker.code.upper() == speaker.code
     assert isinstance(speaker.full_name, str)
@@ -157,7 +157,7 @@ def test_phrase():
     """
     Test that we can create a phrase instance.
     """
-    phrase = mommy.prepare(Phrase)
+    phrase = baker.prepare(Phrase)
     assert isinstance(phrase.transcription, str)
     assert isinstance(phrase.translation, str)
     assert phrase.kind in (Phrase.WORD, Phrase.SENTENCE)
@@ -293,7 +293,7 @@ def test_phrase_recordings():
     # Keep it in a 32 bit signed integer
     MAX_RECORDING_LENGTH = 2 ** 31 - 1
 
-    phrase = mommy.make(Phrase)
+    phrase = baker.make(Phrase)
 
     r1 = Recipe(
         Recording,

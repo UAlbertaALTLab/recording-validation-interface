@@ -22,7 +22,7 @@ Unit/Integration tests for the recordings search API.
 
 import pytest  # type: ignore
 from django.shortcuts import reverse  # type: ignore
-from model_mommy import mommy  # type: ignore
+from model_bakery import baker  # type: ignore
 
 
 MAX_RECORDING_QUERY_TERMS = 3  # TODO: will this be a configuration option?
@@ -37,15 +37,15 @@ def test_search_recordings(client):
     # Store <enipat>, but search for the normatized form (as itwêwina would
     # offer).
     query = "ê-nipat"
-    phrase = mommy.make_recipe("validation.phrase", transcription="enipat")
-    speaker = mommy.make_recipe("validation.speaker")
+    phrase = baker.make_recipe("validation.phrase", transcription="enipat")
+    speaker = baker.make_recipe("validation.speaker")
 
     # Make two recordings. We want to make sure the query actually works by
     # only retrieving the *relevant* recording.
-    recording = mommy.make_recipe(
+    recording = baker.make_recipe(
         "validation.recording", phrase=phrase, speaker=speaker
     )
-    unrelated_recording = mommy.make_recipe("validation.recording")
+    unrelated_recording = baker.make_recipe("validation.recording")
 
     assert recording.phrase != unrelated_recording.phrase
 
@@ -80,7 +80,7 @@ def test_search_multiple_recordings(client):
     """
 
     # Create more phrases (and recordings) than queried forms.
-    phrases = mommy.make_recipe(
+    phrases = baker.make_recipe(
         "validation.phrase", _quantity=MAX_RECORDING_QUERY_TERMS + 2
     )
     # We only want three of these word forms
@@ -90,9 +90,9 @@ def test_search_multiple_recordings(client):
 
     # Ensure each phrase has a recording. Only a subset of these recordings
     # should be returned.
-    speaker = mommy.make_recipe("validation.speaker")
+    speaker = baker.make_recipe("validation.speaker")
     recordings = [
-        mommy.make_recipe("validation.recording", phrase=phrase, speaker=speaker)
+        baker.make_recipe("validation.recording", phrase=phrase, speaker=speaker)
         for phrase in phrases
     ]
 
@@ -119,7 +119,7 @@ def test_search_multiple_recordings(client):
 @pytest.mark.django_db
 def test_search_recording_not_found(client):
     # Create a valid recording, but make sure we never match it.
-    recording = mommy.make_recipe("validation.recording")
+    recording = baker.make_recipe("validation.recording")
 
     # Make the query never matches the only recording in the database:
     query = recording.phrase.transcription + "h"
@@ -137,12 +137,12 @@ def test_search_recording_not_found(client):
 @pytest.mark.django_db
 def test_search_max_queries(client):
     # Create valid recordings, one per phrase, but make too many of them.
-    speaker = mommy.make_recipe("validation.speaker")
-    phrases = mommy.make_recipe(
+    speaker = baker.make_recipe("validation.speaker")
+    phrases = baker.make_recipe(
         "validation.phrase", _quantity=MAX_RECORDING_QUERY_TERMS + 1
     )
     recordings = [
-        mommy.make_recipe("validation.recording", speaker=speaker, phrase=phrase)
+        baker.make_recipe("validation.recording", speaker=speaker, phrase=phrase)
         for phrase in phrases
     ]
 
@@ -173,7 +173,7 @@ def test_search_unique_word_forms(client):
     results as if the word form was requested only once.
     """
     # We need a valid phrase/recording
-    recording = mommy.make_recipe("validation.recording")
+    recording = baker.make_recipe("validation.recording")
     phrase = recording.phrase
 
     # The query will have the term more than once.
@@ -200,16 +200,16 @@ def test_search_fuzzy_match(client):
     # First, insert some unvalidated phrases, with non-standard orthography.
     phrases = {
         # 'query': model,
-        "pwâwiw": mommy.make_recipe("validation.phrase", transcription="pwawiw"),
-        "kostâcinâkosiw": mommy.make_recipe(
+        "pwâwiw": baker.make_recipe("validation.phrase", transcription="pwawiw"),
+        "kostâcinâkosiw": baker.make_recipe(
             "validation.phrase", transcription="kostacinakosow"
         ),
-        "iskwêsis": mommy.make_recipe("validation.phrase", transcription="iskwesis"),
+        "iskwêsis": baker.make_recipe("validation.phrase", transcription="iskwesis"),
     }
 
     # Make them searchable by adding a couple recordings.
     recordings = [
-        mommy.make_recipe("validation.recording", phrase=phrase)
+        baker.make_recipe("validation.recording", phrase=phrase)
         for phrase in phrases.values()
         # Repeat recordings per phrase, to emulate a real recording session
         for _ in range(RECORDINGS_PER_PHRASE)

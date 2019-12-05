@@ -29,7 +29,7 @@ from tempfile import TemporaryDirectory
 
 import pytest  # type: ignore
 from django.shortcuts import reverse  # type: ignore
-from model_mommy import mommy  # type: ignore
+from model_bakery import baker  # type: ignore
 from pydub import AudioSegment  # type: ignore
 
 
@@ -71,7 +71,7 @@ def exported_recording(settings):
     Yields a tuple of the Recording instance, and a bytes instance of the
     recording's transcoded audio.
     """
-    recording = mommy.make_recipe("validation.recording")
+    recording = baker.make_recipe("validation.recording")
 
     # Create a REAL audio recording, saved on disk.
     with TemporaryDirectory() as temp_dir_name:

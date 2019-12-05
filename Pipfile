@@ -24,8 +24,8 @@ hypothesis = "*"
 mypy = "*"
 pycodestyle = "*"
 pytest-django = "*"
-model-mommy = "*"
 isort = "*"
+model-bakery = "*"
 
 [requires]
 python_version = "3.7"

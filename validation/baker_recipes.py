@@ -20,11 +20,11 @@
 """
 Modee Mommy recipes, for use in tests of the Validation app.
 
-See: https://model-mommy.readthedocs.io/en/latest/recipes.html
+See: https://model-baker.readthedocs.io/en/latest/recipes.html
 """
 
 import random
-from model_mommy.recipe import Recipe, foreign_key
+from model_bakery.recipe import Recipe, foreign_key
 from validation.models import Recording, Speaker, Phrase
 
 
