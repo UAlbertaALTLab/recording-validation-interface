@@ -12,8 +12,10 @@ install:
 script:
 - make test
 
+# Deploy to Sapir:
+after_success:
+- openssl aes-256-cbc -K $encrypted_cf988b8ff923_key -iv $encrypted_cf988b8ff923_iv -in recval.key.enc -out recval.key -d
 deploy:
   provider: script
-  before_install:
-  - openssl aes-256-cbc -K $encrypted_cf988b8ff923_key -iv $encrypted_cf988b8ff923_iv -in recval.key.enc -out recval.key -d
-  script: curl --data-urlencode secret@recval.key https://sapir.artsrn.ualberta.ca/redeploy/recval
+  skip_cleanup: true
+  script: curl --verbose --fail --data-urlencode secret@recval.key sapir.artsrn.ualberta.ca/redeploy/recval
