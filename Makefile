@@ -6,7 +6,7 @@
 # make init 		-- initializes the development environment
 # make reformat 	-- formats the Python code
 
-.PHONY: init install-test install-dev install-prod test
+.PHONY: init install-test install-dev install-prod migrate test
 
 install-prod:
 	pipenv install --deploy
@@ -26,6 +26,9 @@ test:
 
 init:
 	git config core.hooksPath .githooks
+
+migrate:
+	pipenv run python3 manage.py migrate
 
 reformat:
 	black librecval tests validation recvalsite
