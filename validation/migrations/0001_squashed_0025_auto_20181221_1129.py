@@ -38,9 +38,7 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-    ]
+    dependencies = [migrations.swappable_dependency(settings.AUTH_USER_MODEL)]
 
     operations = [
         migrations.CreateModel(
@@ -85,7 +83,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"unique_together": set(),},
+            options={"unique_together": set()},
         ),
         migrations.CreateModel(
             name="Speaker",
