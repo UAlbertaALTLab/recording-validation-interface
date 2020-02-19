@@ -36,13 +36,8 @@ clean-dir-structure.py
 
 metadata.csv
  : This is the CSV export of "Master Recordings MetaData" from Google
-  Drive. If it does not exist, use `flask metadata download` to download
-  the latest copy. Note: requires a properly configured [gdrive][]
-  executable on the path.
+  Drive.
 
 phrases.sql
  : An experimental query for creating a denormalized copy of the
   database (such as to export to a CSV file or to use within R).
-
-
-[gdrive]: https://github.com/prasmussen/gdrive
