@@ -13,11 +13,7 @@ Install
 
 Requires Python 3.7, [Pipenv][], and [ffmpeg].
 
-You may also want to install and initialize [gdrive][] before
-continuing.
-
 [Pipenv]: https://github.com/pypa/pipenv#installation
-[gdrive]: https://github.com/prasmussen/gdrive
 [ffmpeg]: https://www.ffmpeg.org/
 
 ### Development environment
@@ -199,13 +195,7 @@ See more: <https://docs.djangoproject.com/en/2.1/ref/settings/#std:setting-STATI
 Before you import any data, you need the "Master Recording MetaData" (sic)
 spreadsheet, available on Google Drive. This should have been downloaded using
 the `./init` script from earlier, but if you still don't have, either download
-it manually as a CSV file as `$RECVAL_METADATA_PATH`, or — if you have the
-[gdrive][] command installed and configured — run the following script to
-download it automatically:
-
-```sh
-pipenv run python manage.py downloadmetadata
-```
+it manually as a CSV file as `$RECVAL_METADATA_PATH`.
 
 Then, initialize the database using the following command:
 
