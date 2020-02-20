@@ -30,12 +30,10 @@ from pathlib import Path
 from typing import Dict, NamedTuple, Optional
 
 import logme  # type: ignore
-from pydub import AudioSegment  # type: ignore
-from textgrid import IntervalTier, TextGrid  # type: ignore
-
 from librecval.normalization import normalize
 from librecval.recording_session import SessionID, SessionMetadata
-
+from pydub import AudioSegment  # type: ignore
+from textgrid import IntervalTier, TextGrid  # type: ignore
 
 # ############################### Exceptions ############################### #
 
@@ -281,6 +279,10 @@ class PhraseExtractor:
 
             # Get the word's English gloss.
             english_interval = english_tier.intervalContaining(midtime)
+            if english_interval is None:
+                self.logger.warn("Could not find translation for %r", interval)
+                continue
+
             translation = normalize(english_interval.mark)
 
             # Snip out the sounds.
