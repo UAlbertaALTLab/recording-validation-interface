@@ -25,8 +25,7 @@ from pathlib import Path
 from typing import Callable
 
 import logme  # type: ignore
-
-from librecval.extract_phrases import RecordingExtractor, RecordingInfo, AudioSegment
+from librecval.extract_phrases import AudioSegment, RecordingExtractor, RecordingInfo
 from librecval.recording_session import parse_metadata
 from librecval.transcode_recording import transcode_to_aac
 
@@ -37,6 +36,12 @@ ImportRecording = Callable[[RecordingInfo, Path], None]
 # ✅ 2016-04-23AM-OFF - 3 text grids, 230 words
 # ⚠️  2016-05-06AM-KCH - could not link text grids to audio
 # ⚠️  2016-03-06AM-OFF - could not find mettadata
+
+
+class RecordingError(Exception):
+    """
+    The error that gets raised if something bad happens with the recording.
+    """
 
 
 @logme.log
@@ -63,8 +68,12 @@ def initialize(
     # Insert each thing found.
     ex = RecordingExtractor(metadata)
     for info, audio in ex.scan(root_directory=directory):
-        recording_path = save_recording(dest, info, audio)
-        import_recording(info, recording_path)
+        try:
+            recording_path = save_recording(dest, info, audio)
+        except RecordingError:
+            logger.exception("Exception while saving recording; skipping.")
+        else:
+            import_recording(info, recording_path)
 
 
 @logme.log
@@ -76,6 +85,9 @@ def save_recording(
     if recording_path.exists():
         logger.warn("Already exists, not transcoding: %s", recording_path)
         return recording_path
+
+    if len(audio) == 0:
+        raise RecordingError(f"Recording empty for {info!r}")
 
     # https://www.ffmpeg.org/doxygen/3.2/group__metadata__api.html
     logger.debug("Writing audio to %s", recording_path)
