@@ -17,7 +17,9 @@
 
     {% for session in sessions %}
     <tr>
-      <td> {{ session.id }}
+      <td> <a href="{{ url('validation:crude_recordings', session_id=session.id) }}">
+          {{ session.id }}
+        </a>
       <td> {{ session.date }}
       <td> {{ session.time_of_day }}
       <td> {{ session.location }}

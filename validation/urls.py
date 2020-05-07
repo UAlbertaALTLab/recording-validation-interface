@@ -34,4 +34,9 @@ urlpatterns = [
         name="search_recordings",
     ),
     path("crude/sessions", views.list_all_sessions),
+    path(
+        "crude/sessions/<str:session_id>",
+        views.all_recordings_for_session,
+        name="crude_recordings",
+    ),
 ]
