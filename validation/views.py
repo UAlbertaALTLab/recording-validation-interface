@@ -17,13 +17,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from django.conf import settings
-from django.urls import reverse
-from django.http import FileResponse, HttpResponse, JsonResponse
 from django.core.paginator import Paginator
-from django.shortcuts import render, get_object_or_404
-
+from django.http import FileResponse, HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404, render
+from django.urls import reverse
 from librecval.normalization import to_indexable_form
 
+from .crude_views import *
 from .models import Phrase, Recording
 
 

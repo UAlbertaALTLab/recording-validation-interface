@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>[CRUDE] All Maskwacîs recording sessions</title>
+</head>
+<body>
+  <h1> All sessions </h1>
+  <table>
+    <tr>
+      <th> ID </th>
+      <th> Date </th>
+      <th> Time of day </th>
+      <th> Location </th>
+      <th> Subsession <th>
+    </tr>
+
+    {% for session in sessions %}
+    <tr>
+      <td> {{ session.id }}
+      <td> {{ session.date }}
+      <td> {{ session.time_of_day }}
+      <td> {{ session.location }}
+      <td> {{ session.location }}
+    </tr>
+    {% endfor %}
+  </table>
+</body>
+</html>

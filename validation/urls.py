@@ -18,8 +18,8 @@
 
 
 from django.urls import path
-from . import views
 
+from . import views
 
 app_name = "validation"
 urlpatterns = [
@@ -33,4 +33,5 @@ urlpatterns = [
         views.search_recordings,
         name="search_recordings",
     ),
+    path("crude/sessions", views.list_all_sessions),
 ]
