@@ -3,7 +3,7 @@
 
 from django.shortcuts import get_object_or_404, render
 
-from .models import RecordingSession
+from .models import Recording, RecordingSession
 
 __all__ = ["list_all_sessions", "all_recordings_for_session"]
 
@@ -21,6 +21,9 @@ def list_all_sessions(request):
 
 def all_recordings_for_session(request, session_id: str):
     session = get_object_or_404(RecordingSession, id=session_id)
+    recordings = Recording.objects.filter(session=session).order_by("timestamp")
     return render(
-        request, "validation/crude/list_recordings.html", dict(session=session)
+        request,
+        "validation/crude/list_recordings.html",
+        dict(session=session, recordings=recordings),
     )
