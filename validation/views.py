@@ -98,7 +98,7 @@ def search_recordings(request, query):
         return request.build_absolute_uri(relative_uri)
 
     def make_absolute_uri_for_speaker(code: str) -> str:
-        return f"https://www.altlab.dev/maskwacis/Speaker/{code}.html"
+        return f"https://www.altlab.dev/maskwacis/Speakers/{code}.html"
 
     recordings = []
     for form in word_forms:
