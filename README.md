@@ -321,8 +321,10 @@ properties:
  - `wordform`: the word form that was matched by the query
  - `speaker`: the speaker's short code (e.g., something like `"ROS"` or `"JER"`)
  - `gender`: the speaker's gender: either `"M"` or `"F"` (all our speakers identify as male or female).
+ - `dialect`: the region of Cree that this person speaks
  - `recording_url`: Absolute URI to the audio, encoded as AAC in an MP4
    container (a `*.m4a` file). This can be used in an `<audio>` tag.
+ - `speaker_bio_url`: Absolute URI to the speaker's biography.
 
 ### Errors
 
@@ -346,54 +348,66 @@ Assume there are six recordings for `nikiskisin`, and none for
 
 ```json
 [
-  {
-    "wordform": "nikiskisin",
-    "speaker": "ROS",
-    "speaker_name": "Rose Makinaw",
-    "anonymous": false,
-    "gender": "F",
-    "recording_url": "http://localhost:8000/recording/7353dda3d48799325ee62de0eceb4b50839382cfcf0ebf96c70d84fd37881201.m4a"
-  },
-  {
-    "wordform": "nikiskisin",
-    "speaker": "ROS",
-    "speaker_name": "Rose Makinaw",
-    "anonymous": false,
-    "gender": "F",
-    "recording_url": "http://localhost:8000/recording/dac08c374354594b7a77195daa4fd2e12a88acc5acf4e4894dd612354c1e7a92.m4a"
-  },
-  {
-    "wordform": "nikiskisin",
-    "speaker": "GOR",
-    "speaker_name": "kîsikâw",
-    "anonymous": false,
-    "gender": "M",
-    "recording_url": "http://localhost:8000/recording/1576034645a6b765ab40275a67390fa197ee3c7ed8cc949907d132df3c0f1c9e.m4a"
-  },
-  {
-    "wordform": "nikiskisin",
-    "speaker": "GOR",
-    "speaker_name": "kîsikâw",
-    "anonymous": false,
-    "gender": "M",
-    "recording_url": "http://localhost:8000/recording/a86939d888ff908d091538b2c1a3dc4fb383167b781b5dddddd4253342b0dace.m4a"
-  },
-  {
-    "wordform": "nikiskisin",
-    "speaker": "LOU",
-    "speaker_name": "Louise Wildcat",
-    "anonymous": false,
-    "gender": "F",
-    "recording_url": "http://localhost:8000/recording/2198ff134107ff474115cdb48ee36f88c17168e215fe424da4cc414bab0f4582.m4a"
-  },
-  {
-    "wordform": "nikiskisin",
-    "speaker": "LOU",
-    "speaker_name": "Louise Wildcat",
-    "anonymous": false,
-    "gender": "F",
-    "recording_url": "http://localhost:8000/recording/e8dd10846601861c1e9c4edf944b1e4da7670ed669fe027bd0b27e0af954e031.m4a"
-  }
+    {
+        "anonymous": false,
+        "dialect": "Maskwacîs",
+        "gender": "F",
+        "recording_url": "http://sapir.artsrn.ualberta.ca/validation/recording/7353dda3d48799325ee62de0eceb4b50839382cfcf0ebf96c70d84fd37881201.m4a",
+        "speaker": "ROS",
+        "speaker_bio_url": "https://www.altlab.dev/maskwacis/Speakers/ROS.html",
+        "speaker_name": "Rose Makinaw",
+        "wordform": "nikiskisin"
+    },
+    {
+        "anonymous": false,
+        "dialect": "Maskwacîs",
+        "gender": "F",
+        "recording_url": "http://sapir.artsrn.ualberta.ca/validation/recording/dac08c374354594b7a77195daa4fd2e12a88acc5acf4e4894dd612354c1e7a92.m4a",
+        "speaker": "ROS",
+        "speaker_bio_url": "https://www.altlab.dev/maskwacis/Speakers/ROS.html",
+        "speaker_name": "Rose Makinaw",
+        "wordform": "nikiskisin"
+    },
+    {
+        "anonymous": false,
+        "dialect": "Maskwacîs",
+        "gender": "M",
+        "recording_url": "http://sapir.artsrn.ualberta.ca/validation/recording/1576034645a6b765ab40275a67390fa197ee3c7ed8cc949907d132df3c0f1c9e.m4a",
+        "speaker": "GOR",
+        "speaker_bio_url": "https://www.altlab.dev/maskwacis/Speakers/GOR.html",
+        "speaker_name": "kîsikâw",
+        "wordform": "nikiskisin"
+    },
+    {
+        "anonymous": false,
+        "dialect": "Maskwacîs",
+        "gender": "M",
+        "recording_url": "http://sapir.artsrn.ualberta.ca/validation/recording/a86939d888ff908d091538b2c1a3dc4fb383167b781b5dddddd4253342b0dace.m4a",
+        "speaker": "GOR",
+        "speaker_bio_url": "https://www.altlab.dev/maskwacis/Speakers/GOR.html",
+        "speaker_name": "kîsikâw",
+        "wordform": "nikiskisin"
+    },
+    {
+        "anonymous": false,
+        "dialect": "Maskwacîs",
+        "gender": "F",
+        "recording_url": "http://sapir.artsrn.ualberta.ca/validation/recording/2198ff134107ff474115cdb48ee36f88c17168e215fe424da4cc414bab0f4582.m4a",
+        "speaker": "LOU",
+        "speaker_bio_url": "https://www.altlab.dev/maskwacis/Speakers/LOU.html",
+        "speaker_name": "Louise Wildcat",
+        "wordform": "nikiskisin"
+    },
+    {
+        "anonymous": false,
+        "dialect": "Maskwacîs",
+        "gender": "F",
+        "recording_url": "http://sapir.artsrn.ualberta.ca/validation/recording/e8dd10846601861c1e9c4edf944b1e4da7670ed669fe027bd0b27e0af954e031.m4a",
+        "speaker": "LOU",
+        "speaker_bio_url": "https://www.altlab.dev/maskwacis/Speakers/LOU.html",
+        "speaker_name": "Louise Wildcat",
+        "wordform": "nikiskisin"
+    }
 ]
 ```
 
