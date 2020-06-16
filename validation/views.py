@@ -21,6 +21,7 @@ from django.core.paginator import Paginator
 from django.http import FileResponse, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+
 from librecval.normalization import to_indexable_form
 
 from .crude_views import *
@@ -96,6 +97,9 @@ def search_recordings(request, query):
         relative_uri = reverse("validation:recording", kwargs={"recording_id": rec_id})
         return request.build_absolute_uri(relative_uri)
 
+    def make_absolute_uri_for_speaker(code: str) -> str:
+        return f"https://www.altlab.dev/maskwacis/Speaker/{code}.html"
+
     recordings = []
     for form in word_forms:
         # Assume the query is an SRO transcription; prepare it for a fuzzy match.
@@ -112,7 +116,9 @@ def search_recordings(request, query):
                 "speaker_name": rec.speaker.full_name,
                 "anonymous": rec.speaker.anonymous,
                 "gender": rec.speaker.gender,
+                "dialect": rec.speaker.dialect,
                 "recording_url": make_absolute_uri_for_recording(rec.id),
+                "speaker_bio_url": make_absolute_uri_for_speaker(rec.speaker.code),
             }
             for rec in result_set
         )

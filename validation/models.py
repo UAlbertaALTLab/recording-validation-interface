@@ -23,9 +23,10 @@ from django.db import models
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
+from simple_history.models import HistoricalRecords
+
 from librecval.normalization import normalize_sro, to_indexable_form
 from librecval.recording_session import Location, SessionID, TimeOfDay
-from simple_history.models import HistoricalRecords
 
 
 def choices_from_enum(enum_class):
@@ -175,6 +176,14 @@ class Speaker(models.Model):
         choices=GENDER_CHOICES,
         null=True,
     )
+
+    @property
+    def dialect(self):
+        """
+        Which dialect this person speaks.
+        """
+        # Hard-coded for now, but it makes implementing this field trival.
+        return "Maskwacîs"
 
     @property
     def anonymous(self):

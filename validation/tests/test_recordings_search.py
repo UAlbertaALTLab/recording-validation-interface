@@ -67,7 +67,7 @@ def test_search_recordings(client):
     assert recording.get("speaker_name") == speaker.full_name
     assert recording.get("anonymous") is False
     assert recording.get("speaker_bio_url").startswith(("http://", "https://"))
-    assert speaker.code.lower() in recording.get("speaker_bio_url")
+    assert speaker.code in recording.get("speaker_bio_url")
     assert recording.get("dialect") == speaker.dialect
 
 
