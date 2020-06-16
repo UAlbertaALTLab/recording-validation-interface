@@ -24,7 +24,6 @@ import pytest  # type: ignore
 from django.shortcuts import reverse  # type: ignore
 from model_bakery import baker  # type: ignore
 
-
 MAX_RECORDING_QUERY_TERMS = 3  # TODO: will this be a configuration option?
 
 
@@ -62,11 +61,14 @@ def test_search_recordings(client):
     assert recording.get("wordform") == phrase.transcription
     # TODO: Change field name to "speaker_code"?
     assert "speaker" in recording.keys()
-    assert recording.get("gender") in "MF"
+    assert recording.get("gender") in ("M", "F")
     assert recording.get("recording_url").startswith(("http://", "https://"))
     assert recording.get("recording_url").endswith(".m4a")
     assert recording.get("speaker_name") == speaker.full_name
     assert recording.get("anonymous") is False
+    assert recording.get("speaker_bio_url").startswith(("http://", "https://"))
+    assert speaker.code.lower() in recording.get("speaker_bio_url")
+    assert recording.get("dialect") == speaker.dialect
 
 
 @pytest.mark.django_db
