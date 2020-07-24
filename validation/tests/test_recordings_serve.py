@@ -60,6 +60,39 @@ def test_serve_recording(client, exported_recording):
     ), "The ETag should be based on the recording ID"
 
 
+@pytest.mark.django_db
+def test_serve_recording_partial_content(client, exported_recording):
+    """
+    Test that a recording is served properly.
+    """
+    recording, file_contents = exported_recording
+    page = client.get(
+        reverse("validation:recording", kwargs={"recording_id": recording.id}),
+        # Safari likes sending this value for some reason:
+        HTTP_RANGE="bytes=0-1",
+    )
+
+    content_length = len(file_contents)
+
+    assert page.status_code == 206
+    assert "bytes" in page.get("Accept-Ranges")
+    assert page.get("Content-Type") == "audio/m4a"
+    assert page.get("Content-Range") == f"bytes 0-1/{content_length}"
+    content = b"".join(page.streaming_content)
+    assert content == file_contents[0:1]
+
+    # Get the rest of the file
+    rest = client.get(
+        reverse("validation:recording", kwargs={"recording_id": recording.id}),
+        HTTP_RANGE="bytes=1-{content_length}",
+    )
+
+    assert page.status_code == 206
+    assert page.get("Content-Range") == f"bytes 1-{content_length - 1}"
+    rest_content = b"".join(page.streaming_content)
+    assert content + rest_content == file_contents
+
+
 # ################################ Fixtures ################################ #
 
 
