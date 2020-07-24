@@ -77,7 +77,10 @@ def serve_recording(request, recording_id):
             _bytes, _equal, range_str = value.partition("=")
             lower_str, _hyphen, upper_str = range_str.partition("-")
             lower = int(lower_str)
-            upper = int(upper_str)
+            if upper_str:
+                upper = int(upper_str)
+            else:
+                upper = None
 
             if lower < 0:
                 raise ValueError
@@ -89,6 +92,9 @@ def serve_recording(request, recording_id):
 
         file_contents = (settings.RECVAL_AUDIO_DIR / f"{recording.id}.m4a").read_bytes()
         total_content_length = len(file_contents)
+
+        if not upper:
+            upper = total_content_length - 1
 
         partial_file_contents = file_contents[lower : upper + 1]
 
