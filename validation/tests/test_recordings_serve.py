@@ -74,21 +74,26 @@ def test_serve_recording_partial_content(client, exported_recording):
 
     content_length = len(file_contents)
 
+    len_of_first_request = 2
+
     assert page.status_code == 206
     assert "bytes" in page.get("Accept-Ranges")
     assert page.get("Content-Type") == "audio/m4a"
     assert page.get("Content-Range") == f"bytes 0-1/{content_length}"
+    assert int(page.get("Content-Length")) == len_of_first_request
     content = b"".join(page.streaming_content)
-    assert content == file_contents[0:1]
+    assert content == file_contents[0:len_of_first_request]
 
     # Get the rest of the file
-    rest = client.get(
+    index_of_last_byte = content_length - 1
+    page = client.get(
         reverse("validation:recording", kwargs={"recording_id": recording.id}),
-        HTTP_RANGE="bytes=1-{content_length}",
+        HTTP_RANGE=f"bytes=2-{index_of_last_byte}",
     )
 
     assert page.status_code == 206
-    assert page.get("Content-Range") == f"bytes 1-{content_length - 1}"
+    assert page.get("Content-Range") == f"bytes 2-{index_of_last_byte}/{content_length}"
+    assert int(page.get("Content-Length")) == content_length - len_of_first_request
     rest_content = b"".join(page.streaming_content)
     assert content + rest_content == file_contents
 

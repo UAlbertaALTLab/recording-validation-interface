@@ -16,12 +16,13 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import io
+
 from django.conf import settings
 from django.core.paginator import Paginator
-from django.http import FileResponse, HttpResponse, JsonResponse
+from django.http import FileResponse, HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
-
 from librecval.normalization import to_indexable_form
 
 from .crude_views import *
@@ -65,10 +66,43 @@ def serve_recording(request, recording_id):
     # just a part of it. Note: GitHub uses 7 digits.
     HASH_PREFIX_LENGTH = 7
     recording = get_object_or_404(Recording, id=recording_id)
-    response = FileResponse(
-        open(settings.RECVAL_AUDIO_DIR / f"{recording.id}.m4a", "rb"),
-        content_type="audio/m4a",
-    )
+
+    if "Range" in request.headers:
+        value = request.headers["Range"]
+
+        if not value.startswith("bytes="):
+            return HttpResponseBadRequest()
+
+        try:
+            _bytes, _equal, range_str = value.partition("=")
+            lower_str, _hyphen, upper_str = range_str.partition("-")
+            lower = int(lower_str)
+            upper = int(upper_str)
+
+            if lower < 0:
+                raise ValueError
+            if upper < lower:
+                raise ValueError
+
+        except ValueError:
+            return HttpResponseBadRequest()
+
+        file_contents = (settings.RECVAL_AUDIO_DIR / f"{recording.id}.m4a").read_bytes()
+        total_content_length = len(file_contents)
+
+        partial_file_contents = file_contents[lower : upper + 1]
+
+        response = FileResponse(
+            io.BytesIO(partial_file_contents), content_type="audio/m4a",
+        )
+        response.status_code = 206
+        response["Accept-Ranges"] = "bytes"
+        response["Content-Range"] = f"bytes {lower}-{upper}/{total_content_length}"
+    else:
+        response = FileResponse(
+            (settings.RECVAL_AUDIO_DIR / f"{recording.id}.m4a").open("rb"),
+            content_type="audio/m4a",
+        )
     # The recording files basically never change, so tell everybody to cache
     # the dookey out these files (or at very least, a year).
     response["Cache-Control"] = f"public, max-age={60 * 60 * 24 * 365}"
