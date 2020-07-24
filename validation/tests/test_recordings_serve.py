@@ -98,6 +98,23 @@ def test_serve_recording_partial_content(client, exported_recording):
     assert content + rest_content == file_contents
 
 
+@pytest.mark.django_db
+def test_serve_recording_partial_content_open_range(client, exported_recording):
+    """
+    Chrome will make this request
+    """
+    recording, file_contents = exported_recording
+    page = client.get(
+        reverse("validation:recording", kwargs={"recording_id": recording.id}),
+        HTTP_RANGE="bytes=0-",
+    )
+
+    assert page.status_code in (200, 206)
+    assert int(page.get("Content-Length")) == len(file_contents)
+    content = b"".join(page.streaming_content)
+    assert content == file_contents
+
+
 # ################################ Fixtures ################################ #
 
 

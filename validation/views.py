@@ -84,7 +84,7 @@ def serve_recording(request, recording_id):
 
             if lower < 0:
                 raise ValueError
-            if upper < lower:
+            if upper is not None and upper < lower:
                 raise ValueError
 
         except ValueError:
