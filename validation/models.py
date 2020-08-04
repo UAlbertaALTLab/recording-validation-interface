@@ -295,9 +295,7 @@ def generate_primary_key(sender, instance, **kwargs):
 
 
 # The length of a SHA 256 hash, as hexadecimal characters.
-SHA256_HEX_LENGTH = len(
-    "7ae712853ddbd7cc88597cfd3f1ac13e60ae81d9642677abc60f15b61c121afe"
-)
+SHA256_HEX_LENGTH = 64
 
 
 class Recording(models.Model):
@@ -310,12 +308,17 @@ class Recording(models.Model):
     QUALITY_CHOICES = ((CLEAN, _("Clean")), (UNUSABLE, _("Unusable")))
 
     id = models.CharField(primary_key=True, max_length=SHA256_HEX_LENGTH)
+
+    # TODO: field for compressed audio file
+
     speaker = models.ForeignKey(Speaker, on_delete=models.CASCADE)
     timestamp = models.IntegerField(
         help_text="The offset (in milliseconds) when the phrase starts in the master file"
     )
     phrase = models.ForeignKey(Phrase, on_delete=models.CASCADE)
     session = models.ForeignKey(RecordingSession, on_delete=models.CASCADE)
+
+    # TODO: determine this automatically during import process
     quality = models.CharField(
         help_text="Is the recording clean? Is it suitable to use publicly?",
         **arguments_for_choices(QUALITY_CHOICES),
