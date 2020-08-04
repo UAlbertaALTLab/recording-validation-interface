@@ -54,7 +54,7 @@ class Command(BaseCommand):
         # Now, import all those recordings!
         import_recordings(
             directory=sessions_dir,
-            transcoded_recordings_path=settings.RECVAL_AUDIO_DIR,
+            transcoded_recordings_path=Recording.get_path_to_audio_directory(),
             metadata_filename=settings.RECVAL_METADATA_PATH,
             import_recording=django_recording_importer,
         )

@@ -168,9 +168,12 @@ STATIC_URL = config("SCRIPT_NAME", default="") + "/static/"
 # Remember to run manage.py collectstatic!
 STATIC_ROOT = config("STATIC_ROOT", default="/var/www/recvalsite/static")
 
-# DEPRECATED: use MEDIA_ROOT instead!
+# DEPRECATED: use MEDIA_ROOT + RECVAL_AUDIO_PREFIX instead!
 # Where the transcoded audio files should be placed AND served from.
 RECVAL_AUDIO_DIR = config("RECVAL_AUDIO_DIR", BASE_DIR / "data" / "audio", cast=Path)
+
+# This is concatenated with MEDIA_ROOT and MEDIA_URL to store and serve the audio files.
+RECVAL_AUDIO_PREFIX = config("RECVAL_AUDIO_PREFIX", default="audio/")
 
 # Where to find the metadata CSV file.
 RECVAL_METADATA_PATH = config(

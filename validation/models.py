@@ -17,7 +17,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
+from pathlib import Path
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.signals import pre_save
@@ -307,14 +309,14 @@ class Recording(models.Model):
     UNUSABLE = "unusable"
     QUALITY_CHOICES = ((CLEAN, _("Clean")), (UNUSABLE, _("Unusable")))
 
-    # Path component that will prefix the audio file name.
-    AUDIO_PREFIX = "audio/"
-
     id = models.CharField(primary_key=True, max_length=SHA256_HEX_LENGTH)
 
-    # Relative to MEDIA_ROOT
-    # TODO: remove blank=True
-    compressed_audio = models.FileField(upload_to=AUDIO_PREFIX, blank=True)
+    compressed_audio = models.FileField(
+        # relative to settings.MEDIA_ROOT
+        upload_to=settings.RECVAL_AUDIO_PREFIX,
+        # TODO: remove blank=True
+        blank=True,
+    )
 
     speaker = models.ForeignKey(Speaker, on_delete=models.CASCADE)
     timestamp = models.IntegerField(
@@ -335,6 +337,13 @@ class Recording(models.Model):
 
     def __str__(self):
         return f'"{self.phrase}" recorded by {self.speaker} during {self.session}'
+
+    @staticmethod
+    def get_path_to_audio_directory() -> Path:
+        """
+        Returns the path to where compressed audio should be written to.
+        """
+        return Path(settings.MEDIA_ROOT) / settings.RECVAL_AUDIO_PREFIX
 
 
 # ############################### Utilities ############################### #
