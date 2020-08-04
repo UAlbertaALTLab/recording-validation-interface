@@ -24,6 +24,7 @@ Its defaults are configured using the following settings:
 
     RECVAL_SESSIONS_DIR
     RECVAL_AUDIO_DIR
+    MEDIA_ROOT
     RECVAL_METADATA_PATH
 
 See recvalsite/settings.py for more information.
@@ -32,14 +33,13 @@ See recvalsite/settings.py for more information.
 from pathlib import Path
 
 import logme  # type: ignore
-
 from django.conf import settings  # type: ignore
 from django.core.management.base import BaseCommand, CommandError  # type: ignore
 
 from librecval import REPOSITORY_ROOT
-from librecval.import_recordings import initialize as import_recordings
 from librecval.extract_phrases import RecordingInfo
-from validation.models import Recording, RecordingSession, Phrase, Speaker
+from librecval.import_recordings import initialize as import_recordings
+from validation.models import Phrase, Recording, RecordingSession, Speaker
 
 
 class Command(BaseCommand):

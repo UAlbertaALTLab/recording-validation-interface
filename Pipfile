@@ -4,28 +4,26 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-pydub = "*"
-sh = "*"
 TextGrid = "*"
-django = "*"
-python-decouple = "*"
 django-simple-history = "*"
 docopt = "*"
 e1839a8 = {path = ".",editable = true}
+jinja2 = "*"
 logme = "*"
-"jinja2" = "*"
-gunicorn = "*"
-mypy = "*"
-black = "*"
+pydub = "*"
+python-decouple = "*"
+sh = "*"
+django = ">=2.2,<3"
 
 [dev-packages]
-pytest = "*"
+black = "*"
+gunicorn = "*"
 hypothesis = "*"
-mypy = "*"
-pycodestyle = "*"
-pytest-django = "*"
-isort = "*"
+isort = ">=5,<6"
 model-bakery = "*"
+mypy = "*"
+pytest = "*"
+pytest-django = "*"
 
 [requires]
 python_version = "3.7"
