@@ -16,8 +16,7 @@
 from django.contrib import admin
 from simple_history.admin import SimpleHistoryAdmin
 
-from .models import Phrase, RecordingSession, Speaker, Recording
-
+from .models import Phrase, Recording, RecordingSession, Speaker
 
 admin.site.register(Phrase, SimpleHistoryAdmin)
 admin.site.register(RecordingSession)

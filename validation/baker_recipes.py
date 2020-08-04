@@ -24,9 +24,10 @@ See: https://model-baker.readthedocs.io/en/latest/recipes.html
 """
 
 import random
-from model_bakery.recipe import Recipe, foreign_key
-from validation.models import Recording, Speaker, Phrase
 
+from model_bakery.recipe import Recipe, foreign_key
+
+from validation.models import Phrase, Recording, Speaker
 
 # What's the shortest a transcription can be (characters)?
 MIN_TRANSCRIPTION_LENGTH = 2
