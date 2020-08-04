@@ -22,10 +22,10 @@ been created.
 
 Its defaults are configured using the following settings:
 
-    RECVAL_SESSIONS_DIR
-    RECVAL_AUDIO_DIR
     MEDIA_ROOT
+    RECVAL_AUDIO_PREFIX
     RECVAL_METADATA_PATH
+    RECVAL_SESSIONS_DIR
 
 See recvalsite/settings.py for more information.
 """
@@ -49,12 +49,16 @@ class Command(BaseCommand):
         parser.add_argument("sessions_dir", nargs="?", type=Path, default=None)
 
     def handle(self, *args, **options) -> None:
-        # Get these from settings?
         sessions_dir = options.get("session_dir", settings.RECVAL_SESSIONS_DIR)
+
+        audio_dir = Recording.get_path_to_audio_directory()
+        # Ensure the audio dir exists!
+        audio_dir.mkdir(parents=True, exist_ok=True)
+
         # Now, import all those recordings!
         import_recordings(
             directory=sessions_dir,
-            transcoded_recordings_path=Recording.get_path_to_audio_directory(),
+            transcoded_recordings_path=audio_dir,
             metadata_filename=settings.RECVAL_METADATA_PATH,
             import_recording=django_recording_importer,
         )
