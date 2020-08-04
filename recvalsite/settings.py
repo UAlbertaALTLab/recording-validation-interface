@@ -15,7 +15,6 @@ from pathlib import Path
 
 from decouple import config
 
-
 # Build paths inside the project like this: BASE_DIR / 'path' / 'to' / 'file'
 BASE_DIR = Path(__file__).resolve().parent.parent
 assert (BASE_DIR / "manage.py").is_file()
@@ -163,11 +162,13 @@ X_FRAME_OPTIONS = "DENY"
 # Derive the static path from WSGI SCRIPT_NAME variable
 # e.g.,  if SCRIPT_NAME=/validation,
 #        then static file URLs will point to /validation/static/
+# TODO: this is the wrong way to construct this variable?
 STATIC_URL = config("SCRIPT_NAME", default="") + "/static/"
 
 # Remember to run manage.py collectstatic!
 STATIC_ROOT = config("STATIC_ROOT", default="/var/www/recvalsite/static")
 
+# DEPRECATED: use MEDIA_ROOT instead!
 # Where the transcoded audio files should be placed AND served from.
 RECVAL_AUDIO_DIR = config("RECVAL_AUDIO_DIR", BASE_DIR / "data" / "audio", cast=Path)
 
@@ -186,3 +187,8 @@ RECVAL_METADATA_PATH = config(
 RECVAL_SESSIONS_DIR = config(
     "RECVAL_SESSIONS_DIR", BASE_DIR / "data" / "sessions", cast=Path
 )
+
+################################### MEDIA (Uploads) ####################################
+
+# See: https://docs.djangoproject.com/en/2.2/topics/files/
+MEDIA_ROOT = config("MEDIA_ROOT", default=BASE_DIR / "data", cast=str)
