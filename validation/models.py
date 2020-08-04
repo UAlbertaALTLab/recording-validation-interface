@@ -307,11 +307,14 @@ class Recording(models.Model):
     UNUSABLE = "unusable"
     QUALITY_CHOICES = ((CLEAN, _("Clean")), (UNUSABLE, _("Unusable")))
 
+    # Path component that will prefix the audio file name.
+    AUDIO_PREFIX = "audio/"
+
     id = models.CharField(primary_key=True, max_length=SHA256_HEX_LENGTH)
 
     # Relative to MEDIA_ROOT
     # TODO: remove blank=True
-    compressed_audio = models.FileField(upload_to="audio/", blank=True)
+    compressed_audio = models.FileField(upload_to=AUDIO_PREFIX, blank=True)
 
     speaker = models.ForeignKey(Speaker, on_delete=models.CASCADE)
     timestamp = models.IntegerField(
