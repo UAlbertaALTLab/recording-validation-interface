@@ -190,5 +190,8 @@ RECVAL_SESSIONS_DIR = config(
 
 ################################### MEDIA (Uploads) ####################################
 
+# Recoring URLS will be moved here
+MEDIA_URL = "media/"
+
 # See: https://docs.djangoproject.com/en/2.2/topics/files/
 MEDIA_ROOT = config("MEDIA_ROOT", default=BASE_DIR / "data", cast=str)

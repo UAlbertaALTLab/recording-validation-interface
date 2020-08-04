@@ -90,6 +90,8 @@ def django_recording_importer(
     if phrase_created:
         logger.info("New phrase: %s", phrase)
 
+    # TODO: create file, add to MEDIA_ROOT
+
     # Finally, we can create the recording.
     recording = Recording(
         id=info.compute_sha256hash(),

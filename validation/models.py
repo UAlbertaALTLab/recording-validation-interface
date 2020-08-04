@@ -309,7 +309,9 @@ class Recording(models.Model):
 
     id = models.CharField(primary_key=True, max_length=SHA256_HEX_LENGTH)
 
-    # TODO: field for compressed audio file
+    # Relative to MEDIA_ROOT
+    # TODO: remove blank=True
+    compressed_audio = models.FileField(upload_to="audio/", blank=True)
 
     speaker = models.ForeignKey(Speaker, on_delete=models.CASCADE)
     timestamp = models.IntegerField(
@@ -326,7 +328,7 @@ class Recording(models.Model):
     )
 
     # Keep track of the recording's history.
-    history = HistoricalRecords()
+    history = HistoricalRecords(excluded_fields=["compressed_audio"])
 
     def __str__(self):
         return f'"{self.phrase}" recorded by {self.speaker} during {self.session}'
