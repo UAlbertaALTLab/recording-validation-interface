@@ -32,6 +32,8 @@ from django.shortcuts import reverse  # type: ignore
 from model_bakery import baker  # type: ignore
 from pydub import AudioSegment  # type: ignore
 
+from validation.models import Recording
+
 
 @pytest.mark.django_db
 def test_serve_recording(client, exported_recording):
@@ -130,10 +132,20 @@ def exported_recording(settings):
 
     # Create a REAL audio recording, saved on disk.
     with TemporaryDirectory() as temp_dir_name:
-        audio_dir = Path(temp_dir_name)
+        media_dir = Path(temp_dir_name)
 
         # Temporarily override the audio directory name.
-        settings.RECVAL_AUDIO_DIR = audio_dir
+        settings.MEDIA_ROOT = media_dir
+        audio_dir = Recording.get_path_to_audio_directory()
+        audio_dir.mkdir(parents=True)
+
+        # This try/except a dumb way of asserting that
+        # audio_dir is a descendant of media_dir.
+        try:
+            audio_dir.relative_to(media_dir)
+        except ValueError:
+            raise
+
         audio = AudioSegment.empty()
         filename = audio_dir / f"{recording.id}.m4a"
         # Create an actual, bona fide M4A file.
