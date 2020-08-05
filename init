@@ -121,7 +121,6 @@ print(f"Wrote {envfilename!s}!")
 
 print("!!! NOTE !!! You may still need to configure the following in .env:")
 print(" - RECVAL_SESSIONS_DIR")
-print(" - RECVAL_AUDIO_DIR")
 print(" - RECVAL_SQLITE_DB_PATH")
 print()
 print("Once that's done, you must run the following to initialize the database:")
