@@ -189,8 +189,11 @@ RECVAL_SESSIONS_DIR = config(
 
 ################################### MEDIA (Uploads) ####################################
 
-# Recoring URLS will be moved here
-MEDIA_URL = "media/"
-
+# Audio (including compressed recordings) and pictures are uploaded here.
 # See: https://docs.djangoproject.com/en/2.2/topics/files/
+
+# This is the default media path; however, you will want to choose something different!
+MEDIA_URL = config("MEDIA_URL", default="/media/")
+
+# Recoring URLS will be moved here
 MEDIA_ROOT = config("MEDIA_ROOT", default=BASE_DIR / "data", cast=str)
