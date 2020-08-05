@@ -67,6 +67,7 @@ def serve_recording(request, recording_id):
     # just a part of it. Note: GitHub uses 7 digits.
     HASH_PREFIX_LENGTH = 7
     recording = get_object_or_404(Recording, id=recording_id)
+    audio_dir = Recording.get_path_to_audio_directory()
 
     if "Range" in request.headers:
         value = request.headers["Range"]
@@ -91,7 +92,7 @@ def serve_recording(request, recording_id):
         except ValueError:
             return HttpResponseBadRequest()
 
-        file_contents = (settings.RECVAL_AUDIO_DIR / f"{recording.id}.m4a").read_bytes()
+        file_contents = (audio_dir / f"{recording.id}.m4a").read_bytes()
         total_content_length = len(file_contents)
 
         if not upper:
@@ -107,8 +108,7 @@ def serve_recording(request, recording_id):
         response["Content-Range"] = f"bytes {lower}-{upper}/{total_content_length}"
     else:
         response = FileResponse(
-            (settings.RECVAL_AUDIO_DIR / f"{recording.id}.m4a").open("rb"),
-            content_type="audio/m4a",
+            (audio_dir / f"{recording.id}.m4a").open("rb"), content_type="audio/m4a",
         )
     # The recording files basically never change, so tell everybody to cache
     # the dookey out these files (or at very least, a year).
