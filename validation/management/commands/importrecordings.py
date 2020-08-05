@@ -34,6 +34,7 @@ from pathlib import Path
 
 import logme  # type: ignore
 from django.conf import settings  # type: ignore
+from django.core.files import File
 from django.core.management.base import BaseCommand, CommandError  # type: ignore
 
 from librecval import REPOSITORY_ROOT
@@ -94,20 +95,23 @@ def django_recording_importer(
     if phrase_created:
         logger.info("New phrase: %s", phrase)
 
-    # TODO: create file, add to MEDIA_ROOT
-
     # Finally, we can create the recording.
-    recording = Recording(
-        id=info.compute_sha256hash(),
-        speaker=speaker,
-        timestamp=info.timestamp,
-        phrase=phrase,
-        session=session,
-        quality="",
-    )
-    recording.clean()
+    with recording_path.open("rb") as f:
+        # XXX: this is kind of dumb; the compressed audio is written to storage, read
+        # again, then written back by Django :/
+        # Use ContentFile instead???
+        audio_file = File(f)
 
-    # TODO: ensure this is matching the ORIGNAL
+        recording = Recording(
+            id=info.compute_sha256hash(),
+            speaker=speaker,
+            compressed_audio=audio_file,
+            timestamp=info.timestamp,
+            phrase=phrase,
+            session=session,
+            quality="",
+        )
+        recording.clean()
 
-    logger.debug("Saving recording %s", recording)
-    recording.save()
+        logger.debug("Saving recording %s", recording)
+        recording.save()

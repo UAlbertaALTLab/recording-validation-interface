@@ -314,8 +314,6 @@ class Recording(models.Model):
     compressed_audio = models.FileField(
         # relative to settings.MEDIA_ROOT
         upload_to=settings.RECVAL_AUDIO_PREFIX,
-        # TODO: remove blank=True
-        blank=True,
     )
 
     speaker = models.ForeignKey(Speaker, on_delete=models.CASCADE)
