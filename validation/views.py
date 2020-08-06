@@ -68,6 +68,8 @@ def serve_recording(request, recording_id):
     recording = get_object_or_404(Recording, id=recording_id)
     audio_dir = Recording.get_path_to_audio_directory()
 
+    local_file_path = audio_dir / f"{recording.id}.m4a"
+
     if "Range" in request.headers:
         value = request.headers["Range"]
 
@@ -91,7 +93,7 @@ def serve_recording(request, recording_id):
         except ValueError:
             return HttpResponseBadRequest()
 
-        file_contents = (audio_dir / f"{recording.id}.m4a").read_bytes()
+        file_contents = local_file_path.read_bytes()
         total_content_length = len(file_contents)
 
         if not upper:
@@ -106,9 +108,7 @@ def serve_recording(request, recording_id):
         response["Accept-Ranges"] = "bytes"
         response["Content-Range"] = f"bytes {lower}-{upper}/{total_content_length}"
     else:
-        response = FileResponse(
-            (audio_dir / f"{recording.id}.m4a").open("rb"), content_type="audio/m4a",
-        )
+        response = FileResponse(local_file_path.open("rb"), content_type="audio/m4a",)
     # The recording files basically never change, so tell everybody to cache
     # the dookey out these files (or at very least, a year).
     response["Cache-Control"] = f"public, max-age={60 * 60 * 24 * 365}"
