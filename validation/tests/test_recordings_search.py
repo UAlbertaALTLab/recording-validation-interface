@@ -236,12 +236,17 @@ def test_search_fuzzy_match(client, bake_recording):
 @pytest.fixture
 def bake_recording(tmpdir, settings):
     """
-    Fixture that will generate a new recording for each request.
+    Creates new recordings ever time the returned function is called.
+    All recordings should be cleaned up after tests are run.
     """
-    tmpdir = Path(tmpdir)
-
+    # Store all recordings in a temporary directory,
+    # which SHOULD automatically be deleted... at some point
     settings.MEDIA_ROOT = str(tmpdir)
 
+    tmpdir = Path(tmpdir)
+
+    # I just took the first few bytes of a random .m4a file
+    # this should be enough for file identification
     m4a_header = (
         b"\x00\x00\x00\x1c"
         b"ftypM4A "
