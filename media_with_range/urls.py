@@ -25,7 +25,7 @@ def create_url_patterns():
 
     # Remove that starting slash that we required!
     # Django completes with warning (urls.W002) otherwise ¯\_(ツ)_/¯
-    media_url = settings.MEDIA_ROOT[1:]
+    media_url = settings.MEDIA_URL[1:]
 
     # Ensure it has a trailing slash:
     if not media_url.endswith("/"):
