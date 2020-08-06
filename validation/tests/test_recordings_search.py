@@ -20,7 +20,10 @@
 Unit/Integration tests for the recordings search API.
 """
 
+from pathlib import Path
+
 import pytest  # type: ignore
+from django.core.files.base import ContentFile
 from django.shortcuts import reverse  # type: ignore
 from model_bakery import baker  # type: ignore
 
@@ -28,7 +31,7 @@ MAX_RECORDING_QUERY_TERMS = 3  # TODO: will this be a configuration option?
 
 
 @pytest.mark.django_db
-def test_search_recordings(client):
+def test_search_recordings(client, bake_recording):
     """
     General test of the recorings search, in the happy case.
     """
@@ -41,10 +44,8 @@ def test_search_recordings(client):
 
     # Make two recordings. We want to make sure the query actually works by
     # only retrieving the *relevant* recording.
-    recording = baker.make_recipe(
-        "validation.recording", phrase=phrase, speaker=speaker, _create_files=True
-    )
-    unrelated_recording = baker.make_recipe("validation.recording", _create_files=True)
+    recording = bake_recording(phrase=phrase, speaker=speaker)
+    unrelated_recording = bake_recording()
 
     assert recording.phrase != unrelated_recording.phrase
 
@@ -236,3 +237,30 @@ def test_search_fuzzy_match(client):
             if result["wordform"] == phrase.transcription
         ]
         assert len(resultant_recordings) == RECORDINGS_PER_PHRASE
+
+
+@pytest.fixture
+def bake_recording(tmpdir, settings):
+    """
+    Fixture that will generate a new recording for each request.
+    """
+    tmpdir = Path(tmpdir)
+
+    settings.MEDIA_ROOT = str(tmpdir)
+
+    m4a_header = (
+        b"\x00\x00\x00\x1c"
+        b"ftypM4A "
+        b"\x00\x00\x02\x00"
+        b"M4A isomiso2"
+        b"\x00\x00\x00\x08"
+    )
+
+    def bake(**kwargs):
+        return baker.make_recipe(
+            "validation.recording",
+            compressed_audio=ContentFile(m4a_header, name="mock_recording.m4a"),
+            **kwargs
+        )
+
+    return bake
