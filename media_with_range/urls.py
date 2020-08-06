@@ -19,7 +19,7 @@ def create_url_patterns():
 
     if not settings.MEDIA_URL.startswith("/"):
         warnings.warn(
-            "can only serve media with relative URL, " f"not {settings.MEDIA_URL}"
+            f"can only serve media with relative URL; not {settings.MEDIA_URL}"
         )
         return []
 

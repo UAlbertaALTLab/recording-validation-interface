@@ -24,6 +24,7 @@ model-bakery = "*"
 mypy = "*"
 pytest = "*"
 pytest-django = "*"
+django-stubs = "*"
 
 [requires]
 python_version = "3.7"
