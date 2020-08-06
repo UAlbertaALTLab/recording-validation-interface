@@ -22,24 +22,26 @@ been created.
 
 Its defaults are configured using the following settings:
 
-    RECVAL_SESSIONS_DIR
-    RECVAL_AUDIO_DIR
+    MEDIA_ROOT
+    RECVAL_AUDIO_PREFIX
     RECVAL_METADATA_PATH
+    RECVAL_SESSIONS_DIR
 
 See recvalsite/settings.py for more information.
 """
 
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
 import logme  # type: ignore
-
 from django.conf import settings  # type: ignore
+from django.core.files.base import ContentFile  # type: ignore
 from django.core.management.base import BaseCommand, CommandError  # type: ignore
 
 from librecval import REPOSITORY_ROOT
-from librecval.import_recordings import initialize as import_recordings
 from librecval.extract_phrases import RecordingInfo
-from validation.models import Recording, RecordingSession, Phrase, Speaker
+from librecval.import_recordings import initialize as import_recordings
+from validation.models import Phrase, Recording, RecordingSession, Speaker
 
 
 class Command(BaseCommand):
@@ -49,15 +51,18 @@ class Command(BaseCommand):
         parser.add_argument("sessions_dir", nargs="?", type=Path, default=None)
 
     def handle(self, *args, **options) -> None:
-        # Get these from settings?
         sessions_dir = options.get("session_dir", settings.RECVAL_SESSIONS_DIR)
-        # Now, import all those recordings!
-        import_recordings(
-            directory=sessions_dir,
-            transcoded_recordings_path=settings.RECVAL_AUDIO_DIR,
-            metadata_filename=settings.RECVAL_METADATA_PATH,
-            import_recording=django_recording_importer,
-        )
+
+        # Store transcoded audio in a temp directory;
+        # these files will be then handled by the currently configured storage backend.
+        with TemporaryDirectory() as audio_dir:
+            # Now, import all those recordings!
+            import_recordings(
+                directory=sessions_dir,
+                transcoded_recordings_path=audio_dir,
+                metadata_filename=settings.RECVAL_METADATA_PATH,
+                import_recording=django_recording_importer,
+            )
 
 
 @logme.log
@@ -90,18 +95,22 @@ def django_recording_importer(
     if phrase_created:
         logger.info("New phrase: %s", phrase)
 
+    # XXX: this is kind of dumb; the compressed audio is written to storage, read again,
+    # and will be written back by Django :/
+    audio_data = recording_path.read_bytes()
+    django_file = ContentFile(audio_data, name=recording_path.name)
+
     # Finally, we can create the recording.
     recording = Recording(
         id=info.compute_sha256hash(),
         speaker=speaker,
+        compressed_audio=django_file,
         timestamp=info.timestamp,
         phrase=phrase,
         session=session,
         quality="",
     )
     recording.clean()
-
-    # TODO: ensure this is matching the ORIGNAL
 
     logger.debug("Saving recording %s", recording)
     recording.save()

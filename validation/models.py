@@ -17,7 +17,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
+from pathlib import Path
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.signals import pre_save
@@ -295,9 +297,7 @@ def generate_primary_key(sender, instance, **kwargs):
 
 
 # The length of a SHA 256 hash, as hexadecimal characters.
-SHA256_HEX_LENGTH = len(
-    "7ae712853ddbd7cc88597cfd3f1ac13e60ae81d9642677abc60f15b61c121afe"
-)
+SHA256_HEX_LENGTH = 64
 
 
 class Recording(models.Model):
@@ -310,12 +310,20 @@ class Recording(models.Model):
     QUALITY_CHOICES = ((CLEAN, _("Clean")), (UNUSABLE, _("Unusable")))
 
     id = models.CharField(primary_key=True, max_length=SHA256_HEX_LENGTH)
+
+    compressed_audio = models.FileField(
+        # relative to settings.MEDIA_ROOT
+        upload_to=settings.RECVAL_AUDIO_PREFIX,
+    )
+
     speaker = models.ForeignKey(Speaker, on_delete=models.CASCADE)
     timestamp = models.IntegerField(
         help_text="The offset (in milliseconds) when the phrase starts in the master file"
     )
     phrase = models.ForeignKey(Phrase, on_delete=models.CASCADE)
     session = models.ForeignKey(RecordingSession, on_delete=models.CASCADE)
+
+    # TODO: determine this automatically during import process
     quality = models.CharField(
         help_text="Is the recording clean? Is it suitable to use publicly?",
         **arguments_for_choices(QUALITY_CHOICES),
@@ -323,10 +331,17 @@ class Recording(models.Model):
     )
 
     # Keep track of the recording's history.
-    history = HistoricalRecords()
+    history = HistoricalRecords(excluded_fields=["compressed_audio"])
 
     def __str__(self):
         return f'"{self.phrase}" recorded by {self.speaker} during {self.session}'
+
+    @staticmethod
+    def get_path_to_audio_directory() -> Path:
+        """
+        Returns the path to where compressed audio should be written to.
+        """
+        return Path(settings.MEDIA_ROOT) / settings.RECVAL_AUDIO_PREFIX
 
 
 # ############################### Utilities ############################### #

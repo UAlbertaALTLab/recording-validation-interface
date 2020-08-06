@@ -71,7 +71,6 @@ The additional configuration should following this template:
 ```sh
 RECVAL_SESSIONS_DIR=/absolute/path/to/recording/sessions/
 RECVAL_METADATA_PATH=/absolute/path/to/master-recordings-metadata.csv
-RECVAL_AUDIO_DIR=/absolute/path/to/transcoded/audio/directory/
 RECVAL_SQLITE_DB_PATH=/absolute/path/to/sqlite3/database.sqlite3
 STATIC_ROOT=/absolute/path/to/static/files/directory/  # (production-only)
 ```
@@ -132,31 +131,6 @@ Audition. In this example, the `.wav` files would be in
 This should point to the "Master Recording MetaData" file, obtained from
 Google Drive, downloaded as a CSV file. This file is explained more
 thoroughly in [Creating the database for the first time][].
-
-
-#### `RECVAL_AUDIO_DIR`
-
-This is the directory where all the transcoded audio files will be
-dumped. During the import process many tiny `*.mp4` files will be
-written in this directory. For example, on my computer:
-
-```sh
-ls -lh $RECVAL_AUDIO_DIR/
-total 21056
--r--r--r--  1 www-data  www-data    19K Oct 31 15:08 004ac84ff9276f7896a6d74acfff47d70d5c738e52c8237905fb0eb62d88f510.m4a
--r--r--r--  1 www-data  www-data    19K Oct 31 15:07 03046963cddbda9812629c78d55f1d3c81706033bd7ee78b2c2e838de1fb3582.m4a
--r--r--r--  1 www-data  www-data    18K Oct 31 15:08 0352ef907a93d0efc1f3f2cf26863d11e90da7211ff1d7cf9c38f4da6cda8d45.m4a
--r--r--r--  1 www-data  www-data    29K Oct 31 15:07 04095b07d0d0a50b974522d4fa336ab762530a6c317a301bb71a4933969aceda.m4a
-... thousands of files omited ...
-```
-
-For best web serving response time, this directory should be directly
-served by the web server (e.g., Apache or Nginx). Place this on a file
-system that is fast at reads. It should only be written to when new
-recording sessions are imported.
-
-The only required permissions on each file are for reading by the web
-server process. The directory must be writable by the import process.
 
 
 #### `RECVAL_SQLITE_DB_PATH`

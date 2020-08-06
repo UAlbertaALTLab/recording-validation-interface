@@ -17,12 +17,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import io
+from pathlib import Path
 
 from django.conf import settings
 from django.core.paginator import Paginator
 from django.http import FileResponse, HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+
 from librecval.normalization import to_indexable_form
 
 from .crude_views import *
@@ -61,54 +63,19 @@ def serve_recording(request, recording_id):
     Note: To make things ~~WEB SCALE~~, we should NOT be doing this in Django;
     instead, Apache/Nginx should be doing this for us.
     """
+
+    from media_with_range.views import serve_file
+
     # How many digits of the hash to include in the ETag.
     # Practically, we do not need to make the entire hash part of the etag;
     # just a part of it. Note: GitHub uses 7 digits.
     HASH_PREFIX_LENGTH = 7
     recording = get_object_or_404(Recording, id=recording_id)
+    audio_dir = Recording.get_path_to_audio_directory()
 
-    if "Range" in request.headers:
-        value = request.headers["Range"]
+    local_file_path = audio_dir / f"{recording.id}.m4a"
+    response = serve_file(request, local_file_path)
 
-        if not value.startswith("bytes="):
-            return HttpResponseBadRequest()
-
-        try:
-            _bytes, _equal, range_str = value.partition("=")
-            lower_str, _hyphen, upper_str = range_str.partition("-")
-            lower = int(lower_str)
-            if upper_str:
-                upper = int(upper_str)
-            else:
-                upper = None
-
-            if lower < 0:
-                raise ValueError
-            if upper is not None and upper < lower:
-                raise ValueError
-
-        except ValueError:
-            return HttpResponseBadRequest()
-
-        file_contents = (settings.RECVAL_AUDIO_DIR / f"{recording.id}.m4a").read_bytes()
-        total_content_length = len(file_contents)
-
-        if not upper:
-            upper = total_content_length - 1
-
-        partial_file_contents = file_contents[lower : upper + 1]
-
-        response = FileResponse(
-            io.BytesIO(partial_file_contents), content_type="audio/m4a",
-        )
-        response.status_code = 206
-        response["Accept-Ranges"] = "bytes"
-        response["Content-Range"] = f"bytes {lower}-{upper}/{total_content_length}"
-    else:
-        response = FileResponse(
-            (settings.RECVAL_AUDIO_DIR / f"{recording.id}.m4a").open("rb"),
-            content_type="audio/m4a",
-        )
     # The recording files basically never change, so tell everybody to cache
     # the dookey out these files (or at very least, a year).
     response["Cache-Control"] = f"public, max-age={60 * 60 * 24 * 365}"
@@ -133,8 +100,9 @@ def search_recordings(request, query):
 
     word_forms = frozenset(query.split(","))
 
-    def make_absolute_uri_for_recording(rec_id: str) -> str:
-        relative_uri = reverse("validation:recording", kwargs={"recording_id": rec_id})
+    def make_absolute_uri_for_recording(rec: Recording) -> str:
+        relative_uri = rec.compressed_audio.url
+        assert relative_uri.startswith("/")
         return request.build_absolute_uri(relative_uri)
 
     def make_absolute_uri_for_speaker(code: str) -> str:
@@ -157,7 +125,7 @@ def search_recordings(request, query):
                 "anonymous": rec.speaker.anonymous,
                 "gender": rec.speaker.gender,
                 "dialect": rec.speaker.dialect,
-                "recording_url": make_absolute_uri_for_recording(rec.id),
+                "recording_url": make_absolute_uri_for_recording(rec),
                 "speaker_bio_url": make_absolute_uri_for_speaker(rec.speaker.code),
             }
             for rec in result_set

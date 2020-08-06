@@ -15,7 +15,6 @@ from pathlib import Path
 
 from decouple import config
 
-
 # Build paths inside the project like this: BASE_DIR / 'path' / 'to' / 'file'
 BASE_DIR = Path(__file__).resolve().parent.parent
 assert (BASE_DIR / "manage.py").is_file()
@@ -37,6 +36,7 @@ ALLOWED_HOSTS = ["localhost", "127.0.0.1", "sapir.artsrn.ualberta.ca"]
 INSTALLED_APPS = [
     # Apps defined in this repository.
     "validation",
+    "media_with_range.apps.MediaWithRangeConfig",
     # Django built-in apps.
     "django.contrib.admin",
     "django.contrib.auth",
@@ -47,6 +47,10 @@ INSTALLED_APPS = [
     # Dependencies.
     "simple_history",
 ]
+
+# Apps used only during debug mode
+if DEBUG:
+    INSTALLED_APPS.append("django_extensions")
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -163,13 +167,14 @@ X_FRAME_OPTIONS = "DENY"
 # Derive the static path from WSGI SCRIPT_NAME variable
 # e.g.,  if SCRIPT_NAME=/validation,
 #        then static file URLs will point to /validation/static/
+# TODO: this is the wrong way to construct this variable?
 STATIC_URL = config("SCRIPT_NAME", default="") + "/static/"
 
 # Remember to run manage.py collectstatic!
 STATIC_ROOT = config("STATIC_ROOT", default="/var/www/recvalsite/static")
 
-# Where the transcoded audio files should be placed AND served from.
-RECVAL_AUDIO_DIR = config("RECVAL_AUDIO_DIR", BASE_DIR / "data" / "audio", cast=Path)
+# This is concatenated with MEDIA_ROOT and MEDIA_URL to store and serve the audio files.
+RECVAL_AUDIO_PREFIX = config("RECVAL_AUDIO_PREFIX", default="audio/")
 
 # Where to find the metadata CSV file.
 RECVAL_METADATA_PATH = config(
@@ -186,3 +191,14 @@ RECVAL_METADATA_PATH = config(
 RECVAL_SESSIONS_DIR = config(
     "RECVAL_SESSIONS_DIR", BASE_DIR / "data" / "sessions", cast=Path
 )
+
+################################### MEDIA (Uploads) ####################################
+
+# Audio (including compressed recordings) and pictures are uploaded here.
+# See: https://docs.djangoproject.com/en/2.2/topics/files/
+
+# This is the default media path; however, you will want to choose something different!
+MEDIA_URL = config("MEDIA_URL", default="/media/")
+
+# Recoring URLS will be moved here
+MEDIA_ROOT = config("MEDIA_ROOT", default=BASE_DIR / "data", cast=str)

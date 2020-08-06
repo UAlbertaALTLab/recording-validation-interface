@@ -39,4 +39,4 @@ def audio_url_filter(rec) -> str:
      Usage (in a template):
          <source src="{{ recording | audio_url }}" type="audio/aac" />
     """
-    return reverse("validation:recording", kwargs={"recording_id": rec.id})
+    return rec.compressed_audio.url
