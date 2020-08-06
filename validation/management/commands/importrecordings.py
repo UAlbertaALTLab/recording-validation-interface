@@ -31,6 +31,7 @@ See recvalsite/settings.py for more information.
 """
 
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
 import logme  # type: ignore
 from django.conf import settings  # type: ignore
@@ -52,17 +53,16 @@ class Command(BaseCommand):
     def handle(self, *args, **options) -> None:
         sessions_dir = options.get("session_dir", settings.RECVAL_SESSIONS_DIR)
 
-        audio_dir = Recording.get_path_to_audio_directory()
-        # Ensure the audio dir exists!
-        audio_dir.mkdir(parents=True, exist_ok=True)
-
-        # Now, import all those recordings!
-        import_recordings(
-            directory=sessions_dir,
-            transcoded_recordings_path=audio_dir,
-            metadata_filename=settings.RECVAL_METADATA_PATH,
-            import_recording=django_recording_importer,
-        )
+        # Store transcoded audio in a temp directory;
+        # these files will be then handled by the currently configured storage backend.
+        with TemporaryDirectory() as audio_dir:
+            # Now, import all those recordings!
+            import_recordings(
+                directory=sessions_dir,
+                transcoded_recordings_path=audio_dir,
+                metadata_filename=settings.RECVAL_METADATA_PATH,
+                import_recording=django_recording_importer,
+            )
 
 
 @logme.log
