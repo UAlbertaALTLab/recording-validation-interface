@@ -158,7 +158,7 @@ def search_recordings(request, query):
                 "anonymous": rec.speaker.anonymous,
                 "gender": rec.speaker.gender,
                 "dialect": rec.speaker.dialect,
-                "recording_url": make_absolute_uri_for_recording(rec.id),
+                "recording_url": rec.compressed_audio.url,
                 "speaker_bio_url": make_absolute_uri_for_speaker(rec.speaker.code),
             }
             for rec in result_set

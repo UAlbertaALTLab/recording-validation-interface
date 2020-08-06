@@ -98,12 +98,13 @@ def django_recording_importer(
     # XXX: this is kind of dumb; the compressed audio is written to storage, read again,
     # and will be written back by Django :/
     audio_data = recording_path.read_bytes()
+    django_file = ContentFile(audio_data, name=recording_path.name)
 
     # Finally, we can create the recording.
     recording = Recording(
         id=info.compute_sha256hash(),
         speaker=speaker,
-        compressed_audio=ContentFile(audio_data),
+        compressed_audio=django_file,
         timestamp=info.timestamp,
         phrase=phrase,
         session=session,
