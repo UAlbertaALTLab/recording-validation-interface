@@ -36,6 +36,7 @@ ALLOWED_HOSTS = ["localhost", "127.0.0.1", "sapir.artsrn.ualberta.ca"]
 INSTALLED_APPS = [
     # Apps defined in this repository.
     "validation",
+    "media_with_range.apps.MediaWithRangeConfig",
     # Django built-in apps.
     "django.contrib.admin",
     "django.contrib.auth",
