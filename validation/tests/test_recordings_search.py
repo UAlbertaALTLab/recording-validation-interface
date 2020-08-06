@@ -73,7 +73,7 @@ def test_search_recordings(client, bake_recording):
 
 
 @pytest.mark.django_db
-def test_search_multiple_recordings(client):
+def test_search_multiple_recordings(client, bake_recording):
     """
     Test for finding multiple recordings by having a comma in the URI.
     e.g.,
@@ -94,10 +94,7 @@ def test_search_multiple_recordings(client):
     # Ensure each phrase has a recording. Only a subset of these recordings
     # should be returned.
     speaker = baker.make_recipe("validation.speaker")
-    recordings = [
-        baker.make_recipe("validation.recording", phrase=phrase, speaker=speaker)
-        for phrase in phrases
-    ]
+    recordings = [bake_recording(phrase=phrase, speaker=speaker) for phrase in phrases]
 
     response = client.get(
         reverse("validation:search_recordings", kwargs={"query": ",".join(query_forms)})
@@ -120,9 +117,9 @@ def test_search_multiple_recordings(client):
 
 
 @pytest.mark.django_db
-def test_search_recording_not_found(client):
+def test_search_recording_not_found(client, bake_recording):
     # Create a valid recording, but make sure we never match it.
-    recording = baker.make_recipe("validation.recording")
+    recording = bake_recording()
 
     # Make the query never matches the only recording in the database:
     query = recording.phrase.transcription + "h"
@@ -138,16 +135,13 @@ def test_search_recording_not_found(client):
 
 
 @pytest.mark.django_db
-def test_search_max_queries(client):
+def test_search_max_queries(client, bake_recording):
     # Create valid recordings, one per phrase, but make too many of them.
     speaker = baker.make_recipe("validation.speaker")
     phrases = baker.make_recipe(
         "validation.phrase", _quantity=MAX_RECORDING_QUERY_TERMS + 1
     )
-    recordings = [
-        baker.make_recipe("validation.recording", speaker=speaker, phrase=phrase)
-        for phrase in phrases
-    ]
+    recordings = [bake_recording(speaker=speaker, phrase=phrase) for phrase in phrases]
 
     # Try fetching the maximum
     query = ",".join(
@@ -170,13 +164,13 @@ def test_search_max_queries(client):
 
 
 @pytest.mark.django_db
-def test_search_unique_word_forms(client):
+def test_search_unique_word_forms(client, bake_recording):
     """
     Searching for a word form more than once in a single query should return
     results as if the word form was requested only once.
     """
     # We need a valid phrase/recording
-    recording = baker.make_recipe("validation.recording")
+    recording = bake_recording()
     phrase = recording.phrase
 
     # The query will have the term more than once.
@@ -193,7 +187,7 @@ def test_search_unique_word_forms(client):
 
 
 @pytest.mark.django_db
-def test_search_fuzzy_match(client):
+def test_search_fuzzy_match(client, bake_recording):
     """
     The search should make fuzzy matches with respect to the transcription.
     """
@@ -212,7 +206,7 @@ def test_search_fuzzy_match(client):
 
     # Make them searchable by adding a couple recordings.
     recordings = [
-        baker.make_recipe("validation.recording", phrase=phrase)
+        bake_recording(phrase=phrase)
         for phrase in phrases.values()
         # Repeat recordings per phrase, to emulate a real recording session
         for _ in range(RECORDINGS_PER_PHRASE)
