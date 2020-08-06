@@ -42,9 +42,9 @@ def test_search_recordings(client):
     # Make two recordings. We want to make sure the query actually works by
     # only retrieving the *relevant* recording.
     recording = baker.make_recipe(
-        "validation.recording", phrase=phrase, speaker=speaker
+        "validation.recording", phrase=phrase, speaker=speaker, _create_files=True
     )
-    unrelated_recording = baker.make_recipe("validation.recording")
+    unrelated_recording = baker.make_recipe("validation.recording", _create_files=True)
 
     assert recording.phrase != unrelated_recording.phrase
 
