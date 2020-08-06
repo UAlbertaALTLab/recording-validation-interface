@@ -23,7 +23,6 @@ from django.core.paginator import Paginator
 from django.http import FileResponse, HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
-
 from librecval.normalization import to_indexable_form
 
 from .crude_views import *
@@ -134,8 +133,9 @@ def search_recordings(request, query):
 
     word_forms = frozenset(query.split(","))
 
-    def make_absolute_uri_for_recording(rec_id: str) -> str:
-        relative_uri = reverse("validation:recording", kwargs={"recording_id": rec_id})
+    def make_absolute_uri_for_recording(rec: Recording) -> str:
+        relative_uri = rec.compressed_audio.url
+        assert relative_uri.startswith("/")
         return request.build_absolute_uri(relative_uri)
 
     def make_absolute_uri_for_speaker(code: str) -> str:
@@ -158,7 +158,7 @@ def search_recordings(request, query):
                 "anonymous": rec.speaker.anonymous,
                 "gender": rec.speaker.gender,
                 "dialect": rec.speaker.dialect,
-                "recording_url": rec.compressed_audio.url,
+                "recording_url": make_absolute_uri_for_recording(rec),
                 "speaker_bio_url": make_absolute_uri_for_speaker(rec.speaker.code),
             }
             for rec in result_set
