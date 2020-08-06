@@ -4,6 +4,7 @@
 import io
 from pathlib import Path
 
+from django.conf import settings
 from django.http import FileResponse, HttpRequest, HttpResponse, HttpResponseBadRequest
 
 
@@ -11,7 +12,8 @@ def serve(request: HttpRequest, path: str) -> HttpResponse:
     """
     Serve a file from MEDIA_ROOT.
     """
-    raise NotImplementedError
+    local_file_path = Path(settings.MEDIA_ROOT) / Path(path)
+    return serve_file(request, local_file_path)
 
 
 def serve_file(request: HttpRequest, local_file_path: Path):

@@ -48,6 +48,10 @@ INSTALLED_APPS = [
     "simple_history",
 ]
 
+# Apps used only during debug mode
+if DEBUG:
+    INSTALLED_APPS.append("django_extensions")
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
