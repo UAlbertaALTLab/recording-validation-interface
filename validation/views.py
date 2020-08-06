@@ -63,6 +63,9 @@ def serve_recording(request, recording_id):
     Note: To make things ~~WEB SCALE~~, we should NOT be doing this in Django;
     instead, Apache/Nginx should be doing this for us.
     """
+
+    from media_with_range.views import serve_file
+
     # How many digits of the hash to include in the ETag.
     # Practically, we do not need to make the entire hash part of the etag;
     # just a part of it. Note: GitHub uses 7 digits.
@@ -77,50 +80,6 @@ def serve_recording(request, recording_id):
     # the dookey out these files (or at very least, a year).
     response["Cache-Control"] = f"public, max-age={60 * 60 * 24 * 365}"
     response["ETag"] = f'"{recording.id[:HASH_PREFIX_LENGTH]}"'
-    return response
-
-
-def serve_file(request, local_file_path: Path) -> HttpResponse:
-    if "Range" in request.headers:
-        value = request.headers["Range"]
-
-        if not value.startswith("bytes="):
-            return HttpResponseBadRequest()
-
-        try:
-            _bytes, _equal, range_str = value.partition("=")
-            lower_str, _hyphen, upper_str = range_str.partition("-")
-            lower = int(lower_str)
-            if upper_str:
-                upper = int(upper_str)
-            else:
-                upper = None
-
-            if lower < 0:
-                raise ValueError
-            if upper is not None and upper < lower:
-                raise ValueError
-
-        except ValueError:
-            return HttpResponseBadRequest()
-
-        file_contents = local_file_path.read_bytes()
-        total_content_length = len(file_contents)
-
-        if not upper:
-            upper = total_content_length - 1
-
-        partial_file_contents = file_contents[lower : upper + 1]
-
-        response = FileResponse(
-            io.BytesIO(partial_file_contents), content_type="audio/m4a",
-        )
-        response.status_code = 206
-        response["Accept-Ranges"] = "bytes"
-        response["Content-Range"] = f"bytes {lower}-{upper}/{total_content_length}"
-    else:
-        response = FileResponse(local_file_path.open("rb"), content_type="audio/m4a",)
-
     return response
 
 
