@@ -17,12 +17,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import io
+from pathlib import Path
 
 from django.conf import settings
 from django.core.paginator import Paginator
 from django.http import FileResponse, HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+
 from librecval.normalization import to_indexable_form
 
 from .crude_views import *
@@ -69,7 +71,16 @@ def serve_recording(request, recording_id):
     audio_dir = Recording.get_path_to_audio_directory()
 
     local_file_path = audio_dir / f"{recording.id}.m4a"
+    response = serve_file(request, local_file_path)
 
+    # The recording files basically never change, so tell everybody to cache
+    # the dookey out these files (or at very least, a year).
+    response["Cache-Control"] = f"public, max-age={60 * 60 * 24 * 365}"
+    response["ETag"] = f'"{recording.id[:HASH_PREFIX_LENGTH]}"'
+    return response
+
+
+def serve_file(request, local_file_path: Path) -> HttpResponse:
     if "Range" in request.headers:
         value = request.headers["Range"]
 
@@ -109,10 +120,7 @@ def serve_recording(request, recording_id):
         response["Content-Range"] = f"bytes {lower}-{upper}/{total_content_length}"
     else:
         response = FileResponse(local_file_path.open("rb"), content_type="audio/m4a",)
-    # The recording files basically never change, so tell everybody to cache
-    # the dookey out these files (or at very least, a year).
-    response["Cache-Control"] = f"public, max-age={60 * 60 * 24 * 365}"
-    response["ETag"] = f'"{recording.id[:HASH_PREFIX_LENGTH]}"'
+
     return response
 
 
