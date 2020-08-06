@@ -17,8 +17,8 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 
-from media_with_range.urls import create_url_patterns
+from media_with_range.urls import media_with_range
 
 urlpatterns = [path("admin/", admin.site.urls), path("", include("validation.urls"))]
 # URLs for media files:
-urlpatterns.extend(create_url_patterns())
+urlpatterns.extend(media_with_range())
