@@ -104,7 +104,7 @@ def search_recordings(request, query):
         uri = rec.compressed_audio.url
         if uri.startswith("/"):
             # It's a relative URI: build an absolute URI:
-            return request.build_absolute_uri(relative_uri)
+            return request.build_absolute_uri(uri)
 
         # It's an absolute URI already:
         assert uri.startswith("http")
