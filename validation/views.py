@@ -101,9 +101,14 @@ def search_recordings(request, query):
     word_forms = frozenset(query.split(","))
 
     def make_absolute_uri_for_recording(rec: Recording) -> str:
-        relative_uri = rec.compressed_audio.url
-        assert relative_uri.startswith("/")
-        return request.build_absolute_uri(relative_uri)
+        uri = rec.compressed_audio.url
+        if uri.startswith("/"):
+            # It's a relative URI: build an absolute URI:
+            return request.build_absolute_uri(relative_uri)
+
+        # It's an absolute URI already:
+        assert uri.startswith("http")
+        return uri
 
     def make_absolute_uri_for_speaker(code: str) -> str:
         return f"https://www.altlab.dev/maskwacis/Speakers/{code}.html"
