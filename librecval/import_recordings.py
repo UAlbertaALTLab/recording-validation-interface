@@ -21,10 +21,13 @@
 Temporary place for database creation glue code.
 """
 
+import os
 from pathlib import Path
 from typing import Callable
 
 import logme  # type: ignore
+from typing_extensions import Literal
+
 from librecval.extract_phrases import AudioSegment, RecordingExtractor, RecordingInfo
 from librecval.recording_session import parse_metadata
 from librecval.transcode_recording import transcode_to_aac
@@ -44,13 +47,17 @@ class RecordingError(Exception):
     """
 
 
+Format = Literal["wav", "m4a"]
+
+
 @logme.log
 def initialize(
     directory: Path,
     transcoded_recordings_path: str,
     metadata_filename: Path,
     import_recording: ImportRecording,
-    logger,
+    recording_format: Format = "m4a",
+    logger=None,
 ) -> None:
     """
     Creates the database from scratch.
@@ -69,7 +76,7 @@ def initialize(
     ex = RecordingExtractor(metadata)
     for info, audio in ex.scan(root_directory=directory):
         try:
-            recording_path = save_recording(dest, info, audio)
+            recording_path = save_recording(dest, info, audio, recording_format)
         except RecordingError:
             logger.exception("Exception while saving recording; skipping.")
         else:
@@ -78,10 +85,14 @@ def initialize(
 
 @logme.log
 def save_recording(
-    dest: Path, info: RecordingInfo, audio: AudioSegment, logger=None
+    dest: Path,
+    info: RecordingInfo,
+    audio: AudioSegment,
+    recording_format: Format = "m4a",
+    logger=None,
 ) -> Path:
     rec_id = info.compute_sha256hash()
-    recording_path = dest / f"{rec_id}.m4a"
+    recording_path = dest / f"{rec_id}.{recording_format}"
     if recording_path.exists():
         logger.warn("Already exists, not transcoding: %s", recording_path)
         return recording_path
@@ -91,17 +102,20 @@ def save_recording(
 
     # https://www.ffmpeg.org/doxygen/3.2/group__metadata__api.html
     logger.debug("Writing audio to %s", recording_path)
-    transcode_to_aac(
-        audio,
-        recording_path,
-        tags=dict(
-            title=info.transcription,
-            artist=info.speaker,
-            album=info.session,
-            language="crk",
-            creation_time=f"{info.session.date:%Y-%m-%d}",
-            year=info.session.year,
-        ),
-    )
+    if recording_format == "m4a":
+        transcode_to_aac(
+            audio,
+            recording_path,
+            tags=dict(
+                title=info.transcription,
+                artist=info.speaker,
+                album=info.session,
+                language="crk",
+                creation_time=f"{info.session.date:%Y-%m-%d}",
+                year=info.session.year,
+            ),
+        )
+    else:
+        audio.export(os.fspath(recording_path), format="wav")
     assert recording_path.exists()
     return recording_path

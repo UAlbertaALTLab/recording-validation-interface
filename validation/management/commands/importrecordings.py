@@ -49,6 +49,20 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("sessions_dir", nargs="?", type=Path, default=None)
+        parser.add_argument(
+            "--wav",
+            action="store_true",
+            default=False,
+            help="Stores wav files INSTEAD of transcoded m4as",
+        )
+
+        parser.add_argument(
+            "--skip-db",
+            dest="store_db",
+            action="store_false",
+            default=True,
+            help="skips storing in the database (write files only)",
+        )
 
     def handle(self, *args, **options) -> None:
         sessions_dir = options.get("session_dir", settings.RECVAL_SESSIONS_DIR)
@@ -61,7 +75,10 @@ class Command(BaseCommand):
                 directory=sessions_dir,
                 transcoded_recordings_path=audio_dir,
                 metadata_filename=settings.RECVAL_METADATA_PATH,
-                import_recording=django_recording_importer,
+                import_recording=django_recording_importer
+                if options["store_db"]
+                else null_recording_importer,
+                recording_format="wav" if options["wav"] else "m4a",
             )
 
 
@@ -114,3 +131,9 @@ def django_recording_importer(
 
     logger.debug("Saving recording %s", recording)
     recording.save()
+
+
+def null_recording_importer(info: RecordingInfo, recording_path: Path) -> None:
+    """
+    Does nothing!
+    """
