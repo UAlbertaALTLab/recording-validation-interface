@@ -66,7 +66,9 @@ def initialize(
     dest = Path(transcoded_recordings_path)
 
     assert directory.resolve().is_dir(), directory
-    assert dest.resolve().is_dir(), dest
+    assert (
+        dest.resolve().is_dir()
+    ), f"audio destination is not a folder: {dest.resolve()}"
     assert metadata_filename.resolve().is_file(), metadata_filename
 
     with open(metadata_filename) as metadata_csv:

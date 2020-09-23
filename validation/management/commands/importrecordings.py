@@ -64,26 +64,46 @@ class Command(BaseCommand):
             help="skips storing in the database (write files only)",
         )
 
-    def handle(self, *args, store_db=True, wav=False, **options) -> None:
+        parser.add_argument(
+            "--audio-dir",
+            type=Path,
+            help="where to store the extracted audio",
+            default=Path("./audio"),
+        )
+
+    def handle(
+        self,
+        *args,
+        store_db=True,
+        wav=False,
+        audio_dir: Path = Path("./audio"),
+        **options
+    ) -> None:
         sessions_dir = options.get("session_dir", settings.RECVAL_SESSIONS_DIR)
 
         if store_db:
             self._handle_store_django(sessions_dir)
         else:
-            self._handle_store_wav(sessions_dir, wav)
+            self._handle_store_wav(sessions_dir, audio_dir, wav)
 
     def _handle_store_wav(
-        self, sessions_dir: Path, wav: bool = False, **options
+        self, sessions_dir: Path, audio_dir: Path, wav: bool = False
     ) -> None:
+        """
+        Stores wave files to a specific directory.
+        """
         import_recordings(
             directory=sessions_dir,
-            transcoded_recordings_path=Path("/tmp"),
+            transcoded_recordings_path=audio_dir,
             metadata_filename=settings.RECVAL_METADATA_PATH,
             import_recording=null_recording_importer,
             recording_format="wav" if wav else "m4a",
         )
 
     def _handle_store_django(self, sessions_dir: Path) -> None:
+        """
+        Stores m4a files, managed by Django's media engine.
+        """
         # Store transcoded audio in a temp directory;
         # these files will be then handled by the currently configured storage backend.
         with TemporaryDirectory() as audio_dir:
