@@ -64,9 +64,26 @@ class Command(BaseCommand):
             help="skips storing in the database (write files only)",
         )
 
-    def handle(self, *args, **options) -> None:
+    def handle(self, *args, store_db=True, wav=False, **options) -> None:
         sessions_dir = options.get("session_dir", settings.RECVAL_SESSIONS_DIR)
 
+        if store_db:
+            self._handle_store_django(sessions_dir)
+        else:
+            self._handle_store_wav(sessions_dir, wav)
+
+    def _handle_store_wav(
+        self, sessions_dir: Path, wav: bool = False, **options
+    ) -> None:
+        import_recordings(
+            directory=sessions_dir,
+            transcoded_recordings_path=Path("/tmp"),
+            metadata_filename=settings.RECVAL_METADATA_PATH,
+            import_recording=null_recording_importer,
+            recording_format="wav" if wav else "m4a",
+        )
+
+    def _handle_store_django(self, sessions_dir: Path) -> None:
         # Store transcoded audio in a temp directory;
         # these files will be then handled by the currently configured storage backend.
         with TemporaryDirectory() as audio_dir:
@@ -75,10 +92,8 @@ class Command(BaseCommand):
                 directory=sessions_dir,
                 transcoded_recordings_path=audio_dir,
                 metadata_filename=settings.RECVAL_METADATA_PATH,
-                import_recording=django_recording_importer
-                if options["store_db"]
-                else null_recording_importer,
-                recording_format="wav" if options["wav"] else "m4a",
+                import_recording=django_recording_importer,
+                recording_format="m4a",
             )
 
 
