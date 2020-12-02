@@ -293,6 +293,11 @@ class RecordingSession(models.Model):
 
 @receiver(pre_save, sender=RecordingSession)
 def generate_primary_key(sender, instance, **kwargs):
+    """
+    When a recording session gets saved this sets the primary
+    key to the session id, e.g. 2017-11-01-AM-OFF-_
+    This happens automatically on save
+    """
     instance.id = str(instance.as_session_id())
 
 
