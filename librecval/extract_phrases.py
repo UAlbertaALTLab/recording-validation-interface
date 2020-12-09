@@ -176,20 +176,20 @@ class RecordingExtractor:
 
 
 @logme.log
-def find_audio_from_audacity_format(text_grid: Path, logger=None) -> Optional[Path]:
+def find_audio_from_audacity_format(annotation_path: Path, logger=None) -> Optional[Path]:
     """
     Finds the associated audio in Audacity's format.
     """
     # TODO: tmill's kludge for certain missing filenames???
-    sound_file = text_grid.with_suffix(".wav")
+    sound_file = annotation_path.with_suffix(".wav")
     logger.debug("[Audacity Format] Trying %s...", sound_file)
     return sound_file if sound_file.exists() else None
 
 
 @logme.log
-def find_audio_from_audition_format(text_grid: Path, logger=None) -> Optional[Path]:
+def find_audio_from_audition_format(annotation_path: Path, logger=None) -> Optional[Path]:
     #  Gross code to try Adobe Audition recorded files
-    session_dir = text_grid.parent
+    session_dir = annotation_path.parent
 
     # If it's in Audition format, there will be exactly ONE file with the
     # *.sesx extension.
@@ -200,7 +200,7 @@ def find_audio_from_audition_format(text_grid: Path, logger=None) -> Optional[Pa
         return None
 
     sound_file = (
-        session_dir / f"{audition_file.stem}_Recorded" / f"{text_grid.stem}.wav"
+        session_dir / f"{audition_file.stem}_Recorded" / f"{annotation_path.stem}.wav"
     )
     logger.debug("[Audition Format] Trying %s...", sound_file)
     return sound_file if sound_file.exists() else None
