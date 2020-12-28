@@ -15,6 +15,7 @@ python-decouple = "*"
 sh = "*"
 django = ">=2.2,<3"
 typing-extensions = "*"
+pympi-ling = "*"
 
 [dev-packages]
 black = "*"

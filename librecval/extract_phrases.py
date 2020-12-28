@@ -34,6 +34,11 @@ from librecval.normalization import normalize
 from librecval.recording_session import SessionID, SessionMetadata
 from pydub import AudioSegment  # type: ignore
 from textgrid import IntervalTier, TextGrid  # type: ignore
+from pympi.Elan import Eaf  # type: ignore
+
+# The following imports are for local testing only, they can be removed
+from librecval.recording_session import parse_metadata
+import pdb
 
 # ############################### Exceptions ############################### #
 
@@ -55,6 +60,13 @@ class InvalidTextGridName(RuntimeError):
     Raised when the TextGrid name does not follow an appropriate pattern.
     """
 
+class MissingTranslationError(RuntimeError):
+    """
+    Raised when the 'English (word)' and 'English (sentene) tiers 
+    can not be found in a .eaf file suggesting that the word or phrase 
+    does not have an existing translation
+    """
+
 
 # ########################################################################## #
 
@@ -67,27 +79,24 @@ class RecordingInfo(NamedTuple):
 
     session: SessionID
     speaker: str
-    type: str
+    type: str  # either "word" or "sentence"
     timestamp: int  # in milliseconds
-    transcription: str
-    translation: str
+    transcription: str  # in Cree
+    translation: str  # in English
+    audio: AudioSegment  # in Cree
 
-    def signature(self) -> str:
-        # TODO: make this resilient to changing type, transcription, and speaker.
-        return (
-            f"session: {self.session}\n"
-            f"speaker: {self.speaker}\n"
-            f"timestamp: {self.timestamp}\n"
-            f"{self.type}: {self.transcription}\n"
-            "\n"
-            f"{self.translation}\n"
-        )
+class Segment(NamedTuple):
+    """
+    Stores an audio segment extracted from a .eaf file
+    """
 
-    def compute_sha256hash(self) -> str:
-        """
-        Compute a hash that can be used as a ID for this recording.
-        """
-        return sha256(self.signature().encode("UTF-8")).hexdigest()
+    translation: str   # in English
+    transcription: str # in Cree
+    type: str           # "word" or "sentence"
+    start: int
+    stop: int
+    comment: str
+
 
 
 @logme.log
@@ -102,13 +111,15 @@ class RecordingExtractor:
         self.sessions: Dict[SessionID, Path] = {}
         self.metadata = metadata
 
+
     def scan(self, root_directory: Path):
         """
         Scans the directory provided for sessions.
 
-        For each session directory found, its TextGrid/.wav file pairs are
+        For each session directory found, its ELAN/.eaf file pairs are
         scanned for words and sentences.
         """
+
         self.logger.debug("Scanning %s for sessions...", root_directory)
         for session_dir in root_directory.iterdir():
             if not session_dir.resolve().is_dir():
@@ -134,27 +145,27 @@ class RecordingExtractor:
         if session_id not in self.metadata:
             raise MissingMetadataError(f"Missing metadata for {session_id}")
 
-        self.logger.debug("Scanning %s for .TextGrid files", session_dir)
-        text_grids = list(session_dir.glob("*.TextGrid"))
-        self.logger.info("%d text grids in %s", len(text_grids), session_dir)
+        self.logger.debug("Scanning %s for .eaf files", session_dir)
+        annotations = list(session_dir.glob("*.eaf"))
+        self.logger.info("%d ELAN files in %s", len(annotations), session_dir)
 
-        for text_grid in text_grids:
+        for _path in annotations:
             # Find the cooresponding audio with a couple different strategies.
             sound_file = find_audio_from_audacity_format(
-                text_grid
-            ) or find_audio_from_audition_format(text_grid)
+                _path
+            ) or find_audio_from_audition_format(_path)
 
             if sound_file is None:
-                self.logger.warn("Could not find cooresponding audio for %s", text_grid)
+                self.logger.warn("Could not find corresponding audio for %s", _path)
                 continue
 
-            assert text_grid.exists() and sound_file.exists()
-            self.logger.debug("Matching sound file for %s", text_grid)
+            assert _path.exists() and sound_file.exists()
+            self.logger.debug("Matching sound file for %s", _path)
 
             try:
-                mic_id = get_mic_id(text_grid.stem)
+                mic_id = get_mic_id(_path.stem)
             except InvalidTextGridName:
-                if len(text_grids) != 1:
+                if len(_path) != 1:
                     raise  # There's no way to determine the speaker.
                 mic_id = 1
                 self.logger.warn("Assuming single text grid is mic 1")
@@ -166,14 +177,96 @@ class RecordingExtractor:
                 sound_file,
                 speaker,
             )
-            extractor = PhraseExtractor(
-                session_id,
-                AudioSegment.from_file(fspath(sound_file)),
-                TextGrid.fromFile(fspath(text_grid)),
-                speaker,
-            )
-            yield from extractor.extract_all()
+            # extractor = PhraseExtractor(
+            #     session_id,
+            #     AudioSegment.from_file(fspath(sound_file)),
+            #     TextGrid.fromFile(fspath(_path)),
+            #     speaker,
+            # )
+            # yield from extractor.extract_all()
+            yield from generate_segments_from_eaf(_path)
 
+
+def generate_segments_from_eaf(annotation_path: Path) -> list:
+    """
+    Returns segements from the annotation file 
+    """
+    segments = []
+
+    # open the EAF
+    eaf_file = Eaf(annotation_path)
+
+    # look at the Cree words tier
+    keys = eaf_file.get_tier_names()
+
+    if "English (word)" not in keys:
+        print(keys)
+
+    english_word_tier = "English (word)" if "English (word)" in keys else None
+    cree_word_tier = "Cree (word)" if "Cree (word)" in keys else None
+    
+    english_phrase_tier = "English (sentence)" if "English (sentence)" in keys else None
+    cree_phrase_tier = "Cree (sentence)" if "Cree (sentence)" in keys else None
+
+    comment_tier = "Comments" if "Comments" in keys else None
+
+    if not english_word_tier and english_phrase_tier:
+        raise MissingTranslationError(
+            f"No English word or phrase found for data at {annotation_path}"
+        )
+
+    # for each Cree word,
+    #   add a segment with translation, transcription, start, stop, comment ALL from the EAF
+    cree_words = eaf_file.get_annotation_data_for_tier(cree_word_tier)
+    for cree_word in cree_words:
+        start = cree_word[0]
+        stop = cree_word[1]
+        transcription = cree_word[2]
+
+        translation = eaf_file.get_annotation_data_at_time(english_word_tier, start + 1)
+        translation = translation[0][2] if len(translation) > 0 and len(translation[0]) == 3 else ""
+        
+        comment = eaf_file.get_annotation_data_at_time(comment_tier, start + 1) or ""
+        comment = comment[0][2] if len(comment) > 0 else ""
+
+        s = Segment(
+            translation = translation,   # in English
+            transcription = transcription, # in Cree
+            type = "word",
+            start = start,
+            stop = stop,
+            comment = comment
+        )
+
+        segments.append(s)
+
+    # for each Cree phrases,
+    #   add a segment with translation, transcription, start, stop, comment ALL from the EAF
+    cree_phrases = eaf_file.get_annotation_data_for_tier(cree_phrase_tier) if cree_phrase_tier else []
+    for cree_phrase in cree_phrases:
+        start = cree_phrase[0]
+        stop = cree_phrase[1]
+        transcription = cree_phrase[2]
+
+        translation = eaf_file.get_annotation_data_at_time(english_phrase_tier, start + 1)
+        translation = translation[0][2] if len(translation) > 0 and len(translation[0]) == 3 else ""
+
+        comment = eaf_file.get_annotation_data_at_time(comment_tier, start + 1) or ""
+        comment = comment[0][2] if len(comment) > 0 and len(comment[0]) == 3 else ""
+
+        s = Segment(
+            translation = translation,   # in English
+            transcription = transcription, # in Cree
+            type = "sentence",
+            start = start,
+            stop = stop,
+            comment = comment
+        )
+
+        segments.append(s)
+
+    return segments
+    
 
 @logme.log
 def find_audio_from_audacity_format(annotation_path: Path, logger=None) -> Optional[Path]:
@@ -266,6 +359,8 @@ class PhraseExtractor:
 
             transcription = normalize(interval.mark)
 
+            # TODO: extract COMMENT tier?????
+
             start = to_milliseconds(interval.minTime)
             end = to_milliseconds(interval.maxTime)
             midtime = (interval.minTime + interval.maxTime) / 2
@@ -344,7 +439,7 @@ def to_milliseconds(seconds: Decimal) -> int:
 
 def get_mic_id(name: str) -> int:
     """
-    Return the microphone number from the filename of the wav file.
+    Return the microphone number from the filename of the TextGrid file.
 
     There are at lease five formats in which TextGrid files are named:
     >>> get_mic_id('2_003.TextGrid')
@@ -404,3 +499,22 @@ def get_mic_id(name: str) -> int:
     if not m:
         raise InvalidTextGridName(name)
     return int(m.group(1), 10)
+
+
+if __name__ == "__main__":
+    print("main")
+    metadata_filename = "../private/metadata.csv"
+    with open(metadata_filename) as metadata_csv:
+        metadata = parse_metadata(metadata_csv)
+
+    print("Metadata parsed")
+
+    directory = Path("../data/sessions/")
+
+    extractor = RecordingExtractor(metadata)
+    print("It's an extractor")
+    for info in extractor.scan(root_directory=directory):
+        continue
+    print("Scan done")
+    # TODO: this entire main thing
+    # generate_segments_from_eaf("../data/sessions/2015-05-11-PM-___-_/2015-05-11pm-01.eaf")
