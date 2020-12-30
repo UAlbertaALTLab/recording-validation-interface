@@ -60,10 +60,11 @@ class InvalidTextGridName(RuntimeError):
     Raised when the TextGrid name does not follow an appropriate pattern.
     """
 
+
 class MissingTranslationError(RuntimeError):
     """
-    Raised when the 'English (word)' and 'English (sentene) tiers 
-    can not be found in a .eaf file suggesting that the word or phrase 
+    Raised when the 'English (word)' and 'English (sentene) tiers
+    can not be found in a .eaf file suggesting that the word or phrase
     does not have an existing translation
     """
 
@@ -71,32 +72,37 @@ class MissingTranslationError(RuntimeError):
 # ########################################################################## #
 
 
-class RecordingInfo(NamedTuple):
-    """
-    All the information you could possible want to know about a recorded
-    snippet.
-    """
-
-    session: SessionID
-    speaker: str
-    type: str  # either "word" or "sentence"
-    timestamp: int  # in milliseconds
-    transcription: str  # in Cree
-    translation: str  # in English
-    audio: AudioSegment  # in Cree
-
 class Segment(NamedTuple):
     """
     Stores an audio segment extracted from a .eaf file
     """
 
-    translation: str   # in English
-    transcription: str # in Cree
-    type: str           # "word" or "sentence"
+    translation: str  # in English
+    transcription: str  # in Cree
+    type: str  # "word" or "sentence"
     start: int
     stop: int
     comment: str
+    speaker: str
+    session: SessionID
+    audio: AudioSegment
 
+    def signature(self) -> str:
+        # TODO: make this resilient to changing type, transcription, and speaker.
+        return (
+            f"session: {self.session}\n"
+            f"speaker: {self.speaker}\n"
+            f"timestamp: {self.start}\n"
+            f"{self.type}: {self.transcription}\n"
+            "\n"
+            f"{self.translation}\n"
+        )
+
+    def compute_sha256hash(self) -> str:
+        """
+        Compute a hash that can be used as a ID for this recording.
+        """
+        return sha256(self.signature().encode("UTF-8")).hexdigest()
 
 
 @logme.log
@@ -110,7 +116,6 @@ class RecordingExtractor:
     def __init__(self, metadata=Dict[SessionID, SessionMetadata]) -> None:
         self.sessions: Dict[SessionID, Path] = {}
         self.metadata = metadata
-
 
     def scan(self, root_directory: Path):
         """
@@ -177,21 +182,18 @@ class RecordingExtractor:
                 sound_file,
                 speaker,
             )
-            # extractor = PhraseExtractor(
-            #     session_id,
-            #     AudioSegment.from_file(fspath(sound_file)),
-            #     TextGrid.fromFile(fspath(_path)),
-            #     speaker,
-            # )
-            # yield from extractor.extract_all()
-            yield from generate_segments_from_eaf(_path)
+
+            audio = AudioSegment.from_file(fspath(sound_file))
+            yield from generate_segments_from_eaf(_path, audio, speaker, session_id)
 
 
-def generate_segments_from_eaf(annotation_path: Path) -> list:
+def generate_segments_from_eaf(
+    annotation_path: Path, audio: AudioSegment, speaker: str, session_id: SessionID
+) -> list:
+
     """
-    Returns segements from the annotation file 
+    Returns segements from the annotation file
     """
-    segments = []
 
     # open the EAF
     eaf_file = Eaf(annotation_path)
@@ -199,14 +201,8 @@ def generate_segments_from_eaf(annotation_path: Path) -> list:
     # look at the Cree words tier
     keys = eaf_file.get_tier_names()
 
-    if "English (word)" not in keys:
-        print(keys)
-
-    english_word_tier = "English (word)" if "English (word)" in keys else None
-    cree_word_tier = "Cree (word)" if "Cree (word)" in keys else None
-    
-    english_phrase_tier = "English (sentence)" if "English (sentence)" in keys else None
-    cree_phrase_tier = "Cree (sentence)" if "Cree (sentence)" in keys else None
+    english_word_tier, cree_word_tier = get_word_tiers(keys)
+    english_phrase_tier, cree_phrase_tier = get_phrase_tiers(keys)
 
     comment_tier = "Comments" if "Comments" in keys else None
 
@@ -219,57 +215,98 @@ def generate_segments_from_eaf(annotation_path: Path) -> list:
     #   add a segment with translation, transcription, start, stop, comment ALL from the EAF
     cree_words = eaf_file.get_annotation_data_for_tier(cree_word_tier)
     for cree_word in cree_words:
-        start = cree_word[0]
-        stop = cree_word[1]
-        transcription = cree_word[2]
 
-        translation = eaf_file.get_annotation_data_at_time(english_word_tier, start + 1)
-        translation = translation[0][2] if len(translation) > 0 and len(translation[0]) == 3 else ""
-        
-        comment = eaf_file.get_annotation_data_at_time(comment_tier, start + 1) or ""
-        comment = comment[0][2] if len(comment) > 0 else ""
-
-        s = Segment(
-            translation = translation,   # in English
-            transcription = transcription, # in Cree
-            type = "word",
-            start = start,
-            stop = stop,
-            comment = comment
+        s, sound_bite = extract_data(
+            eaf_file,
+            "word",
+            cree_word,
+            audio,
+            speaker,
+            session_id,
+            english_word_tier,
+            comment_tier,
         )
 
-        segments.append(s)
+        yield s, sound_bite
 
     # for each Cree phrases,
     #   add a segment with translation, transcription, start, stop, comment ALL from the EAF
-    cree_phrases = eaf_file.get_annotation_data_for_tier(cree_phrase_tier) if cree_phrase_tier else []
+    cree_phrases = (
+        eaf_file.get_annotation_data_for_tier(cree_phrase_tier)
+        if cree_phrase_tier
+        else []
+    )
     for cree_phrase in cree_phrases:
-        start = cree_phrase[0]
-        stop = cree_phrase[1]
-        transcription = cree_phrase[2]
-
-        translation = eaf_file.get_annotation_data_at_time(english_phrase_tier, start + 1)
-        translation = translation[0][2] if len(translation) > 0 and len(translation[0]) == 3 else ""
-
-        comment = eaf_file.get_annotation_data_at_time(comment_tier, start + 1) or ""
-        comment = comment[0][2] if len(comment) > 0 and len(comment[0]) == 3 else ""
-
-        s = Segment(
-            translation = translation,   # in English
-            transcription = transcription, # in Cree
-            type = "sentence",
-            start = start,
-            stop = stop,
-            comment = comment
+        s, sound_bite = extract_data(
+            eaf_file,
+            "sentence",
+            cree_phrase,
+            audio,
+            speaker,
+            session_id,
+            english_phrase_tier,
+            comment_tier,
         )
+        yield s, sound_bite
 
-        segments.append(s)
 
-    return segments
-    
+def get_word_tiers(keys):
+
+    english_word_tier = "English (word)" if "English (word)" in keys else None
+    cree_word_tier = "Cree (word)" if "Cree (word)" in keys else None
+
+    return english_word_tier, cree_word_tier
+
+
+def get_phrase_tiers(keys):
+
+    english_phrase_tier = "English (sentence)" if "English (sentence)" in keys else None
+    cree_phrase_tier = "Cree (sentence)" if "Cree (sentence)" in keys else None
+
+    return english_phrase_tier, cree_phrase_tier
+
+
+def extract_data(
+    _file, _type, snippet, audio, speaker, session_id, english_tier, comment_tier
+):
+    start = snippet[0]
+    stop = snippet[1]
+    transcription = snippet[2]
+
+    translation = _file.get_annotation_data_at_time(english_tier, start + 1)
+    translation = (
+        translation[0][2] if len(translation) > 0 and len(translation[0]) == 3 else ""
+    )
+
+    comment = _file.get_annotation_data_at_time(comment_tier, start + 1) or ""
+    comment = comment[0][2] if len(comment) > 0 and len(comment[0]) == 3 else ""
+
+    sound_bite = audio[start:stop]
+
+    # normalize
+    transcription = normalize(transcription)
+    translation = normalize(translation)
+    sound_bite = sound_bite.normalize(headroom=0.1)
+
+    s = Segment(
+        translation=translation,  # in English
+        transcription=transcription,  # in Cree
+        type=_type,
+        start=start,
+        stop=stop,
+        comment=comment,
+        speaker=speaker,
+        session=session_id,
+        audio=sound_bite,
+    )
+
+    return s, sound_bite
+
 
 @logme.log
-def find_audio_from_audacity_format(annotation_path: Path, logger=None) -> Optional[Path]:
+def find_audio_from_audacity_format(
+    annotation_path: Path, logger=None
+) -> Optional[Path]:
     """
     Finds the associated audio in Audacity's format.
     """
@@ -280,7 +317,9 @@ def find_audio_from_audacity_format(annotation_path: Path, logger=None) -> Optio
 
 
 @logme.log
-def find_audio_from_audition_format(annotation_path: Path, logger=None) -> Optional[Path]:
+def find_audio_from_audition_format(
+    annotation_path: Path, logger=None
+) -> Optional[Path]:
     #  Gross code to try Adobe Audition recorded files
     session_dir = annotation_path.parent
 
@@ -303,138 +342,6 @@ WORD_TIER_ENGLISH = 0
 WORD_TIER_CREE = 1
 SENTENCE_TIER_ENGLISH = 2
 SENTENCE_TIER_CREE = 3
-
-
-@logme.log
-class PhraseExtractor:
-    """
-    Extracts recorings from a session directory.
-    """
-
-    logger: logging.Logger
-
-    def __init__(
-        self,
-        session: SessionID,
-        sound: AudioSegment,
-        text_grid: TextGrid,
-        speaker: str,  # Something like "ABC"
-    ) -> None:
-        self.session = session
-        self.sound = sound
-        self.text_grid = text_grid
-        self.speaker = speaker
-
-    def extract_all(self):
-        assert len(self.text_grid.tiers) >= 4, "TextGrid has too few tiers"
-
-        self.logger.debug("Extracting words from %s/%s", self.session, self.speaker)
-        yield from self.extract_words(
-            cree_tier=self.text_grid.tiers[WORD_TIER_CREE],
-            english_tier=self.text_grid.tiers[WORD_TIER_ENGLISH],
-        )
-
-        self.logger.debug("Extracting sentences from %s/%s", self.session, self.speaker)
-        yield from self.extract_sentences(
-            cree_tier=self.text_grid.tiers[SENTENCE_TIER_CREE],
-            english_tier=self.text_grid.tiers[SENTENCE_TIER_ENGLISH],
-        )
-
-    def extract_words(self, cree_tier, english_tier):
-        yield from self.extract_phrases("word", cree_tier, english_tier)
-
-    def extract_sentences(self, cree_tier, english_tier):
-        yield from self.extract_phrases("sentence", cree_tier, english_tier)
-
-    def extract_phrases(
-        self, type_: str, cree_tier: IntervalTier, english_tier: IntervalTier
-    ):
-        assert is_cree_tier(cree_tier), cree_tier.name
-        assert is_english_tier(english_tier), english_tier.name
-
-        for interval in cree_tier:
-            if not interval.mark or interval.mark.strip() == "":
-                # This interval is empty, for some reason.
-                continue
-
-            transcription = normalize(interval.mark)
-
-            # TODO: extract COMMENT tier?????
-
-            start = to_milliseconds(interval.minTime)
-            end = to_milliseconds(interval.maxTime)
-            midtime = (interval.minTime + interval.maxTime) / 2
-
-            # Figure out if this word belongs to a sentence.
-            if type_ == "word" and self.timestamp_within_sentence(midtime):
-                # It's an example sentence; leave it for the next loop.
-                # TODO: WHY ARE WE SKIPPING IT AGAIN?
-                self.logger.debug("%r is in a sentence", transcription)
-                continue
-
-            # Get the word's English gloss.
-            english_interval = english_tier.intervalContaining(midtime)
-            if english_interval is None:
-                self.logger.warn("Could not find translation for %r", interval)
-                continue
-
-            translation = normalize(english_interval.mark)
-
-            # Snip out the sounds.
-            sound_bite = self.sound[start:end]
-            # tmills: normalize sound levels (some speakers are very quiet)
-            sound_bite = sound_bite.normalize(headroom=0.1)  # dB
-
-            yield self.info_for(type_, transcription, translation, start, sound_bite)
-
-    def info_for(
-        self,
-        type_: str,
-        transcription: str,
-        translation: str,
-        timestamp: int,
-        sound_bite: AudioSegment,
-    ):
-        """
-        Return a tuple of the phrase and its audio.
-        """
-        assert type_ in ("word", "sentence")
-        info = RecordingInfo(
-            session=self.session,
-            speaker=self.speaker,
-            type=type_,
-            timestamp=timestamp,
-            transcription=transcription,
-            translation=translation,
-        )
-        return info, sound_bite
-
-    def timestamp_within_sentence(self, timestamp: Decimal):
-        """
-        Return True when the timestamp is found inside a Cree sentence.
-        """
-        sentences = self.text_grid.tiers[SENTENCE_TIER_CREE]
-        sentence = sentences.intervalContaining(timestamp)
-        return sentence and sentence.mark != ""
-
-
-cree_pattern = re.compile(r"\b(?:cree|crk)\b", re.IGNORECASE)
-english_pattern = re.compile(r"\b(?:english|eng|en)\b", re.IGNORECASE)
-
-
-def is_english_tier(tier: IntervalTier) -> bool:
-    return bool(english_pattern.search(tier.name))
-
-
-def is_cree_tier(tier: IntervalTier) -> bool:
-    return bool(cree_pattern.search(tier.name))
-
-
-def to_milliseconds(seconds: Decimal) -> int:
-    """
-    Converts interval times to an integer in milliseconds.
-    """
-    return int(seconds * 1000)
 
 
 def get_mic_id(name: str) -> int:
@@ -499,22 +406,3 @@ def get_mic_id(name: str) -> int:
     if not m:
         raise InvalidTextGridName(name)
     return int(m.group(1), 10)
-
-
-if __name__ == "__main__":
-    print("main")
-    metadata_filename = "../private/metadata.csv"
-    with open(metadata_filename) as metadata_csv:
-        metadata = parse_metadata(metadata_csv)
-
-    print("Metadata parsed")
-
-    directory = Path("../data/sessions/")
-
-    extractor = RecordingExtractor(metadata)
-    print("It's an extractor")
-    for info in extractor.scan(root_directory=directory):
-        continue
-    print("Scan done")
-    # TODO: this entire main thing
-    # generate_segments_from_eaf("../data/sessions/2015-05-11-PM-___-_/2015-05-11pm-01.eaf")
