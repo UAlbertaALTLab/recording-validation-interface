@@ -64,6 +64,8 @@ class MissingTranslationError(RuntimeError):
     does not have an existing translation
     """
 
+    # TODO: this is a weird assumption to make. So far it hasn't been an issue though?
+
 
 # ########################################################################## #
 
@@ -183,33 +185,33 @@ class RecordingExtractor:
 
 def generate_segments_from_eaf(
     annotation_path: Path, audio: AudioSegment, speaker: str, session_id: SessionID
-) -> list:
+):
 
     """
-    Returns segements from the annotation file
+    Yields segements from the annotation file
     """
 
     # open the EAF
     eaf_file = Eaf(annotation_path)
 
-    # look at the Cree words tier
     keys = eaf_file.get_tier_names()
 
+    # get tiers from keys
     english_word_tier, cree_word_tier = get_word_tiers(keys)
     english_phrase_tier, cree_phrase_tier = get_phrase_tiers(keys)
 
     comment_tier = "Comments" if "Comments" in keys else None
 
     if not english_word_tier and english_phrase_tier:
+        # Assuming each entry needs to have a translation before continuining
+        # Again, this is a weird assumption to make
         raise MissingTranslationError(
             f"No English word or phrase found for data at {annotation_path}"
         )
 
-    # for each Cree word,
-    #   add a segment with translation, transcription, start, stop, comment ALL from the EAF
+    # Extract data for Cree words
     cree_words = eaf_file.get_annotation_data_for_tier(cree_word_tier)
     for cree_word in cree_words:
-
         s, sound_bite = extract_data(
             eaf_file,
             "word",
@@ -220,11 +222,9 @@ def generate_segments_from_eaf(
             english_word_tier,
             comment_tier,
         )
-
         yield s, sound_bite
 
-    # for each Cree phrases,
-    #   add a segment with translation, transcription, start, stop, comment ALL from the EAF
+    # Extract data for Cree phrases
     cree_phrases = (
         eaf_file.get_annotation_data_for_tier(cree_phrase_tier)
         if cree_phrase_tier
@@ -262,7 +262,17 @@ def get_phrase_tiers(keys):
 
 def extract_data(
     _file, _type, snippet, audio, speaker, session_id, english_tier, comment_tier
-):
+) -> tuple:
+    """
+    Extracts all relevant data from a .eaf file, where "relevant data" is:
+    - translation
+    - transcription
+    - start time
+    - stop time
+    - comment
+    Returns a Segment and a sound bite
+    """
+
     start = snippet[0]
     stop = snippet[1]
     transcription = snippet[2]
