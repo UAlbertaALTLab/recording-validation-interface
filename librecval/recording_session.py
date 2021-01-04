@@ -58,7 +58,7 @@ strict_pattern = re.compile(
     )
     -
     (?:
-        (?P<subsession> \d+) | _
+        (?P<subsession> \d+) | _ | _\d+
     )
     \Z
 """,
@@ -171,6 +171,10 @@ class SessionID(NamedTuple):
     @property
     def day(self):
         return self.date.day
+
+    @property
+    def _subsession(self):
+        return self.subsession or "_"
 
     @classmethod
     def from_name(cls, directory_name: str) -> "SessionID":

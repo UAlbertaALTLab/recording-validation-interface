@@ -33,12 +33,8 @@ import logme  # type: ignore
 from librecval.normalization import normalize
 from librecval.recording_session import SessionID, SessionMetadata
 from pydub import AudioSegment  # type: ignore
-from textgrid import IntervalTier, TextGrid  # type: ignore
 from pympi.Elan import Eaf  # type: ignore
 
-# The following imports are for local testing only, they can be removed
-from librecval.recording_session import parse_metadata
-import pdb
 
 # ############################### Exceptions ############################### #
 
@@ -55,9 +51,9 @@ class MissingMetadataError(RuntimeError):
     """
 
 
-class InvalidTextGridName(RuntimeError):
+class InvalidFileName(RuntimeError):
     """
-    Raised when the TextGrid name does not follow an appropriate pattern.
+    Raised when the ELAN name does not follow an appropriate pattern.
     """
 
 
@@ -87,22 +83,20 @@ class Segment(NamedTuple):
     session: SessionID
     audio: AudioSegment
 
-    def signature(self) -> str:
-        # TODO: make this resilient to changing type, transcription, and speaker.
-        return (
-            f"session: {self.session}\n"
-            f"speaker: {self.speaker}\n"
-            f"timestamp: {self.start}\n"
-            f"{self.type}: {self.transcription}\n"
-            "\n"
-            f"{self.translation}\n"
-        )
+    def compute_id(self) -> str:
+        """
+        Compute a meaningful id for the recording
+        ID is of the form: word/phrase-speaker-date-subsession
+        """
 
-    def compute_sha256hash(self) -> str:
-        """
-        Compute a hash that can be used as a ID for this recording.
-        """
-        return sha256(self.signature().encode("UTF-8")).hexdigest()
+        word = self.transcription  # this can be a word or a phrase
+        word = word.replace(" ", "_")
+        person = self.speaker or "_"
+        _date = f"{self.session.year}-{self.session.month}-{self.session.day}"
+        sub_session = self.session._subsession
+        _id = f"{word}-{person}-{_date}-{sub_session}"
+        return _id
+        # return sha256(self.signature().encode("UTF-8")).hexdigest()
 
 
 @logme.log
@@ -169,7 +163,7 @@ class RecordingExtractor:
 
             try:
                 mic_id = get_mic_id(_path.stem)
-            except InvalidTextGridName:
+            except InvalidFileName:
                 if len(_path) != 1:
                     raise  # There's no way to determine the speaker.
                 mic_id = 1
@@ -346,23 +340,23 @@ SENTENCE_TIER_CREE = 3
 
 def get_mic_id(name: str) -> int:
     """
-    Return the microphone number from the filename of the TextGrid file.
+    Return the microphone number from the filename of the ELAN file.
 
-    There are at lease five formats in which TextGrid files are named:
-    >>> get_mic_id('2_003.TextGrid')
+    There are at lease five formats in which ELAN files are named:
+    >>> get_mic_id('2_003.eaf')
     2
-    >>> get_mic_id('2015-05-11am-03.TextGrid')
+    >>> get_mic_id('2015-05-11am-03.eaf')
     3
-    >>> get_mic_id('2016-02-24am-Track 2_001.TextGrid')
+    >>> get_mic_id('2016-02-24am-Track 2_001.eaf')
     2
-    >>> get_mic_id('Track 4_001.TextGrid')
+    >>> get_mic_id('Track 4_001.eaf')
     4
 
     This one is the most annoying format:
     >>> get_mic_id('2015-03-19-Rain-03')
     3
     """
-    # Match something like '2016-02-24am-Track 2_001.TextGrid'
+    # Match something like '2016-02-24am-Track 2_001.eaf'
     m = re.match(
         r"""
         ^
@@ -382,7 +376,7 @@ def get_mic_id(name: str) -> int:
         (\d+)               # THE MIC NUMBER!
 
         _\d{3}
-        (?:[.]TextGrid)?$
+        (?:[.]eaf)?$
         """,
         name,
         re.VERBOSE,
@@ -398,11 +392,11 @@ def get_mic_id(name: str) -> int:
         )?
 
         (\d+)
-        (?:[.]TextGrid)?$
+        (?:[.]eaf)?$
         """,
         name,
         re.VERBOSE,
     )
     if not m:
-        raise InvalidTextGridName(name)
+        raise InvalidFileName(name)
     return int(m.group(1), 10)
