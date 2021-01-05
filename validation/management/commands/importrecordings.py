@@ -152,7 +152,7 @@ def django_recording_importer(info: Segment, recording_path: Path, logger) -> No
 
     # Finally, we can create the recording.
     recording = Recording(
-        id=info.compute_id(),
+        id=info.compute_sha256hash(),
         speaker=speaker,
         compressed_audio=django_file,
         timestamp=info.start,

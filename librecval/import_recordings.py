@@ -93,7 +93,7 @@ def save_recording(
     recording_format: Format = "m4a",
     logger=None,
 ) -> Path:
-    rec_id = info.compute_id()
+    rec_id = info.compute_sha256hash()
     recording_path = dest / f"{rec_id}.{recording_format}"
     if recording_path.exists():
         logger.warn("Already exists, not transcoding: %s", recording_path)

@@ -85,20 +85,27 @@ class Segment(NamedTuple):
     session: SessionID
     audio: AudioSegment
 
-    def compute_id(self) -> str:
-        """
-        Compute a meaningful id for the recording
-        ID is of the form: word/phrase-speaker-date-subsession
-        """
+    def signature(self) -> str:
+        # TODO: make this resilient to changing type, transcription, and speaker.
+        return (
+            f"session: {self.session}\n"
+            f"speaker: {self.speaker}\n"
+            f"timestamp: {self.start}\n"
+            f"{self.type}: {self.transcription}\n"
+            "\n"
+            f"{self.translation}\n"
+        )
 
-        word = self.transcription  # this can be a word or a phrase
-        word = word.replace(" ", "_")
-        person = self.speaker or "_"
-        _date = f"{self.session.year}-{self.session.month}-{self.session.day}"
-        sub_session = self.session._subsession
-        _id = f"{word}-{person}-{_date}-{sub_session}"
-        return _id
-        # return sha256(self.signature().encode("UTF-8")).hexdigest()
+    def compute_sha256hash(self) -> str:
+        """
+        Compute a hash that can be used as a ID for this recording.
+        We use the hash instead of including the word in the id for these reasons:
+        - we want people to validate the spelling of the word, so
+        the word itself might change, making the name meaningless
+        - the db doesn't like diacritics very much
+        - other reasons, and good ones, too
+        """
+        return sha256(self.signature().encode("UTF-8")).hexdigest()
 
 
 @logme.log
