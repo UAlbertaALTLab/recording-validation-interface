@@ -127,6 +127,7 @@ class RecordingExtractor:
         For each session directory found, its ELAN/.eaf file pairs are
         scanned for words and sentences.
         """
+        count = 0
 
         self.logger.debug("Scanning %s for sessions...", root_directory)
         for session_dir in root_directory.iterdir():
@@ -134,13 +135,15 @@ class RecordingExtractor:
                 self.logger.debug("Rejecting %s; not a directory", session_dir)
                 continue
             try:
-                yield from self.extract_session(session_dir)
+                print(f"Processed folder number {count}")
+                count += 1
+                yield from self.extract_session(session_dir, count)
             except DuplicateSessionError:
                 self.logger.exception("Skipping %s: duplicate", session_dir)
             except MissingMetadataError:
                 self.logger.exception("Skipping %s: Missing metadata", session_dir)
 
-    def extract_session(self, session_dir: Path):
+    def extract_session(self, session_dir: Path, folder_count):
         """
         Extracts recordings from a single session.
         """
@@ -156,6 +159,7 @@ class RecordingExtractor:
         self.logger.debug("Scanning %s for .eaf files", session_dir)
         annotations = list(session_dir.glob("*.eaf"))
         self.logger.info("%d ELAN files in %s", len(annotations), session_dir)
+        count = 0
 
         for _path in annotations:
             # Find the cooresponding audio with a couple different strategies.
@@ -187,6 +191,8 @@ class RecordingExtractor:
             )
 
             audio = AudioSegment.from_file(fspath(sound_file))
+            print(f"Processed file number {count} from folder number {folder_count}")
+            count += 1
             yield from generate_segments_from_eaf(_path, audio, speaker, session_id)
 
 
@@ -202,6 +208,7 @@ def generate_segments_from_eaf(
     eaf_file = Eaf(annotation_path)
 
     keys = eaf_file.get_tier_names()
+    count = 0
 
     # get tiers from keys
     english_word_tier, cree_word_tier = get_word_tiers(keys)
@@ -229,6 +236,8 @@ def generate_segments_from_eaf(
             english_word_tier,
             comment_tier,
         )
+        count += 1
+        print(f"Processed audio segment number {count}")
         yield s, sound_bite
 
     # Extract data for Cree phrases
@@ -248,6 +257,8 @@ def generate_segments_from_eaf(
             english_phrase_tier,
             comment_tier,
         )
+        count += 1
+        print(f"Processed audio segment number {count}")
         yield s, sound_bite
 
 
