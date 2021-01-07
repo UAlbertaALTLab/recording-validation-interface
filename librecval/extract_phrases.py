@@ -173,8 +173,8 @@ class RecordingExtractor:
             try:
                 mic_id = get_mic_id(_path.stem)
             except InvalidFileName:
-                if len(_path) != 1:
-                    raise  # There's no way to determine the speaker.
+                # if len(_path) != 1:
+                #    raise  # There's no way to determine the speaker.
                 mic_id = 1
                 self.logger.warn("Assuming single text grid is mic 1")
 
