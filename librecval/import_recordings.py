@@ -64,6 +64,7 @@ def initialize(
     """
 
     dest = Path(transcoded_recordings_path)
+    count = 0
 
     assert directory.resolve().is_dir(), directory
     assert (
@@ -79,10 +80,12 @@ def initialize(
     for info, audio in ex.scan(root_directory=directory):
         try:
             recording_path = save_recording(dest, info, audio, recording_format)
+            count += 1
         except RecordingError:
             logger.exception("Exception while saving recording; skipping.")
         else:
             import_recording(info, recording_path)
+    print(f"Processed {count} audio segments")
 
 
 @logme.log
