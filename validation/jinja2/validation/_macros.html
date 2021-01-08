@@ -75,4 +75,11 @@
 </td>
 {% endmacro %}
 
+{#
+  # Expands to a <td> that displays the segment speaker.
+  #}
+ {% macro speaker(recording) %}
+   {{ recording.speaker }}
+ {% endmacro %}
+
 {# vim: set ft=htmldjango :#}

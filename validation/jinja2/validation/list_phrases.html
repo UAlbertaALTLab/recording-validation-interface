@@ -30,6 +30,7 @@
         <th scope="col"> Transcription </th>
         <th scope="col"> Translation </th>
         <th scope="col"> Recordings </th>
+        <th scope="col">Speaker </th>
       </tr>
     </thead>
     {% for phrase in phrases %}
@@ -41,6 +42,16 @@
         {% for recording in phrase.recordings %}
           <li>
             {{ macros.player(recording) }}
+          </li>
+
+        {% endfor %}{# for recording in phrase.recordings #}
+        </ul>
+      </td>
+      <td>
+        <ul class="speaker">
+        {% for recording in phrase.recordings %}
+          <li class="speaker_code">
+            {{ macros.speaker(recording) }}
           </li>
 
         {% endfor %}{# for recording in phrase.recordings #}
