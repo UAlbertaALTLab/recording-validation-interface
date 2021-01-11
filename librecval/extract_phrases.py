@@ -28,6 +28,7 @@ from hashlib import sha256
 from os import fspath
 from pathlib import Path
 from typing import Dict, NamedTuple, Optional
+import glob
 
 import logme  # type: ignore
 from librecval.normalization import normalize
@@ -163,9 +164,11 @@ class RecordingExtractor:
 
         for _path in annotations:
             # Find the cooresponding audio with a couple different strategies.
-            sound_file = find_audio_from_audacity_format(
-                _path
-            ) or find_audio_from_audition_format(_path)
+            sound_file = (
+                find_audio_from_audacity_format(_path)
+                or find_audio_from_audition_format(_path)
+                or find_audio_file_with_space(_path)
+            )
 
             if sound_file is None:
                 self.logger.warn("Could not find corresponding audio for %s", _path)
@@ -323,6 +326,28 @@ def extract_data(
     )
 
     return s, sound_bite
+
+
+@logme.log
+def find_audio_file_with_space(annotation_path: Path, logger=None) -> Optional[Path]:
+    """
+    Finds the associated audio in Audacity's format.
+    """
+
+    # Get folder name without expected track name
+    i = str(annotation_path).rfind("/")
+    _path = str(annotation_path)[:i]
+
+    # the track number is between the last - and the last .
+    j = str(annotation_path).rfind("-")
+    k = str(annotation_path).rfind(".")
+    track = str(annotation_path)[j + 1 : k]
+
+    # find the .wav file
+    dirs = list(glob.glob(_path + "/**/" + track + ".wav", recursive=True))
+    sound_file = Path(dirs[0]) or None
+    logger.debug("[Recorded Subfolder] Trying %s...", sound_file)
+    return sound_file if sound_file.exists() else None
 
 
 @logme.log
