@@ -345,7 +345,7 @@ def find_audio_file_with_space(annotation_path: Path, logger=None) -> Optional[P
 
     # find the .wav file
     dirs = list(glob.glob(_path + "/**/" + track + ".wav", recursive=True))
-    sound_file = Path(dirs[0]) or None
+    sound_file = Path(dirs[0]) if len(dirs) > 0 else None
     logger.debug("[Recorded Subfolder] Trying %s...", sound_file)
     return sound_file if sound_file.exists() else None
 
