@@ -167,7 +167,7 @@ class RecordingExtractor:
             sound_file = (
                 find_audio_from_audacity_format(_path)
                 or find_audio_from_audition_format(_path)
-                or find_audio_file_with_space(_path)
+                or find_audio_oddities(_path)
             )
 
             if sound_file is None:
@@ -329,7 +329,7 @@ def extract_data(
 
 
 @logme.log
-def find_audio_file_with_space(annotation_path: Path, logger=None) -> Optional[Path]:
+def find_audio_oddities(annotation_path: Path, logger=None) -> Optional[Path]:
     """
     Finds the associated audio in Audacity's format.
     """
@@ -345,11 +345,51 @@ def find_audio_file_with_space(annotation_path: Path, logger=None) -> Optional[P
     track = track.split("_")[0]
 
     # find the .wav file
+
+    # try 1: the .wav file is in a subfolder, but it has 'Track number' in it
     dirs = list(glob.glob(_path + "/**/" + track + "*.wav", recursive=True))
     sound_file = Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
+
     if not sound_file:
-        track = track.replace(" ", "")
-        dirs = list(glob.glob(_path + "/**/" + track + ".wav", recursive=True))
+        # try 2: the .wav file has no space between 'Track' and the number
+        track_2 = track.replace(" ", "")
+        dirs = list(glob.glob(_path + "/**/" + track_2 + "*.wav", recursive=True))
+        sound_file = Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
+
+    if not sound_file:
+        # try 3: the .wav file does have a space between 'Track' and the number
+        track_3 = track.replace("Track", "Track ")
+        dirs = list(glob.glob(_path + "/**/" + track_3 + "*.wav", recursive=True))
+        sound_file = Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
+
+    if not sound_file:
+        # try 4: the variable 'track' has a leading '_'
+        track_4 = track.replace("_", "")
+        dirs = list(glob.glob(_path + "/**/" + track_4 + "*.wav", recursive=True))
+        sound_file = Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
+
+    if not sound_file:
+        # try 5: the variable 'track' has a leading '_', but also needs a space after "Track"
+        track_5 = track.replace("_", "")
+        track_5 = track.replace("Track", "Track ")
+        dirs = list(glob.glob(_path + "/**/" + track_5 + "*.wav", recursive=True))
+        sound_file = Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
+
+    if not sound_file:
+        # try 6: the .wav file is not in a subfolder, but also doesn't have the word "Track" in it
+        track_6 = str(annotation_path)[:j]
+        dirs = list(glob.glob(_path + "/" + track_6 + "*.wav", recursive=True))
+        sound_file = Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
+
+    if not sound_file:
+        # try 7: the .wav file is not in a subfolder, but also doesn't have the word "Track" in it
+        # BUT ALSO the .eaf file has am/pm in it and the .wav file does not
+        track_7 = str(annotation_path)[:j]
+        track_7 = track_7.replace("am", "")
+        track_7 = track_7.replace("AM", "")
+        track_7 = track_7.replace("pm", "")
+        track_7 = track_7.replace("PM", "")
+        dirs = list(glob.glob(_path + "/" + track_7 + "*.wav", recursive=True))
         sound_file = Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
 
     logger.debug("[Recorded Subfolder] Trying %s...", sound_file)
