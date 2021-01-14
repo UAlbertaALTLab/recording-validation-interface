@@ -342,7 +342,7 @@ def find_audio_oddities(annotation_path: Path, logger=None) -> Optional[Path]:
     j = str(annotation_path).rfind("-")
     k = str(annotation_path).rfind(".")
     track = str(annotation_path)[j + 1 : k]
-    track = track.split("_")[0]
+    track_1 = track.split("_")[0]
 
     # find the .wav file
 
@@ -352,44 +352,115 @@ def find_audio_oddities(annotation_path: Path, logger=None) -> Optional[Path]:
 
     if not sound_file:
         # try 2: the .wav file has no space between 'Track' and the number
-        track_2 = track.replace(" ", "")
+        print("try 2")
+        track_2 = track_1.replace(" ", "")
         dirs = list(glob.glob(_path + "/**/" + track_2 + "*.wav", recursive=True))
         sound_file = Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
 
     if not sound_file:
         # try 3: the .wav file does have a space between 'Track' and the number
-        track_3 = track.replace("Track", "Track ")
+        # This tree covers audio file names that DO NOT have the date in them
+        print("try 3")
+        track_split = track.split("_")
+        n = 0
+        j = 0
+        for n in range(len(track_split)):
+            if "TRACK" in track_split[n].upper():
+                j = n
+            n += 1
+
+        track_3 = ""
+        while j < len(track_split):
+            track_3 = track_3 + str(track_split[j]) + "_"
+            j += 1
+
+        track_3 = track_3[:-1]
         dirs = list(glob.glob(_path + "/**/" + track_3 + "*.wav", recursive=True))
         sound_file = Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
+        if not sound_file:
+            print("try 4")
+            track_4 = track_3.replace("Track", "Track ")
+            dirs = list(glob.glob(_path + "/**/" + track_4 + "*.wav", recursive=True))
+            sound_file = (
+                Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
+            )
+        if not sound_file:
+            print("try 5")
+            track_5 = track_3.replace(" ", "")
+            track_5 = track_3.replace("Track_", "Track ")
+            dirs = list(glob.glob(_path + "/**/" + track_5 + "*.wav", recursive=True))
+            sound_file = (
+                Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
+            )
+        if not sound_file:
+            print("try 6")
+            track_6 = track_3.replace("track", "Track")
+            dirs = list(glob.glob(_path + "/**/" + track_6 + "*.wav", recursive=True))
+            sound_file = (
+                Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
+            )
+        if not sound_file:
+            print("try 7")
+            track_7 = track_3.replace("Track 0", "Track ")
+            dirs = list(glob.glob(_path + "/**/" + track_6 + "*.wav", recursive=True))
+            sound_file = (
+                Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
+            )
 
     if not sound_file:
-        # try 4: the variable 'track' has a leading '_'
-        track_4 = track.replace("_", "")
-        dirs = list(glob.glob(_path + "/**/" + track_4 + "*.wav", recursive=True))
+        # try 8: the .wav file has the same name as the .eaf file
+        # EXCEPT the .eaf file has the word 'Track_' in it
+        # This option DOES NOT have the word 'Track' in it
+        # and it DOES have the date in it
+        print("try 8")
+        track_8 = str(annotation_path)[i + 1 : k]
+        track_8 = track_8.replace("Track_", "")
+        dirs = list(glob.glob(_path + "/**/" + track_8 + "*.wav", recursive=True))
+        sound_file = Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
+        if not sound_file:
+            print("try 9")
+            track_9 = track_8.replace("am", "")
+            track_9 = track_9.replace("pm", "")
+            track_9 = track_9.replace("AM", "")
+            track_9 = track_9.replace("PM", "")
+            dirs = list(glob.glob(_path + "/**/" + track_9 + "*.wav", recursive=True))
+            sound_file = (
+                Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
+            )
+
+    if not sound_file:
+        # try 10: the variable 'track' has a leading '_'
+        print("try 10")
+        track_10 = track.replace("_", "")
+        dirs = list(glob.glob(_path + "/**/" + track_10 + "*.wav", recursive=True))
         sound_file = Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
 
     if not sound_file:
-        # try 5: the variable 'track' has a leading '_', but also needs a space after "Track"
-        track_5 = track.replace("_", "")
-        track_5 = track.replace("Track", "Track ")
-        dirs = list(glob.glob(_path + "/**/" + track_5 + "*.wav", recursive=True))
+        # try 11: the variable 'track' has a leading '_', but also needs a space after "Track"
+        print("try 11")
+        track_11 = track.replace("_", "")
+        track_11 = track.replace("Track", "Track ")
+        dirs = list(glob.glob(_path + "/**/" + track_11 + "*.wav", recursive=True))
         sound_file = Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
 
     if not sound_file:
-        # try 6: the .wav file is not in a subfolder, but also doesn't have the word "Track" in it
-        track_6 = str(annotation_path)[:j]
-        dirs = list(glob.glob(_path + "/" + track_6 + "*.wav", recursive=True))
+        # try 12: the .wav file is not in a subfolder, but also doesn't have the word "Track" in it
+        print("try 12")
+        track_12 = str(annotation_path)[:j]
+        dirs = list(glob.glob(_path + "/" + track_12 + "*.wav", recursive=True))
         sound_file = Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
 
     if not sound_file:
-        # try 7: the .wav file is not in a subfolder, but also doesn't have the word "Track" in it
+        # try 13: the .wav file is not in a subfolder, but also doesn't have the word "Track" in it
         # BUT ALSO the .eaf file has am/pm in it and the .wav file does not
-        track_7 = str(annotation_path)[:j]
-        track_7 = track_7.replace("am", "")
-        track_7 = track_7.replace("AM", "")
-        track_7 = track_7.replace("pm", "")
-        track_7 = track_7.replace("PM", "")
-        dirs = list(glob.glob(_path + "/" + track_7 + "*.wav", recursive=True))
+        print("try 13")
+        track_13 = str(annotation_path)[i + 1 : k]
+        track_13 = track_13.replace("am", "")
+        track_13 = track_13.replace("AM", "")
+        track_13 = track_13.replace("pm", "")
+        track_13 = track_13.replace("PM", "")
+
+        dirs = list(glob.glob(_path + "/" + track_13 + "*.wav", recursive=True))
         sound_file = Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
 
     logger.debug("[Recorded Subfolder] Trying %s...", sound_file)
