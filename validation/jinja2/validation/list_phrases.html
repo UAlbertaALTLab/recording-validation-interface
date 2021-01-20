@@ -35,7 +35,7 @@
     </thead>
     {% for phrase in phrases %}
     <tr data-update-uri="{{ url('validation:update_text', phrase_id=phrase.id) }}">
-      {{ macros.td_transcription(user, phrase) }}
+      {{ macros.td_transcription_link(user, phrase) }}
       {{ macros.td_translation(user, phrase) }}
       <td>
         <ul class="recordings">

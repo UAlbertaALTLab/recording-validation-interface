@@ -16,6 +16,7 @@ sh = "*"
 django = ">=2.2,<3"
 typing-extensions = "*"
 pympi-ling = "*"
+requests = "*"
 
 [dev-packages]
 gunicorn = "*"
@@ -30,4 +31,3 @@ django-extensions = "*"
 
 [requires]
 python_full_version = "3.7.9"
-

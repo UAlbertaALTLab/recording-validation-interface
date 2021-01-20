@@ -29,6 +29,7 @@ from librecval.normalization import to_indexable_form
 
 from .crude_views import *
 from .models import Phrase, Recording
+from .helpers import get_distance_with_translations
 
 
 def index(request):
@@ -151,6 +152,18 @@ def add_cors_headers(response):
     """
     response["Access-Control-Allow-Origin"] = "*"
     return response
+
+
+def segment_content_view(request, segment_name):
+    """
+    The view for a single segment
+    Returns the selected phrase and info provided by the helper functions
+    """
+    phrases = Phrase.objects.filter(transcription=segment_name)
+    suggestions = get_distance_with_translations(segment_name)
+    context = dict(phrases=phrases, segment_name=segment_name, suggestions=suggestions)
+
+    return render(request, "validation/segment_details.html", context)
 
 
 # TODO: Speaker bio page like https://ojibwe.lib.umn.edu/about/voices
