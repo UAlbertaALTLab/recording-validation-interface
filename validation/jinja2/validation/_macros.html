@@ -82,7 +82,7 @@
  # Expands to a <td> that displays the English translation.
  #}
 {% macro td_translation(user, phrase) %}
-<td lang="en">
+<td lang="en" id="{{ phrase }}-translation">
   {{ phrase.translation }}
 </td>
 {% endmacro %}

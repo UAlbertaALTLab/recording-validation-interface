@@ -4,6 +4,9 @@ import operator
 
 import requests
 import json
+import logging
+
+logging.captureWarnings(True)
 
 """
 RULES
