@@ -1,0 +1,13 @@
+{% extends 'validation/_base.html' %}
+{% import 'validation/_macros.html' as macros %}
+
+{% block content %}
+<div>
+<h2>Login to Validate Entries</h2>
+<form action="" method="POST">
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+    {{ form }}
+    <input type="submit" value="Login">
+</form>
+</div>
+{% endblock content %}
