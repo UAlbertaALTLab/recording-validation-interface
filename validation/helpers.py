@@ -91,7 +91,7 @@ def get_differ(word, suggestion):
 
         # end check for swapping glides
 
-        if c.split()[1] in vowels:
+        if len(c.split()) > 1 and c.split()[1] in vowels:
             # adding or removing a diacritic from a vowel has cost 0
             alt = get_analog(c)
             if i + 1 < len(df):

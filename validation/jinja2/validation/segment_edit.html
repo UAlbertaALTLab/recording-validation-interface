@@ -1,12 +1,8 @@
-<div class="table-responsive">
-    <form>
-        <label for="cree">Cree word: </label><br>
-        <input size="50" type="text" id="cree" name="cree"><br>
-
-        <label for="transl">English translation: </label><br>
-        <input size="50" type="text" id="transl" name="transl"><br>
-        <label for="analysis">Analysis:</label><br>
-        <input size="50" type="text" id="analysis" name="analysis"><br>
-
-    </form>
+<div>
+<form action="" method="post">
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+    {{ form }}
+    <input type="submit" value="Save">
+    <input type="button" onclick="hideDiv()" value="Cancel">
+</form>
 </div>
