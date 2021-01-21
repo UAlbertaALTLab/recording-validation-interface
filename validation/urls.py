@@ -39,5 +39,5 @@ urlpatterns = [
         views.all_recordings_for_session,
         name="crude_recordings",
     ),
-    path("<str:segment_name>", views.segment_content_view, name="segment_detail"),
+    path("<str:segment_id>", views.segment_content_view, name="segment_detail"),
 ]

@@ -154,12 +154,13 @@ def add_cors_headers(response):
     return response
 
 
-def segment_content_view(request, segment_name):
+def segment_content_view(request, segment_id):
     """
     The view for a single segment
     Returns the selected phrase and info provided by the helper functions
     """
-    phrases = Phrase.objects.filter(transcription=segment_name)
+    phrases = Phrase.objects.filter(id=segment_id)
+    segment_name = phrases[0].transcription
     suggestions = get_distance_with_translations(segment_name)
     context = dict(phrases=phrases, segment_name=segment_name, suggestions=suggestions)
 
