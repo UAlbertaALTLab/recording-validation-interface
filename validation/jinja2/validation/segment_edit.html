@@ -1,0 +1,8 @@
+<div>
+<form action="" method="post">
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+    {{ form }}
+    <input type="submit" value="Save">
+    <input type="button" onclick="hideDiv()" value="Cancel">
+</form>
+</div>

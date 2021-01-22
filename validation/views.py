@@ -29,6 +29,8 @@ from django.http import (
     HttpResponseRedirect,
 )
 from django.shortcuts import get_object_or_404, render
+from django.http import FileResponse, HttpResponse, HttpResponseBadRequest, JsonResponse
+from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
 
 from librecval.normalization import to_indexable_form
@@ -37,6 +39,7 @@ from .crude_views import *
 from .models import Phrase, Recording
 from .forms import Login
 from .helpers import get_distance_with_translations
+from .forms import EditSegment
 
 
 def index(request):
@@ -183,10 +186,35 @@ def segment_content_view(request, segment_id):
     The view for a single segment
     Returns the selected phrase and info provided by the helper functions
     """
+    if request.method == "POST":
+        form = EditSegment(request.POST)
+        og_phrase = Phrase.objects.filter(id=segment_id)[0]
+        phrase_id = og_phrase.id
+        if form.is_valid():
+            transcription = form.cleaned_data["cree"]
+            translation = form.cleaned_data["transl"]
+            analysis = form.cleaned_data["analysis"]
+            p = Phrase.objects.filter(id=phrase_id)[0]
+            p.transcription = transcription
+            p.translation = translation
+            p.analysis = analysis
+            p.validated = True
+            p.save()
+
     phrases = Phrase.objects.filter(id=segment_id)
     segment_name = phrases[0].transcription
     suggestions = get_distance_with_translations(segment_name)
-    context = dict(phrases=phrases, segment_name=segment_name, suggestions=suggestions)
+    history = phrases[0].history.all()
+
+    form = EditSegment()
+
+    context = dict(
+        phrases=phrases,
+        segment_name=segment_name,
+        suggestions=suggestions,
+        form=form,
+        history=history,
+    )
 
     return render(request, "validation/segment_details.html", context)
 
