@@ -22,6 +22,15 @@ class Register(forms.Form):
 
 
 class EditSegment(forms.Form):
-    cree = forms.CharField(required=False, widget=forms.TextInput)
-    transl = forms.CharField(required=False, widget=forms.TextInput)
-    analysis = forms.CharField(required=False, widget=forms.TextInput)
+    cree = forms.CharField(
+        required=False, widget=forms.TextInput(attrs={"class": "form-control"})
+    )
+    transl = forms.CharField(
+        required=False, widget=forms.TextInput(attrs={"class": "form-control"})
+    )
+    analysis = forms.CharField(
+        required=False,
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "style": "margin-bottom: 2rem;"}
+        ),
+    )

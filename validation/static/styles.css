@@ -34,6 +34,10 @@ li .speaker {
   margin: .5rem;
 }
 
+li.speaker_code {
+  padding-bottom: 1.5rem;
+}
+
 .recordings audio {
   max-width: 100%;
 }
