@@ -9,9 +9,20 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
   <title>{% block title %} Maskwacîs Recordings Validation {% endblock title %}</title>
   <style>
+    /* color scheme: 
+      Green: #18AD39
+      Deep blue: #143B6D
+      Deep purple: #403D62
+      Light purple: #7B6E87
+      Blush: #BC9AA1
+    */
   main {
     margin: 1em auto;
   }
+
+  .bg-dark {
+    background-color: #143B6D !important;
+}
 
   ul.recordings {
     padding: auto 0;
@@ -28,6 +39,37 @@
   .recordings audio {
     max-width: 100%;
   }
+
+  .login {
+        background-color: #f5f5f5;
+        padding: 2rem;
+        margin: 0 auto;
+        max-width: 50rem;
+        min-width: 22rem;
+        justify-content: center;
+    }
+
+  .login-button {
+    color: #ffffff;
+    background-color: #7B6E87;
+    border-radius: 5px;
+    margin: 1rem 5rem;
+  }
+
+  .login > h2 {
+    text-align: center;
+  }
+
+  .login > form {
+    padding: 0 auto;
+  }
+
+  .login-form-wrapper {
+    margin: 0 auto;
+    width: 16rem;
+    padding: 1rem;
+  }
+
   </style>
   {% endblock head %}
 
