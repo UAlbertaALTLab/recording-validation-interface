@@ -22,25 +22,25 @@
  # Adapted from: https://docs.djangoproject.com/en/2.1/topics/pagination/
  #}
 {% macro pagination(page, endpoint) %}
-<ul class="nav nav-pills justify-content-center">
+<ul class="nav justify-content-center">
   {% if page.has_previous() %}
-  <li class="nav-item"><a class="nav-link" href="?page=1">
+  <li class="nav-item"><a class="link-nav" href="?page=1">
       First
   </a></li>
-  <li class="nav-item"><a class="nav-link" href="?page={{ page.previous_page_number() }}">
+  <li class="nav-item"><a class="link-nav" href="?page={{ page.previous_page_number() }}">
       Previous
   </a></li>
   {% endif %}
 
-  <li class="nav-item"><a class="nav-link active" href="#">
+  <li class="nav-item"><a class="nav-link active button-nav" href="#">
       Page {{ page.number }}
   </a></li>
 
   {% if page.has_next() %}
-  <li class="nav-item"><a class="nav-link" href="?page={{ page.next_page_number() }}">
+  <li class="nav-item"><a class="link-nav" href="?page={{ page.next_page_number() }}">
       Next
   </a></li>
-  <li class="nav-item"><a class="nav-link" href="?page={{ page.paginator.num_pages }}">
+  <li class="nav-item"><a class="link-nav" href="?page={{ page.paginator.num_pages }}">
       Last
   </a></li>
   {% endif %}

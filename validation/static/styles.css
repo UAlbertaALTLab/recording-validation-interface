@@ -1,0 +1,132 @@
+@import "./variables.css";
+
+/* main styles */
+main {
+  margin: 1em auto;
+}
+
+.header-dark {
+  background-color: var(--mauve);
+}
+
+ul.recordings {
+  padding: auto 0;
+  list-style: none;
+}
+
+li .speaker {
+  display: inline-block;
+  min-width: 4rem;
+  text-align: center;
+  margin: .5rem;
+}
+
+.recordings audio {
+  max-width: 100%;
+}
+
+
+/* login styles */
+.login {
+  background-color: #F5F5F5;
+  padding: 2rem;
+  margin: 0 auto;
+  max-width: 50rem;
+  min-width: 22rem;
+  justify-content: center;
+}
+
+.login-button {
+  color: #FFFFFF;
+  background-color: #7B6E87;
+  border-radius: 5px;
+  margin: 1rem 5rem;
+}
+
+.login > h2 {
+  text-align: center;
+}
+
+.login > form {
+  padding: 0 auto;
+}
+
+.login-form-wrapper {
+  margin: 0 auto;
+  width: 16rem;
+  padding: 1rem;
+}
+
+/* button styles */
+.button-success {
+  color: var(--custom-green);
+  border: 2px solid var(--custom-green);
+  border-radius: var(--button-radius);
+  display: inline-block;
+  font-weight: 400;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  padding: .375rem .75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+.button-success:hover {
+  color: var(--custom-white);
+  background-color: var(--custom-green);
+  border-color: var(--custom-green);
+}
+
+.button-fail {
+  color: var(--custom-orange);
+  border: 2px solid var(--custom-orange);
+  border-radius: var(--button-radius);
+  display: inline-block;
+  font-weight: 400;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  padding: .375rem .75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+.button-fail:hover {
+  color: var(--custom-white);
+  background-color: var(--custom-orange);
+  border-color: var(--custom-orange);
+}
+
+/* nav styles */
+.button-nav {
+  border-radius: var(--button-radius);
+  text-decoration: none;
+  display: block;
+  padding: 0.5rem 1rem;
+  background-color: var(--light-green);
+  color: var(--custom-white);
+}
+
+.button-nav:hover {
+  border-radius: var(--button-radius);
+  text-decoration: none;
+  display: block;
+  padding: 0.5rem 1rem;
+  background-color: var(--custom-green);
+  color: var(--custom-white);
+}
+
+.link-nav {
+  color: var(--light-green);
+  text-decoration: none;
+  display: block;
+  padding: 0.5rem 1rem;
+  background-color: transparent;
+}
+
+.link-nav:hover {
+  color: var(--custom-green);
+}
