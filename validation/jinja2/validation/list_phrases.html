@@ -30,17 +30,28 @@
         <th scope="col"> Transcription </th>
         <th scope="col"> Translation </th>
         <th scope="col"> Recordings </th>
+        <th scope="col">Speaker </th>
       </tr>
     </thead>
     {% for phrase in phrases %}
     <tr data-update-uri="{{ url('validation:update_text', phrase_id=phrase.id) }}">
-      {{ macros.td_transcription(user, phrase) }}
+      {{ macros.td_transcription_link(user, phrase) }}
       {{ macros.td_translation(user, phrase) }}
       <td>
         <ul class="recordings">
         {% for recording in phrase.recordings %}
           <li>
             {{ macros.player(recording) }}
+          </li>
+
+        {% endfor %}{# for recording in phrase.recordings #}
+        </ul>
+      </td>
+      <td>
+        <ul class="speaker">
+        {% for recording in phrase.recordings %}
+          <li class="speaker_code">
+            {{ macros.speaker(recording) }}
           </li>
 
         {% endfor %}{# for recording in phrase.recordings #}

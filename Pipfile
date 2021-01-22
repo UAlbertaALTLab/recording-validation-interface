@@ -15,9 +15,10 @@ python-decouple = "*"
 sh = "*"
 django = ">=2.2,<3"
 typing-extensions = "*"
+pympi-ling = "*"
+requests = "*"
 
 [dev-packages]
-black = "*"
 gunicorn = "*"
 hypothesis = "*"
 isort = ">=5,<6"
@@ -29,7 +30,4 @@ django-stubs = "*"
 django-extensions = "*"
 
 [requires]
-python_version = "3.7"
-
-[pipenv]
-allow_prereleases = true
+python_full_version = "3.7.9"

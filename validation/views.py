@@ -36,6 +36,7 @@ from librecval.normalization import to_indexable_form
 from .crude_views import *
 from .models import Phrase, Recording
 from .forms import Login
+from .helpers import get_distance_with_translations
 
 
 def index(request):
@@ -175,6 +176,19 @@ def login(request):
     form = Login()
     context = dict(form=form)
     return render(request, "validation/login.html", context)
+
+
+def segment_content_view(request, segment_id):
+    """
+    The view for a single segment
+    Returns the selected phrase and info provided by the helper functions
+    """
+    phrases = Phrase.objects.filter(id=segment_id)
+    segment_name = phrases[0].transcription
+    suggestions = get_distance_with_translations(segment_name)
+    context = dict(phrases=phrases, segment_name=segment_name, suggestions=suggestions)
+
+    return render(request, "validation/segment_details.html", context)
 
 
 # TODO: Speaker bio page like https://ojibwe.lib.umn.edu/about/voices

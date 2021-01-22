@@ -39,7 +39,7 @@ from django.core.files.base import ContentFile  # type: ignore
 from django.core.management.base import BaseCommand, CommandError  # type: ignore
 
 from librecval import REPOSITORY_ROOT
-from librecval.extract_phrases import RecordingInfo
+from librecval.extract_phrases import Segment
 from librecval.import_recordings import initialize as import_recordings
 from validation.models import Phrase, Recording, RecordingSession, Speaker
 
@@ -118,9 +118,7 @@ class Command(BaseCommand):
 
 
 @logme.log
-def django_recording_importer(
-    info: RecordingInfo, recording_path: Path, logger
-) -> None:
+def django_recording_importer(info: Segment, recording_path: Path, logger) -> None:
     """
     Imports a single recording.
     """
@@ -157,7 +155,7 @@ def django_recording_importer(
         id=info.compute_sha256hash(),
         speaker=speaker,
         compressed_audio=django_file,
-        timestamp=info.timestamp,
+        timestamp=info.start,
         phrase=phrase,
         session=session,
         quality="",
@@ -168,7 +166,7 @@ def django_recording_importer(
     recording.save()
 
 
-def null_recording_importer(info: RecordingInfo, recording_path: Path) -> None:
+def null_recording_importer(info: Segment, recording_path: Path) -> None:
     """
     Does nothing!
     """

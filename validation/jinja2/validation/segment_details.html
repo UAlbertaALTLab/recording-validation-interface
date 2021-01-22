@@ -1,0 +1,62 @@
+{% extends 'validation/_base.html' %}
+{% import 'validation/_macros.html' as macros %}
+
+{% block content %}
+<div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col"> Transcription </th>
+          <th scope="col"> Translation </th>
+          <th scope="col"> Recordings </th>
+          <th scope="col">Speaker </th>
+        </tr>
+      </thead>
+      {% for phrase in phrases %}
+      <tr>
+        {{ macros.td_transcription(user, phrase) }}
+        {{ macros.td_translation(user, phrase) }}
+        <td>
+          <ul class="recordings">
+          {% for recording in phrase.recordings %}
+            <li>
+              {{ macros.player(recording) }}
+            </li>
+  
+          {% endfor %}{# for recording in phrase.recordings #}
+          </ul>
+        </td>
+        <td>
+          <ul class="speaker">
+          {% for recording in phrase.recordings %}
+            <li class="speaker_code">
+              {{ macros.speaker(recording) }}
+            </li>
+  
+          {% endfor %}{# for recording in phrase.recordings #}
+          </ul>
+        </td>
+      </tr>
+      {% endfor %}{# for phrase in phrases #}
+    </table>
+
+    <table class="table table-striped">
+        <thead>
+          <tr>
+            <th scope="col"> Suggestion </th>
+            <th scope="col"> Translation </th>
+            <th scope="col"> Analysis </th>
+            <th scope="col"> MED </th>
+          </tr>
+        </thead>
+        {% for suggestion in suggestions %}
+        <tr>
+            {{ macros.td_suggestion_transcription(user, suggestion) }}
+            {{ macros.td_suggestion_translation(user, suggestion, suggestions) }}
+            {{ macros.td_suggestion_analysis(user, suggestion, suggestions) }}
+            {{ macros.td_suggestion_med(user, suggestion, suggestions) }}
+        </tr>
+        {% endfor %}{# for suggestion in suggestions #}
+      </table>
+</div>
+{% endblock content %}
