@@ -21,7 +21,13 @@ from pathlib import Path
 
 from django.conf import settings
 from django.core.paginator import Paginator
-from django.http import FileResponse, HttpResponse, HttpResponseBadRequest, JsonResponse
+from django.http import (
+    FileResponse,
+    HttpResponse,
+    HttpResponseBadRequest,
+    JsonResponse,
+    HttpResponseRedirect,
+)
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 
@@ -29,6 +35,7 @@ from librecval.normalization import to_indexable_form
 
 from .crude_views import *
 from .models import Phrase, Recording
+from .forms import Login
 
 
 def index(request):
@@ -151,6 +158,23 @@ def add_cors_headers(response):
     """
     response["Access-Control-Allow-Origin"] = "*"
     return response
+
+
+def login(request):
+    """
+    Serves the login page and sets cookies on successful login
+    """
+
+    if request.method == "POST":
+        form = Login(request.POST)
+        if form.is_valid():
+            response = HttpResponseRedirect("/")
+            response.set_cookie("authenticated", True)
+            response.set_cookie("user", form.cleaned_data["username"])
+            return response
+    form = Login()
+    context = dict(form=form)
+    return render(request, "validation/login.html", context)
 
 
 # TODO: Speaker bio page like https://ojibwe.lib.umn.edu/about/voices
