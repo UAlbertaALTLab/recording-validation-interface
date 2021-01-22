@@ -5,8 +5,21 @@ main {
   margin: 1em auto;
 }
 
+a:hover {
+  cursor: pointer;
+}
+
 .header-dark {
   background-color: var(--mauve);
+}
+
+.table td .speaker {
+  padding: 0;
+}
+
+ul.speaker {
+  padding-bottom: 10;
+  list-style: none;
 }
 
 ul.recordings {
