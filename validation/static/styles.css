@@ -36,11 +36,26 @@ li .speaker {
   justify-content: center;
 }
 
+.login-link:hover {
+  text-decoration: none;
+  cursor: pointer;
+}
+
 .login-button {
-  color: #FFFFFF;
-  background-color: #7B6E87;
-  border-radius: 5px;
+  color: var(--custom-purple);
+  background-color: transparent;
+  border: 2px solid var(--custom-purple);
+  border-radius: var(--button-radius);
   margin: 1rem 5rem;
+}
+
+.login-button:hover {
+  color: var(--custom-white);
+  background-color: var(--custom-purple);
+  border: 2px solid var(--custom-purple);
+  border-radius: var(--button-radius);
+  margin: 1rem 5rem;
+  cursor: pointer;
 }
 
 .login > h2 {
@@ -77,6 +92,7 @@ li .speaker {
   color: var(--custom-white);
   background-color: var(--custom-green);
   border-color: var(--custom-green);
+  cursor: pointer;
 }
 
 .button-fail {
@@ -98,6 +114,7 @@ li .speaker {
   color: var(--custom-white);
   background-color: var(--custom-orange);
   border-color: var(--custom-orange);
+  cursor: pointer;
 }
 
 /* nav styles */
@@ -117,6 +134,7 @@ li .speaker {
   padding: 0.5rem 1rem;
   background-color: var(--custom-green);
   color: var(--custom-white);
+  cursor: pointer;
 }
 
 .link-nav {
@@ -129,4 +147,5 @@ li .speaker {
 
 .link-nav:hover {
   color: var(--custom-green);
+  cursor: pointer;
 }
