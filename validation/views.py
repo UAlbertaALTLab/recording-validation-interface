@@ -47,7 +47,16 @@ def search_phrases(request):
     """
     The search results for pages.
     """
-    return HttpResponse(501)
+    query = request.GET.get("query")
+    all_phrases = Phrase.objects.all()
+    cree_matches = Phrase.objects.filter(transcription__contains=query)
+    english_matches = Phrase.objects.filter(translation__contains=query)
+    all_matches = list(set().union(cree_matches, english_matches))
+    paginator = Paginator(all_matches, 30)
+    page_no = request.GET.get("page", 1)
+    phrases = paginator.get_page(page_no)
+    context = dict(phrases=phrases, search_term=query)
+    return render(request, "validation/search.html", context)
 
 
 def update_text(request):
