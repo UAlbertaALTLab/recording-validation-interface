@@ -23,6 +23,15 @@
 {% import 'validation/_macros.html' as macros %}
 
 {% block content %}
+<div>
+  <form class="form-inline ml-2 my-2 my-lg-0" method="GET" action="{{
+    url('validation:index')
+  }}">
+    <button class="btn btn-outline-success my-2 my-sm-0" type="submit" name="mode" value="all">All</button>
+    <button class="btn btn-outline-success my-2 my-sm-0" type="submit" name="mode" value="validated">Validated</button>
+    <button class="btn btn-outline-success my-2 my-sm-0" type="submit" name="mode" value="unvalidated">Unvalidated</button>
+  </form>
+</div>
 <div class="table-responsive">
   <table class="table table-striped">
     <thead>

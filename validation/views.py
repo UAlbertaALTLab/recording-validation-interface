@@ -35,7 +35,16 @@ def index(request):
     """
     The home page.
     """
-    all_phrases = Phrase.objects.all()
+    mode = query = request.GET.get("mode")
+    if mode == "all":
+        all_phrases = Phrase.objects.all()
+    elif mode == "validated":
+        all_phrases = Phrase.objects.filter(validated=True)
+    elif mode == "unvalidated":
+        all_phrases = Phrase.objects.filter(validated=False)
+    else:
+        all_phrases = Phrase.objects.all()
+
     paginator = Paginator(all_phrases, 30)
     page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)
