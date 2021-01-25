@@ -26,6 +26,12 @@ urlpatterns = [
     path("", views.index, name="index"),
     # TODO: phrases/<int:phrases_id>/<slug>
     path("search/", views.search_phrases, name="search_phrases"),
+    path("advanced_search/", views.advanced_search, name="advanced_search"),
+    path(
+        "advanced_search_results/",
+        views.advanced_search_results,
+        name="advanced_search_results",
+    ),
     path("phrases/<int:phrase_id>/", views.update_text, name="update_text"),
     path("recording/<str:recording_id>.m4a", views.serve_recording, name="recording"),
     path(
