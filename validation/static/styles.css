@@ -134,6 +134,23 @@ li.speaker_code {
   cursor: pointer;
 }
 
+.button-filter {
+  padding: 0.3rem;
+  margin-right: 0.2rem;
+  margin-bottom: 1rem;
+  border: none;
+}
+
+.button-filter-active {
+  color: var(--custom-white);
+  background-color: var(--custom-green);
+  border-color: var(--custom-green);
+}
+
+.filters {
+  margin: 0 auto;
+}
+
 /* nav styles */
 .button-nav {
   border-radius: var(--button-radius);

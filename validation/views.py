@@ -46,20 +46,32 @@ def index(request):
     """
     The home page.
     """
+    all_class = "button-success button-filter"
+    validated_class = "button-success button-filter"
+    unvalidated_class = "button-success button-filter"
     mode = query = request.GET.get("mode")
     if mode == "all":
         all_phrases = Phrase.objects.all()
+        all_class = "button-success button-filter button-filter-active"
     elif mode == "validated":
         all_phrases = Phrase.objects.filter(validated=True)
+        validated_class = "button-success button-filter button-filter-active"
     elif mode == "unvalidated":
         all_phrases = Phrase.objects.filter(validated=False)
+        unvalidated_class = "button-success button-filter button-filter-active"
     else:
         all_phrases = Phrase.objects.all()
+        all_class = "button-success button-filter button-filter-active"
 
     paginator = Paginator(all_phrases, 30)
     page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)
-    context = dict(phrases=phrases)
+    context = dict(
+        phrases=phrases,
+        all_class=all_class,
+        validated_class=validated_class,
+        unvalidated_class=unvalidated_class,
+    )
     return render(request, "validation/list_phrases.html", context)
 
 
