@@ -4,14 +4,14 @@
 
 {% block content %}
 <div class="login">
-<h2>Login to Validate Entries</h2>
+<h2>Register as a New User</h2>
     <div class="login-form-wrapper">
         <form action="" method="GET">
             <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+            {{ form.username.errors }}
             {{ form }}
-            <input type="submit" value="Login" class="login-button">
+            <input type="submit" value="Register" class="login-button">
         </form>
-        <a href="{{ url('validation:register') }}"><button class="login-button">Register</button></a>
     </div>
 </div>
 {% endblock content %}

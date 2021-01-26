@@ -25,6 +25,7 @@ app_name = "validation"
 urlpatterns = [
     path("", views.index, name="index"),
     path("login", views.login, name="login"),
+    path("register", views.register, name="register"),
     # TODO: phrases/<int:phrases_id>/<slug>
     path("phrases", views.search_phrases, name="search_phrases"),
     path("phrases/<int:phrase_id>/", views.update_text, name="update_text"),

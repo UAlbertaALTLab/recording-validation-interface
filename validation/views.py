@@ -30,12 +30,14 @@ from django.http import (
 )
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login as django_login
 
 from librecval.normalization import to_indexable_form
 
 from .crude_views import *
 from .models import Phrase, Recording
-from .forms import Login
+from .forms import Login, Register
 
 
 def index(request):
@@ -165,16 +167,50 @@ def login(request):
     Serves the login page and sets cookies on successful login
     """
 
-    if request.method == "POST":
-        form = Login(request.POST)
+    if request.method == "GET":
+        form = Login(request.GET)
         if form.is_valid():
-            response = HttpResponseRedirect("/")
-            response.set_cookie("authenticated", True)
-            response.set_cookie("user", form.cleaned_data["username"])
-            return response
+            username = form.cleaned_data["username"]
+            password = form.cleaned_data["password"]
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                django_login(request, user)
+                response = HttpResponseRedirect("/")
+                return response
     form = Login()
     context = dict(form=form)
     return render(request, "validation/login.html", context)
+
+
+def register(request):
+    """
+    Serves the login page and sets cookies on successful login
+    """
+
+    if request.method == "GET":
+        form = Register(request.GET)
+        if form.is_valid():
+            username = form.clean_username()
+            password = form.cleaned_data["password"]
+            first_name = form.cleaned_data["first_name"]
+            last_name = form.cleaned_data["last_name"]
+            user = authenticate(request, username=username, password=password)
+            if user is None:
+                new_user = User.objects.create_user(
+                    username=username,
+                    password=password,
+                    first_name=first_name,
+                    last_name=last_name,
+                )
+                new_user.save()
+                response = HttpResponseRedirect("/login")
+                return response
+        else:
+            # TODO: show error message when username is not unique
+            print()
+
+    context = dict(form=form)
+    return render(request, "validation/register.html", context)
 
 
 # TODO: Speaker bio page like https://ojibwe.lib.umn.edu/about/voices
