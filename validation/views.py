@@ -36,17 +36,26 @@ from django.urls import reverse
 from librecval.normalization import to_indexable_form
 
 from .crude_views import *
-from .models import Phrase, Recording
 from .forms import Login
 from .helpers import get_distance_with_translations
 from .forms import EditSegment
+from .models import Phrase, Recording, Speaker
 
 
 def index(request):
     """
     The home page.
     """
-    all_phrases = Phrase.objects.all()
+    mode = query = request.GET.get("mode")
+    if mode == "all":
+        all_phrases = Phrase.objects.all()
+    elif mode == "validated":
+        all_phrases = Phrase.objects.filter(validated=True)
+    elif mode == "unvalidated":
+        all_phrases = Phrase.objects.filter(validated=False)
+    else:
+        all_phrases = Phrase.objects.all()
+
     paginator = Paginator(all_phrases, 30)
     page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)
@@ -58,7 +67,94 @@ def search_phrases(request):
     """
     The search results for pages.
     """
-    return HttpResponse(501)
+    query = request.GET.get("query")
+    cree_matches = Phrase.objects.filter(transcription__contains=query)
+    english_matches = Phrase.objects.filter(translation__contains=query)
+    all_matches = list(set().union(cree_matches, english_matches))
+    paginator = Paginator(all_matches, 30)
+    page_no = request.GET.get("page", 1)
+    phrases = paginator.get_page(page_no)
+    context = dict(phrases=phrases, search_term=query)
+    return render(request, "validation/search.html", context)
+
+
+def advanced_search(request):
+    """
+    The search results for pages.
+    """
+    query = Speaker.objects.all()
+    speakers = []
+    for q in query:
+        speakers.append(q.code)
+
+    print(query)
+
+    context = dict(speakers=speakers)
+    return render(request, "validation/advanced_search.html", context)
+
+
+def advanced_search_results(request):
+    """
+    Search results for advanced search
+    Takes in parameters from GET request and makes necessary
+    queries to return all the appropriate entries
+    The steps are:
+    cree phrases UNION english phrases UNION analysis
+    INTERSECT status
+    INTERSECT speaker
+    """
+    transcription = request.GET.get("transcription")
+    translation = request.GET.get("translation")
+    analysis = request.GET.get("analysis")
+    status = request.GET.get("status")
+    speaker = request.GET.get("speaker")
+    speakers = speaker.strip().split(",")[:-1]
+
+    if transcription != "":
+        cree_matches = Phrase.objects.filter(transcription__contains=transcription)
+    else:
+        cree_matches = []
+
+    if translation != "":
+        english_matches = Phrase.objects.filter(translation__contains=translation)
+    else:
+        english_matches = []
+
+    # if analysis != "":
+    #     analysis_matches = Phrase.objects.filter(analysis__contains=analysis)
+    # else:
+    #     analysis_matches = []
+
+    if transcription == "" and translation == "":
+        phrase_matches = Phrase.objects.all()
+    else:
+        phrase_matches = list(set().union(cree_matches, english_matches))
+
+    if status != "all":
+        if status == "validated":
+            status_matches = Phrase.objects.filter(validated=True)
+        elif status == "unvalidated":
+            status_matches = Phrase.objects.filter(validated=False)
+        phrase_and_status_matches = list(
+            set(phrase_matches).intersection(status_matches)
+        )
+    else:
+        phrase_and_status_matches = phrase_matches
+
+    all_matches = []
+    if "all" in speaker or speaker == "None":
+        all_matches = phrase_and_status_matches
+    else:
+        for phrase in phrase_and_status_matches:
+            for recording in phrase.recordings:
+                if recording.speaker.code in speakers:
+                    all_matches.append(phrase)
+
+    paginator = Paginator(all_matches, 30)
+    page_no = request.GET.get("page", 1)
+    phrases = paginator.get_page(page_no)
+    context = dict(phrases=phrases, search_term="query")
+    return render(request, "validation/search.html", context)
 
 
 def update_text(request):
