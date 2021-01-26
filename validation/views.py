@@ -84,7 +84,13 @@ def advanced_search(request):
 
 def advanced_search_results(request):
     """
-    The search results for pages.
+    Search results for advanced search
+    Takes in parameters from GET request and makes necessary
+    queries to return all the appropriate entries
+    The steps are:
+    cree phrases UNION english phrases UNION analysis
+    INTERSECT status
+    INTERSECT speaker
     """
     transcription = request.GET.get("transcription")
     translation = request.GET.get("translation")
@@ -92,11 +98,6 @@ def advanced_search_results(request):
     status = request.GET.get("status")
     speaker = request.GET.get("speaker")
     speakers = speaker.strip().split(",")[:-1]
-    print("SPEAKER: ", speakers)
-
-    # all phrase = cree phrase UNION english phrase UNION analysis
-    # all phrases INTERSECT status
-    # all phrases INTERSECT speaker
 
     if transcription != "":
         cree_matches = Phrase.objects.filter(transcription__contains=transcription)
@@ -113,7 +114,10 @@ def advanced_search_results(request):
     # else:
     #     analysis_matches = []
 
-    phrase_matches = list(set().union(cree_matches, english_matches))
+    if transcription == "" and translation == "":
+        phrase_matches = Phrase.objects.all()
+    else:
+        phrase_matches = list(set().union(cree_matches, english_matches))
 
     if status != "all":
         if status == "validated":
@@ -121,19 +125,20 @@ def advanced_search_results(request):
         elif status == "unvalidated":
             status_matches = Phrase.objects.filter(validated=False)
         phrase_and_status_matches = list(
-            set().intersection(phrase_matches, status_matches)
+            set(phrase_matches).intersection(status_matches)
         )
     else:
         phrase_and_status_matches = phrase_matches
 
     all_matches = []
-    if speaker != "all" and speaker != "":
+    if "all" in speaker or speaker == "None":
+        all_matches = phrase_and_status_matches
+    else:
         for phrase in phrase_and_status_matches:
-            for recording in phrase.recordings():
+            for recording in phrase.recordings:
                 if recording.speaker.code in speakers:
                     all_matches.append(phrase)
 
-    print(all_matches)
     paginator = Paginator(all_matches, 30)
     page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)

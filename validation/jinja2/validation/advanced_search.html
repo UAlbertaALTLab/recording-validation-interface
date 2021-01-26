@@ -15,7 +15,11 @@
                 selected_speakers += items[i].value+",";
         }
 
-        document.getElementById('speaker').value = selected_speakers;
+        if (selected_speakers.length == 0) {
+            document.getElementById('speaker').value = 'None';
+        } else {
+            document.getElementById('speaker').value = selected_speakers;
+        }
     }
 </script>
 <form method="GET" action="{{
