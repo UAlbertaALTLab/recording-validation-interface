@@ -82,7 +82,7 @@
  # Expands to a <td> that displays the English translation.
  #}
 {% macro td_translation(user, phrase) %}
-<td lang="en" id="{{ phrase }}-translation">
+<td lang="en" id="{{ phrase }}-translation" class="restrict-content">
   {{ phrase.translation }}
 </td>
 {% endmacro %}
@@ -127,7 +127,7 @@
  {% endmacro %}
 
 {#
-  # Expands to a <td> that displays the segment speaker.
+  # Returns the recording speaker
   #}
  {% macro speaker(recording) %}
    {{ recording.speaker }}

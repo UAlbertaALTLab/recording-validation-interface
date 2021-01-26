@@ -166,3 +166,8 @@ li.speaker_code {
   color: var(--custom-green);
   cursor: pointer;
 }
+
+/* table styles */
+.restrict-content {
+  max-width: 15rem;
+}
