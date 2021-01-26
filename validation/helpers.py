@@ -1,9 +1,13 @@
+from os import fspath
+
 import divvunspell
 from difflib import Differ, SequenceMatcher, get_close_matches
 import operator
 
 import requests
 import json
+
+from django.conf import settings
 
 """
 RULES
@@ -15,7 +19,8 @@ RULES
 
 """
 
-archive = divvunspell.SpellerArchive("/Users/jolenepoulin/Documents/crk.zhfst")
+
+archive = divvunspell.SpellerArchive(fspath(settings.BASE_DIR / 'crk.zhfst'))
 speller = archive.speller()
 
 vowels = ["a", "i", "o", "â", "î", "ô"]
