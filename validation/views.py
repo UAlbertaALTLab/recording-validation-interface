@@ -48,7 +48,8 @@ def index(request):
     paginator = Paginator(all_phrases, 30)
     page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)
-    context = dict(phrases=phrases)
+    auth = request.user.is_authenticated
+    context = dict(phrases=phrases, auth=auth)
     return render(request, "validation/list_phrases.html", context)
 
 
