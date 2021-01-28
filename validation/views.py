@@ -163,33 +163,13 @@ def add_cors_headers(response):
     return response
 
 
-def login(request):
-    """
-    Serves the login page and authenticates user on success
-    """
-
-    if request.method == "POST":
-        form = Login(request.POST)
-        if form.is_valid():
-            username = form.cleaned_data["username"]
-            password = form.cleaned_data["password"]
-            user = authenticate(request, username=username, password=password)
-            if user is not None:
-                django_login(request, user)
-                response = HttpResponseRedirect("/")
-                return response
-    form = Login()
-    context = dict(form=form)
-    return render(request, "validation/login.html", context)
-
-
 def register(request):
     """
     Serves the register page and creates a new user on success
     """
 
-    if request.method == "GET":
-        form = Register(request.GET)
+    if request.method == "POST":
+        form = Register(request.POST)
         if form.is_valid():
             username = form.clean_username()
             password = form.cleaned_data["password"]

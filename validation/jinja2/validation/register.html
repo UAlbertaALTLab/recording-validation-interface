@@ -6,7 +6,7 @@
 <div class="login">
 <h2>Register as a New User</h2>
     <div class="login-form-wrapper">
-        <form action="" id="register-form" method="GET">
+        <form action="" id="register-form" method="POST">
             <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
             {{ form }}
             <input type="submit" value="Register" id="register-button" class="login-button">
