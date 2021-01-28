@@ -101,12 +101,11 @@
 
     {# Login button #}
     <div>
-      <a href="/login" style="color: white;">
         {% if auth %}
-        Logout
+        <a href="/logout" id="logout-link" style="color: white;">Logout</a>
         {% else %}
-        Login
-        {% endif %}</a>
+        <a href="/login" id="login-link" style="color: white;">Login</a>
+        {% endif %}
     </div>
   </nav>
 
