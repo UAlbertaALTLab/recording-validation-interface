@@ -199,10 +199,10 @@ class RecordingExtractor:
             yield from generate_segments_from_eaf(_path, audio, speaker, session_id)
 
 
-def generate_segments_from_eaf(
-    annotation_path: Path, audio: AudioSegment, speaker: str, session_id: SessionID
-):
-
+@logme.log
+def find_audio_from_audacity_format(
+    annotation_path: Path, logger=None
+) -> Optional[Path]:
     """
     Yields segements from the annotation file
     """
@@ -212,6 +212,14 @@ def generate_segments_from_eaf(
 
     keys = eaf_file.get_tier_names()
     count = 0
+
+
+@logme.log
+def find_audio_from_audition_format(
+    annotation_path: Path, logger=None
+) -> Optional[Path]:
+    #  Gross code to try Adobe Audition recorded files
+    session_dir = annotation_path.parent
 
     # get tiers from keys
     english_word_tier, cree_word_tier = get_word_tiers(keys)

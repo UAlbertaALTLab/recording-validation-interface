@@ -20,7 +20,7 @@ RULES
 """
 
 
-archive = divvunspell.SpellerArchive(fspath(settings.BASE_DIR / 'crk.zhfst'))
+archive = divvunspell.SpellerArchive(fspath(settings.BASE_DIR / "crk.zhfst"))
 speller = archive.speller()
 
 vowels = ["a", "i", "o", "â", "î", "ô"]

@@ -116,9 +116,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
-    {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"
-    },
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
 
@@ -210,3 +208,5 @@ MEDIA_URL = config("MEDIA_URL", default="/media/")
 
 # Recoring URLS will be moved here
 MEDIA_ROOT = config("MEDIA_ROOT", default=BASE_DIR / "data", cast=str)
+
+LOGIN_REDIRECT_URL = "/"
