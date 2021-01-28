@@ -21,14 +21,23 @@ from pathlib import Path
 
 from django.conf import settings
 from django.core.paginator import Paginator
-from django.http import FileResponse, HttpResponse, HttpResponseBadRequest, JsonResponse
+from django.http import (
+    FileResponse,
+    HttpResponse,
+    HttpResponseBadRequest,
+    JsonResponse,
+    HttpResponseRedirect,
+)
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login as django_login
 
 from librecval.normalization import to_indexable_form
 
 from .crude_views import *
 from .models import Phrase, Recording
+from .forms import Login, Register
 
 
 def index(request):
@@ -39,7 +48,8 @@ def index(request):
     paginator = Paginator(all_phrases, 30)
     page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)
-    context = dict(phrases=phrases)
+    auth = request.user.is_authenticated
+    context = dict(phrases=phrases, auth=auth)
     return render(request, "validation/list_phrases.html", context)
 
 
@@ -151,6 +161,34 @@ def add_cors_headers(response):
     """
     response["Access-Control-Allow-Origin"] = "*"
     return response
+
+
+def register(request):
+    """
+    Serves the register page and creates a new user on success
+    """
+
+    if request.method == "POST":
+        form = Register(request.POST)
+        if form.is_valid():
+            username = form.clean_username()
+            password = form.cleaned_data["password"]
+            first_name = form.cleaned_data["first_name"]
+            last_name = form.cleaned_data["last_name"]
+            user = authenticate(request, username=username, password=password)
+            if user is None:
+                new_user = User.objects.create_user(
+                    username=username,
+                    password=password,
+                    first_name=first_name,
+                    last_name=last_name,
+                )
+                new_user.save()
+                response = HttpResponseRedirect("/login")
+                return response
+
+    context = dict(form=form)
+    return render(request, "validation/register.html", context)
 
 
 # TODO: Speaker bio page like https://ojibwe.lib.umn.edu/about/voices
