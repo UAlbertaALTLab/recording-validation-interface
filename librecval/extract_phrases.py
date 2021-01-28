@@ -176,7 +176,9 @@ class RecordingExtractor:
 
 
 @logme.log
-def find_audio_from_audacity_format(annotation_path: Path, logger=None) -> Optional[Path]:
+def find_audio_from_audacity_format(
+    annotation_path: Path, logger=None
+) -> Optional[Path]:
     """
     Finds the associated audio in Audacity's format.
     """
@@ -187,7 +189,9 @@ def find_audio_from_audacity_format(annotation_path: Path, logger=None) -> Optio
 
 
 @logme.log
-def find_audio_from_audition_format(annotation_path: Path, logger=None) -> Optional[Path]:
+def find_audio_from_audition_format(
+    annotation_path: Path, logger=None
+) -> Optional[Path]:
     #  Gross code to try Adobe Audition recorded files
     session_dir = annotation_path.parent
 
