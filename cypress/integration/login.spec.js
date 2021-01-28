@@ -4,7 +4,7 @@
 describe("Login", () => {
     it("loads the page", () => {
         // checks that all page elements load
-        cy.visit('/login')
+        cy.visit(Cypress.env('login_url'))
         cy.get('h2')
             .contains('Login to Validate Entries')
         cy.get('#login-form')
@@ -25,7 +25,7 @@ describe("Login", () => {
 
     it("enters valid information", () => {
         // login as valid user works
-        cy.visit('/login')
+        cy.visit(Cypress.env('login_url'))
 
         cy.get('#login-form')
             .should('be.visible');
@@ -46,7 +46,7 @@ describe("Login", () => {
 
     it("needs a password to proceed", () => {
         // login without password does not work
-        cy.visit('/login')
+        cy.visit(Cypress.env('login_url'))
 
         cy.get('#login-form')
             .should('be.visible');
@@ -63,7 +63,7 @@ describe("Login", () => {
 
     it("needs a VALID password to proceed", () => {
         // login with invalid password does not work
-        cy.visit('/login')
+        cy.visit(Cypress.env('login_url'))
 
         cy.get('#login-form')
             .should('be.visible');
@@ -84,7 +84,7 @@ describe("Login", () => {
 
     it("needs needs to login with a real user", () => {
         // login with invalid password does not work
-        cy.visit('/login')
+        cy.visit(Cypress.env('login_url'))
 
         cy.get('#login-form')
             .should('be.visible');

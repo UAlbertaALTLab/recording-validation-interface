@@ -165,11 +165,11 @@ def add_cors_headers(response):
 
 def login(request):
     """
-    Serves the login page and sets cookies on successful login
+    Serves the login page and authenticates user on success
     """
 
-    if request.method == "GET":
-        form = Login(request.GET)
+    if request.method == "POST":
+        form = Login(request.POST)
         if form.is_valid():
             username = form.cleaned_data["username"]
             password = form.cleaned_data["password"]
@@ -185,7 +185,7 @@ def login(request):
 
 def register(request):
     """
-    Serves the login page and sets cookies on successful login
+    Serves the register page and creates a new user on success
     """
 
     if request.method == "GET":

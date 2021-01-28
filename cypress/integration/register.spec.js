@@ -5,7 +5,7 @@ describe("Register", () => {
     it("loads from login page", () => {
         // checks that register button on login page
         // navigates to register page
-        cy.visit('/login')
+        cy.visit(Cypress.env('login_url'))
 
         cy.get('#register-button')
             .should('be.visible')
@@ -17,7 +17,7 @@ describe("Register", () => {
 
     it("loads all UI elements", () => {
         // checks that all UI elements load
-        cy.visit('/register')
+        cy.visit(Cypress.env('register_url'))
 
         cy.get('h2')
             .contains('Register as a New User')
@@ -43,7 +43,7 @@ describe("Register", () => {
 
     it("creates a new valid user", () => {
         // creates a new valid user
-        cy.visit('/register')
+        cy.visit(Cypress.env('register_url'))
 
         cy.get('h2')
             .contains('Register as a New User')
@@ -72,7 +72,7 @@ describe("Register", () => {
 
     it("raises an error when the username is already taken", () => {
         // doesn't allow username duplication
-        cy.visit('/register')
+        cy.visit(Cypress.env('register_url'))
 
         cy.get('h2')
             .contains('Register as a New User')
@@ -104,7 +104,7 @@ describe("Register", () => {
     })
 
     it("needs a first name to make a new user", () => {
-        cy.visit('/register')
+        cy.visit(Cypress.env('register_url'))
 
         cy.get('h2')
             .contains('Register as a New User')
@@ -121,7 +121,7 @@ describe("Register", () => {
     })
 
     it("needs a last name to make a new user", () => {
-        cy.visit('/register')
+        cy.visit(Cypress.env('register_url'))
 
         cy.get('h2')
             .contains('Register as a New User')
@@ -141,7 +141,7 @@ describe("Register", () => {
     })
 
     it("needs a username to make a new user", () => {
-        cy.visit('/register')
+        cy.visit(Cypress.env('register_url'))
 
         cy.get('h2')
             .contains('Register as a New User')
@@ -164,7 +164,7 @@ describe("Register", () => {
     })
 
     it("needs a password to make a new user", () => {
-        cy.visit('/register')
+        cy.visit(Cypress.env('register_url'))
 
         cy.get('h2')
             .contains('Register as a New User')
