@@ -206,9 +206,6 @@ def register(request):
                 new_user.save()
                 response = HttpResponseRedirect("/login")
                 return response
-        else:
-            # TODO: show error message when username is not unique
-            print()
 
     context = dict(form=form)
     return render(request, "validation/register.html", context)
