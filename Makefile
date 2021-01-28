@@ -32,3 +32,6 @@ migrate:
 
 reformat:
 	black librecval tests validation recvalsite
+
+requirements.txt:
+	pipfile2req > $@

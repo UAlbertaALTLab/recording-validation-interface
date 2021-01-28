@@ -5,7 +5,7 @@ node_modules/
 .venv/
 
 # Audio files
-.data/
+data/
 
 # HFSTs
 *.zhfst
