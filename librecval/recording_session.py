@@ -206,7 +206,6 @@ class SessionID(NamedTuple):
     def parse_dirty(cls, name: str) -> "SessionID":
         """
         Attempts to parse a messy session name.
-
         >>> sid = SessionID.parse_dirty('2015-04-15-am')
         >>> sid.date
         datetime.date(2015, 4, 15)
@@ -264,10 +263,8 @@ class SessionMetadata:
     def parse(cls, row: Dict[str, Any], session_name: str = None) -> "SessionMetadata":
         """
         Parses a row from the metadata CSV file.
-
         Can pass an explicit session name to override what's written in the
         "SESSION" column.
-
         """
         # Extract "raw" name
         raw_name = row["SESSION"]
@@ -380,7 +377,6 @@ def parse_metadata(metadata_file: TextIO, logger) -> Dict[SessionID, SessionMeta
 def apply_or_none(fn: Callable[[AnyStr], T], match: Optional[AnyStr]) -> Optional[T]:
     """
     Applies fn to the match ONLY if the match is not None.
-
     This is similar to >>= from Haskell.
     """
     if match is not None:

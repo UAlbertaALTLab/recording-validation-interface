@@ -13,9 +13,25 @@
     margin: 1em auto;
   }
 
+  .table td .speaker {
+    padding: 0;
+  }
+  .bg-dark {
+    background-color: #143B6D !important;
+}
+
   ul.recordings {
     padding: auto 0;
     list-style: none;
+  }
+
+  ul.speaker {
+    padding-bottom: 10;
+    list-style: none;
+  }
+
+  li.speaker_code {
+    padding-bottom: 1.5rem;
   }
 
   li .speaker {
@@ -28,6 +44,46 @@
   .recordings audio {
     max-width: 100%;
   }
+
+  .login {
+        background-color: #f5f5f5;
+        padding: 2rem;
+        margin: 0 auto;
+        max-width: 50rem;
+        min-width: 22rem;
+        justify-content: center;
+    }
+
+  .login-button {
+    color: #ffffff;
+    background-color: #7B6E87;
+    border-radius: 5px;
+    margin: 1rem 5rem;
+  }
+
+  .login > h2 {
+    text-align: center;
+  }
+
+  .login > form {
+    padding: 0 auto;
+  }
+
+  .login-form-wrapper {
+    margin: 0 auto;
+    width: 16rem;
+    padding: 1rem;
+  }
+
+  .errorlist {
+    color: red;
+    font-size: 9pt;
+    list-style: none;
+    margin-left: -2rem;
+    margin-bottom: 0;
+    font-style: italic;
+  }
+
   </style>
   {% endblock head %}
 
@@ -54,6 +110,15 @@
         <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
       </form>
       <a href="{{ url('validation:advanced_search') }}" class="btn btn-outline-success my-2 my-sm-0">Advanced Search</a>
+    </div>
+
+    {# Login button #}
+    <div>
+        {% if auth %}
+        <a href="/logout" id="logout-link" style="color: white;">Logout</a>
+        {% else %}
+        <a href="/login" id="login-link" style="color: white;">Login</a>
+        {% endif %}
     </div>
   </nav>
 

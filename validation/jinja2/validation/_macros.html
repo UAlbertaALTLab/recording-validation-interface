@@ -59,12 +59,24 @@
 
 {#
  # Expands to a <td> that displays the Cree transcription.
+  # Creates link from phrase to view more details 
  #}
-{% macro td_transcription(user, phrase) %}
+{% macro td_transcription_link(user, phrase) %}
 <td lang="crk">
-  {{ phrase.transcription }}
+  <a name="word-link" id="{{ phrase.transcription }}" href="{{ url('validation:segment_detail', phrase.id) }} ">
+    {{ phrase.transcription }}
+  </a>
 </td>
 {% endmacro %}
+
+{#
+  # Expands to a <td> that displays the Cree transcription.
+  #}
+ {% macro td_transcription(user, phrase) %}
+ <td lang="crk">
+     {{ phrase.transcription }}
+ </td>
+ {% endmacro %}
 
 {#
  # Expands to a <td> that displays the English translation.
@@ -74,5 +86,51 @@
   {{ phrase.translation }}
 </td>
 {% endmacro %}
+
+{#
+  # Expands to a <td> that displays the Cree suggestion from itwêwina.
+  #}
+ {% macro td_suggestion_transcription(user, suggestion) %}
+ <td lang="crk">
+   {{ suggestion }}
+ </td>
+ {% endmacro %}
+
+{#
+  # Expands to a <td> that displays the English translation
+    # of the Cree suggestion from itwêwina.
+  #}
+ {% macro td_suggestion_translation(user, suggestion, suggestions) %}
+ <td lang="en">
+   {{ suggestions[suggestion]['translation'][0] or 'No translation available' }}
+ </td>
+ {% endmacro %}
+
+ {#
+  # Expands to a <td> that displays the linguistic analysis
+    # of the Cree suggestion from itwêwina.
+  #}
+ {% macro td_suggestion_analysis(user, suggestion, suggestions) %}
+ <td lang="en">
+   {{ suggestions[suggestion]['analysis'] }}
+ </td>
+ {% endmacro %}
+
+ {#
+  # Expands to a <td> that displays the English translation
+    # of the Cree suggestion from itwêwina.
+  #}
+ {% macro td_suggestion_med(user, suggestion, suggestions) %}
+ <td lang="en">
+   {{ suggestions[suggestion]['med'] }}
+ </td>
+ {% endmacro %}
+
+{#
+  # Expands to a <td> that displays the segment speaker.
+  #}
+ {% macro speaker(recording) %}
+   {{ recording.speaker }}
+ {% endmacro %}
 
 {# vim: set ft=htmldjango :#}
