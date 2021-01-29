@@ -18,6 +18,7 @@
 
 import io
 from pathlib import Path
+import datetime
 
 from django.conf import settings
 from django.core.paginator import Paginator
@@ -182,6 +183,8 @@ def segment_content_view(request, segment_id):
             p.translation = translation
             p.analysis = analysis
             p.validated = True
+            p.modifier = str(request.user)
+            p.date = datetime.datetime.now()
             p.save()
 
     phrases = Phrase.objects.filter(id=segment_id)
