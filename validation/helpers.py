@@ -193,8 +193,3 @@ def get_distance_with_translations(word):
         }
 
     return suggestions
-
-
-if __name__ == "__main__":
-    word = "ekwa"
-    print(get_distance_with_translations(word))
