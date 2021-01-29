@@ -12,7 +12,7 @@ describe("Details View", () => {
             .click();
 
         cy.location('pathname')
-            .should('include', '/1');
+            .should('include', 'segment/1');
     })
 
     it("shows original word", () => {
@@ -28,7 +28,7 @@ describe("Details View", () => {
                     .click()
 
                 cy.location('pathname')
-                    .should('include', '/1');
+                    .should('include', 'segment/1');
 
                 cy.get('#segment-table')
                     .contains(w)
