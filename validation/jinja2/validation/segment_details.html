@@ -131,11 +131,11 @@
         </thead>
         {% for revision in history %}
         <tr>
-          <td>{{ revision.modifier }} </td>
-          <td>{{ revision.date }} </td>
-          <td>{{ revision.transcription }} </td>
-          <td>{{ revision.translation }} </td>
-          <td>{{ revision.analysis }} </td>
+          <td cy-data="revision-modifier">{{ revision.modifier }} </td>
+          <td cy-data="revision-date">{{ revision.date }} </td>
+          <td cy-data="revision-transcription">{{ revision.transcription }} </td>
+          <td cy-data="revision-translation">{{ revision.translation }} </td>
+          <td cy-data="revision-analysis">{{ revision.analysis }} </td>
           {% if auth %}
           <td>
             <input type="button" value="Revert" onclick="revert('{{ revision.transcription }}', '{{ revision.translation }}', '{{ revision.analysis }}')" />
