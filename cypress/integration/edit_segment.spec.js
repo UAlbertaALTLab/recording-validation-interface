@@ -35,7 +35,7 @@ describe("Edit segment", () => {
 
         cy.get('a[name="word-link"]:first')
             .then((word) => {
-                const w = word[0].id
+                const word_id = word[0].id
                 cy.get('a[name="word-link"]:first')
                     .click()
 
@@ -43,7 +43,7 @@ describe("Edit segment", () => {
                     .should('include', Cypress.env("segment_details_url"));
 
                 cy.get('#segment-table')
-                    .contains(w)
+                    .contains(word_id)
             })
         })
     
@@ -97,13 +97,16 @@ describe("Edit segment", () => {
         cy.visit(Cypress.env("segment_details_url"));
 
         cy.get("#suggestions-table").within(() => {
-            cy.get('td:first')
+            cy.get('[cy-data="suggestion-transcription"]')
+                .first()
                 .invoke('text')
                 .as('transcription')
-            cy.get('td:nth-child(2):first')
+            cy.get('[cy-data="suggestion-translation"]')
+                .first()
                 .invoke('text')
                 .as('translation')
-            cy.get('td:nth-child(3):first')
+            cy.get('[cy-data="suggestion-analysis"]')
+                .first()
                 .invoke('text')
                 .as('analysis')
             cy.get('input:first')
@@ -136,13 +139,16 @@ describe("Edit segment", () => {
         cy.visit(Cypress.env("segment_details_url"));
 
         cy.get("#revision-table").within(() => {
-            cy.get('td:nth-child(3):first')
+            cy.get('[cy-data="revision-transcription"]')
+                .first()
                 .invoke('text')
                 .as('transcription')
-            cy.get('td:nth-child(4):first')
+            cy.get('[cy-data="revision-translation"]')
+                .first()
                 .invoke('text')
                 .as('translation')
-            cy.get('td:nth-child(5):first')
+            cy.get('[cy-data="revision-analysis"]')
+                .first()
                 .invoke('text')
                 .as('analysis')
             cy.get('input:first')
@@ -178,15 +184,14 @@ describe("Edit segment", () => {
             .click()
 
         cy.get("#segment-table").within(() => {
-            cy.get('td:first')
+            cy.get('[cy-data="segment-transcription"]')
+                .first()
                 .invoke('text')
                 .as('transcription')
-            cy.get('td:nth-child(2):first')
+            cy.get('[cy-data="segment-translation"]')
+                .first()
                 .invoke('text')
                 .as('translation')
-            cy.get('td:nth-child(3):first')
-                .invoke('text')
-                .as('analysis')            
         })
 
         cy.get('[data-cy=edit-div]').should('be.visible')
@@ -201,32 +206,27 @@ describe("Edit segment", () => {
             .within(() => {
                 cy.get('@translation')
             })
-
-        cy.get('#id_analysis')
-            .should('be.visible')
-            .within(() => {
-                cy.get('@analysis')
-            })
     })
 
     it("should update the entry when clicking Save", () => {
         cy.visit(Cypress.env("segment_details_url"));
 
         cy.get("#suggestions-table").within(() => {
-            cy.get('td:first')
+            cy.get('[cy-data="suggestion-transcription"]')
+                .first()
                 .invoke('text')
                 .as('transcription')
-            cy.get('td:nth-child(2):first')
+            cy.get('[cy-data="suggestion-translation"]')
+                .first()
                 .invoke('text')
                 .as('translation')
-            cy.get('td:nth-child(3):first')
+            cy.get('[cy-data="suggestion-analysis"]')
+                .first()
                 .invoke('text')
                 .as('analysis')
             cy.get('input:first')
                 .should('have.value', 'Accept')
                 .click()
-
-            
         })
         cy.get('[data-cy=edit-div]').should('be.visible')
         cy.get('#id_cree')
@@ -266,13 +266,16 @@ describe("Edit segment", () => {
         cy.visit(Cypress.env("segment_details_url"));
 
         cy.get("#suggestions-table").within(() => {
-            cy.get('td:first')
+            cy.get('[cy-data="suggestion-transcription"]')
+                .first()
                 .invoke('text')
                 .as('transcription')
-            cy.get('td:nth-child(2):first')
+            cy.get('[cy-data="suggestion-translation"]')
+                .first()
                 .invoke('text')
                 .as('translation')
-            cy.get('td:nth-child(3):first')
+            cy.get('[cy-data="suggestion-analysis"]')
+                .first()
                 .invoke('text')
                 .as('analysis')
             cy.get('input:first')
@@ -281,15 +284,14 @@ describe("Edit segment", () => {
         })
 
         cy.get("#segment-table").within(() => {
-            cy.get('td:first')
+            cy.get('[cy-data="segment-transcription"]')
+                .first()
                 .invoke('text')
                 .as('og_transcription')
-            cy.get('td:nth-child(2):first')
+            cy.get('[cy-data="segment-translation"]')
+                .first()
                 .invoke('text')
-                .as('og_translation')
-            cy.get('td:nth-child(3):first')
-                .invoke('text')
-                .as('og_analysis')            
+                .as('og_translation')         
         })
 
         cy.get('[data-cy=edit-div]').should('be.visible')
@@ -321,7 +323,6 @@ describe("Edit segment", () => {
         cy.get("#segment-table").within(() => {
             cy.get('@og_transcription')
             cy.get('@og_translation')
-            cy.get('@og_analysis')
         })
     })
 });
