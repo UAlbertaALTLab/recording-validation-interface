@@ -36,9 +36,9 @@ from django.contrib.auth import authenticate, login as django_login
 from librecval.normalization import to_indexable_form
 
 from .crude_views import *
-from .models import Phrase, Recording
+from .models import Phrase, Recording, Speaker
 from .helpers import get_distance_with_translations
-from .forms import Login, Register, Speaker
+from .forms import Login, Register
 
 
 def index(request):
@@ -86,8 +86,6 @@ def advanced_search(request):
     speakers = []
     for q in query:
         speakers.append(q.code)
-
-    print(query)
 
     context = dict(speakers=speakers)
     return render(request, "validation/advanced_search.html", context)
@@ -153,7 +151,7 @@ def advanced_search_results(request):
     paginator = Paginator(all_matches, 30)
     page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)
-    context = dict(phrases=phrases, search_term="query")
+    context = dict(phrases=phrases, search_term="advanced search")
     return render(request, "validation/search.html", context)
 
 
