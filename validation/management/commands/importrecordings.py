@@ -19,14 +19,11 @@
 """
 Django management command to import recordings. This assumes the database has
 been created.
-
 Its defaults are configured using the following settings:
-
     MEDIA_ROOT
     RECVAL_AUDIO_PREFIX
     RECVAL_METADATA_PATH
     RECVAL_SESSIONS_DIR
-
 See recvalsite/settings.py for more information.
 """
 

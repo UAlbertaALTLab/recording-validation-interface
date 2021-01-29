@@ -105,7 +105,6 @@ class RecordingExtractor:
     def scan(self, root_directory: Path):
         """
         Scans the directory provided for sessions.
-
         For each session directory found, its TextGrid/.wav file pairs are
         scanned for words and sentences.
         """
@@ -349,7 +348,6 @@ def to_milliseconds(seconds: Decimal) -> int:
 def get_mic_id(name: str) -> int:
     """
     Return the microphone number from the filename of the wav file.
-
     There are at lease five formats in which TextGrid files are named:
     >>> get_mic_id('2_003.TextGrid')
     2
@@ -359,7 +357,6 @@ def get_mic_id(name: str) -> int:
     2
     >>> get_mic_id('Track 4_001.TextGrid')
     4
-
     This one is the most annoying format:
     >>> get_mic_id('2015-03-19-Rain-03')
     3
@@ -380,9 +377,7 @@ def get_mic_id(name: str) -> int:
             )?
             Track\s
         )?
-
         (\d+)               # THE MIC NUMBER!
-
         _\d{3}
         (?:[.]TextGrid)?$
         """,
@@ -398,7 +393,6 @@ def get_mic_id(name: str) -> int:
         (?:         # Handle this incredibly specific case:
             Rain-   # It happens three times and I hate it.
         )?
-
         (\d+)
         (?:[.]TextGrid)?$
         """,

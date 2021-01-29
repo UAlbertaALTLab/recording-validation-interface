@@ -37,6 +37,7 @@ from librecval.normalization import to_indexable_form
 
 from .crude_views import *
 from .models import Phrase, Recording
+from .helpers import get_distance_with_translations
 from .forms import Login, Register
 
 
@@ -163,6 +164,22 @@ def add_cors_headers(response):
     return response
 
 
+def segment_content_view(request, segment_id):
+    """
+    The view for a single segment
+    Returns the selected phrase and info provided by the helper functions
+    """
+    phrases = Phrase.objects.filter(id=segment_id)
+    segment_name = phrases[0].transcription
+    suggestions = get_distance_with_translations(segment_name)
+    auth = request.user.is_authenticated
+    context = dict(
+        phrases=phrases, segment_name=segment_name, suggestions=suggestions, auth=auth
+    )
+
+    return render(request, "validation/segment_details.html", context)
+
+
 def register(request):
     """
     Serves the register page and creates a new user on success
@@ -187,6 +204,7 @@ def register(request):
                 response = HttpResponseRedirect("/login")
                 return response
 
+    form = Register()
     context = dict(form=form)
     return render(request, "validation/register.html", context)
 
