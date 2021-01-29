@@ -111,6 +111,20 @@ class Phrase(models.Model):
         default="<UNINDEXABLE>",
     )
 
+    date = models.DateField(
+        help_text="When was this phrase last modified?", auto_now_add=True
+    )
+
+    analysis = models.CharField(
+        help_text="The analysis of the Cree phrase", blank=True, max_length=256
+    )
+
+    modifier = models.CharField(
+        help_text="The person who added or modified the phrase",
+        default="AUTO",
+        max_length=64,
+    )
+
     # Keep track of Phrases' history, so we can review, revert, and inspect them.
     history = HistoricalRecords()
 

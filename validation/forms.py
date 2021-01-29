@@ -4,6 +4,12 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 
 
+class EditSegment(forms.Form):
+    cree = forms.CharField(required=False, widget=forms.TextInput)
+    transl = forms.CharField(required=False, widget=forms.TextInput)
+    analysis = forms.CharField(required=False, widget=forms.TextInput)
+
+
 class Login(forms.Form):
     username = forms.CharField(
         required=True,
