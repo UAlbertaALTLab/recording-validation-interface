@@ -12,7 +12,7 @@ describe("Details View", () => {
             .click();
 
         cy.location('pathname')
-            .should('include', 'segment/1');
+            .should('include', Cypress.env("segment_details_url"));
     })
 
     it("shows original word", () => {
@@ -28,7 +28,7 @@ describe("Details View", () => {
                     .click()
 
                 cy.location('pathname')
-                    .should('include', 'segment/1');
+                    .should('include', Cypress.env("segment_details_url"));
 
                 cy.get('#segment-table')
                     .contains(w)

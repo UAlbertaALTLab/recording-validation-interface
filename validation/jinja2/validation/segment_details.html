@@ -1,8 +1,51 @@
+<script>
+    function showDiv(name, suggestions=null) {
+        document.getElementById('edit').style.display = "block";
+        document.getElementById('id_cree').focus()
+        analysis = '';
+
+        if (suggestions == null) {
+            translation = document.getElementById(name + '-translation').innerHTML;
+        } else {
+            translation = suggestions[name]['translation'];
+            analysis = suggestions[name]['analysis'];
+        }
+
+        document.getElementById('id_cree').value = name;
+        document.getElementById('id_transl').value = translation;
+        document.getElementById('id_analysis').value = analysis;
+    }
+
+    function hideDiv() {
+        document.getElementById('edit').style.display = "none";
+    }
+
+
+    function revert(transcription, translation, analysis) {
+        document.getElementById('edit').style.display = "block";
+        document.getElementById('id_cree').focus()
+
+        document.getElementById('id_cree').value = transcription;
+        document.getElementById('id_transl').value = translation;
+        document.getElementById('id_analysis').value = analysis;
+    }
+
+    
+</script>
+
 {% extends 'validation/_base.html' %}
 {% import 'validation/_macros.html' as macros %}
 
 {% block content %}
 <div class="table-responsive">
+  {% if auth %}
+    <button data-cy="edit-button" class="favorite styled"
+        onclick="showDiv('{{ segment_name }}')"
+        style="float: right">
+            Edit
+    </button>
+    {% endif %}
+
     <table id="segment-table" class="table table-striped">
       <thead>
         <tr>
@@ -40,6 +83,10 @@
       {% endfor %}{# for phrase in phrases #}
     </table>
 
+    <div style="display: none;" id="edit" data-cy="edit-div">
+        {% include 'validation/segment_edit.html' %}
+    </div>
+
     <table id="suggestions-table" class="table table-striped">
         <thead>
           <tr>
@@ -47,6 +94,9 @@
             <th scope="col"> Translation </th>
             <th scope="col"> Analysis </th>
             <th scope="col"> MED </th>
+            {% if auth %}
+            <th scope="col"> Options </th>
+            {% endif %}
           </tr>
         </thead>
         {% for suggestion in suggestions %}
@@ -55,8 +105,43 @@
             {{ macros.td_suggestion_translation(user, suggestion, suggestions) }}
             {{ macros.td_suggestion_analysis(user, suggestion, suggestions) }}
             {{ macros.td_suggestion_med(user, suggestion, suggestions) }}
+            {% if auth %}
+            <td>
+                <input type="button" value="Accept" onclick="showDiv('{{ suggestion }}', {{ suggestions }})" />
+            </td>
+            {% endif %}
         </tr>
         {% endfor %}{# for suggestion in suggestions #}
+      </table>
+      <h4>Revision History:</h4>
+      <table id="revision-table" class="table table-striped">
+        <thead>
+          <tr>
+            <th scope="col"> User </th>
+            <th scope="col"> Date </th>
+            <th scope="col"> Transcription </th>
+            <th scope="col"> Translation </th>
+            <th scope="col">Analysis </th>
+            {% if auth %}
+            <th scope="col">Options </th>
+            {% endif %}
+          </tr>
+        </thead>
+        {% for revision in history %}
+        <tr>
+          <td data-cy="revision-modifier">{{ revision.modifier }} </td>
+          <td data-cy="revision-date">{{ revision.date }} </td>
+          <td data-cy="revision-transcription">{{ revision.transcription }} </td>
+          <td data-cy="revision-translation">{{ revision.translation }} </td>
+          <td data-cy="revision-analysis">{{ revision.analysis }} </td>
+          {% if auth %}
+          <td>
+            <input type="button" value="Revert" onclick="revert('{{ revision.transcription }}', '{{ revision.translation }}', '{{ revision.analysis }}')" />
+        </td>
+        {% endif %}
+          
+        </tr>
+        {% endfor %}{# for revision in history #}
       </table>
 </div>
 {% endblock content %}
