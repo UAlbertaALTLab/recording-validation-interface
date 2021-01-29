@@ -3,7 +3,6 @@
 
 describe("Edit segment", () => {
     beforeEach(() => {
-        cy.fixture("users.json").as("mockedUsers");
     
         cy.visit(Cypress.env('login_url'));
         cy.get("[name=csrfmiddlewaretoken]")
