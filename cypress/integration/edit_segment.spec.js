@@ -1,0 +1,298 @@
+/// <reference types="cypress" />
+// Tests the ability to edit a segment
+
+describe("Edit segment", () => {
+    it("shows original word", () => {
+        cy.visit(Cypress.env('home'));
+
+        cy.get(".table")
+            .should("be.visible");
+
+        cy.get('a[name="word-link"]:first')
+            .then((word) => {
+                const w = word[0].id
+                cy.get('a[name="word-link"]:first')
+                    .click()
+
+                cy.location('pathname')
+                    .should('include', '/1');
+
+                cy.get('#segment-table')
+                    .contains(w)
+            })
+        })
+    
+    it("shows all tables", () => {
+        cy.visit('/1');
+
+        cy.get("#segment-table").within(() => {
+            cy.get('th').contains('Transcription')
+            cy.get('th').contains('Translation')
+            cy.get('th').contains('Recordings')
+            cy.get('th').contains('Speaker')
+        })
+
+        cy.get("#suggestions-table").within(() => {
+            cy.get('th').contains('Suggestion')
+            cy.get('th').contains('Translation')
+            cy.get('th').contains('Analysis')
+            cy.get('th').contains('MED')
+            cy.get('th').contains('Options')
+        })
+
+        cy.get("#revision-table").within(() => {
+            cy.get('th').contains('User')
+            cy.get('th').contains('Date')
+            cy.get('th').contains('Transcription')
+            cy.get('th').contains('Translation')
+            cy.get('th').contains('Analysis')
+            cy.get('th').contains('Options')
+        })
+
+        cy.get('#edit')
+                .should('not.be.visible')
+    })
+
+    it("shows all buttons", () => {
+        cy.visit('/1');
+
+        cy.get("#suggestions-table").within(() => {
+            cy.get('input:first')
+                .should('have.value', 'Accept')
+        })
+
+        cy.get("#revision-table").within(() => {
+            cy.get('input:first')
+                .should('have.value', 'Revert')
+        })
+
+    })
+
+    it("should load content when clicking Accept", () => {
+        cy.visit('/1');
+
+        cy.get("#suggestions-table").within(() => {
+            cy.get('td:first')
+                .invoke('text')
+                .as('transcription')
+            cy.get('td:nth-child(2):first')
+                .invoke('text')
+                .as('translation')
+            cy.get('td:nth-child(3):first')
+                .invoke('text')
+                .as('analysis')
+            cy.get('input:first')
+                .should('have.value', 'Accept')
+                .click()
+
+            
+        })
+        cy.get('[data-cy=edit-div]').should('be.visible')
+        cy.get('#id_cree')
+            .should('be.visible')
+            .within(() => {
+                cy.get('@transcription')
+            })
+
+        cy.get('#id_transl')
+            .should('be.visible')
+            .within(() => {
+                cy.get('@translation')
+            })
+
+        cy.get('#id_analysis')
+            .should('be.visible')
+            .within(() => {
+                cy.get('@analysis')
+            })
+    })
+
+    it("should load content when clicking Revert", () => {
+        cy.visit('/1');
+
+        cy.get("#revision-table").within(() => {
+            cy.get('td:nth-child(3):first')
+                .invoke('text')
+                .as('transcription')
+            cy.get('td:nth-child(4):first')
+                .invoke('text')
+                .as('translation')
+            cy.get('td:nth-child(5):first')
+                .invoke('text')
+                .as('analysis')
+            cy.get('input:first')
+                .should('have.value', 'Revert')
+                .click()
+        })
+
+        cy.get('[data-cy=edit-div]').should('be.visible')
+        cy.get('#id_cree')
+            .should('be.visible')
+            .within(() => {
+                cy.get('@transcription')
+            })
+
+        cy.get('#id_transl')
+            .should('be.visible')
+            .within(() => {
+                cy.get('@translation')
+            })
+
+        cy.get('#id_analysis')
+            .should('be.visible')
+            .within(() => {
+                cy.get('@analysis')
+            })
+    })
+
+    it("should load content when clicking Edit", () => {
+        cy.visit('/1');
+
+        cy.get('[data-cy="edit-button"]')
+            .should('be.visible')
+            .click()
+
+        cy.get("#segment-table").within(() => {
+            cy.get('td:first')
+                .invoke('text')
+                .as('transcription')
+            cy.get('td:nth-child(2):first')
+                .invoke('text')
+                .as('translation')
+            cy.get('td:nth-child(3):first')
+                .invoke('text')
+                .as('analysis')            
+        })
+
+        cy.get('[data-cy=edit-div]').should('be.visible')
+        cy.get('#id_cree')
+            .should('be.visible')
+            .within(() => {
+                cy.get('@transcription')
+            })
+
+        cy.get('#id_transl')
+            .should('be.visible')
+            .within(() => {
+                cy.get('@translation')
+            })
+
+        cy.get('#id_analysis')
+            .should('be.visible')
+            .within(() => {
+                cy.get('@analysis')
+            })
+    })
+
+    it("should update the entry when clicking Save", () => {
+        cy.visit('/1');
+
+        cy.get("#suggestions-table").within(() => {
+            cy.get('td:first')
+                .invoke('text')
+                .as('transcription')
+            cy.get('td:nth-child(2):first')
+                .invoke('text')
+                .as('translation')
+            cy.get('td:nth-child(3):first')
+                .invoke('text')
+                .as('analysis')
+            cy.get('input:first')
+                .should('have.value', 'Accept')
+                .click()
+
+            
+        })
+        cy.get('[data-cy=edit-div]').should('be.visible')
+        cy.get('#id_cree')
+            .should('be.visible')
+            .within(() => {
+                cy.get('@transcription')
+            })
+
+        cy.get('#id_transl')
+            .should('be.visible')
+            .within(() => {
+                cy.get('@translation')
+            })
+
+        cy.get('#id_analysis')
+            .should('be.visible')
+            .within(() => {
+                cy.get('@analysis')
+            })
+
+        cy.get('[data-cy="save-button"]')
+            .should('be.visible')
+            .click()
+
+        cy.get("#segment-table").within(() => {
+            cy.get('@transcription')
+            cy.get('@translation')
+            cy.get('@analysis')
+        })
+    })
+
+    it("should not update the entry when clicking Cancel", () => {
+        cy.visit('/1');
+
+        cy.get("#suggestions-table").within(() => {
+            cy.get('td:first')
+                .invoke('text')
+                .as('transcription')
+            cy.get('td:nth-child(2):first')
+                .invoke('text')
+                .as('translation')
+            cy.get('td:nth-child(3):first')
+                .invoke('text')
+                .as('analysis')
+            cy.get('input:first')
+                .should('have.value', 'Accept')
+                .click()            
+        })
+
+        cy.get("#segment-table").within(() => {
+            cy.get('td:first')
+                .invoke('text')
+                .as('og_transcription')
+            cy.get('td:nth-child(2):first')
+                .invoke('text')
+                .as('og_translation')
+            cy.get('td:nth-child(3):first')
+                .invoke('text')
+                .as('og_analysis')            
+        })
+
+        cy.get('[data-cy=edit-div]').should('be.visible')
+        cy.get('#id_cree')
+            .should('be.visible')
+            .within(() => {
+                cy.get('@transcription')
+            })
+            .type("DONT SAVE")
+
+        cy.get('#id_transl')
+            .should('be.visible')
+            .within(() => {
+                cy.get('@translation')
+            })
+            .type("DONT SAVE")
+
+        cy.get('#id_analysis')
+            .should('be.visible')
+            .within(() => {
+                cy.get('@analysis')
+            })
+            .type("DONT SAVE")
+
+        cy.get('[data-cy="cancel-button"]')
+            .should('be.visible')
+            .click()
+
+        cy.get("#segment-table").within(() => {
+            cy.get('@og_transcription')
+            cy.get('@og_translation')
+            cy.get('@og_analysis')
+        })
+    })
+})

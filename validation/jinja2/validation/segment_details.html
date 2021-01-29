@@ -40,13 +40,13 @@
 
 {% block content %}
 <div class="table-responsive">
-    <button class="favorite styled"
+    <button data-cy="edit-button" class="favorite styled"
         onclick="showDiv('{{ segment_name }}')"
         style="float: right">
             Edit
     </button>
 
-    <table class="table table-striped">
+    <table id="segment-table" class="table table-striped">
       <thead>
         <tr>
           <th scope="col"> Transcription </th>
@@ -83,11 +83,11 @@
       {% endfor %}{# for phrase in phrases #}
     </table>
 
-    <div style="display: none;" id="edit">
+    <div style="display: none;" id="edit" data-cy="edit-div">
         {% include 'validation/segment_edit.html' %}
     </div>
 
-    <table class="table table-striped">
+    <table id="suggestions-table" class="table table-striped">
         <thead>
           <tr>
             <th scope="col"> Suggestion </th>
@@ -110,7 +110,7 @@
         {% endfor %}{# for suggestion in suggestions #}
       </table>
       <h4>Revision History:</h4>
-      <table class="table table-striped">
+      <table id="revision-table" class="table table-striped">
         <thead>
           <tr>
             <th scope="col"> User </th>
