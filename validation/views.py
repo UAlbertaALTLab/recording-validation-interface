@@ -188,6 +188,7 @@ def segment_content_view(request, segment_id):
     segment_name = phrases[0].transcription
     suggestions = get_distance_with_translations(segment_name)
     history = phrases[0].history.all()
+    auth = request.user.is_authenticated
 
     form = EditSegment()
 
@@ -197,6 +198,7 @@ def segment_content_view(request, segment_id):
         suggestions=suggestions,
         form=form,
         history=history,
+        auth=auth,
     )
 
     return render(request, "validation/segment_details.html", context)
@@ -226,6 +228,7 @@ def register(request):
                 response = HttpResponseRedirect("/login")
                 return response
 
+    form = Register()
     context = dict(form=form)
     return render(request, "validation/register.html", context)
 

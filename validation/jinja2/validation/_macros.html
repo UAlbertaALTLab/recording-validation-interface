@@ -63,7 +63,7 @@
  #}
 {% macro td_transcription_link(user, phrase) %}
 <td lang="crk">
-  <a name="word-link" id="{{ phrase.transcription }}" href="/{{ phrase.id }} ">
+  <a name="word-link" id="{{ phrase.transcription }}" href="{{ url('validation:segment_detail', phrase.id) }} ">
     {{ phrase.transcription }}
   </a>
 </td>
