@@ -2,7 +2,33 @@
 // Tests the ability to edit a segment
 
 describe("Edit segment", () => {
+    beforeEach(() => {
+        cy.fixture("users.json").as("mockedUsers");
+    
+        cy.visit(Cypress.env('login_url'));
+        cy.get("[name=csrfmiddlewaretoken]")
+          .should("exist")
+          .should("have.attr", "value")
+          .as("csrfToken");
+    
+        cy.get("@csrfToken").then((token) => {
+          cy.request({
+            method: "POST",
+            url: Cypress.env("login_url"), 
+            form: true,
+            body: {
+              username: "cypress",
+              password: "1234asdf",
+            },
+            headers: {
+              "X-CSRFTOKEN": token,
+            },
+          });
+        });
+    })
+
     it("shows original word", () => {
+        
         cy.visit(Cypress.env('home'));
 
         cy.get(".table")
@@ -15,7 +41,7 @@ describe("Edit segment", () => {
                     .click()
 
                 cy.location('pathname')
-                    .should('include', '/1');
+                    .should('include', Cypress.env("segment_details_url"));
 
                 cy.get('#segment-table')
                     .contains(w)
@@ -23,7 +49,7 @@ describe("Edit segment", () => {
         })
     
     it("shows all tables", () => {
-        cy.visit('/1');
+        cy.visit(Cypress.env("segment_details_url"));
 
         cy.get("#segment-table").within(() => {
             cy.get('th').contains('Transcription')
@@ -54,7 +80,7 @@ describe("Edit segment", () => {
     })
 
     it("shows all buttons", () => {
-        cy.visit('/1');
+        cy.visit(Cypress.env("segment_details_url"));
 
         cy.get("#suggestions-table").within(() => {
             cy.get('input:first')
@@ -69,7 +95,7 @@ describe("Edit segment", () => {
     })
 
     it("should load content when clicking Accept", () => {
-        cy.visit('/1');
+        cy.visit(Cypress.env("segment_details_url"));
 
         cy.get("#suggestions-table").within(() => {
             cy.get('td:first')
@@ -108,7 +134,7 @@ describe("Edit segment", () => {
     })
 
     it("should load content when clicking Revert", () => {
-        cy.visit('/1');
+        cy.visit(Cypress.env("segment_details_url"));
 
         cy.get("#revision-table").within(() => {
             cy.get('td:nth-child(3):first')
@@ -146,7 +172,7 @@ describe("Edit segment", () => {
     })
 
     it("should load content when clicking Edit", () => {
-        cy.visit('/1');
+        cy.visit(Cypress.env("segment_details_url"));
 
         cy.get('[data-cy="edit-button"]')
             .should('be.visible')
@@ -185,7 +211,7 @@ describe("Edit segment", () => {
     })
 
     it("should update the entry when clicking Save", () => {
-        cy.visit('/1');
+        cy.visit(Cypress.env("segment_details_url"));
 
         cy.get("#suggestions-table").within(() => {
             cy.get('td:first')
@@ -231,10 +257,14 @@ describe("Edit segment", () => {
             cy.get('@translation')
             cy.get('@analysis')
         })
+
+        // Make sure the username of the editor was stored
+        cy.get("#revision-table")
+            .contains('cypress')
     })
 
     it("should not update the entry when clicking Cancel", () => {
-        cy.visit('/1');
+        cy.visit(Cypress.env("segment_details_url"));
 
         cy.get("#suggestions-table").within(() => {
             cy.get('td:first')
@@ -295,4 +325,61 @@ describe("Edit segment", () => {
             cy.get('@og_analysis')
         })
     })
+});
+
+describe("Edit segment, no auth", () => {
+    it("shows original word", () => {
+        
+        cy.visit(Cypress.env('home'));
+
+        cy.get(".table")
+            .should("be.visible");
+
+        cy.get('a[name="word-link"]:first')
+            .then((word) => {
+                const w = word[0].id
+                cy.get('a[name="word-link"]:first')
+                    .click()
+
+                cy.location('pathname')
+                    .should('include', Cypress.env("segment_details_url"));
+
+                cy.get('#segment-table')
+                    .contains(w)
+            })
+    })
+
+    it("does not show options or edit", () => {
+        cy.visit(Cypress.env("segment_details_url"));
+
+        cy.get("#segment-table").within(() => {
+            cy.get('th').contains('Transcription')
+            cy.get('th').contains('Translation')
+            cy.get('th').contains('Recordings')
+            cy.get('th').contains('Speaker')
+        })
+
+        cy.get("#suggestions-table").within(() => {
+            cy.get('th').contains('Suggestion')
+            cy.get('th').contains('Translation')
+            cy.get('th').contains('Analysis')
+            cy.get('th').contains('MED')
+            cy.get('Options').should('not.exist')
+        })
+
+        cy.get("#revision-table").within(() => {
+            cy.get('th').contains('User')
+            cy.get('th').contains('Date')
+            cy.get('th').contains('Transcription')
+            cy.get('th').contains('Translation')
+            cy.get('th').contains('Analysis')
+            cy.get('Options').should('not.exist')
+        })
+
+        cy.get('[data-cy="edit-button"]')
+            .should('not.exist')
+        cy.get('#edit')
+            .should('not.be.visible')
+    })
+
 })
