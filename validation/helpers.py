@@ -7,9 +7,6 @@ import operator
 
 import requests
 import json
-import logging
-
-logging.captureWarnings(True)
 
 from django.conf import settings
 from django.utils.http import urlencode
