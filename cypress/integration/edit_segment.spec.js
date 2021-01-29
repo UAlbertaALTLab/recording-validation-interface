@@ -97,15 +97,15 @@ describe("Edit segment", () => {
         cy.visit(Cypress.env("segment_details_url"));
 
         cy.get("#suggestions-table").within(() => {
-            cy.get('[cy-data="suggestion-transcription"]')
+            cy.get('[data-cy="suggestion-transcription"]')
                 .first()
                 .invoke('text')
                 .as('transcription')
-            cy.get('[cy-data="suggestion-translation"]')
+            cy.get('[data-cy="suggestion-translation"]')
                 .first()
                 .invoke('text')
                 .as('translation')
-            cy.get('[cy-data="suggestion-analysis"]')
+            cy.get('[data-cy="suggestion-analysis"]')
                 .first()
                 .invoke('text')
                 .as('analysis')
@@ -139,15 +139,15 @@ describe("Edit segment", () => {
         cy.visit(Cypress.env("segment_details_url"));
 
         cy.get("#revision-table").within(() => {
-            cy.get('[cy-data="revision-transcription"]')
+            cy.get('[data-cy="revision-transcription"]')
                 .first()
                 .invoke('text')
                 .as('transcription')
-            cy.get('[cy-data="revision-translation"]')
+            cy.get('[data-cy="revision-translation"]')
                 .first()
                 .invoke('text')
                 .as('translation')
-            cy.get('[cy-data="revision-analysis"]')
+            cy.get('[data-cy="revision-analysis"]')
                 .first()
                 .invoke('text')
                 .as('analysis')
@@ -184,11 +184,11 @@ describe("Edit segment", () => {
             .click()
 
         cy.get("#segment-table").within(() => {
-            cy.get('[cy-data="segment-transcription"]')
+            cy.get('[data-cy="segment-transcription"]')
                 .first()
                 .invoke('text')
                 .as('transcription')
-            cy.get('[cy-data="segment-translation"]')
+            cy.get('[data-cy="segment-translation"]')
                 .first()
                 .invoke('text')
                 .as('translation')
@@ -212,15 +212,15 @@ describe("Edit segment", () => {
         cy.visit(Cypress.env("segment_details_url"));
 
         cy.get("#suggestions-table").within(() => {
-            cy.get('[cy-data="suggestion-transcription"]')
+            cy.get('[data-cy="suggestion-transcription"]')
                 .first()
                 .invoke('text')
                 .as('transcription')
-            cy.get('[cy-data="suggestion-translation"]')
+            cy.get('[data-cy="suggestion-translation"]')
                 .first()
                 .invoke('text')
                 .as('translation')
-            cy.get('[cy-data="suggestion-analysis"]')
+            cy.get('[data-cy="suggestion-analysis"]')
                 .first()
                 .invoke('text')
                 .as('analysis')
@@ -266,15 +266,15 @@ describe("Edit segment", () => {
         cy.visit(Cypress.env("segment_details_url"));
 
         cy.get("#suggestions-table").within(() => {
-            cy.get('[cy-data="suggestion-transcription"]')
+            cy.get('[data-cy="suggestion-transcription"]')
                 .first()
                 .invoke('text')
                 .as('transcription')
-            cy.get('[cy-data="suggestion-translation"]')
+            cy.get('[data-cy="suggestion-translation"]')
                 .first()
                 .invoke('text')
                 .as('translation')
-            cy.get('[cy-data="suggestion-analysis"]')
+            cy.get('[data-cy="suggestion-analysis"]')
                 .first()
                 .invoke('text')
                 .as('analysis')
@@ -284,11 +284,11 @@ describe("Edit segment", () => {
         })
 
         cy.get("#segment-table").within(() => {
-            cy.get('[cy-data="segment-transcription"]')
+            cy.get('[data-cy="segment-transcription"]')
                 .first()
                 .invoke('text')
                 .as('og_transcription')
-            cy.get('[cy-data="segment-translation"]')
+            cy.get('[data-cy="segment-translation"]')
                 .first()
                 .invoke('text')
                 .as('og_translation')         

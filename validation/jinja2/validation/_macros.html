@@ -73,7 +73,7 @@
   # Expands to a <td> that displays the Cree transcription.
   #}
  {% macro td_transcription(user, phrase) %}
- <td cy-data="segment-transcription" lang="crk">
+ <td data-cy="segment-transcription" lang="crk">
      {{ phrase.transcription }}
  </td>
  {% endmacro %}
@@ -82,7 +82,7 @@
  # Expands to a <td> that displays the English translation.
  #}
 {% macro td_translation(user, phrase) %}
-<td cy-data="segment-translation" lang="en" id="{{ phrase }}-translation">
+<td data-cy="segment-translation" lang="en" id="{{ phrase }}-translation">
   {{ phrase.translation }}
 </td>
 {% endmacro %}
@@ -91,7 +91,7 @@
   # Expands to a <td> that displays the Cree suggestion from itwêwina.
   #}
  {% macro td_suggestion_transcription(user, suggestion) %}
- <td cy-data="suggestion-transcription" lang="crk">
+ <td data-cy="suggestion-transcription" lang="crk">
    {{ suggestion }}
  </td>
  {% endmacro %}
@@ -101,7 +101,7 @@
     # of the Cree suggestion from itwêwina.
   #}
  {% macro td_suggestion_translation(user, suggestion, suggestions) %}
- <td cy-data="suggestion-translation" lang="en">
+ <td data-cy="suggestion-translation" lang="en">
    {{ suggestions[suggestion]['translation'][0] or 'No translation available' }}
  </td>
  {% endmacro %}
@@ -111,7 +111,7 @@
     # of the Cree suggestion from itwêwina.
   #}
  {% macro td_suggestion_analysis(user, suggestion, suggestions) %}
- <td cy-data="suggestion-analysis" lang="en">
+ <td data-cy="suggestion-analysis" lang="en">
    {{ suggestions[suggestion]['analysis'] }}
  </td>
  {% endmacro %}
