@@ -18,13 +18,24 @@
 
 
 from django.urls import path
+from django.contrib.auth import views as auth_views
 
 from . import views
 
 app_name = "validation"
 urlpatterns = [
     path("", views.index, name="index"),
-    path("login", views.login, name="login"),
+    path(
+        "login",
+        auth_views.LoginView.as_view(template_name="validation/login.html"),
+        name="login",
+    ),
+    path(
+        "logout",
+        auth_views.LogoutView.as_view(template_name="validation/logout.html"),
+        name="logout",
+    ),
+    path("register", views.register, name="register"),
     # TODO: phrases/<int:phrases_id>/<slug>
     path("search/", views.search_phrases, name="search_phrases"),
     path("advanced_search/", views.advanced_search, name="advanced_search"),
@@ -46,5 +57,5 @@ urlpatterns = [
         views.all_recordings_for_session,
         name="crude_recordings",
     ),
-    path("<str:segment_id>", views.segment_content_view, name="segment_detail"),
+    path("segment/<str:segment_id>", views.segment_content_view, name="segment_detail"),
 ]

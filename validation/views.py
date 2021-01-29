@@ -32,14 +32,15 @@ from django.shortcuts import get_object_or_404, render
 from django.http import FileResponse, HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login as django_login
 
 from librecval.normalization import to_indexable_form
 
 from .crude_views import *
-from .forms import Login
-from .helpers import get_distance_with_translations
-from .forms import EditSegment
 from .models import Phrase, Recording, Speaker
+from .helpers import get_distance_with_translations
+from .forms import EditSegment, Login, Register
 
 
 def index(request):
@@ -66,11 +67,13 @@ def index(request):
     paginator = Paginator(all_phrases, 30)
     page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)
+    auth = request.user.is_authenticated
     context = dict(
         phrases=phrases,
         all_class=all_class,
         validated_class=validated_class,
         unvalidated_class=unvalidated_class,
+        auth=auth,
     )
     return render(request, "validation/list_phrases.html", context)
 
@@ -272,23 +275,6 @@ def add_cors_headers(response):
     return response
 
 
-def login(request):
-    """
-    Serves the login page and sets cookies on successful login
-    """
-
-    if request.method == "POST":
-        form = Login(request.POST)
-        if form.is_valid():
-            response = HttpResponseRedirect("/")
-            response.set_cookie("authenticated", True)
-            response.set_cookie("user", form.cleaned_data["username"])
-            return response
-    form = Login()
-    context = dict(form=form)
-    return render(request, "validation/login.html", context)
-
-
 def segment_content_view(request, segment_id):
     """
     The view for a single segment
@@ -313,6 +299,7 @@ def segment_content_view(request, segment_id):
     segment_name = phrases[0].transcription
     suggestions = get_distance_with_translations(segment_name)
     history = phrases[0].history.all()
+    auth = request.user.is_authenticated
 
     form = EditSegment()
 
@@ -322,9 +309,39 @@ def segment_content_view(request, segment_id):
         suggestions=suggestions,
         form=form,
         history=history,
+        auth=auth,
     )
 
     return render(request, "validation/segment_details.html", context)
+
+
+def register(request):
+    """
+    Serves the register page and creates a new user on success
+    """
+
+    if request.method == "POST":
+        form = Register(request.POST)
+        if form.is_valid():
+            username = form.clean_username()
+            password = form.cleaned_data["password"]
+            first_name = form.cleaned_data["first_name"]
+            last_name = form.cleaned_data["last_name"]
+            user = authenticate(request, username=username, password=password)
+            if user is None:
+                new_user = User.objects.create_user(
+                    username=username,
+                    password=password,
+                    first_name=first_name,
+                    last_name=last_name,
+                )
+                new_user.save()
+                response = HttpResponseRedirect("/login")
+                return response
+
+    form = Register()
+    context = dict(form=form)
+    return render(request, "validation/register.html", context)
 
 
 # TODO: Speaker bio page like https://ojibwe.lib.umn.edu/about/voices

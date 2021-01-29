@@ -29,7 +29,7 @@ def _get_env_file_path() -> Path:
 
     """
     cur_dir = Path(__file__).parent
-    while not (cur_dir / 'Pipfile').is_file():
+    while not (cur_dir / "Pipfile").is_file():
         if cur_dir.parent == cur_dir:
             raise Exception("Reached root without encountering Pipfile")
         cur_dir = cur_dir.parent

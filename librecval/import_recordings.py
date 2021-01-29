@@ -28,11 +28,11 @@ from typing import Callable
 import logme  # type: ignore
 from typing_extensions import Literal
 
-from librecval.extract_phrases import AudioSegment, RecordingExtractor, Segment
+from librecval.extract_phrases import AudioSegment, RecordingExtractor, RecordingInfo
 from librecval.recording_session import parse_metadata
 from librecval.transcode_recording import transcode_to_aac
 
-ImportRecording = Callable[[Segment, Path], None]
+ImportRecording = Callable[[RecordingInfo, Path], None]
 
 # TODO: create report with emoji
 #
@@ -64,7 +64,6 @@ def initialize(
     """
 
     dest = Path(transcoded_recordings_path)
-    count = 0
 
     assert directory.resolve().is_dir(), directory
     assert (
@@ -80,18 +79,16 @@ def initialize(
     for info, audio in ex.scan(root_directory=directory):
         try:
             recording_path = save_recording(dest, info, audio, recording_format)
-            count += 1
         except RecordingError:
             logger.exception("Exception while saving recording; skipping.")
         else:
             import_recording(info, recording_path)
-    print(f"Processed {count} audio segments")
 
 
 @logme.log
 def save_recording(
     dest: Path,
-    info: Segment,
+    info: RecordingInfo,
     audio: AudioSegment,
     recording_format: Format = "m4a",
     logger=None,

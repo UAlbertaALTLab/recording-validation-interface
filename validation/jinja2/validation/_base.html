@@ -38,7 +38,11 @@
 
     {# Login button #}
     <div>
-      <a href="/login" class="button-success login-link">Login</a>
+        {% if auth %}
+        <a href="/logout" id="logout-link" style="color: white;">Logout</a>
+        {% else %}
+        <a href="/login" id="login-link" style="color: white;">Login</a>
+        {% endif %}
     </div>
   </nav>
 

@@ -2,6 +2,7 @@ from os import fspath
 
 import divvunspell
 from difflib import Differ, SequenceMatcher, get_close_matches
+from urllib.parse import urljoin
 import operator
 
 import requests
@@ -11,6 +12,7 @@ import logging
 logging.captureWarnings(True)
 
 from django.conf import settings
+from django.utils.http import urlencode
 
 """
 RULES
@@ -23,11 +25,11 @@ RULES
 """
 
 
-archive = divvunspell.SpellerArchive(fspath(settings.BASE_DIR / 'crk.zhfst'))
+archive = divvunspell.SpellerArchive(fspath(settings.BASE_DIR / "crk.zhfst"))
 speller = archive.speller()
 
 vowels = ["a", "i", "o", "â", "î", "ô"]
-consonants = ["  c", "  h", "  k", "  m", "  n", "  p", "  s", "  t", "  w", "  y"]
+consonants = [f"  {char}" for char in "chkmnpstwy"]
 
 
 def get_edit_distance(word):
@@ -48,22 +50,23 @@ def get_edit_distance(word):
 
 def get_differ(word, suggestion):
     med = 0
-    dif = Differ()
-    df = list(dif.compare(word, suggestion))
+    df = list(Differ().compare(word, suggestion))
+
+    def diff_char_or_none(index):
+        if index >= 0 and index < len(df):
+            return df[index]
+        return None
+
     for i in range(len(df)):
         c = df[i]
 
         # check for replaced e with ê
         # we should never replace ê with e though
-        if c == "- e":
-            if i + 1 < len(df):
-                if df[i + 1] == "+ ê":
-                    continue
+        if c == "- e" and diff_char_or_none(i + 1) == "+ ê":
+            continue
 
-        if c == "+ ê":
-            if i - 1 >= 0:
-                if df[i - 1] == "- e":
-                    continue
+        if c == "+ ê" and diff_char_or_none(i - 1) == "- e":
+            continue
 
         # no change, carry on
         if "+" not in c and "-" not in c:
@@ -74,25 +77,17 @@ def get_differ(word, suggestion):
             continue
 
         # check for swapping glides
-        if c == "- y":
-            if i + 1 < len(df):
-                if df[i + 1] == "+ w":
-                    continue
+        if c == "- y" and diff_char_or_none(i + 1) == "+ w":
+            continue
 
-        if c == "- w":
-            if i + 1 < len(df):
-                if df[i + 1] == "+ y":
-                    continue
+        if c == "- w" and diff_char_or_none(i + 1) == "+ y":
+            continue
 
-        if c == "+ y":
-            if i - 1 >= 0:
-                if df[i - 1] == "- w":
-                    continue
+        if c == "+ y" and diff_char_or_none(i - 1) == "- w":
+            continue
 
-        if c == "+ w":
-            if i - 1 >= 0:
-                if df[i - 1] == "- y":
-                    continue
+        if c == "+ w" and diff_char_or_none(i - 1) == "- y":
+            continue
 
         # end check for swapping glides
 
@@ -164,8 +159,10 @@ def get_analog(char):
 
 
 def get_translations_from_itwewina(word):
-    url = "https://sapir.artsrn.ualberta.ca/cree-dictionary/click-in-text/?q=" + word
-    r = requests.get(url, verify=False)
+    url = (
+        urljoin(settings.ITWEWINA_URL, "click-in-text/") + "?" + urlencode({"q": word})
+    )
+    r = requests.get(url)
     if r.status_code == 200:
         return json.loads(r.text)
     else:
@@ -196,8 +193,3 @@ def get_distance_with_translations(word):
         }
 
     return suggestions
-
-
-if __name__ == "__main__":
-    word = "ekwa"
-    print(get_distance_with_translations(word))
