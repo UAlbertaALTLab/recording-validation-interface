@@ -175,6 +175,22 @@ def get_translations_from_itwewina(word):
         return "Error getting request"
 
 
+def get_lemma_from_analysis(analysis):
+    # we assume here that the lemma is the longest
+    # sequence of characters in the string
+    # THIS IS A WEAK CHECK
+    analysis = analysis.replace("/", "+")
+    parts = analysis.split("+")
+    max_len = 0
+    max_char = ""
+    for p in parts:
+        if len(p) > max_len:
+            max_len = len(p)
+            max_char = p
+
+    return max_char
+
+
 def get_distance_with_translations(word):
     suggestions = get_edit_distance(word)
     for word in suggestions:
@@ -182,9 +198,12 @@ def get_distance_with_translations(word):
         defs = []
         analysis = ""
         for i in r["results"]:
-            if type(i["definitions"]) == list:
+            if type(i["definitions"]) == list and len(i["definitions"]) > 0:
                 defs.append(i["definitions"])
             analysis = i["lemma_wordform"]["analysis"]
+
+        if len(defs) == 0 and analysis != "":
+            lemma = get_lemma_from_analysis(analysis)
 
         translations = []
         for d in defs:
