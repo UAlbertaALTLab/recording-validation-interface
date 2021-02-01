@@ -204,7 +204,6 @@ def get_translations_only(results):
     for d in defs:
         for i in d:
             if type(i) == dict and i["text"]:
-                print(type(i["text"]))
                 translations.append(i["text"])
 
     translations = "; ".join(translations)
