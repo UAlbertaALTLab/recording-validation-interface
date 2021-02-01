@@ -211,9 +211,9 @@ def register(request):
     """
     Serves the register page and creates a new user on success
     """
+    form = Register(request.POST)
 
     if request.method == "POST":
-        form = Register(request.POST)
         if form.is_valid():
             username = form.clean_username()
             password = form.cleaned_data["password"]
@@ -231,7 +231,6 @@ def register(request):
                 response = HttpResponseRedirect("/login")
                 return response
 
-    form = Register()
     context = dict(form=form)
     return render(request, "validation/register.html", context)
 
