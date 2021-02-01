@@ -40,8 +40,8 @@ class Command(BaseCommand):
         # Generate this folder by running:
         # python3 manage.py importrecordings --wav --skip-db
         audio_dir = Path(_path)
-        for audio in os.listdir(audio_dir):
-            audio_id = audio[:-4]
+        for audio_file in os.listdir(audio_dir):
+            audio_id = audio_file[:-4]
 
             conn = sqlite3.connect("./db.sqlite3")
             cur = conn.cursor()
@@ -75,10 +75,10 @@ class Command(BaseCommand):
             conn.close()
 
             # Create necessary directories if they do not exist
-            speaker_dir = Path(_path + "/" + speaker)
-            speaker_audio_dir = Path(_path + "/" + speaker + "/audio")
-            speaker_persephone_dir = Path(_path + "/" + speaker + "/persephone")
-            speaker_s4a_dir = Path(_path + "/" + speaker + "/s4a")
+            speaker_dir = audio_dir / speaker
+            speaker_audio_dir = audio_dir / speaker / "audio"
+            speaker_persephone_dir = audio_dir / speaker / "persephone"
+            speaker_s4a_dir = audio_dir / speaker / "s4a"
 
             for _dir in [
                 speaker_dir,
@@ -86,25 +86,24 @@ class Command(BaseCommand):
                 speaker_persephone_dir,
                 speaker_s4a_dir,
             ]:
-                if not os.path.isdir(_dir):
-                    os.mkdir(_dir)
+                _dir.mkdir(exist_ok=True)
 
             # Copy the audio file
-            from_dir = Path(_path + "/" + audio)
-            to_dir = Path(_path + "/" + speaker + "/audio/" + audio)
+            from_dir = audio_dir / audio_file
+            to_dir = audio_dir / speaker / "audio" / audio_file
             shutil.copyfile(from_dir, to_dir)
 
             # Treat the transcription for Persephone and save it
-            persephone_file = Path(
-                _path + "/" + speaker + "/persephone/" + audio_id + ".txt"
-            )
+            persephone_filename = audio_id + ".txt"
+            persephone_path = audio_dir / speaker / "persephone" / persephone_filename
             persephone_trans = self.create_persephone_transcription(transcription)
-            with open(persephone_file, "w+") as f:
+            with open(persephone_path, "w+") as f:
                 f.write(persephone_trans)
 
             # Save the transcription for Simple4All
-            s4a_file = Path(_path + "/" + speaker + "/s4a/" + audio_id + ".txt")
-            with open(s4a_file, "w+") as f:
+            s4a_filename = audio_id + ".txt"
+            s4a_path = audio_dir / speaker / "s4a" / s4a_filename
+            with open(s4a_path, "w+") as f:
                 f.write(transcription)
 
             # Print so we know we're making progress
@@ -120,6 +119,7 @@ class Command(BaseCommand):
         >>> self.create_persephone_transcription("kîkwây ôma")
         k î k w â y  ô m a
         """
+        assert "%" not in transcription
         persephone_trans = transcription.replace(" ", "%")
         persephone_trans = list(persephone_trans)
         persephone_trans = " ".join(persephone_trans)
