@@ -102,7 +102,7 @@
   #}
  {% macro td_suggestion_translation(user, suggestion, suggestions) %}
  <td data-cy="suggestion-translation" lang="en">
-   {{ suggestions[suggestion]['translation'][0] or 'No translation available' }}
+   {{ suggestions[suggestion]['translation'] or 'No translation available' }}
  </td>
  {% endmacro %}
 

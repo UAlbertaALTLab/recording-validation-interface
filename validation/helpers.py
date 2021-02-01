@@ -175,6 +175,43 @@ def get_translations_from_itwewina(word):
         return "Error getting request"
 
 
+def get_translations_and_analysis(results):
+    defs = []
+    analysis = ""
+    for i in results["results"]:
+        if type(i["definitions"]) == list and len(i["definitions"]) > 0:
+            defs.append(i["definitions"])
+        analysis = i["lemma_wordform"]["analysis"]
+
+    translations = []
+    for d in defs:
+        for i in d:
+            if type(i) == dict and i["text"]:
+                translations.append(i["text"])
+
+    translations = "; ".join(translations)
+
+    return translations, analysis
+
+
+def get_translations_only(results):
+    defs = []
+    for i in results["results"]:
+        if type(i["definitions"]) == list and len(i["definitions"]) > 0:
+            defs.append(i["definitions"])
+
+    translations = ["(Lemma translation)"]
+    for d in defs:
+        for i in d:
+            if type(i) == dict and i["text"]:
+                print(type(i["text"]))
+                translations.append(i["text"])
+
+    translations = "; ".join(translations)
+
+    return translations
+
+
 def get_lemma_from_analysis(analysis):
     # we assume here that the lemma is the longest
     # sequence of characters in the string
@@ -194,22 +231,13 @@ def get_lemma_from_analysis(analysis):
 def get_distance_with_translations(word):
     suggestions = get_edit_distance(word)
     for word in suggestions:
-        r = get_translations_from_itwewina(word)
-        defs = []
-        analysis = ""
-        for i in r["results"]:
-            if type(i["definitions"]) == list and len(i["definitions"]) > 0:
-                defs.append(i["definitions"])
-            analysis = i["lemma_wordform"]["analysis"]
+        results = get_translations_from_itwewina(word)
 
-        if len(defs) == 0 and analysis != "":
+        translations, analysis = get_translations_and_analysis(results)
+        if len(translations) == 0 and analysis != "":
             lemma = get_lemma_from_analysis(analysis)
-
-        translations = []
-        for d in defs:
-            for i in d:
-                if type(i) == dict and i["text"]:
-                    translations.append(i["text"])
+            results = get_translations_from_itwewina(lemma)
+            translations = get_translations_only(results)
 
         suggestions[word] = {
             "med": suggestions[word],
