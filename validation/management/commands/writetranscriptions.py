@@ -20,11 +20,9 @@ import sqlite3
 import os
 import shutil
 
-import logme  # type: ignore
 from django.core.management.base import BaseCommand, CommandError  # type: ignore
 
 
-@logme.log
 class Command(BaseCommand):
     """
     Takes all extracted audio files in .wav format
@@ -36,10 +34,12 @@ class Command(BaseCommand):
     help = "creates transcription files for persephone and Simple4All"
 
     def handle(self, *args, **options):
+        # Change this if the raw audio files exist elsewhere!
+        _path = "./audio"
 
         # Generate this folder by running:
         # python3 manage.py importrecordings --wav --skip-db
-        audio_dir = Path("./audio")
+        audio_dir = Path(_path)
         for audio in os.listdir(audio_dir):
             audio_id = audio[:-4]
 
@@ -75,10 +75,10 @@ class Command(BaseCommand):
             conn.close()
 
             # Create necessary directories if they do not exist
-            speaker_dir = Path("./audio/" + speaker)
-            speaker_audio_dir = Path("./audio/" + speaker + "/audio")
-            speaker_persephone_dir = Path("./audio/" + speaker + "/persephone")
-            speaker_s4a_dir = Path("./audio/" + speaker + "/s4a")
+            speaker_dir = Path(_path + "/" + speaker)
+            speaker_audio_dir = Path(_path + "/" + speaker + "/audio")
+            speaker_persephone_dir = Path(_path + "/" + speaker + "/persephone")
+            speaker_s4a_dir = Path(_path + "/" + speaker + "/s4a")
 
             for _dir in [
                 speaker_dir,
@@ -90,20 +90,20 @@ class Command(BaseCommand):
                     os.mkdir(_dir)
 
             # Copy the audio file
-            from_dir = Path("./audio/" + audio)
-            to_dir = Path("./audio/" + speaker + "/audio/" + audio)
+            from_dir = Path(_path + "/" + audio)
+            to_dir = Path(_path + "/" + speaker + "/audio/" + audio)
             shutil.copyfile(from_dir, to_dir)
 
             # Treat the transcription for Persephone and save it
             persephone_file = Path(
-                "./audio/" + speaker + "/persephone/" + audio_id + ".txt"
+                _path + "/" + speaker + "/persephone/" + audio_id + ".txt"
             )
             persephone_trans = self.create_persephone_transcription(transcription)
             with open(persephone_file, "w+") as f:
                 f.write(persephone_trans)
 
             # Save the transcription for Simple4All
-            s4a_file = Path("./audio/" + speaker + "/s4a/" + audio_id + ".txt")
+            s4a_file = Path(_path + "/" + speaker + "/s4a/" + audio_id + ".txt")
             with open(s4a_file, "w+") as f:
                 f.write(transcription)
 
