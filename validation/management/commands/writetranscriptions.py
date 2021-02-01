@@ -15,23 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-# open audio folder
-# for every file in audio folder
-# query the DB to find the files speaker
-# select speaker_id from validation_recording where id = .wav file name
-# if a folder by that speaker name does not exist,
-#   create it
-# query the DB to find the phrase ID and store it
-# select phrase_id from validation_recording where id = .wav file name
-# query the DB to find the transcription, and store it
-# select transcription from validation_phrase where id = phrase_id
-# copy the .wav file to the directory named after the speaker
-# write the transcription to a subdirectory for persephone, making sure
-#   there are the correct number of spaces
-# write the transcription to a subdirectory for Simple4All,
-#   making sure there are no spaces between characters
-
 from pathlib import Path
 import sqlite3
 import os
@@ -43,10 +26,19 @@ from django.core.management.base import BaseCommand, CommandError  # type: ignor
 
 @logme.log
 class Command(BaseCommand):
+    """
+    Takes all extracted audio files in .wav format
+    and writes transcription files for them that can
+    then be used by Persephone and Simple4All.
+    Files are created in the ./audio directory and stored by speaker
+    """
+
     help = "creates transcription files for persephone and Simple4All"
 
     def handle(self, *args, **options):
 
+        # Generate this folder by running:
+        # python3 manage.py importrecordings --wav --skip-db
         audio_dir = Path("./audio")
         for audio in os.listdir(audio_dir):
             audio_id = audio[:-4]
@@ -54,6 +46,7 @@ class Command(BaseCommand):
             conn = sqlite3.connect("./db.sqlite3")
             cur = conn.cursor()
 
+            # Fetch speaker code
             cur.execute(
                 f"select speaker_id from validation_recording where id='{audio_id}'"
             )
@@ -63,6 +56,7 @@ class Command(BaseCommand):
             else:
                 continue
 
+            # Fetch phrase id
             cur.execute(
                 f"select phrase_id from validation_recording where id='{audio_id}'"
             )
@@ -70,6 +64,7 @@ class Command(BaseCommand):
             if phrase_id:
                 phrase_id = phrase_id[0]
 
+            # Fetch transcription
             cur.execute(
                 f"select transcription from validation_phrase where id='{phrase_id}'"
             )
@@ -79,6 +74,7 @@ class Command(BaseCommand):
 
             conn.close()
 
+            # Create necessary directories if they do not exist
             speaker_dir = Path("./audio/" + speaker)
             speaker_audio_dir = Path("./audio/" + speaker + "/audio")
             speaker_persephone_dir = Path("./audio/" + speaker + "/persephone")
@@ -93,10 +89,12 @@ class Command(BaseCommand):
                 if not os.path.isdir(_dir):
                     os.mkdir(_dir)
 
+            # Copy the audio file
             from_dir = Path("./audio/" + audio)
             to_dir = Path("./audio/" + speaker + "/audio/" + audio)
             shutil.copyfile(from_dir, to_dir)
 
+            # Treat the transcription for Persephone and save it
             persephone_file = Path(
                 "./audio/" + speaker + "/persephone/" + audio_id + ".txt"
             )
@@ -107,8 +105,10 @@ class Command(BaseCommand):
             with open(persephone_file, "w+") as f:
                 f.write(persephone_trans)
 
+            # Save the transcription for Simple4All
             s4a_file = Path("./audio/" + speaker + "/s4a/" + audio_id + ".txt")
             with open(s4a_file, "w+") as f:
                 f.write(transcription)
 
+            # Print so we know we're making progress
             print(f"Added phrase {transcription} for speaker {speaker}")
