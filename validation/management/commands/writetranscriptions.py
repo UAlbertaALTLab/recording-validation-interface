@@ -98,10 +98,7 @@ class Command(BaseCommand):
             persephone_file = Path(
                 "./audio/" + speaker + "/persephone/" + audio_id + ".txt"
             )
-            persephone_trans = transcription.replace(" ", "%")
-            persephone_trans = list(persephone_trans)
-            persephone_trans = " ".join(persephone_trans)
-            persephone_trans = persephone_trans.replace("%", " ")
+            persephone_trans = self.create_persephone_transcription(transcription)
             with open(persephone_file, "w+") as f:
                 f.write(persephone_trans)
 
@@ -112,3 +109,20 @@ class Command(BaseCommand):
 
             # Print so we know we're making progress
             print(f"Added phrase {transcription} for speaker {speaker}")
+
+    def create_persephone_transcription(self, transcription):
+        """
+        Treats the transcription so it can be read by Persephone
+        As in, it places a space between all characters, and
+        2 spaces between words:
+        >>> self.create_persephone_transcription("wâpamêw")
+        w â p a m ê w
+        >>> self.create_persephone_transcription("kîkwây ôma")
+        k î k w â y  ô m a
+        """
+        persephone_trans = transcription.replace(" ", "%")
+        persephone_trans = list(persephone_trans)
+        persephone_trans = " ".join(persephone_trans)
+        persephone_trans = persephone_trans.replace("%", " ")
+
+        return persephone_trans
