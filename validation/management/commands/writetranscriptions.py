@@ -19,6 +19,7 @@ from pathlib import Path
 import sqlite3
 import os
 import shutil
+from contextlib import closing
 
 from django.core.management.base import BaseCommand, CommandError  # type: ignore
 
@@ -43,36 +44,22 @@ class Command(BaseCommand):
         for audio_file in os.listdir(audio_dir):
             audio_id = audio_file[:-4]
 
-            conn = sqlite3.connect("./db.sqlite3")
-            cur = conn.cursor()
+            with closing(sqlite3.connect("./db.sqlite3")) as conn:
+                cur = conn.cursor()
 
-            # Fetch speaker code
-            cur.execute(
-                f"select speaker_id from validation_recording where id='{audio_id}'"
-            )
-            speaker = cur.fetchone()
-            if speaker:
-                speaker = speaker[0]
-            else:
+                query = """
+                select speaker_id, transcription from validation_recording as rec, validation_phrase as p
+                where rec.id = ?
+                and rec.phrase_id = p.id;
+                """
+
+                cur.execute(query, (str(audio_id),))
+                result = cur.fetchone()
+                speaker = result[0] if result else None
+                transcription = result[1] if result else None
+
+            if not speaker:
                 continue
-
-            # Fetch phrase id
-            cur.execute(
-                f"select phrase_id from validation_recording where id='{audio_id}'"
-            )
-            phrase_id = cur.fetchone()
-            if phrase_id:
-                phrase_id = phrase_id[0]
-
-            # Fetch transcription
-            cur.execute(
-                f"select transcription from validation_phrase where id='{phrase_id}'"
-            )
-            transcription = cur.fetchone()
-            if transcription:
-                transcription = transcription[0]
-
-            conn.close()
 
             # Create necessary directories if they do not exist
             speaker_dir = audio_dir / speaker
