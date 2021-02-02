@@ -72,6 +72,7 @@ def search_phrases(request):
     cree_matches = Phrase.objects.filter(transcription__contains=query)
     english_matches = Phrase.objects.filter(translation__contains=query)
     all_matches = list(set().union(cree_matches, english_matches))
+    all_matches.sort(key=lambda phrase: phrase.transcription)
     paginator = Paginator(all_matches, 30)
     page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)
@@ -84,9 +85,7 @@ def advanced_search(request):
     The search results for pages.
     """
     query = Speaker.objects.all()
-    speakers = []
-    for q in query:
-        speakers.append(q.code)
+    speakers = [q.code for q in query]
 
     context = dict(speakers=speakers)
     return render(request, "validation/advanced_search.html", context)
@@ -118,10 +117,7 @@ def advanced_search_results(request):
     else:
         english_matches = []
 
-    # if analysis != "":
-    #     analysis_matches = Phrase.objects.filter(analysis__contains=analysis)
-    # else:
-    #     analysis_matches = []
+    # TODO: filter by analysis
 
     if transcription == "" and translation == "":
         phrase_matches = Phrase.objects.all()
@@ -147,6 +143,8 @@ def advanced_search_results(request):
             for recording in phrase.recordings:
                 if recording.speaker.code in speakers:
                     all_matches.append(phrase)
+
+    all_matches.sort(key=lambda phrase: phrase.transcription)
 
     paginator = Paginator(all_matches, 30)
     page_no = request.GET.get("page", 1)

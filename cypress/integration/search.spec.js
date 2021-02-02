@@ -2,19 +2,19 @@
 // Tests for search and advanced search
 
 describe("Search", () => {
-    it("should display the search results", () => { 
+    it("should search for then display the first word on the main page", () => { 
         cy.visit(Cypress.env("home"))
 
         cy.get('a[name="word-link"]:first')
-            .then((word) => {
-                const w = word[0].id
+            .then((anchorElements) => {
+                const word = anchorElements[0].id
                 cy.get("input[name='query']")
                     .click()
-                    .type(w)
+                    .type(word)
                     .type('{enter}')
 
                 cy.get('h2')
-                    .contains(w)
+                    .contains(word)
                 
                 cy.get(".table")
                     .should("be.visible")
@@ -24,7 +24,7 @@ describe("Search", () => {
                 cy.get(".table")
                     .contains("Recordings")
                 cy.get(".table")
-                    .contains(w)
+                    .contains(word)
             })
     })
 
