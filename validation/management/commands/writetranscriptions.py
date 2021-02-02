@@ -63,8 +63,8 @@ class Command(BaseCommand):
 
             # Create necessary directories if they do not exist
             speaker_dir = audio_dir / speaker
-            speaker_audio_dir = audio_dir / speaker / "audio"
-            speaker_persephone_dir = audio_dir / speaker / "persephone"
+            speaker_audio_dir = audio_dir / speaker / "wav"
+            speaker_persephone_dir = audio_dir / speaker / "label"
             speaker_s4a_dir = audio_dir / speaker / "s4a"
 
             for _dir in [
@@ -77,12 +77,12 @@ class Command(BaseCommand):
 
             # Copy the audio file
             from_dir = audio_dir / audio_file
-            to_dir = audio_dir / speaker / "audio" / audio_file
+            to_dir = audio_dir / speaker / "wav" / audio_file
             shutil.copyfile(from_dir, to_dir)
 
             # Treat the transcription for Persephone and save it
             persephone_filename = audio_id + ".txt"
-            persephone_path = audio_dir / speaker / "persephone" / persephone_filename
+            persephone_path = audio_dir / speaker / "label" / persephone_filename
             persephone_trans = self.create_persephone_transcription(transcription)
             with open(persephone_path, "w+") as f:
                 f.write(persephone_trans)

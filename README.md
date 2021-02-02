@@ -427,9 +427,9 @@ python manage.py writetranscriptions
 
 This should create:
 * A new folder for each speaker code, eg: `./audio/LOU`
-* A copy of the .wav file in the speaker folder, eg: `./audio/LOU/audio/audio_id.wav`
-* A transcription file to be used by Persephone, eg: `./audio/LOU/persephone/audio_id.txt`
-* A transcription file to be used by Simple4All, eg: `./audio/LOU/s4a/audio_id.txt`
+* A copy of the .wav file in the speaker folder, eg: `./audio/LOU/wav/audio_id.wav`
+* A transcription file to be used by **Persephone**, eg: `./audio/LOU/label/audio_id.txt`
+* A transcription file to be used by **Simple4All**, eg: `./audio/LOU/s4a/audio_id.txt`
 
 
 Frequently Asked Questions
