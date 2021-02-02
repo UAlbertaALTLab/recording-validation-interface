@@ -106,8 +106,7 @@ def advanced_search_results(request):
     translation = request.GET.get("translation")
     analysis = request.GET.get("analysis")
     status = request.GET.get("status")
-    speaker = request.GET.get("speaker")
-    speakers = speaker.strip().split(",")[:-1]
+    speakers = request.GET.getlist("speaker-options")
 
     if transcription != "":
         cree_matches = Phrase.objects.filter(transcription__contains=transcription)
@@ -141,7 +140,7 @@ def advanced_search_results(request):
         phrase_and_status_matches = phrase_matches
 
     all_matches = []
-    if "all" in speaker or speaker == "None":
+    if "all" in speakers or speakers == []:
         all_matches = phrase_and_status_matches
     else:
         for phrase in phrase_and_status_matches:
