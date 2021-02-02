@@ -18,6 +18,7 @@ typing-extensions = "*"
 pympi-ling = "*"
 requests = "*"
 divvunspell-python = {ref = "3aa656d36a2fa1ede90e53c320b2095c05cf7c05", git = "https://github.com/divvun/divvunspell-sdk-python"}
+hfst-optimized-lookup = "*"
 
 [dev-packages]
 gunicorn = "*"
@@ -31,4 +32,4 @@ django-stubs = "*"
 django-extensions = "*"
 
 [requires]
-python_full_version = "3.7.9"
+python_version = "3.7"

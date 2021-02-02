@@ -1,6 +1,7 @@
 from os import fspath
 
 import divvunspell
+import hfst_optimized_lookup
 from difflib import Differ, SequenceMatcher, get_close_matches
 from urllib.parse import urljoin
 import operator
@@ -24,6 +25,10 @@ RULES
 
 archive = divvunspell.SpellerArchive(fspath(settings.BASE_DIR / "crk.zhfst"))
 speller = archive.speller()
+
+fst = hfst_optimized_lookup.TransducerFile(
+    fspath(settings.BASE_DIR / "crk-descriptive-analyzer.hfstol")
+)
 
 vowels = ["a", "i", "o", "â", "î", "ô"]
 consonants = [f"  {char}" for char in "chkmnpstwy"]
@@ -211,20 +216,16 @@ def get_translations_only(results):
     return translations
 
 
-def get_lemma_from_analysis(analysis):
-    # we assume here that the lemma is the longest
-    # sequence of characters in the string
-    # THIS IS A WEAK CHECK
-    analysis = analysis.replace("/", "+")
-    parts = analysis.split("+")
-    max_len = 0
-    max_char = ""
-    for p in parts:
-        if len(p) > max_len:
-            max_len = len(p)
-            max_char = p
-
-    return max_char
+def get_lemma(word):
+    lemmas = []
+    analyses = fst.lookup_symbols(word)
+    for wordform in analyses:
+        lemma = ""
+        for char in wordform:
+            if len(char) == 1:
+                lemma += char
+        lemmas.append(lemma)
+    return lemmas
 
 
 def get_distance_with_translations(word):
@@ -234,7 +235,13 @@ def get_distance_with_translations(word):
 
         translations, analysis = get_translations_and_analysis(results)
         if len(translations) == 0 and analysis != "":
-            lemma = get_lemma_from_analysis(analysis)
+            lemmas = get_lemma(word)
+            lemma = ""
+            # Sometime more than one lemma is return
+            # We want the same lemma as is present in the analysis from divvunspell
+            for l in lemmas:
+                if l in analysis:
+                    lemma = l
             results = get_translations_from_itwewina(lemma)
             translations = get_translations_only(results)
 
