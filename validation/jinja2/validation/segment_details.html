@@ -91,9 +91,9 @@
         <thead>
           <tr>
             <th scope="col"> Suggestion </th>
+            <th scope="col"> MED </th>
             <th scope="col"> Translation </th>
             <th scope="col"> Analysis </th>
-            <th scope="col"> MED </th>
             {% if auth %}
             <th scope="col"> Options </th>
             {% endif %}
@@ -101,16 +101,34 @@
         </thead>
         {% for suggestion in suggestions %}
         <tr>
-            {{ macros.td_suggestion_transcription(user, suggestion) }}
+            {{ macros.td_suggestion_transcription(user, suggestion, suggestions) }}
+            {{ macros.td_suggestion_med(user, suggestion, suggestions) }}
+            {% if suggestions[suggestion]['len'] > 1 %}
+            <td>Multiple Translations</td>
+            <td>Multiple Analyses</td>
+            {% else %}
             {{ macros.td_suggestion_translation(user, suggestion, suggestions) }}
             {{ macros.td_suggestion_analysis(user, suggestion, suggestions) }}
-            {{ macros.td_suggestion_med(user, suggestion, suggestions) }}
             {% if auth %}
             <td>
                 <input type="button" value="Accept" onclick="showDiv('{{ suggestion }}', {{ suggestions }})" />
             </td>
             {% endif %}
+            {% endif %}
         </tr>
+        {% if suggestions[suggestion]['len'] > 1 %}
+          {% for match in suggestions[suggestion]['matches'] %}
+            <tr>
+            <td>{{ match['translations'] }}</td>
+            <td>{{ match['analysis'] }}</td>
+            {% if auth %}
+            <td>
+                <input type="button" value="Accept" onclick="showDiv('{{ suggestion }}', {{ suggestions }})" />
+            </td>
+          </tr>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
         {% endfor %}{# for suggestion in suggestions #}
       </table>
       <h4>Revision History:</h4>

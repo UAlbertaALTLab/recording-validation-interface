@@ -180,40 +180,31 @@ def get_translations_from_itwewina(word):
         return "Error getting request"
 
 
-def get_translations_and_analysis(results):
-    defs = []
-    analysis = ""
-    for i in results["results"]:
-        if type(i["definitions"]) == list and len(i["definitions"]) > 0:
-            defs.append(i["definitions"])
-        analysis = i["lemma_wordform"]["analysis"]
+def get_translations(results, from_lemma=False):
+    matches = []
 
+    for i in results["results"]:
+        if from_lemma and i["is_lemma"]:
+            translations, analysis = extract_translations(i)
+            translations = "(Lemma translation) " + translations
+            matches.append({"translations": translations, "analysis": analysis})
+        else:
+            translations, analysis = extract_translations(i)
+            matches.append({"translations": translations, "analysis": analysis})
+
+    return matches
+
+
+def extract_translations(entry):
     translations = []
-    for d in defs:
-        for i in d:
-            if type(i) == dict and i["text"]:
-                translations.append(i["text"])
+
+    if type(entry["definitions"]) == list and len(entry["definitions"]) > 0:
+        translations = [str(j["text"]) for j in entry["definitions"]]
 
     translations = "; ".join(translations)
+    analysis = entry["lemma_wordform"]["analysis"]
 
     return translations, analysis
-
-
-def get_translations_only(results):
-    defs = []
-    for i in results["results"]:
-        if type(i["definitions"]) == list and len(i["definitions"]) > 0:
-            defs.append(i["definitions"])
-
-    translations = ["(Lemma translation)"]
-    for d in defs:
-        for i in d:
-            if type(i) == dict and i["text"]:
-                translations.append(i["text"])
-
-    translations = "; ".join(translations)
-
-    return translations
 
 
 def get_lemma(word):
@@ -233,22 +224,23 @@ def get_distance_with_translations(word):
     for word in suggestions:
         results = get_translations_from_itwewina(word)
 
-        translations, analysis = get_translations_and_analysis(results)
-        if len(translations) == 0 and analysis != "":
-            lemmas = get_lemma(word)
-            lemma = ""
-            # Sometime more than one lemma is return
-            # We want the same lemma as is present in the analysis from divvunspell
-            for l in lemmas:
-                if l in analysis:
-                    lemma = l
-            results = get_translations_from_itwewina(lemma)
-            translations = get_translations_only(results)
+        matches = get_translations(results)
+        for entry in matches:
+            if len(entry["translations"]) == 0 and entry["analysis"] != "":
+                lemmas = get_lemma(word)
+                lemma = ""
+                # Sometimes more than one lemma is returned
+                # We want the same lemma as is present in the analysis from divvunspell
+                for l in lemmas:
+                    if l in entry["analysis"]:
+                        lemma = l
+                results = get_translations_from_itwewina(lemma)
+                matches = get_translations(results, from_lemma=True)
 
         suggestions[word] = {
             "med": suggestions[word],
-            "translation": translations,
-            "analysis": analysis,
+            "matches": matches,
+            "len": len(matches) if len(matches) == 1 else len(matches) + 1,
         }
 
     return suggestions
