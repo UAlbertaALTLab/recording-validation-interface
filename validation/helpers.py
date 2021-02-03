@@ -184,12 +184,10 @@ def get_translations(results, from_lemma=False):
     matches = []
 
     for i in results["results"]:
-        if from_lemma and i["is_lemma"]:
-            translations, analysis = extract_translations(i)
+        translations, analysis = extract_translations(i["lemma_wordform"])
+        if from_lemma:
             translations = "(Lemma translation) " + translations
-            matches.append({"translations": translations, "analysis": analysis})
-        else:
-            translations, analysis = extract_translations(i)
+        if {"translations": translations, "analysis": analysis} not in matches:
             matches.append({"translations": translations, "analysis": analysis})
 
     return matches
@@ -202,7 +200,7 @@ def extract_translations(entry):
         translations = [str(j["text"]) for j in entry["definitions"]]
 
     translations = "; ".join(translations)
-    analysis = entry["lemma_wordform"]["analysis"]
+    analysis = entry["analysis"]
 
     return translations, analysis
 
