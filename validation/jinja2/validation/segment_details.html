@@ -1,15 +1,17 @@
 <script>
-    function showDiv(name, suggestions=null) {
+    function showDiv(name) {
         document.getElementById('edit').style.display = "block";
         document.getElementById('id_cree').focus()
-        analysis = '';
+        
+        translation = document.getElementById(name + '-translation').innerHTML;
 
-        if (suggestions == null) {
-            translation = document.getElementById(name + '-translation').innerHTML;
-        } else {
-            translation = suggestions[name]['translation'];
-            analysis = suggestions[name]['analysis'];
-        }
+        document.getElementById('id_cree').value = name;
+        document.getElementById('id_transl').value = translation;
+    }
+
+    function showDivAccept(name, translation, analysis) {
+        document.getElementById('edit').style.display = "block";
+        document.getElementById('id_cree').focus()
 
         document.getElementById('id_cree').value = name;
         document.getElementById('id_transl').value = translation;
@@ -19,7 +21,6 @@
     function hideDiv() {
         document.getElementById('edit').style.display = "none";
     }
-
 
     function revert(transcription, translation, analysis) {
         document.getElementById('edit').style.display = "block";
@@ -104,16 +105,19 @@
             {{ macros.td_suggestion_transcription(user, suggestion, suggestions) }}
             {{ macros.td_suggestion_med(user, suggestion, suggestions) }}
             {% if suggestions[suggestion]['len'] > 1 %}
-            <td>Multiple Translations</td>
-            <td>Multiple Analyses</td>
+              <td>Multiple Translations</td>
+              <td>Multiple Analyses</td>
+              <td></td>
             {% else %}
-            {{ macros.td_suggestion_translation(user, suggestion, suggestions) }}
-            {{ macros.td_suggestion_analysis(user, suggestion, suggestions) }}
-            {% if auth %}
-            <td>
-                <input type="button" value="Accept" onclick="showDiv('{{ suggestion }}', {{ suggestions }})" />
-            </td>
-            {% endif %}
+              {{ macros.td_suggestion_translation(user, suggestion, suggestions) }}
+              {{ macros.td_suggestion_analysis(user, suggestion, suggestions) }}
+              {% if auth %}
+              <td>
+                  {% set transl = suggestions[suggestion]["matches"][0]["translations"] %}
+                  {% set analysis = suggestions[suggestion]["matches"][0]["analysis"] %}
+                  <input type="button" value="Accept" onclick="showDivAccept('{{ suggestion }}', '{{ transl }}', '{{ analysis }}')" />
+              </td>
+              {% endif %}
             {% endif %}
         </tr>
         {% if suggestions[suggestion]['len'] > 1 %}
@@ -123,7 +127,9 @@
             <td>{{ match['analysis'] }}</td>
             {% if auth %}
             <td>
-                <input type="button" value="Accept" onclick="showDiv('{{ suggestion }}', {{ suggestions }})" />
+                {% set transl = match["translations"] %}
+                {% set analysis = match["analysis"] %}
+                <input type="button" value="Accept" onclick="showDivAccept('{{ suggestion }}', '{{ transl }}', '{{ analysis }}')" />
             </td>
           </tr>
             {% endif %}
