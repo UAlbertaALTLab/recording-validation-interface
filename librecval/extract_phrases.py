@@ -173,11 +173,6 @@ class RecordingExtractor:
             )
             yield from extractor.extract_all()
 
-            audio = AudioSegment.from_file(fspath(sound_file))
-            print(f"Processed file number {count} from folder number {folder_count}")
-            count += 1
-            yield from generate_segments_from_eaf(_path, audio, speaker, session_id)
-
 
 @logme.log
 def find_audio_from_audacity_format(
@@ -198,21 +193,6 @@ def find_audio_from_audition_format(
 ) -> Optional[Path]:
     #  Gross code to try Adobe Audition recorded files
     session_dir = annotation_path.parent
-    keys = eaf_file.get_tier_names()
-    count = 0
-
-    # get tiers from keys
-    english_word_tier, cree_word_tier = get_word_tiers(keys)
-    english_phrase_tier, cree_phrase_tier = get_phrase_tiers(keys)
-
-    comment_tier = "Comments" if "Comments" in keys else None
-
-    if not english_word_tier and english_phrase_tier:
-        # Assuming each entry needs to have a translation before continuining
-        # Again, this is a weird assumption to make
-        raise MissingTranslationError(
-            f"No English word or phrase found for data at {annotation_path}"
-        )
 
     # If it's in Audition format, there will be exactly ONE file with the
     # *.sesx extension.

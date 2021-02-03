@@ -6,22 +6,6 @@
 {% import 'validation/_macros.html' as macros %}
 
 {% block content %}
-<script>
-    function getSelectedSpeakers() {
-        var items = document.getElementsByName('speaker-options')
-        var selected_speakers = "";
-        for (var i=0; i<items.length; i++){
-            if(items[i].type=='checkbox' && items[i].checked==true)
-                selected_speakers += items[i].value+",";
-        }
-
-        if (selected_speakers.length == 0) {
-            document.getElementById('speaker').value = 'None';
-        } else {
-            document.getElementById('speaker').value = selected_speakers;
-        }
-    }
-</script>
 <form method="GET" action="{{
     url('validation:advanced_search_results')
   }}">
@@ -50,7 +34,7 @@
 
     <input type="hidden" name="speaker" id="speaker">
 
-    <button onclick="getSelectedSpeakers()" class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    <button data-cy="advanced-form-submit" class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
   </form>
 
   {% endblock content %}

@@ -6,9 +6,7 @@
 
         if (suggestions == null) {
             translation = document.getElementById(name + '-translation').innerHTML;
-        }
-
-        else {
+        } else {
             translation = suggestions[name]['translation'];
             analysis = suggestions[name]['analysis'];
         }
@@ -40,12 +38,14 @@
 
 {% block content %}
 <div class="table-responsive">
-    <button
+  {% if auth %}
+    <button data-cy="edit-button" class="favorite styled"
         onclick="showDiv('{{ segment_name }}')"
         style="float: right; margin-bottom: 0.5rem;"
         class="button-fail">
             Edit
     </button>
+    {% endif %}
 
     <table id="segment-table" class="table table-striped">
       <thead>
@@ -84,7 +84,7 @@
       {% endfor %}{# for phrase in phrases #}
     </table>
 
-    <div style="display: none;" id="edit">
+    <div style="display: none;" id="edit" data-cy="edit-div">
         {% include 'validation/segment_edit.html' %}
     </div>
 
@@ -95,7 +95,9 @@
             <th scope="col"> Translation </th>
             <th scope="col"> Analysis </th>
             <th scope="col"> MED </th>
+            {% if auth %}
             <th scope="col"> Options </th>
+            {% endif %}
           </tr>
         </thead>
         {% for suggestion in suggestions %}
@@ -104,14 +106,16 @@
             {{ macros.td_suggestion_translation(user, suggestion, suggestions) }}
             {{ macros.td_suggestion_analysis(user, suggestion, suggestions) }}
             {{ macros.td_suggestion_med(user, suggestion, suggestions) }}
+            {% if auth %}
             <td>
                 <input type="button" class="button-success" value="Accept" onclick="showDiv('{{ suggestion }}', {{ suggestions }})" />
             </td>
+            {% endif %}
         </tr>
         {% endfor %}{# for suggestion in suggestions #}
       </table>
       <h4>Revision History:</h4>
-      <table class="table table-striped">
+      <table id="revision-table" class="table table-striped">
         <thead>
           <tr>
             <th scope="col"> User </th>
@@ -119,19 +123,23 @@
             <th scope="col"> Transcription </th>
             <th scope="col"> Translation </th>
             <th scope="col">Analysis </th>
+            {% if auth %}
             <th scope="col">Options </th>
+            {% endif %}
           </tr>
         </thead>
         {% for revision in history %}
         <tr>
-          <td>{{ revision.modifier }} </td>
-          <td>{{ revision.date }} </td>
-          <td>{{ revision.transcription }} </td>
-          <td>{{ revision.translation }} </td>
-          <td>{{ revision.analysis }} </td>
+          <td data-cy="revision-modifier">{{ revision.modifier }} </td>
+          <td data-cy="revision-date">{{ revision.date }} </td>
+          <td data-cy="revision-transcription">{{ revision.transcription }} </td>
+          <td data-cy="revision-translation">{{ revision.translation }} </td>
+          <td data-cy="revision-analysis">{{ revision.analysis }} </td>
+          {% if auth %}
           <td>
             <input type="button" class="button-fail" value="Revert" onclick="revert('{{ revision.transcription }}', '{{ revision.translation }}', '{{ revision.analysis }}')" />
         </td>
+        {% endif %}
           
         </tr>
         {% endfor %}{# for revision in history #}
