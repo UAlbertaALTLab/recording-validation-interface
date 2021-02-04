@@ -23,6 +23,13 @@
 {% import 'validation/_macros.html' as macros %}
 
 {% block content %}
+<form class="form-inline ml-2 my-2 my-lg-0" method="GET" action="{{
+  url('validation:index')
+}}">
+  <button class="btn btn-outline-success my-2 my-sm-0" type="submit" name="mode" value="all">All</button>
+  <button class="btn btn-outline-success my-2 my-sm-0" type="submit" name="mode" value="validated">Validated</button>
+  <button class="btn btn-outline-success my-2 my-sm-0" type="submit" name="mode" value="unvalidated">Unvalidated</button>
+</form>
 <div class="table-responsive">
   <table class="table table-striped">
     <thead>
@@ -30,17 +37,28 @@
         <th scope="col"> Transcription </th>
         <th scope="col"> Translation </th>
         <th scope="col"> Recordings </th>
+        <th scope="col"> Speaker </th>
       </tr>
     </thead>
     {% for phrase in phrases %}
     <tr data-update-uri="{{ url('validation:update_text', phrase_id=phrase.id) }}">
-      {{ macros.td_transcription(user, phrase) }}
+      {{ macros.td_transcription_link(user, phrase) }}
       {{ macros.td_translation(user, phrase) }}
       <td>
         <ul class="recordings">
         {% for recording in phrase.recordings %}
           <li>
             {{ macros.player(recording) }}
+          </li>
+
+        {% endfor %}{# for recording in phrase.recordings #}
+        </ul>
+      </td>
+      <td>
+        <ul class="speaker">
+        {% for recording in phrase.recordings %}
+          <li class="speaker_code">
+            {{ macros.speaker(recording) }}
           </li>
 
         {% endfor %}{# for recording in phrase.recordings #}

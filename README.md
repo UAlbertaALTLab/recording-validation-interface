@@ -26,6 +26,18 @@ make install-dev
 
 This will also setup the [git pre-commit hook](https://www.viget.com/articles/two-ways-to-share-git-hooks-with-your-team/).
 
+You will also need:
+
+  - `crk.zhfst` from building [`lang-crk`] with `--enable-spellers`
+
+  - `private/metadata.csv` from downloading the “Master Recordings
+    MetaData” document on google drive as CSV
+
+  - some sessions from `sapir:/data/av/backup-mwe/sessions` in
+    `/data/sessions`; `2015-03-23-__-___-_` (6GB) is known to work.
+
+[`lang-crk`]: https://github.com/giellalt/lang-crk
+
 ### Production
 
 > **NOTE**: Before you continue, you may want to run

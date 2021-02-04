@@ -37,7 +37,7 @@
     </thead>
     {% for phrase in phrases %}
     <tr>
-      {{ macros.td_transcription(user, phrase) }}
+      {{ macros.td_transcription_link(user, phrase) }}
       {{ macros.td_translation(user, phrase) }}
       <td>
         <ul class="recordings">
