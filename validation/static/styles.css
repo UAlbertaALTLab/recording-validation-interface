@@ -43,6 +43,14 @@ li.speaker_code {
   max-width: 100%;
 }
 
+.logout-message {
+  background-color: #F5F5F5;
+  margin: 0 auto;
+  padding: 2rem;
+  max-width: 50rem;
+  min-width: 20rem;
+  text-align: center;
+}
 
 /* login styles */
 .login {
