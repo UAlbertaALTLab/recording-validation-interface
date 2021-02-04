@@ -18,6 +18,7 @@ a:hover {
 }
 
 ul.speaker {
+  margin-top: 0.5rem;
   padding-bottom: 10;
   list-style: none;
 }
@@ -72,6 +73,23 @@ li.speaker_code {
   border: 2px solid var(--custom-purple);
   border-radius: var(--button-radius);
   margin: 1rem 5rem;
+  cursor: pointer;
+}
+
+
+.register-button {
+  color: var(--custom-purple);
+  background-color: transparent;
+  border: 2px solid var(--custom-purple);
+  border-radius: var(--button-radius);
+  margin: 0rem 4.5rem;
+}
+
+.register-button:hover {
+  color: var(--custom-white);
+  background-color: var(--custom-purple);
+  border: 2px solid var(--custom-purple);
+  border-radius: var(--button-radius);
   cursor: pointer;
 }
 
@@ -187,4 +205,22 @@ li.speaker_code {
 /* table styles */
 .restrict-content {
   max-width: 15rem;
+}
+
+.rec-height {
+  height: 3rem;
+}
+
+/* form styles */
+.form-restrict {
+  max-width: 15rem;
+}
+
+.errorlist {
+  list-style: none;
+  font-size: 0.8rem;
+  color: var(--custom-orange);
+  font-style: italic;
+  margin-bottom: 0;
+  margin-left: -2rem;
 }

@@ -52,7 +52,9 @@
         <ul class="recordings">
         {% for recording in phrase.recordings %}
           <li>
-            {{ macros.player(recording) }}
+            <div class="rec-height">
+              {{ macros.player(recording) }}
+            </div>
           </li>
 
         {% endfor %}{# for recording in phrase.recordings #}
@@ -61,8 +63,10 @@
       <td>
         <ul class="speaker">
         {% for recording in phrase.recordings %}
-          <li class="speaker_code">
-            {{ macros.speaker(recording) }}
+          <li>
+            <div class="rec-height">
+              {{ macros.speaker(recording) }}
+            </div>
           </li>
 
         {% endfor %}{# for recording in phrase.recordings #}

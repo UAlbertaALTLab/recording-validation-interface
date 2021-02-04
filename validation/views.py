@@ -150,7 +150,7 @@ def advanced_search_results(request):
 
     all_matches = []
     if "all" in speakers or speakers == []:
-        all_matches = phrase_and_status_matches
+        all_matches = [p for p in phrase_and_status_matches]
     else:
         for phrase in phrase_and_status_matches:
             for recording in phrase.recordings:
@@ -280,7 +280,7 @@ def segment_content_view(request, segment_id):
         phrase_id = og_phrase.id
         if form.is_valid():
             transcription = form.cleaned_data["cree"]
-            translation = form.cleaned_data["transl"]
+            translation = form.cleaned_data["translation"]
             analysis = form.cleaned_data["analysis"]
             p = Phrase.objects.filter(id=phrase_id)[0]
             p.transcription = transcription

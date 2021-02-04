@@ -7,42 +7,30 @@ from django.contrib.auth.models import User
 class Login(forms.Form):
     username = forms.CharField(
         required=True,
-        widget=forms.TextInput(
-            attrs={"class": "form-control", "style": "max-width: 15rem;"}
-        ),
+        widget=forms.TextInput(attrs={"class": "form-control form-restrict"}),
     )
     password = forms.CharField(
         required=True,
-        widget=forms.PasswordInput(
-            attrs={"class": "form-control", "style": "max-width: 15rem;"}
-        ),
+        widget=forms.PasswordInput(attrs={"class": "form-control form-restrict"}),
     )
 
 
 class Register(forms.Form):
     first_name = forms.CharField(
         required=True,
-        widget=forms.TextInput(
-            attrs={"class": "form-control", "style": "max-width: 15rem;"}
-        ),
+        widget=forms.TextInput(attrs={"class": "form-control form-restrict"}),
     )
     last_name = forms.CharField(
         required=True,
-        widget=forms.TextInput(
-            attrs={"class": "form-control", "style": "max-width: 15rem;"}
-        ),
+        widget=forms.TextInput(attrs={"class": "form-control form-restrict"}),
     )
     username = forms.CharField(
         required=True,
-        widget=forms.TextInput(
-            attrs={"class": "form-control", "style": "max-width: 15rem;"}
-        ),
+        widget=forms.TextInput(attrs={"class": "form-control form-restrict"}),
     )
     password = forms.CharField(
         required=True,
-        widget=forms.PasswordInput(
-            attrs={"class": "form-control", "style": "max-width: 15rem;"}
-        ),
+        widget=forms.PasswordInput(attrs={"class": "form-control form-restrict"}),
     )
 
     def clean_username(self):
@@ -66,7 +54,7 @@ class EditSegment(forms.Form):
     cree = forms.CharField(
         required=False, widget=forms.TextInput(attrs={"class": "form-control"})
     )
-    transl = forms.CharField(
+    translation = forms.CharField(
         required=False, widget=forms.TextInput(attrs={"class": "form-control"})
     )
     analysis = forms.CharField(
