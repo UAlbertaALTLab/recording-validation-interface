@@ -52,6 +52,10 @@ li.speaker_code {
   text-align: center;
 }
 
+.bottom-margin {
+  margin-bottom: 2rem;
+}
+
 /* login styles */
 .login {
   background-color: #F5F5F5;
