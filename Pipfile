@@ -31,4 +31,4 @@ django-stubs = "*"
 django-extensions = "*"
 
 [requires]
-python_full_version = "3.7.9"
+python_version = "3.7"
