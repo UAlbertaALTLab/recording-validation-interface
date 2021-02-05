@@ -2,6 +2,6 @@ version: '3.7'
 services:
    web:
        build: .
-       command: pipenv shell && python manage.py runserver localhost:8000
+       command: python manage.py runserver localhost:8000
        ports:
            - 8000:8000

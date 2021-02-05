@@ -8,7 +8,6 @@ node_modules/
 data/
 
 # HFSTs
-*.zhfst
 
 # Caches
 .pytest_cache/

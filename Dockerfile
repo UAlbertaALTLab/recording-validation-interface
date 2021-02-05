@@ -15,20 +15,18 @@ RUN groupadd --system --gid ${UID_GID} ${WSGI_USER} \
 ENV PYTHONUNBUFFERED 1
 
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
-RUN /bin/bash -c "source $HOME/.cargo/env"
+ENV PATH=/root/.cargo/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 RUN pip install maturin
 RUN pip install pep517
-RUN pip install pipenv 
+RUN pip install pipenv
 
 # Sets the container's working directory to /app
 WORKDIR /app/
 # Copies all files from our local project into the container
 ADD . /app/
+ADD crk.zhfst /app/
 
-RUN pipenv install --system --deploy --ignore-pipfile
-
-# runs the pip install command for all packages listed in the requirements.txt file
-# RUN pip install -r /app/requirements.txt
+RUN pipenv install --system --ignore-pipfile --dev
 
 EXPOSE 8000
