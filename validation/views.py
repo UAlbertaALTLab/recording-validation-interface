@@ -46,21 +46,34 @@ def index(request):
     """
     The home page.
     """
+    all_class = "button-success button-filter"
+    validated_class = "button-success button-filter"
+    unvalidated_class = "button-success button-filter"
     mode = query = request.GET.get("mode")
     if mode == "all":
         all_phrases = Phrase.objects.all()
+        all_class = "button-success button-filter button-filter-active"
     elif mode == "validated":
         all_phrases = Phrase.objects.filter(validated=True)
+        validated_class = "button-success button-filter button-filter-active"
     elif mode == "unvalidated":
         all_phrases = Phrase.objects.filter(validated=False)
+        unvalidated_class = "button-success button-filter button-filter-active"
     else:
         all_phrases = Phrase.objects.all()
+        all_class = "button-success button-filter button-filter-active"
 
     paginator = Paginator(all_phrases, 30)
     page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)
     auth = request.user.is_authenticated
-    context = dict(phrases=phrases, auth=auth)
+    context = dict(
+        phrases=phrases,
+        all_class=all_class,
+        validated_class=validated_class,
+        unvalidated_class=unvalidated_class,
+        auth=auth,
+    )
     return render(request, "validation/list_phrases.html", context)
 
 
@@ -137,7 +150,7 @@ def advanced_search_results(request):
 
     all_matches = []
     if "all" in speakers or speakers == []:
-        all_matches = phrase_and_status_matches
+        all_matches = [p for p in phrase_and_status_matches]
     else:
         for phrase in phrase_and_status_matches:
             for recording in phrase.recordings:
@@ -267,7 +280,7 @@ def segment_content_view(request, segment_id):
         phrase_id = og_phrase.id
         if form.is_valid():
             transcription = form.cleaned_data["cree"]
-            translation = form.cleaned_data["transl"]
+            translation = form.cleaned_data["translation"]
             analysis = form.cleaned_data["analysis"]
             p = Phrase.objects.filter(id=phrase_id)[0]
             p.transcription = transcription
