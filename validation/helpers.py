@@ -1,7 +1,6 @@
 from os import fspath
 
 import divvunspell
-import hfst_optimized_lookup
 from difflib import Differ, SequenceMatcher, get_close_matches
 from urllib.parse import urljoin
 import operator
@@ -25,10 +24,6 @@ RULES
 
 archive = divvunspell.SpellerArchive(fspath(settings.BASE_DIR / "crk.zhfst"))
 speller = archive.speller()
-
-fst = hfst_optimized_lookup.TransducerFile(
-    fspath(settings.BASE_DIR / "crk-descriptive-analyzer.hfstol")
-)
 
 vowels = ["a", "i", "o", "â", "î", "ô"]
 consonants = [f"  {char}" for char in "chkmnpstwy"]

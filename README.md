@@ -30,8 +30,6 @@ You will also need:
 
   - `crk.zhfst` from building [`lang-crk`] with `--enable-spellers`
 
-  - `crk-descriptive-analyzer.hfstol` from the [lang-crk releases](https://github.com/giellalt/lang-crk/releases)
-
   - `private/metadata.csv` from downloading the “Master Recordings
     MetaData” document on google drive as CSV
 
