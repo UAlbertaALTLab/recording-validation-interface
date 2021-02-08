@@ -180,13 +180,11 @@ def get_translations_from_itwewina(word):
         return "Error getting request"
 
 
-def get_translations(results, from_lemma=False):
+def get_translations(results):
     matches = []
 
     for i in results["results"]:
         translations, analysis = extract_translations(i["lemma_wordform"])
-        if from_lemma:
-            translations = "(Lemma translation) " + translations
         if {"translations": translations, "analysis": analysis} not in matches:
             matches.append({"translations": translations, "analysis": analysis})
 
@@ -205,35 +203,12 @@ def extract_translations(entry):
     return translations, analysis
 
 
-def get_lemma(word):
-    lemmas = []
-    analyses = fst.lookup_symbols(word)
-    for wordform in analyses:
-        lemma = ""
-        for char in wordform:
-            if len(char) == 1:
-                lemma += char
-        lemmas.append(lemma)
-    return lemmas
-
-
 def get_distance_with_translations(word):
     suggestions = get_edit_distance(word)
     for word in suggestions:
         results = get_translations_from_itwewina(word)
 
         matches = get_translations(results)
-        for entry in matches:
-            if len(entry["translations"]) == 0 and entry["analysis"] != "":
-                lemmas = get_lemma(word)
-                lemma = ""
-                # Sometimes more than one lemma is returned
-                # We want the same lemma as is present in the analysis from divvunspell
-                for l in lemmas:
-                    if l in entry["analysis"]:
-                        lemma = l
-                results = get_translations_from_itwewina(lemma)
-                matches = get_translations(results, from_lemma=True)
 
         suggestions[word] = {
             "med": suggestions[word],

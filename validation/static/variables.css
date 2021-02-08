@@ -1,0 +1,16 @@
+/**
+* Style variables used for Maskwacîs
+**/
+
+:root {
+    /* main color scheme */
+    --custom-green: #668E3F;
+    --light-green: #75AB69;
+    --mauve: #472F35;
+    --custom-purple: #524C53;
+    --custom-orange: #D78278;
+    --custom-white: #ffffff;
+
+    /* button styles */
+    --button-radius: 0.25rem;
+}

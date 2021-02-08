@@ -174,7 +174,10 @@ X_FRAME_OPTIONS = "DENY"
 # e.g.,  if SCRIPT_NAME=/validation,
 #        then static file URLs will point to /validation/static/
 # TODO: this is the wrong way to construct this variable?
-STATIC_URL = config("SCRIPT_NAME", default="") + "/static/"
+STATIC_URL = "/static/"
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]
 
 # Remember to run manage.py collectstatic!
 STATIC_ROOT = config("STATIC_ROOT", default="/var/www/recvalsite/static")
