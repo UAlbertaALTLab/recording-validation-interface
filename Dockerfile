@@ -26,7 +26,11 @@ WORKDIR /app/
 # Copies all files from our local project into the container
 ADD . /app/
 ADD crk.zhfst /app/
+ADD db.sqlite3 /app/
 
 RUN pipenv install --system --ignore-pipfile --dev
 
 EXPOSE 8000
+
+USER  ${WSGI_USER}:${WSGI_USER}
+CMD ["uwsgi", "--show-config"]

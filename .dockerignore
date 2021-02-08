@@ -7,13 +7,8 @@ node_modules/
 # Audio files
 data/
 
-# HFSTs
-
 # Caches
 .pytest_cache/
-
-# Databases
-*.sqlite3
 
 # Tests
 .tests/

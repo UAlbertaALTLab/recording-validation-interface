@@ -1,7 +1,8 @@
 version: '3.7'
 services:
-   web:
-       build: .
-       command: python manage.py runserver localhost:8000
-       ports:
-           - 8000:8000
+    web:
+        build: .
+        command: python manage.py runserver 0.0.0.0:8000
+        ports:
+            - 127.0.0.1:8000:8000
+        tty: true
