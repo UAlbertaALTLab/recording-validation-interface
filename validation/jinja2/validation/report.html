@@ -1,0 +1,40 @@
+{% extends 'validation/_base.html' %}
+
+
+{% block content %}
+<script type="text/javascript">
+    window.onload = function () {
+        var chart = new CanvasJS.Chart("chartContainer",
+        {
+            title:{
+                text: "Entries in Database"
+            },
+            legend: {
+                maxWidth: 350,
+                itemWidth: 120
+            },
+            data: [
+            {
+                type: "pie",
+                showInLegend: true,
+                legendText: "{indexLabel}",
+                dataPoints: [
+                    { y: "{{ unvalidated }}", indexLabel: "Unvalidated entries" },
+                    { y: "{{ validated }}", indexLabel: "Validated entries" }
+                ]
+            }
+            ]
+        });
+        chart.render();
+    }
+</script>
+<script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+<div class="logout-message">
+    <h2>Reports!</h2>
+    <p>There are currently {{ all_phrases }} entries in the database <br >
+    {{ validated }} entries are validated <br>
+    {{ unvalidated }} entries are unvalidated</p>
+</div>
+
+<section id="chartContainer"></section>
+{% endblock content %}

@@ -339,4 +339,16 @@ def register(request):
     return render(request, "validation/register.html", context)
 
 
+def reporting(request):
+    validated_count = Phrase.objects.filter(validated=True).count()
+    unvalidated_count = Phrase.objects.filter(validated=False).count()
+    all_phrases_count = Phrase.objects.filter().count()
+    context = dict(
+        validated=validated_count,
+        unvalidated=unvalidated_count,
+        all_phrases=all_phrases_count,
+    )
+    return render(request, "validation/report.html", context)
+
+
 # TODO: Speaker bio page like https://ojibwe.lib.umn.edu/about/voices

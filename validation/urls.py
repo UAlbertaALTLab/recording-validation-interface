@@ -58,4 +58,5 @@ urlpatterns = [
         name="crude_recordings",
     ),
     path("segment/<str:segment_id>", views.segment_content_view, name="segment_detail"),
+    path("report", views.reporting, name="report"),
 ]
