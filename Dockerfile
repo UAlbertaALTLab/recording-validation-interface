@@ -33,6 +33,7 @@ RUN mkdir static && python manage.py collectstatic
 
 EXPOSE 8000
 
+RUN chown "${WSGI_USER}:${WSGI_USER}" /app
 USER  ${WSGI_USER}:${WSGI_USER}
 ENV UWSGI_HTTP=:8000 UWSGI_MASTER=1 UWSGI_HTTP_KEEPALIVE=1 UWSGI_AUTO_CHUNKED=1 UWSGI_WSGI_ENV_BEHAVIOUR=holy
 CMD ["uwsgi", "-w", "recvalsite.wsgi", "--static-map", "/static=/var/www/recvalsite/static"]
