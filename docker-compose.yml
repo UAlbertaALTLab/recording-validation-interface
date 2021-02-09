@@ -2,7 +2,8 @@ version: '3.7'
 services:
     web:
         build: .
-        command: python manage.py runserver 0.0.0.0:8000
         ports:
             - 127.0.0.1:8000:8000
-        tty: true
+        volumes:
+            - "./db.sqlite3:/app/db.sqlite3"
+            - "./data/audio:/app/data/audio"

@@ -17,20 +17,22 @@ ENV PYTHONUNBUFFERED 1
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 ENV PATH=/root/.cargo/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
-RUN pip install maturin
-RUN pip install pep517
-RUN pip install pipenv
+RUN pip install maturin pep517 pipenv
 
 # Sets the container's working directory to /app
 WORKDIR /app/
-# Copies all files from our local project into the container
-ADD . /app/
-ADD crk.zhfst /app/
-ADD db.sqlite3 /app/
 
-RUN pipenv install --system --ignore-pipfile --dev
+COPY Pipfile /app/Pipfile
+COPY Pipfile.lock /app/Pipfile.lock
+RUN pipenv install --system --dev
+
+# Copies all files from our local project into the container
+COPY . /app/
+COPY crk.zhfst /app/
+RUN mkdir static && python manage.py collectstatic
 
 EXPOSE 8000
 
 USER  ${WSGI_USER}:${WSGI_USER}
-CMD ["uwsgi", "--show-config"]
+ENV UWSGI_HTTP=:8000 UWSGI_MASTER=1 UWSGI_HTTP_KEEPALIVE=1 UWSGI_AUTO_CHUNKED=1 UWSGI_WSGI_ENV_BEHAVIOUR=holy
+CMD ["uwsgi", "-w", "recvalsite.wsgi", "--static-map", "/static=/var/www/recvalsite/static"]
