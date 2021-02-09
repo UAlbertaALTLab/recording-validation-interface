@@ -4,51 +4,33 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 
 
-class EditSegment(forms.Form):
-    cree = forms.CharField(required=False, widget=forms.TextInput)
-    transl = forms.CharField(required=False, widget=forms.TextInput)
-    analysis = forms.CharField(required=False, widget=forms.TextInput)
-
-
 class Login(forms.Form):
     username = forms.CharField(
         required=True,
-        widget=forms.TextInput(
-            attrs={"class": "form-control", "style": "max-width: 15rem;"}
-        ),
+        widget=forms.TextInput(attrs={"class": "form-control form-restrict"}),
     )
     password = forms.CharField(
         required=True,
-        widget=forms.PasswordInput(
-            attrs={"class": "form-control", "style": "max-width: 15rem;"}
-        ),
+        widget=forms.PasswordInput(attrs={"class": "form-control form-restrict"}),
     )
 
 
 class Register(forms.Form):
     first_name = forms.CharField(
         required=True,
-        widget=forms.TextInput(
-            attrs={"class": "form-control", "style": "max-width: 15rem;"}
-        ),
+        widget=forms.TextInput(attrs={"class": "form-control form-restrict"}),
     )
     last_name = forms.CharField(
         required=True,
-        widget=forms.TextInput(
-            attrs={"class": "form-control", "style": "max-width: 15rem;"}
-        ),
+        widget=forms.TextInput(attrs={"class": "form-control form-restrict"}),
     )
     username = forms.CharField(
         required=True,
-        widget=forms.TextInput(
-            attrs={"class": "form-control", "style": "max-width: 15rem;"}
-        ),
+        widget=forms.TextInput(attrs={"class": "form-control form-restrict"}),
     )
     password = forms.CharField(
         required=True,
-        widget=forms.PasswordInput(
-            attrs={"class": "form-control", "style": "max-width: 15rem;"}
-        ),
+        widget=forms.PasswordInput(attrs={"class": "form-control form-restrict"}),
     )
 
     def clean_username(self):
@@ -66,3 +48,16 @@ class Register(forms.Form):
         except ObjectDoesNotExist:
             return username  # if username doesn't exist, this is good. We can create the username
         raise forms.ValidationError("Username is already taken.", code="invalid")
+
+
+class EditSegment(forms.Form):
+    cree = forms.CharField(
+        required=False, widget=forms.TextInput(attrs={"class": "form-control"})
+    )
+    translation = forms.CharField(
+        required=False, widget=forms.TextInput(attrs={"class": "form-control"})
+    )
+    analysis = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control bottom-margin"}),
+    )
