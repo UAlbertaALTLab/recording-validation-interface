@@ -1,0 +1,40 @@
+{#
+    # Displays search form to perform an advanced search
+#}
+   
+{% extends 'validation/_base.html' %}
+{% import 'validation/_macros.html' as macros %}
+
+{% block content %}
+<form method="GET" action="{{
+    url('validation:advanced_search_results')
+  }}">
+    Nêhiyawêwin phrase:
+    <input class="form-control mr-sm-2" name="transcription" type="search" placeholder="Search" aria-label="Search"><br>
+    English phrase:
+    <input class="form-control mr-sm-2" name="translation" type="search" placeholder="Search" aria-label="Search"><br>
+    Analysis:
+    <input class="form-control mr-sm-2" name="analysis" type="search" placeholder="Search" aria-label="Search"><br>
+
+    Status:
+    <input type="radio" id="all" name="status" value="all" checked>
+    <label for="all">All</label>  
+    <input type="radio" id="validated" name="status" value="validated">
+    <label for="validated">Validated</label>  
+    <input type="radio" id="unvalidated" name="status" value="unvalidated">
+    <label for="unvalidated">Unvalidated</label> <br>
+
+    Speaker:
+    <input type="checkbox" id="all_speakers" name="speaker-options" value="all">
+    <label for="all_spakers">All</label><br>
+        {% for speaker in speakers %}
+        <input type="checkbox" id="{{ speaker }}" name="speaker-options" value="{{ speaker }}">
+        <label for="{{ speaker }}">{{ speaker }}</label><br>
+        {% endfor %}
+
+    <input type="hidden" name="speaker" id="speaker">
+
+    <button data-cy="advanced-form-submit" class="btn button-success my-2 my-sm-0" type="submit">Search</button>
+  </form>
+
+  {% endblock content %}

@@ -37,7 +37,7 @@ from django.contrib.auth import authenticate, login as django_login
 from librecval.normalization import to_indexable_form
 
 from .crude_views import *
-from .models import Phrase, Recording
+from .models import Phrase, Recording, Speaker
 from .helpers import get_distance_with_translations
 from .forms import EditSegment, Login, Register
 
@@ -46,12 +46,34 @@ def index(request):
     """
     The home page.
     """
-    all_phrases = Phrase.objects.all()
+    all_class = "button-success button-filter"
+    validated_class = "button-success button-filter"
+    unvalidated_class = "button-success button-filter"
+    mode = query = request.GET.get("mode")
+    if mode == "all":
+        all_phrases = Phrase.objects.all()
+        all_class = "button-success button-filter button-filter-active"
+    elif mode == "validated":
+        all_phrases = Phrase.objects.filter(validated=True)
+        validated_class = "button-success button-filter button-filter-active"
+    elif mode == "unvalidated":
+        all_phrases = Phrase.objects.filter(validated=False)
+        unvalidated_class = "button-success button-filter button-filter-active"
+    else:
+        all_phrases = Phrase.objects.all()
+        all_class = "button-success button-filter button-filter-active"
+
     paginator = Paginator(all_phrases, 30)
     page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)
     auth = request.user.is_authenticated
-    context = dict(phrases=phrases, auth=auth)
+    context = dict(
+        phrases=phrases,
+        all_class=all_class,
+        validated_class=validated_class,
+        unvalidated_class=unvalidated_class,
+        auth=auth,
+    )
     return render(request, "validation/list_phrases.html", context)
 
 
@@ -59,7 +81,89 @@ def search_phrases(request):
     """
     The search results for pages.
     """
-    return HttpResponse(501)
+    query = request.GET.get("query")
+    cree_matches = Phrase.objects.filter(transcription__contains=query)
+    english_matches = Phrase.objects.filter(translation__contains=query)
+    all_matches = list(set().union(cree_matches, english_matches))
+    all_matches.sort(key=lambda phrase: phrase.transcription)
+    paginator = Paginator(all_matches, 30)
+    page_no = request.GET.get("page", 1)
+    phrases = paginator.get_page(page_no)
+    context = dict(phrases=phrases, search_term=query)
+    return render(request, "validation/search.html", context)
+
+
+def advanced_search(request):
+    """
+    The search results for pages.
+    """
+    query = Speaker.objects.all()
+    speakers = [q.code for q in query]
+
+    context = dict(speakers=speakers)
+    return render(request, "validation/advanced_search.html", context)
+
+
+def advanced_search_results(request):
+    """
+    Search results for advanced search
+    Takes in parameters from GET request and makes necessary
+    queries to return all the appropriate entries
+    The steps are:
+    cree phrases UNION english phrases UNION analysis
+    INTERSECT status
+    INTERSECT speaker
+    """
+    transcription = request.GET.get("transcription")
+    translation = request.GET.get("translation")
+    analysis = request.GET.get("analysis")
+    status = request.GET.get("status")
+    speakers = request.GET.getlist("speaker-options")
+
+    if transcription != "":
+        cree_matches = Phrase.objects.filter(transcription__contains=transcription)
+    else:
+        cree_matches = []
+
+    if translation != "":
+        english_matches = Phrase.objects.filter(translation__contains=translation)
+    else:
+        english_matches = []
+
+    # TODO: filter by analysis
+
+    if transcription == "" and translation == "":
+        phrase_matches = Phrase.objects.all()
+    else:
+        phrase_matches = list(set().union(cree_matches, english_matches))
+
+    if status != "all":
+        if status == "validated":
+            status_matches = Phrase.objects.filter(validated=True)
+        elif status == "unvalidated":
+            status_matches = Phrase.objects.filter(validated=False)
+        phrase_and_status_matches = list(
+            set(phrase_matches).intersection(status_matches)
+        )
+    else:
+        phrase_and_status_matches = phrase_matches
+
+    all_matches = []
+    if "all" in speakers or speakers == []:
+        all_matches = [p for p in phrase_and_status_matches]
+    else:
+        for phrase in phrase_and_status_matches:
+            for recording in phrase.recordings:
+                if recording.speaker.code in speakers:
+                    all_matches.append(phrase)
+
+    all_matches.sort(key=lambda phrase: phrase.transcription)
+
+    paginator = Paginator(all_matches, 30)
+    page_no = request.GET.get("page", 1)
+    phrases = paginator.get_page(page_no)
+    context = dict(phrases=phrases, search_term="advanced search")
+    return render(request, "validation/search.html", context)
 
 
 def update_text(request):
@@ -176,7 +280,7 @@ def segment_content_view(request, segment_id):
         phrase_id = og_phrase.id
         if form.is_valid():
             transcription = form.cleaned_data["cree"]
-            translation = form.cleaned_data["transl"]
+            translation = form.cleaned_data["translation"]
             analysis = form.cleaned_data["analysis"]
             p = Phrase.objects.filter(id=phrase_id)[0]
             p.transcription = transcription
@@ -211,9 +315,9 @@ def register(request):
     """
     Serves the register page and creates a new user on success
     """
+    form = Register(request.POST)
 
     if request.method == "POST":
-        form = Register(request.POST)
         if form.is_valid():
             username = form.clean_username()
             password = form.cleaned_data["password"]
@@ -231,7 +335,6 @@ def register(request):
                 response = HttpResponseRedirect("/login")
                 return response
 
-    form = Register()
     context = dict(form=form)
     return render(request, "validation/register.html", context)
 
