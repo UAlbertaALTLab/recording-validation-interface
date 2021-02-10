@@ -41,8 +41,9 @@ class Command(BaseCommand):
         # Generate this folder by running:
         # python3 manage.py importrecordings --wav --skip-db
         audio_dir = Path(_path)
-        for audio_file in os.listdir(audio_dir):
-            audio_id = audio_file[:-4]
+        for audio_file in audio_dir.iterdir():
+            audio_id = audio_file.stem
+            audio_filename = audio_id + ".wav"
 
             with closing(sqlite3.connect("./db.sqlite3")) as conn:
                 cur = conn.cursor()
@@ -78,21 +79,21 @@ class Command(BaseCommand):
                 _dir.mkdir(exist_ok=True)
 
             # Copy the audio file
-            from_dir = audio_dir / audio_file
-            to_dir = audio_dir / speaker / "wav" / audio_file
+            from_dir = audio_file
+            to_dir = audio_dir / speaker / "wav" / audio_filename
             shutil.copyfile(from_dir, to_dir)
 
             # Treat the transcription for Persephone and save it
             persephone_filename = audio_id + ".txt"
             persephone_path = audio_dir / speaker / "label" / persephone_filename
             persephone_trans = self.create_persephone_transcription(transcription)
-            with open(persephone_path, "w+") as f:
+            with open(persephone_path, "w", encoding="UTF=8") as f:
                 f.write(persephone_trans)
 
             # Save the transcription for Simple4All
             s4a_filename = audio_id + ".txt"
             s4a_path = audio_dir / speaker / "s4a" / s4a_filename
-            with open(s4a_path, "w+") as f:
+            with open(s4a_path, "w", encoding="UTF=8") as f:
                 f.write(transcription)
 
             # Print so we know we're making progress
