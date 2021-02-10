@@ -25,7 +25,7 @@ RULES
 archive = divvunspell.SpellerArchive(fspath(settings.BASE_DIR / "crk.zhfst"))
 speller = archive.speller()
 
-vowels = ["a", "i", "o", "â", "î", "ô"]
+vowels = ["a", "i", "o", "â", "î", "ô", "e", "ê"]
 consonants = [f"  {char}" for char in "chkmnpstwy"]
 
 
