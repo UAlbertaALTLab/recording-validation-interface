@@ -32,7 +32,7 @@ class Command(BaseCommand):
     Files are created in the ./audio directory and stored by speaker
     """
 
-    help = "creates transcription files for persephone and Simple4All"
+    help = "creates transcription files for Persephone and Simple4All"
 
     def handle(self, *args, **options):
         # Change this if the raw audio files exist elsewhere!
@@ -58,6 +58,8 @@ class Command(BaseCommand):
                 speaker = result[0] if result else None
                 transcription = result[1] if result else None
 
+            # if there are things that aren't audio files in the directory
+            # the speaker variable will be empty, this is normal/fine
             if not speaker:
                 continue
 

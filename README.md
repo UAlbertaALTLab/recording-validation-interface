@@ -406,6 +406,7 @@ The following steps should be performed from within the `pipenv shell`
 First, populate the database by running:
 
 ```
+python manage.py makemigrations
 python manage.py migrate
 python manage.py importrecordings
 ```
