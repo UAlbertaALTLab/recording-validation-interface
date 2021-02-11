@@ -83,6 +83,7 @@ class Segment(NamedTuple):
     stop: int
     comment: str
     speaker: str
+    quality: str  # one of: good, bad, unknown
     session: SessionID
     audio: AudioSegment
 
@@ -291,6 +292,7 @@ def extract_data(
     - start time
     - stop time
     - comment
+    - quality
     Returns a Segment and a sound bite
     """
 
@@ -305,6 +307,12 @@ def extract_data(
 
     comment = _file.get_annotation_data_at_time(comment_tier, start + 1) or ""
     comment = comment[0][2] if len(comment) > 0 and len(comment[0]) == 3 else ""
+
+    quality = "unknown"
+    if "good" in comment.lower() or "best" in comment.lower():
+        quality = "good"
+    elif "bad" in comment.lower():
+        quality = "bad"
 
     sound_bite = audio[start:stop]
 
@@ -321,6 +329,7 @@ def extract_data(
         stop=stop,
         comment=comment,
         speaker=speaker,
+        quality=quality,
         session=session_id,
         audio=sound_bite,
     )

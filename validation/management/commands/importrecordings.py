@@ -155,7 +155,8 @@ def django_recording_importer(info: Segment, recording_path: Path, logger) -> No
         timestamp=info.start,
         phrase=phrase,
         session=session,
-        quality="",
+        quality=info.quality,
+        comment=info.comment,
     )
     recording.clean()
 
