@@ -429,28 +429,6 @@ def find_audio_oddities(annotation_path: Path, logger=None) -> Optional[Path]:
             )
 
     if not sound_file:
-        # try 10: the variable 'track' has a leading '_'
-        print("try 10")
-        track_10 = track.replace("_", "")
-        dirs = list(glob.glob(_path + "/**/" + track_10 + "*.wav", recursive=True))
-        sound_file = Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
-
-    if not sound_file:
-        # try 11: the variable 'track' has a leading '_', but also needs a space after "Track"
-        print("try 11")
-        track_11 = track.replace("_", "")
-        track_11 = track.replace("Track", "Track ")
-        dirs = list(glob.glob(_path + "/**/" + track_11 + "*.wav", recursive=True))
-        sound_file = Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
-
-    if not sound_file:
-        # try 12: the .wav file is not in a subfolder, but also doesn't have the word "Track" in it
-        print("try 12")
-        track_12 = str(annotation_path)[:j]
-        dirs = list(glob.glob(_path + "/" + track_12 + "*.wav", recursive=True))
-        sound_file = Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
-
-    if not sound_file:
         # try 13: the .wav file is not in a subfolder, but also doesn't have the word "Track" in it
         # BUT ALSO the .eaf file has am/pm in it and the .wav file does not
         print("try 13")
