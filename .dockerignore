@@ -1,0 +1,23 @@
+# Do not copy files these when dealing with Docker
+
+# Dependencies
+node_modules/
+.venv/
+
+# Audio files
+data/
+
+# Caches
+.pytest_cache/
+
+# Tests
+.tests/
+./cypress
+
+# Development files
+.git/
+.vscode/
+.idea/
+
+# Databases
+*.sqlite3

@@ -269,6 +269,12 @@ pipenv run python manage.py runserver
 The main site should be available at <http://localhost:8000/>. The admin
 interface should be available at <http://localhost:8000/admin>.
 
+The server can also be run through Docker by running:
+
+```
+docker-compose up --build
+```
+on a machine with Docker installed.
 
 Testing
 -------
