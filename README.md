@@ -26,6 +26,18 @@ make install-dev
 
 This will also setup the [git pre-commit hook](https://www.viget.com/articles/two-ways-to-share-git-hooks-with-your-team/).
 
+You will also need:
+
+  - `crk.zhfst` from building [`lang-crk`] with `--enable-spellers`
+
+  - `private/metadata.csv` from downloading the “Master Recordings
+    MetaData” document on google drive as CSV
+
+  - some sessions from `sapir:/data/av/backup-mwe/sessions` in
+    `/data/sessions`; `2015-03-23-__-___-_` (6GB) is known to work.
+
+[`lang-crk`]: https://github.com/giellalt/lang-crk
+
 ### Production
 
 > **NOTE**: Before you continue, you may want to run
@@ -257,6 +269,12 @@ pipenv run python manage.py runserver
 The main site should be available at <http://localhost:8000/>. The admin
 interface should be available at <http://localhost:8000/admin>.
 
+The server can also be run through Docker by running:
+
+```
+docker-compose up --build
+```
+on a machine with Docker installed.
 
 Testing
 -------
@@ -384,6 +402,41 @@ Assume there are six recordings for `nikiskisin`, and none for
     }
 ]
 ```
+
+### Generating Transcription Files
+These are necessary in order to run Persephone and Simple4All against the current 
+set of recordings.
+
+The following steps should be performed from within the `pipenv shell`
+
+First, populate the database by running:
+
+```
+python manage.py makemigrations
+python manage.py migrate
+python manage.py importrecordings
+```
+
+Then generate the .wav files:
+
+```
+python manage.py importrecording --wav --skip-db
+```
+
+This saves all the recording snippets to the `./audio` directory, unless otherwise specified 
+(not recommended for this task).
+
+Next, create the transcription files by running:
+
+```
+python manage.py writetranscriptions
+```
+
+This should create:
+* A new folder for each speaker code, eg: `./audio/LOU`
+* A copy of the .wav file in the speaker folder, eg: `./audio/LOU/wav/audio_id.wav`
+* A transcription file to be used by **Persephone**, eg: `./audio/LOU/label/audio_id.txt`
+* A transcription file to be used by **Simple4All**, eg: `./audio/LOU/s4a/audio_id.txt`
 
 
 Frequently Asked Questions

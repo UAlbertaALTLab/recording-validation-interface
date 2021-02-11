@@ -1,0 +1,10 @@
+{
+    "baseUrl": "http://localhost:8000",
+    "env": {
+        "home": "/",
+        "login_url": "/login",
+        "register_url": "/register",
+        "logout_url": "/logout",
+        "segment_details_url": "/segment/1"
+      }
+}

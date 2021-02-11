@@ -1,0 +1,238 @@
+@import "./variables.css";
+
+/* main styles */
+main {
+  margin: 1em auto;
+}
+
+a:hover {
+  cursor: pointer;
+}
+
+.header-dark {
+  background-color: var(--mauve);
+}
+
+.table td .speaker {
+  padding: 0;
+}
+
+ul.speaker {
+  margin-top: 0.5rem;
+  padding-bottom: 10;
+  list-style: none;
+}
+
+ul.recordings {
+  padding: auto 0;
+  list-style: none;
+}
+
+li .speaker {
+  display: inline-block;
+  min-width: 4rem;
+  text-align: center;
+  margin: .5rem;
+}
+
+li.speaker_code {
+  padding-bottom: 1.5rem;
+}
+
+.recordings audio {
+  max-width: 100%;
+}
+
+.logout-message {
+  background-color: #F5F5F5;
+  margin: 0 auto;
+  padding: 2rem;
+  max-width: 50rem;
+  min-width: 20rem;
+  text-align: center;
+}
+
+.bottom-margin {
+  margin-bottom: 2rem;
+}
+
+/* login styles */
+.login {
+  background-color: #F5F5F5;
+  padding: 2rem;
+  margin: 0 auto;
+  max-width: 50rem;
+  min-width: 22rem;
+  justify-content: center;
+}
+
+.login-link:hover {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.login-button {
+  color: var(--custom-purple);
+  background-color: transparent;
+  border: 2px solid var(--custom-purple);
+  border-radius: var(--button-radius);
+  margin: 1rem 5rem;
+}
+
+.login-button:hover {
+  color: var(--custom-white);
+  background-color: var(--custom-purple);
+  border: 2px solid var(--custom-purple);
+  border-radius: var(--button-radius);
+  margin: 1rem 5rem;
+  cursor: pointer;
+}
+
+
+.register-button {
+  color: var(--custom-purple);
+  background-color: transparent;
+  border: 2px solid var(--custom-purple);
+  border-radius: var(--button-radius);
+  margin: 0rem 4.5rem;
+}
+
+.register-button:hover {
+  color: var(--custom-white);
+  background-color: var(--custom-purple);
+  border: 2px solid var(--custom-purple);
+  border-radius: var(--button-radius);
+  cursor: pointer;
+}
+
+.login > h2 {
+  text-align: center;
+}
+
+.login > form {
+  padding: 0 auto;
+}
+
+.login-form-wrapper {
+  margin: 0 auto;
+  width: 16rem;
+  padding: 1rem;
+}
+
+/* button styles */
+.button-success {
+  color: var(--custom-green);
+  border: 2px solid var(--custom-green);
+  border-radius: var(--button-radius);
+  display: inline-block;
+  font-weight: 400;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  padding: .375rem .75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+.button-success:hover {
+  color: var(--custom-white);
+  background-color: var(--custom-green);
+  border-color: var(--custom-green);
+  cursor: pointer;
+}
+
+.button-fail {
+  color: var(--custom-orange);
+  border: 2px solid var(--custom-orange);
+  border-radius: var(--button-radius);
+  display: inline-block;
+  font-weight: 400;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  padding: .375rem .75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+.button-fail:hover {
+  color: var(--custom-white);
+  background-color: var(--custom-orange);
+  border-color: var(--custom-orange);
+  cursor: pointer;
+}
+
+.button-filter {
+  padding: 0.3rem;
+  margin-right: 0.2rem;
+  margin-bottom: 1rem;
+  border: none;
+}
+
+.button-filter-active {
+  color: var(--custom-white);
+  background-color: var(--custom-green);
+  border-color: var(--custom-green);
+}
+
+.filters {
+  margin: 0 auto;
+}
+
+/* nav styles */
+.button-nav {
+  border-radius: var(--button-radius);
+  text-decoration: none;
+  display: block;
+  padding: 0.5rem 1rem;
+  background-color: var(--light-green);
+  color: var(--custom-white);
+}
+
+.button-nav:hover {
+  border-radius: var(--button-radius);
+  text-decoration: none;
+  display: block;
+  padding: 0.5rem 1rem;
+  background-color: var(--custom-green);
+  color: var(--custom-white);
+  cursor: pointer;
+}
+
+.link-nav {
+  color: var(--light-green);
+  text-decoration: none;
+  display: block;
+  padding: 0.5rem 1rem;
+  background-color: transparent;
+}
+
+.link-nav:hover {
+  color: var(--custom-green);
+  cursor: pointer;
+}
+
+/* table styles */
+.restrict-content {
+  max-width: 15rem;
+}
+
+.rec-height {
+  height: 3rem;
+}
+
+/* form styles */
+.form-restrict {
+  max-width: 15rem;
+}
+
+.errorlist {
+  list-style: none;
+  font-size: 0.8rem;
+  color: var(--custom-orange);
+  font-style: italic;
+  margin-bottom: 0;
+  margin-left: -2rem;
+}

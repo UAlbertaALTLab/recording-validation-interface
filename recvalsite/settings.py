@@ -11,9 +11,12 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+import secrets
 from pathlib import Path
 
 from decouple import config
+
+from .save_secret_key import save_secret_key
 
 # Build paths inside the project like this: BASE_DIR / 'path' / 'to' / 'file'
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,7 +26,10 @@ assert (BASE_DIR / "manage.py").is_file()
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config("SECRET_KEY")
+SECRET_KEY = config("SECRET_KEY", default=None)
+if SECRET_KEY is None:
+    SECRET_KEY = save_secret_key(secrets.token_hex())
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", default=False, cast=bool)
@@ -168,7 +174,10 @@ X_FRAME_OPTIONS = "DENY"
 # e.g.,  if SCRIPT_NAME=/validation,
 #        then static file URLs will point to /validation/static/
 # TODO: this is the wrong way to construct this variable?
-STATIC_URL = config("SCRIPT_NAME", default="") + "/static/"
+STATIC_URL = "/static/"
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]
 
 # Remember to run manage.py collectstatic!
 STATIC_ROOT = config("STATIC_ROOT", default="/var/www/recvalsite/static")
@@ -202,3 +211,7 @@ MEDIA_URL = config("MEDIA_URL", default="/media/")
 
 # Recoring URLS will be moved here
 MEDIA_ROOT = config("MEDIA_ROOT", default=BASE_DIR / "data", cast=str)
+
+LOGIN_REDIRECT_URL = "/"
+
+ITWEWINA_URL = "https://sapir.artsrn.ualberta.ca/cree-dictionary/"

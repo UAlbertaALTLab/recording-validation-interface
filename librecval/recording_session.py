@@ -58,7 +58,7 @@ strict_pattern = re.compile(
     )
     -
     (?:
-        (?P<subsession> \d+) | _ | _\d+
+        (?P<subsession> \d+) | _
     )
     \Z
 """,
@@ -172,10 +172,6 @@ class SessionID(NamedTuple):
     def day(self):
         return self.date.day
 
-    @property
-    def _subsession(self):
-        return self.subsession or "_"
-
     @classmethod
     def from_name(cls, directory_name: str) -> "SessionID":
         m = strict_pattern.match(directory_name)
@@ -210,7 +206,6 @@ class SessionID(NamedTuple):
     def parse_dirty(cls, name: str) -> "SessionID":
         """
         Attempts to parse a messy session name.
-
         >>> sid = SessionID.parse_dirty('2015-04-15-am')
         >>> sid.date
         datetime.date(2015, 4, 15)
@@ -265,23 +260,23 @@ class SessionMetadata:
         )
 
     @classmethod
-    def parse(cls, row: Dict[str, Any]) -> "SessionMetadata":
+    def parse(cls, row: Dict[str, Any], session_name: str = None) -> "SessionMetadata":
         """
         Parses a row from the metadata CSV file.
-
         Can pass an explicit session name to override what's written in the
         "SESSION" column.
-
         """
         # Extract "raw" name
         raw_name = row["SESSION"]
 
+        # Parse a session out of it
+        effective_name = session_name or raw_name
         try:
-            session = SessionID.from_name(raw_name)
+            session = SessionID.from_name(effective_name)
         except SessionParseError:
-            session = SessionID.parse_dirty(raw_name)
+            session = SessionID.parse_dirty(effective_name)
 
-        # Who is speaking on each mic?
+        # Who are speaking on the mics?
         mic_names = [key for key in row.keys() if key.startswith("MIC")]
         assert len(mic_names) >= 3
         mics = {
@@ -348,7 +343,6 @@ def parse_metadata(metadata_file: TextIO, logger) -> Dict[SessionID, SessionMeta
     identifier to its metadata (e.g., speaker codes, elicitation sheets,
     etc.).
     """
-    # TODO: return Dict and list/set of session names in .csv that were skipped
     reader = csv.DictReader(metadata_file)
 
     sessions: Dict[SessionID, SessionMetadata] = {}
@@ -365,11 +359,17 @@ def parse_metadata(metadata_file: TextIO, logger) -> Dict[SessionID, SessionMeta
             continue
 
         try:
-            s = SessionMetadata.parse(row)
+            s = SessionMetadata.parse(row, session_name=override.effective_name)
         except SessionParseError:
             logger.exception("Could not parse: %s", row)
             # We'll just skip this row...
         else:
+            if raw_name != override.effective_name:
+                logger.info(
+                    "Using renamed session: %r instead of %r",
+                    override.effective_name,
+                    raw_name,
+                )
             sessions[s.session] = s
     return sessions
 
@@ -377,7 +377,6 @@ def parse_metadata(metadata_file: TextIO, logger) -> Dict[SessionID, SessionMeta
 def apply_or_none(fn: Callable[[AnyStr], T], match: Optional[AnyStr]) -> Optional[T]:
     """
     Applies fn to the match ONLY if the match is not None.
-
     This is similar to >>= from Haskell.
     """
     if match is not None:
