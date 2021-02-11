@@ -38,11 +38,8 @@ from librecval.normalization import to_indexable_form
 
 from .crude_views import *
 from .models import Phrase, Recording, Speaker
-from .helpers import get_distance_with_translations
+from .helpers import get_distance_with_translations, normalize_img_name
 from .forms import EditSegment, Login, Register
-
-import requests
-from bs4 import BeautifulSoup
 
 
 def index(request):
@@ -352,9 +349,13 @@ def speaker_view(request, speaker_code):
         full_name = speaker.full_name
         gender = speaker.gender or ""
         speaker_code = speaker.code
+        image_name = full_name.replace(" ", "") + ".jpg"
+        image_name = normalize_img_name(image_name)
+        image_url = f"http://altlab.ualberta.ca/maskwacis/Speakers/{image_name}"
     else:
         full_name = f"No speaker found for speaker code {speaker_code}"
         gender = ""
+        image_url = "#"
 
     if gender.upper() == "M":
         pronouns = "(He/Him)"
@@ -362,22 +363,6 @@ def speaker_view(request, speaker_code):
         pronouns = "(She/Her)"
     else:
         pronouns = ""
-
-    if speaker_code:
-        speaker_url = (
-            f"http://altlab.ualberta.ca/maskwacis/Speakers/{speaker_code}.html"
-        )
-        r = requests.get(speaker_url)
-        parsed_response = BeautifulSoup(r.text)
-        image = parsed_response.body.find("img")
-        if image:
-            image_name = image["src"]
-        else:
-            image_name = "#"
-    else:
-        image_name = "#"
-
-    image_url = f"http://altlab.ualberta.ca/maskwacis/Speakers/{image_name}"
 
     context = dict(full_name=full_name, pronouns=pronouns, img_src=image_url)
     return render(request, "validation/speaker_view.html", context)
@@ -389,19 +374,8 @@ def all_speakers(request):
     for speaker in speaker_objects:
         full_name = speaker.full_name
 
-        # TODO: once we have the full names in the DB, use the full_name
-        # field to make this URL, not requests and BeautifulSoup
-        speaker_url = (
-            f"http://altlab.ualberta.ca/maskwacis/Speakers/{speaker.code}.html"
-        )
-        r = requests.get(speaker_url)
-        parsed_response = BeautifulSoup(r.text)
-        image = parsed_response.body.find("img")
-        if image:
-            image_name = image["src"]
-        else:
-            image_name = "#"
-
+        image_name = full_name.replace(" ", "") + ".jpg"
+        image_name = normalize_img_name(image_name)
         image_url = f"http://altlab.ualberta.ca/maskwacis/Speakers/{image_name}"
 
         speaker_dict = dict(full_name=full_name, code=speaker.code, img_url=image_url)
