@@ -175,27 +175,40 @@ def get_translations_from_itwewina(word):
         return "Error getting request"
 
 
+def get_translations(results):
+    matches = []
+
+    for i in results["results"]:
+        translations, analysis = extract_translations(i["lemma_wordform"])
+        if {"translations": translations, "analysis": analysis} not in matches:
+            matches.append({"translations": translations, "analysis": analysis})
+
+    return matches
+
+
+def extract_translations(entry):
+    translations = []
+
+    if type(entry["definitions"]) == list and len(entry["definitions"]) > 0:
+        translations = [str(j["text"]) for j in entry["definitions"]]
+
+    translations = "; ".join(translations)
+    analysis = entry["analysis"]
+
+    return translations, analysis
+
+
 def get_distance_with_translations(word):
     suggestions = get_edit_distance(word)
     for word in suggestions:
-        r = get_translations_from_itwewina(word)
-        defs = []
-        analysis = ""
-        for i in r["results"]:
-            if type(i["definitions"]) == list:
-                defs.append(i["definitions"])
-            analysis = i["lemma_wordform"]["analysis"]
+        results = get_translations_from_itwewina(word)
 
-        translations = []
-        for d in defs:
-            for i in d:
-                if type(i) == dict and i["text"]:
-                    translations.append(i["text"])
+        matches = get_translations(results)
 
         suggestions[word] = {
             "med": suggestions[word],
-            "translation": translations,
-            "analysis": analysis,
+            "matches": matches,
+            "len": len(matches) if len(matches) == 1 else len(matches) + 1,
         }
 
     return suggestions

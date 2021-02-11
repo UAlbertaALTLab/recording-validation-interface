@@ -90,8 +90,8 @@
 {#
   # Expands to a <td> that displays the Cree suggestion from itwêwina.
   #}
- {% macro td_suggestion_transcription(user, suggestion) %}
- <td data-cy="suggestion-transcription" lang="crk">
+ {% macro td_suggestion_transcription(user, suggestion, suggestions) %}
+ <td data-cy="suggestion-transcription" lang="crk" rowspan="{{ suggestions[suggestion]['len'] }}">
    {{ suggestion }}
  </td>
  {% endmacro %}
@@ -102,7 +102,7 @@
   #}
  {% macro td_suggestion_translation(user, suggestion, suggestions) %}
  <td data-cy="suggestion-translation" lang="en">
-   {{ suggestions[suggestion]['translation'][0] or 'No translation available' }}
+   {{ suggestions[suggestion]['matches'][0]['translations'] or 'No translation available' }}
  </td>
  {% endmacro %}
 
@@ -112,7 +112,7 @@
   #}
  {% macro td_suggestion_analysis(user, suggestion, suggestions) %}
  <td data-cy="suggestion-analysis" lang="en">
-   {{ suggestions[suggestion]['analysis'] }}
+   {{ suggestions[suggestion]['matches'][0]['analysis'] }}
  </td>
  {% endmacro %}
 
@@ -121,7 +121,7 @@
     # of the Cree suggestion from itwêwina.
   #}
  {% macro td_suggestion_med(user, suggestion, suggestions) %}
- <td lang="en">
+ <td lang="en" rowspan="{{ suggestions[suggestion]['len'] }}">
    {{ suggestions[suggestion]['med'] }}
  </td>
  {% endmacro %}
