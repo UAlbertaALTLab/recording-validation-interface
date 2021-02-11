@@ -28,11 +28,11 @@ from typing import Callable
 import logme  # type: ignore
 from typing_extensions import Literal
 
-from librecval.extract_phrases import AudioSegment, RecordingExtractor, RecordingInfo
+from librecval.extract_phrases import AudioSegment, RecordingExtractor, Segment
 from librecval.recording_session import parse_metadata
 from librecval.transcode_recording import transcode_to_aac
 
-ImportRecording = Callable[[RecordingInfo, Path], None]
+ImportRecording = Callable[[Segment, Path], None]
 
 # TODO: create report with emoji
 #
@@ -88,7 +88,7 @@ def initialize(
 @logme.log
 def save_recording(
     dest: Path,
-    info: RecordingInfo,
+    info: Segment,
     audio: AudioSegment,
     recording_format: Format = "m4a",
     logger=None,
