@@ -56,6 +56,21 @@ li.speaker_code {
   margin-bottom: 2rem;
 }
 
+.header-link {
+  color: white;
+  padding: 0.25rem 0.5rem;
+}
+
+.header-link > a {
+  color: white;
+  text-decoration: none;
+}
+
+.header-link > a:hover {
+  color: white;
+  text-decoration: underline;
+}
+
 /* login styles */
 .login {
   background-color: #F5F5F5;
@@ -235,4 +250,8 @@ li.speaker_code {
   font-style: italic;
   margin-bottom: 0;
   margin-left: -2rem;
+}
+
+.card {
+  margin-bottom: 1rem;
 }

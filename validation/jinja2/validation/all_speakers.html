@@ -1,0 +1,22 @@
+{% extends 'validation/_base.html' %}
+
+
+{% block content %}
+<div class="logout-message">
+    <h2>Maskwacîs Speakers</h2>
+    <div class="row">
+        {% for speaker in speakers %}
+        <div class="col-sm-6">
+            <div class="card">
+                <img class="card-img-top" src="{{ speaker.img_url }}" alt="Image of {{ speaker.full_name }}">
+                <div class="card-body">
+                <h5 class="card-title">{{ speaker.full_name }}</h5>
+                <p class="card-text">This is where the first line/few words of the speaker bio will go</p>
+                <a href="{{ url('validation:speaker_view', speaker.code) }}" class="btn button-success">Read More</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock content %}

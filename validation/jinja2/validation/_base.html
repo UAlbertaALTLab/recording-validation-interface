@@ -39,12 +39,15 @@
       </form>
     </div>
 
+    <div class="header-link">
+      <a href="/speakers/" data-cy="speakers-link">Speakers</a>
+    </div>
     {# Login button #}
-    <div>
+    <div class="header-link">
         {% if auth %}
-        <a href="/logout" id="logout-link" style="color: white;">Logout</a>
+        <a href="/logout" id="logout-link">Logout</a>
         {% else %}
-        <a href="/login" id="login-link" style="color: white;">Login</a>
+        <a href="/login" id="login-link">Login</a>
         {% endif %}
     </div>
   </nav>
