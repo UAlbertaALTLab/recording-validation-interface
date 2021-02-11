@@ -60,7 +60,7 @@ class InvalidFileName(RuntimeError):
 
 class MissingTranslationError(RuntimeError):
     """
-    Raised when the 'English (word)' and 'English (sentene) tiers
+    Raised when the 'English (word)' and 'English (sentence)' tiers
     can not be found in a .eaf file suggesting that the word or phrase
     does not have an existing translation
     """
@@ -183,12 +183,12 @@ class RecordingExtractor:
                 # if len(_path) != 1:
                 #    raise  # There's no way to determine the speaker.
                 mic_id = 1
-                self.logger.warn("Assuming single text grid is mic 1")
+                self.logger.warn("Assuming single ELAN file is mic 1")
 
             speaker = self.metadata[session_id][mic_id]
 
             self.logger.debug(
-                "Opening audio and text grid from %s for speaker %s",
+                "Opening audio and .eaf from %s for speaker %s",
                 sound_file,
                 speaker,
             )
@@ -352,15 +352,13 @@ def find_audio_oddities(annotation_path: Path, logger=None) -> Optional[Path]:
 
     if not sound_file:
         # try 2: the .wav file has no space between 'Track' and the number
-        print("try 2")
         track_2 = track_1.replace(" ", "")
         dirs = list(glob.glob(_path + "/**/" + track_2 + "*.wav", recursive=True))
         sound_file = Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
 
     if not sound_file:
         # try 3: the .wav file does have a space between 'Track' and the number
-        # This tree covers audio file names that DO NOT have the date in them
-        print("try 3")
+        # This try covers audio file names that DO NOT have the date in them
         track_split = track.split("_")
         n = 0
         j = 0
@@ -378,14 +376,12 @@ def find_audio_oddities(annotation_path: Path, logger=None) -> Optional[Path]:
         dirs = list(glob.glob(_path + "/**/" + track_3 + "*.wav", recursive=True))
         sound_file = Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
         if not sound_file:
-            print("try 4")
             track_4 = track_3.replace("Track", "Track ")
             dirs = list(glob.glob(_path + "/**/" + track_4 + "*.wav", recursive=True))
             sound_file = (
                 Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
             )
         if not sound_file:
-            print("try 5")
             track_5 = track_3.replace(" ", "")
             track_5 = track_3.replace("Track_", "Track ")
             dirs = list(glob.glob(_path + "/**/" + track_5 + "*.wav", recursive=True))
@@ -393,14 +389,12 @@ def find_audio_oddities(annotation_path: Path, logger=None) -> Optional[Path]:
                 Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
             )
         if not sound_file:
-            print("try 6")
             track_6 = track_3.replace("track", "Track")
             dirs = list(glob.glob(_path + "/**/" + track_6 + "*.wav", recursive=True))
             sound_file = (
                 Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
             )
         if not sound_file:
-            print("try 7")
             track_7 = track_3.replace("Track 0", "Track ")
             dirs = list(glob.glob(_path + "/**/" + track_6 + "*.wav", recursive=True))
             sound_file = (
@@ -412,13 +406,11 @@ def find_audio_oddities(annotation_path: Path, logger=None) -> Optional[Path]:
         # EXCEPT the .eaf file has the word 'Track_' in it
         # This option DOES NOT have the word 'Track' in it
         # and it DOES have the date in it
-        print("try 8")
         track_8 = str(annotation_path)[i + 1 : k]
         track_8 = track_8.replace("Track_", "")
         dirs = list(glob.glob(_path + "/**/" + track_8 + "*.wav", recursive=True))
         sound_file = Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
         if not sound_file:
-            print("try 9")
             track_9 = track_8.replace("am", "")
             track_9 = track_9.replace("pm", "")
             track_9 = track_9.replace("AM", "")
@@ -431,7 +423,6 @@ def find_audio_oddities(annotation_path: Path, logger=None) -> Optional[Path]:
     if not sound_file:
         # try 13: the .wav file is not in a subfolder, but also doesn't have the word "Track" in it
         # BUT ALSO the .eaf file has am/pm in it and the .wav file does not
-        print("try 13")
         track_13 = str(annotation_path)[i + 1 : k]
         track_13 = track_13.replace("am", "")
         track_13 = track_13.replace("AM", "")
