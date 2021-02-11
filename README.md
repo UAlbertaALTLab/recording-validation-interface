@@ -269,6 +269,12 @@ pipenv run python manage.py runserver
 The main site should be available at <http://localhost:8000/>. The admin
 interface should be available at <http://localhost:8000/admin>.
 
+The server can also be run through Docker by running:
+
+```
+docker-compose up --build
+```
+on a machine with Docker installed.
 
 Testing
 -------
@@ -396,6 +402,41 @@ Assume there are six recordings for `nikiskisin`, and none for
     }
 ]
 ```
+
+### Generating Transcription Files
+These are necessary in order to run Persephone and Simple4All against the current 
+set of recordings.
+
+The following steps should be performed from within the `pipenv shell`
+
+First, populate the database by running:
+
+```
+python manage.py makemigrations
+python manage.py migrate
+python manage.py importrecordings
+```
+
+Then generate the .wav files:
+
+```
+python manage.py importrecording --wav --skip-db
+```
+
+This saves all the recording snippets to the `./audio` directory, unless otherwise specified 
+(not recommended for this task).
+
+Next, create the transcription files by running:
+
+```
+python manage.py writetranscriptions
+```
+
+This should create:
+* A new folder for each speaker code, eg: `./audio/LOU`
+* A copy of the .wav file in the speaker folder, eg: `./audio/LOU/wav/audio_id.wav`
+* A transcription file to be used by **Persephone**, eg: `./audio/LOU/label/audio_id.txt`
+* A transcription file to be used by **Simple4All**, eg: `./audio/LOU/s4a/audio_id.txt`
 
 
 Frequently Asked Questions
