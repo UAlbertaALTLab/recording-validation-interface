@@ -2,11 +2,11 @@
 
 
 {% block content %}
-<div class="logout-message">
+<div class="speakers-grid">
     <h2>Maskwacîs Speakers</h2>
     <div class="row">
         {% for speaker in speakers %}
-        <div class="col-sm-6">
+        <div class="col-sm-4">
             <div class="card">
                 <img class="card-img-top" src="{{ speaker.img_url }}" alt="Image of {{ speaker.full_name }}">
                 <div class="card-body">

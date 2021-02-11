@@ -255,3 +255,12 @@ li.speaker_code {
 .card {
   margin-bottom: 1rem;
 }
+
+.speakers-grid {
+  max-width: 60rem;
+  background-color: #F5F5F5;
+  margin: 0 auto;
+  padding: 2rem;
+  min-width: 20rem;
+  text-align: center;
+}
