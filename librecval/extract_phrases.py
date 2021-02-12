@@ -345,20 +345,28 @@ def find_audio_oddities(annotation_path: Path, logger=None) -> Optional[Path]:
     """
 
     # Get folder name without expected track name
-    i = str(annotation_path).rfind("/")
     _path = str(annotation_path.parent)
+    sound_file = None
 
     # the track number is between the last - and the last .
-    j = str(annotation_path).rfind("-")
-    k = str(annotation_path).rfind(".")
-    track = str(annotation_path)[j + 1 : k]
-    track_1 = track.split("_")[0]
 
-    # find the .wav file
+    match = re.match(
+        r"""
+        .*-(
+            [^-]+   # looking for the string between the last / and the last .
+            )
+            \.[^-.]+
+        """,
+        str(annotation_path),
+        re.VERBOSE,
+    )
+    if match:
+        track = match.group(1)
+        track_1 = track.split("_")[0]
 
-    # try 1: the .wav file is in a subfolder, but it has 'Track number' in it
-    dirs = list(glob.glob(_path + "/**/" + track + "*.wav", recursive=True))
-    sound_file = Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
+        # try 1: the .wav file is in a subfolder, but it has 'Track number' in it
+        dirs = list(glob.glob(_path + "/**/" + track + "*.wav", recursive=True))
+        sound_file = Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
 
     if not sound_file:
         # try 2: the .wav file has no space between 'Track' and the number
@@ -416,7 +424,7 @@ def find_audio_oddities(annotation_path: Path, logger=None) -> Optional[Path]:
         # EXCEPT the .eaf file has the word 'Track_' in it
         # This option DOES NOT have the word 'Track' in it
         # and it DOES have the date in it
-        track_8 = str(annotation_path)[i + 1 : k]
+        track_8 = str(annotation_path.stem)
         track_8 = track_8.replace("Track_", "")
         dirs = list(glob.glob(_path + "/**/" + track_8 + "*.wav", recursive=True))
         sound_file = Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
@@ -433,7 +441,7 @@ def find_audio_oddities(annotation_path: Path, logger=None) -> Optional[Path]:
     if not sound_file:
         # try 13: the .wav file is not in a subfolder, but also doesn't have the word "Track" in it
         # BUT ALSO the .eaf file has am/pm in it and the .wav file does not
-        track_13 = str(annotation_path)[i + 1 : k]
+        track_13 = str(annotation_path.stem)
         track_13 = track_13.replace("am", "")
         track_13 = track_13.replace("AM", "")
         track_13 = track_13.replace("pm", "")
