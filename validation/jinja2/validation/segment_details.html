@@ -14,7 +14,7 @@
         document.getElementById('id_cree').focus()
 
         document.getElementById('id_cree').value = name;
-        document.getElementById('id_transl').value = translation;
+        document.getElementById('id_translation').value = translation;
         document.getElementById('id_analysis').value = analysis;
     }
 
@@ -27,7 +27,7 @@
         document.getElementById('id_cree').focus()
 
         document.getElementById('id_cree').value = transcription;
-        document.getElementById('id_transl').value = translation;
+        document.getElementById('id_translation').value = translation;
         document.getElementById('id_analysis').value = analysis;
     }
 
@@ -116,7 +116,7 @@
               <td>
                   {% set transl = suggestions[suggestion]["matches"][0]["translations"] %}
                   {% set analysis = suggestions[suggestion]["matches"][0]["analysis"] %}
-                  <input type="button" value="Accept" onclick="showDivAccept('{{ suggestion }}', '{{ transl }}', '{{ analysis }}')" />
+                  <input type="button" class="button-success" value="Accept" onclick="showDivAccept('{{ suggestion }}', '{{ transl }}', '{{ analysis }}')" />
               </td>
               {% endif %}
             {% endif %}
