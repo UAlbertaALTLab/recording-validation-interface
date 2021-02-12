@@ -109,7 +109,7 @@ def save_recording(
             audio,
             recording_path,
             tags=dict(
-                title=info.transcription,
+                title=info.cree_transcription,
                 artist=info.speaker,
                 album=info.session,
                 language="crk",

@@ -76,8 +76,8 @@ class Segment(NamedTuple):
     Stores an audio segment extracted from a .eaf file
     """
 
-    translation: str  # in English
-    transcription: str  # in Cree
+    english_translation: str
+    cree_transcription: str
     type: str  # "word" or "sentence"
     start: int
     stop: int
@@ -93,9 +93,9 @@ class Segment(NamedTuple):
             f"session: {self.session}\n"
             f"speaker: {self.speaker}\n"
             f"timestamp: {self.start}\n"
-            f"{self.type}: {self.transcription}\n"
+            f"{self.type}: {self.cree_transcription}\n"
             "\n"
-            f"{self.translation}\n"
+            f"{self.english_translation}\n"
         )
 
     def compute_sha256hash(self) -> str:
@@ -104,7 +104,8 @@ class Segment(NamedTuple):
         We use the hash instead of including the word in the id for these reasons:
         - we want people to validate the spelling of the word, so
         the word itself might change, making the name meaningless
-        - the db doesn't like diacritics very much
+        - Sapir's filesystem and backups don't like diacritics very much
+        - we get URL issues trying to load the audio if we use the name
         - other reasons, and good ones, too
         """
         return sha256(self.signature().encode("UTF-8")).hexdigest()
@@ -322,8 +323,8 @@ def extract_data(
     sound_bite = sound_bite.normalize(headroom=0.1)
 
     s = Segment(
-        translation=translation,  # in English
-        transcription=transcription,  # in Cree
+        english_translation=translation,
+        cree_transcription=transcription,
         type=_type,
         start=start,
         stop=stop,
