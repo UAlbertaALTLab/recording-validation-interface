@@ -346,7 +346,7 @@ def find_audio_oddities(annotation_path: Path, logger=None) -> Optional[Path]:
 
     # Get folder name without expected track name
     i = str(annotation_path).rfind("/")
-    _path = str(annotation_path)[:i]
+    _path = str(annotation_path.parent)
 
     # the track number is between the last - and the last .
     j = str(annotation_path).rfind("-")
