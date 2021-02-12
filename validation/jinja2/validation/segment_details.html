@@ -116,7 +116,7 @@
               <td>
                   {% set transl = suggestions[suggestion]["matches"][0]["translations"] %}
                   {% set analysis = suggestions[suggestion]["matches"][0]["analysis"] %}
-                  <input type="button" value="Accept" onclick="showDivAccept('{{ suggestion }}', '{{ transl }}', '{{ analysis }}')" />
+                  <input type="button" class="button-success" value="Accept" onclick="showDivAccept('{{ suggestion }}', '{{ transl }}', '{{ analysis }}')" />
               </td>
               {% endif %}
             {% endif %}
