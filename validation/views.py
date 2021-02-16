@@ -349,9 +349,13 @@ def speaker_view(request, speaker_code):
         full_name = speaker.full_name
         gender = speaker.gender or ""
         speaker_code = speaker.code
-        image_name = full_name.replace(" ", "") + ".jpg"
-        image_name = normalize_img_name(image_name)
-        image_url = f"http://altlab.ualberta.ca/maskwacis/Speakers/{image_name}"
+
+        if speaker_code == "JON":
+            image_url = "#"
+        else:
+            image_name = full_name.replace(" ", "") + ".jpg"
+            image_name = normalize_img_name(image_name)
+            image_url = f"/static/images/{image_name}"
     else:
         full_name = f"No speaker found for speaker code {speaker_code}"
         gender = ""
@@ -374,11 +378,14 @@ def all_speakers(request):
     for speaker in speaker_objects:
         full_name = speaker.full_name
 
-        image_name = full_name.replace(" ", "") + ".jpg"
-        image_name = normalize_img_name(image_name)
-        image_url = f"http://altlab.ualberta.ca/maskwacis/Speakers/{image_name}"
+        if speaker.code == "JON":
+            image_url = "#"
+        else:
+            image_name = full_name.replace(" ", "") + ".jpg"
+            image_name = normalize_img_name(image_name)
+            image_url = f"/static/images/{image_name}"
 
-        speaker_dict = dict(full_name=full_name, code=speaker.code, img_url=image_url)
+        speaker_dict = dict(full_name=full_name, code=speaker.code, img_src=image_url)
         speakers.append(speaker_dict)
 
     context = dict(speakers=speakers)
