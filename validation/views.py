@@ -37,7 +37,7 @@ from django.contrib.auth import authenticate, login as django_login
 from librecval.normalization import to_indexable_form
 
 from .crude_views import *
-from .models import Phrase, Recording, Speaker
+from .models import Phrase, Recording, Speaker, RecordingSession
 from .helpers import get_distance_with_translations
 from .forms import EditSegment, Login, Register
 
@@ -342,11 +342,13 @@ def register(request):
 def reporting(request):
     validated_count = Phrase.objects.filter(validated=True).count()
     unvalidated_count = Phrase.objects.filter(validated=False).count()
-    all_phrases_count = Phrase.objects.filter().count()
+    all_phrases_count = Phrase.objects.all().count()
+    all_sessions = RecordingSession.objects.all().count()
     context = dict(
         validated=validated_count,
         unvalidated=unvalidated_count,
         all_phrases=all_phrases_count,
+        all_sessions=all_sessions,
     )
     return render(request, "validation/report.html", context)
 
