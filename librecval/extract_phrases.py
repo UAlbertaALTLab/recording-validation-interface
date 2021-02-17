@@ -29,6 +29,7 @@ from os import fspath
 from pathlib import Path
 from typing import Dict, NamedTuple, Optional
 import glob
+from typing_extensions import Literal
 
 import logme  # type: ignore
 from librecval.normalization import normalize
@@ -70,6 +71,8 @@ class MissingTranslationError(RuntimeError):
 
 # ########################################################################## #
 
+WordOrSentence = Literal["word", "sentence"]
+
 
 class Segment(NamedTuple):
     """
@@ -78,7 +81,7 @@ class Segment(NamedTuple):
 
     english_translation: str
     cree_transcription: str
-    type: str  # "word" or "sentence"
+    type: WordOrSentence
     start: int
     stop: int
     comment: str
@@ -284,7 +287,14 @@ def get_phrase_tiers(keys):
 
 
 def extract_data(
-    _file, _type, snippet, audio, speaker, session_id, english_tier, comment_tier
+    _file,
+    _type: WordOrSentence,
+    snippet,
+    audio,
+    speaker,
+    session_id,
+    english_tier,
+    comment_tier,
 ) -> tuple:
     """
     Extracts all relevant data from a .eaf file, where "relevant data" is:
@@ -345,7 +355,7 @@ def find_audio_oddities(annotation_path: Path, logger=None) -> Optional[Path]:
     """
 
     # Get folder name without expected track name
-    _path = str(annotation_path.parent)
+    _path = annotation_path.parent
     sound_file = None
 
     # the track number is between the last - and the last .
@@ -365,13 +375,13 @@ def find_audio_oddities(annotation_path: Path, logger=None) -> Optional[Path]:
         track_1 = track.split("_")[0]
 
         # try 1: the .wav file is in a subfolder, but it has 'Track number' in it
-        dirs = list(glob.glob(_path + "/**/" + track + "*.wav", recursive=True))
+        dirs = list(_path.glob(f"**/{track}*.wav"))
         sound_file = Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
 
     if not sound_file:
         # try 2: the .wav file has no space between 'Track' and the number
         track_2 = track_1.replace(" ", "")
-        dirs = list(glob.glob(_path + "/**/" + track_2 + "*.wav", recursive=True))
+        dirs = list(_path.glob(f"**/{track_2}*.wav"))
         sound_file = Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
 
     if not sound_file:
@@ -391,30 +401,30 @@ def find_audio_oddities(annotation_path: Path, logger=None) -> Optional[Path]:
             j += 1
 
         track_3 = track_3[:-1]
-        dirs = list(glob.glob(_path + "/**/" + track_3 + "*.wav", recursive=True))
+        dirs = list(_path.glob(f"**/{track_3}*.wav"))
         sound_file = Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
         if not sound_file:
             track_4 = track_3.replace("Track", "Track ")
-            dirs = list(glob.glob(_path + "/**/" + track_4 + "*.wav", recursive=True))
+            dirs = list(_path.glob(f"**/{track_4}*.wav"))
             sound_file = (
                 Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
             )
         if not sound_file:
             track_5 = track_3.replace(" ", "")
             track_5 = track_3.replace("Track_", "Track ")
-            dirs = list(glob.glob(_path + "/**/" + track_5 + "*.wav", recursive=True))
+            dirs = list(_path.glob(f"**/{track_5}*.wav"))
             sound_file = (
                 Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
             )
         if not sound_file:
             track_6 = track_3.replace("track", "Track")
-            dirs = list(glob.glob(_path + "/**/" + track_6 + "*.wav", recursive=True))
+            dirs = list(_path.glob(f"**/{track_6}*.wav"))
             sound_file = (
                 Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
             )
         if not sound_file:
             track_7 = track_3.replace("Track 0", "Track ")
-            dirs = list(glob.glob(_path + "/**/" + track_6 + "*.wav", recursive=True))
+            dirs = list(_path.glob(f"**/{track_6}*.wav"))
             sound_file = (
                 Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
             )
@@ -426,14 +436,14 @@ def find_audio_oddities(annotation_path: Path, logger=None) -> Optional[Path]:
         # and it DOES have the date in it
         track_8 = str(annotation_path.stem)
         track_8 = track_8.replace("Track_", "")
-        dirs = list(glob.glob(_path + "/**/" + track_8 + "*.wav", recursive=True))
+        dirs = list(_path.glob(f"**/{track_8}*.wav"))
         sound_file = Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
         if not sound_file:
             track_9 = track_8.replace("am", "")
             track_9 = track_9.replace("pm", "")
             track_9 = track_9.replace("AM", "")
             track_9 = track_9.replace("PM", "")
-            dirs = list(glob.glob(_path + "/**/" + track_9 + "*.wav", recursive=True))
+            dirs = list(_path.glob(f"**/{track_9}*.wav"))
             sound_file = (
                 Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
             )
@@ -447,7 +457,7 @@ def find_audio_oddities(annotation_path: Path, logger=None) -> Optional[Path]:
         track_13 = track_13.replace("pm", "")
         track_13 = track_13.replace("PM", "")
 
-        dirs = list(glob.glob(_path + "/" + track_13 + "*.wav", recursive=True))
+        dirs = list(_path.glob(f"{track_13}*.wav"))
         sound_file = Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
 
     logger.debug("[Recorded Subfolder] Trying %s...", sound_file)
