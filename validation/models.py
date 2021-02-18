@@ -74,6 +74,11 @@ class Phrase(models.Model):
         (NEW_WORD, "New word"),
     )
 
+    phrase_hash = models.CharField(
+        help_text="Unique hash to determine if phrase has changed",
+        max_length=SHA256_HEX_LENGTH,
+    )
+
     transcription = models.CharField(
         help_text="The transciption of the Cree phrase.",
         blank=False,
@@ -238,6 +243,11 @@ class RecordingSession(models.Model):
 
     id = models.CharField(primary_key=True, max_length=len("2000-01-01-__-___-_"))
 
+    session_hash = models.CharField(
+        help_text="Unique hash to determine if session has changed",
+        max_length=SHA256_HEX_LENGTH,
+    )
+
     date = models.DateField(help_text="The day the session occured.")
     # See librecval for the appropriate choices:
     time_of_day = models.CharField(
@@ -330,6 +340,11 @@ class Recording(models.Model):
     QUALITY_CHOICES = ((GOOD, _("Good")), (BAD, _("Bad")), (UNKNOWN, _("Unknown")))
 
     id = models.CharField(primary_key=True, max_length=SHA256_HEX_LENGTH)
+
+    recording_hash = models.CharField(
+        help_text="Unique hash to determine if recording has changed",
+        max_length=SHA256_HEX_LENGTH,
+    )
 
     compressed_audio = models.FileField(
         # relative to settings.MEDIA_ROOT
