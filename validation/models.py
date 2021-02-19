@@ -297,7 +297,7 @@ class RecordingSession(models.Model):
         return cls.objects.filter(id=str(session_id))
 
     @classmethod
-    def get_or_create_by_session_id(cls, session_id: SessionID):
+    def get_or_create_by_session_id(cls, session_id: SessionID, session_hash):
         """
         Same as cls.objects.get_or_create(), but only deals with session IDs.
         """
@@ -305,6 +305,7 @@ class RecordingSession(models.Model):
             (obj,) = cls.objects_by_id(session_id)
         except ValueError:
             obj = cls.create_from(session_id)
+            obj.session_hash = session_hash
             obj.save()
             return obj, True
         else:
@@ -387,7 +388,7 @@ class TranscriptionFile(models.Model):
     """
 
     session = models.ForeignKey(RecordingSession, on_delete=models.CASCADE)
-    file_name = models.CharField(max_length=1024)
+    file_name = models.CharField(max_length=1024, primary_key=True)
     file_hash = models.CharField(
         help_text="Unique hash to determine if transcription has changed",
         max_length=SHA256_HEX_LENGTH,

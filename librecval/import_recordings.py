@@ -35,7 +35,6 @@ from librecval.transcode_recording import transcode_to_aac
 
 from validation.models import RecordingSession, Recording, TranscriptionFile
 
-ImportRecording = Callable[[Segment, Path], None]
 
 # TODO: create report with emoji
 #
@@ -62,6 +61,48 @@ class KitchenSink:
         self.transcription_hash = compute_transcription_hash(info.annotation_path)
         self.session_hash = compute_session_hash(metadata[info.session])
         self.recording_hash = compute_recording_hash(audio)
+
+    def compute_sha256hash(self):
+        return self.info.compute_sha256hash()
+
+    @property
+    def speaker(self):
+        return self.info.speaker
+
+    @property
+    def session(self):
+        return self.info.session
+
+    @property
+    def cree_transcription(self):
+        return self.info.cree_transcription
+
+    @property
+    def english_translation(self):
+        return self.info.english_translation
+
+    @property
+    def type(self):
+        return self.info.type
+
+    @property
+    def start(self):
+        return self.info.start
+
+    @property
+    def quality(self):
+        return self.info.quality
+
+    @property
+    def comment(self):
+        return self.info.comment
+
+    @property
+    def annotation_path(self):
+        return self.info.annotation_path
+
+
+ImportRecording = Callable[[KitchenSink, Path], None]
 
 
 @logme.log
@@ -108,7 +149,7 @@ def initialize(
         except RecordingError:
             logger.exception("Exception while saving recording; skipping.")
         else:
-            import_recording(segment.info, recording_path)
+            import_recording(segment, recording_path)
 
 
 @logme.log
@@ -164,34 +205,44 @@ def compute_transcription_hash(annotation_path: Path):
     return sha256(annotation_path.read_bytes()).hexdigest()
 
 
-def should_import(segment: KitchenSink):
+@logme.log
+def should_import(segment: KitchenSink, logger=None):
     # Checks if the segment hash has changed or does not exist
     # Returns True if needs to be imported
 
     try:
-        rec_session = RecordingSession.objects.get(id=info.session)
+        rec_session = RecordingSession.objects.get(id=segment.session)
     except RecordingSession.DoesNotExist:
+        logger.info(f"Recording session does not exist: {segment.session}")
         return True
     if rec_session.session_hash != segment.session_hash:
+        logger.info("Recording session hash doesn't match")
         return True
 
     try:
         # The recording uses the transcription_hash as its ID
-        recording = Recording.objects.get(id=segment.info.compute_sha256hash())
+        recording = Recording.objects.get(id=segment.compute_sha256hash())
     except Recording.DoesNotExist:
+        logger.info(f"Recording does not exist")
         return True
     if recording.recording_hash != segment.recording_hash:
+        logger.info("Recording hash doesn't match")
         return True
 
     try:
         transcription = TranscriptionFile.objects.get(
-            file_name=str(info.annotation_path.resolve())
+            file_name=str(segment.annotation_path.resolve())
         )
     except TranscriptionFile.DoesNotExist:
+        logger.info(
+            f"Transcription file does not exist: {str(segment.annotation_path.resolve())}"
+        )
         return True
     if transcription.file_hash != segment.transcription_hash:
+        logger.info("Transcription file hash doesn't match")
         return True
 
+    logger.info("Don't import")
     return False
 
 

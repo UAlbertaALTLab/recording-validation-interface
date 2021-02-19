@@ -38,7 +38,14 @@ from django.core.management.base import BaseCommand, CommandError  # type: ignor
 from librecval import REPOSITORY_ROOT
 from librecval.extract_phrases import Segment
 from librecval.import_recordings import initialize as import_recordings
-from validation.models import Phrase, Recording, RecordingSession, Speaker
+from librecval.import_recordings import KitchenSink
+from validation.models import (
+    Phrase,
+    Recording,
+    RecordingSession,
+    Speaker,
+    TranscriptionFile,
+)
 
 
 class Command(BaseCommand):
@@ -115,7 +122,7 @@ class Command(BaseCommand):
 
 
 @logme.log
-def django_recording_importer(info: Segment, recording_path: Path, logger) -> None:
+def django_recording_importer(info: KitchenSink, recording_path: Path, logger) -> None:
     """
     Imports a single recording.
     """
@@ -129,7 +136,7 @@ def django_recording_importer(info: Segment, recording_path: Path, logger) -> No
         logger.info("New speaker: %s", speaker)
 
     session, session_created = RecordingSession.get_or_create_by_session_id(
-        info.session
+        info.session, info.session_hash
     )
     if session_created:
         logger.info("New session: %s", session)
@@ -159,11 +166,21 @@ def django_recording_importer(info: Segment, recording_path: Path, logger) -> No
         session=session,
         quality=info.quality,
         comment=info.comment,
+        recording_hash=info.recording_hash,
     )
     recording.clean()
 
     logger.debug("Saving recording %s", recording)
     recording.save()
+
+    transcription, transcription_created = TranscriptionFile.objects.get_or_create(
+        session=session,
+        file_name=info.annotation_path,
+        file_hash=info.transcription_hash,
+    )
+
+    if transcription_created:
+        logger.info("New transcription file: %s", transcription)
 
 
 def null_recording_importer(info: Segment, recording_path: Path) -> None:
