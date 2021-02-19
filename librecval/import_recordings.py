@@ -33,6 +33,8 @@ from librecval.extract_phrases import AudioSegment, RecordingExtractor, Segment
 from librecval.recording_session import parse_metadata, SessionID
 from librecval.transcode_recording import transcode_to_aac
 
+from validation.models import RecordingSession, Recording, Phrase
+
 ImportRecording = Callable[[Segment, Path], None]
 
 # TODO: create report with emoji
@@ -78,13 +80,13 @@ def initialize(
     # Insert each thing found.
     ex = RecordingExtractor(metadata)
     segments = list(ex.scan(root_directory=directory))
+    segments_to_import = []
 
     for info, audio in segments:
-        # look for a recording with this hash; if none
-        # look for a recording with the same info but different hash
-        phrase_hash = info.compute_sha256hash()
-        session_hash = compute_session_hash(metadata, info.session)
-        recording_hash = compute_recording_hash(audio)
+        if should_import(info, audio, metadata):
+            segments_to_import.append((info, audio))
+
+    for info, audio in segments_to_import:
         try:
             recording_path = save_recording(dest, info, audio, recording_format)
         except RecordingError:
@@ -131,12 +133,35 @@ def save_recording(
     return recording_path
 
 
-def compute_session_hash(metadata, session_id):
-    metadata_entry = metadata[session_id]
-    metadata_to_hash = repr(metadata_entry)
+def compute_session_hash(metadata):
+    # takes a single row from the metadata and hashes it
+    metadata_to_hash = repr(metadata)
     return sha256(metadata_to_hash.encode("UTF-8")).hexdigest()
 
 
 def compute_recording_hash(audio):
     # takes the raw data from the AudioSegment and hashes it
     return sha256(audio.raw_data).hexdigest()
+
+
+def should_import(info, audio, metadata):
+    # look for a recording with this hash; if none
+    # look for a recording with the same info but different hash
+    phrase_hash = info.compute_sha256hash()
+    session_hash = compute_session_hash(metadata[info.session])
+    recording_hash = compute_recording_hash(audio)
+
+    try:
+        rec_session = RecordingSession.objects.get(id=info.session)
+    except RecordingSession.DoesNotExist:
+        return True
+    if rec_session.session_hash != session_hash:
+        return True
+
+    try:
+        # The recording uses the phrase_hash as its ID for some reason
+        recording = Recording.objects.get(id=phrase_hash)
+    except Recording.DoesNotExist:
+        return True
+    if recording.recording_hash != recording_hash:
+        return True
