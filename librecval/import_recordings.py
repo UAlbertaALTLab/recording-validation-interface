@@ -53,6 +53,17 @@ class RecordingError(Exception):
 Format = Literal["wav", "m4a"]
 
 
+class KitchenSink:
+    def __init__(self, info, audio, metadata):
+        self.info = info
+        self.audio = audio
+        self.metadata = metadata
+
+        self.transcription_hash = compute_transcription_hash(info.annotation_path)
+        self.session_hash = compute_session_hash(metadata[info.session])
+        self.recording_hash = compute_recording_hash(audio)
+
+
 @logme.log
 def initialize(
     directory: Path,
@@ -79,20 +90,25 @@ def initialize(
 
     # Insert each thing found.
     ex = RecordingExtractor(metadata)
-    segments = list(ex.scan(root_directory=directory))
+    segments = [
+        KitchenSink(info, audio, metadata)
+        for info, audio in ex.scan(root_directory=directory)
+    ]
     segments_to_import = []
 
-    for info, audio in segments:
-        if should_import(info, audio, metadata):
-            segments_to_import.append((info, audio))
+    for segment in segments:
+        if should_import(segment):
+            segments_to_import.append(segment)
 
-    for info, audio in segments_to_import:
+    for segment in segments_to_import:
         try:
-            recording_path = save_recording(dest, info, audio, recording_format)
+            recording_path = save_recording(
+                dest, segment.info, segment.audio, recording_format
+            )
         except RecordingError:
             logger.exception("Exception while saving recording; skipping.")
         else:
-            import_recording(info, recording_path)
+            import_recording(segment.info, recording_path)
 
 
 @logme.log
@@ -148,26 +164,23 @@ def compute_transcription_hash(annotation_path: Path):
     return sha256(annotation_path.read_bytes()).hexdigest()
 
 
-def should_import(info, audio, metadata):
-    # look for a recording with this hash; if none
-    # look for a recording with the same info but different hash
-    transcription_hash = compute_transcription_hash(info.annotation_path)
-    session_hash = compute_session_hash(metadata[info.session])
-    recording_hash = compute_recording_hash(audio)
+def should_import(segment: KitchenSink):
+    # Checks if the segment hash has changed or does not exist
+    # Returns True if needs to be imported
 
     try:
         rec_session = RecordingSession.objects.get(id=info.session)
     except RecordingSession.DoesNotExist:
         return True
-    if rec_session.session_hash != session_hash:
+    if rec_session.session_hash != segment.session_hash:
         return True
 
     try:
         # The recording uses the transcription_hash as its ID
-        recording = Recording.objects.get(id=info.compute_sha256hash())
+        recording = Recording.objects.get(id=segment.info.compute_sha256hash())
     except Recording.DoesNotExist:
         return True
-    if recording.recording_hash != recording_hash:
+    if recording.recording_hash != segment.recording_hash:
         return True
 
     try:
@@ -176,7 +189,13 @@ def should_import(info, audio, metadata):
         )
     except TranscriptionFile.DoesNotExist:
         return True
-    if transcription.file_hash != transcription_hash:
+    if transcription.file_hash != segment.transcription_hash:
         return True
 
     return False
+
+
+def delete_entry(entry):
+    # TODO: this
+    # "Update" an entry that's already in the DB but has changed a little
+    pass
