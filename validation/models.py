@@ -31,6 +31,10 @@ from librecval.normalization import normalize_sro, to_indexable_form
 from librecval.recording_session import Location, SessionID, TimeOfDay
 
 
+# The length of a SHA 256 hash, as hexadecimal characters.
+SHA256_HEX_LENGTH = 64
+
+
 def choices_from_enum(enum_class):
     """
     Utility for converting a Python 3.4+ Enum into a choices for a Django
@@ -323,10 +327,6 @@ def generate_primary_key(sender, instance, **kwargs):
     This happens automatically on save
     """
     instance.id = str(instance.as_session_id())
-
-
-# The length of a SHA 256 hash, as hexadecimal characters.
-SHA256_HEX_LENGTH = 64
 
 
 class Recording(models.Model):

@@ -77,11 +77,13 @@ def initialize(
 
     # Insert each thing found.
     ex = RecordingExtractor(metadata)
-    for info, audio in ex.scan(root_directory=directory):
+    segments = list(ex.scan(root_directory=directory))
+
+    for info, audio in segments:
         # look for a recording with this hash; if none
         # look for a recording with the same info but different hash
         phrase_hash = info.compute_sha256hash()
-        session_hash = compute_session_hash(metadata, session_id)
+        session_hash = compute_session_hash(metadata, info.session)
         recording_hash = compute_recording_hash(audio)
         try:
             recording_path = save_recording(dest, info, audio, recording_format)
@@ -131,10 +133,10 @@ def save_recording(
 
 def compute_session_hash(metadata, session_id):
     metadata_entry = metadata[session_id]
-    metadata_to_hash = str(metadata_entry)
+    metadata_to_hash = repr(metadata_entry)
     return sha256(metadata_to_hash.encode("UTF-8")).hexdigest()
 
 
 def compute_recording_hash(audio):
     # takes the raw data from the AudioSegment and hashes it
-    return sha256(str(audio.raw_data).encode("UTF-8")).hexdigest()
+    return sha256(audio.raw_data).hexdigest()
