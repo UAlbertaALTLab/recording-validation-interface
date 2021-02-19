@@ -81,6 +81,7 @@ class Segment(NamedTuple):
 
     english_translation: str
     cree_transcription: str
+    annotation_path: Path
     type: WordOrSentence
     start: int
     stop: int
@@ -243,6 +244,7 @@ def generate_segments_from_eaf(
             session_id,
             english_word_tier,
             comment_tier,
+            annotation_path,
         )
         count += 1
         print(f"Processed audio segment number {count}")
@@ -264,6 +266,7 @@ def generate_segments_from_eaf(
             session_id,
             english_phrase_tier,
             comment_tier,
+            annotation_path,
         )
         count += 1
         print(f"Processed audio segment number {count}")
@@ -295,6 +298,7 @@ def extract_data(
     session_id,
     english_tier,
     comment_tier,
+    annotation_path: Path,
 ) -> tuple:
     """
     Extracts all relevant data from a .eaf file, where "relevant data" is:
@@ -335,6 +339,7 @@ def extract_data(
     s = Segment(
         english_translation=translation,
         cree_transcription=transcription,
+        annotation_path=annotation_path,
         type=_type,
         start=start,
         stop=stop,

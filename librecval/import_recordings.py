@@ -30,10 +30,10 @@ import logme  # type: ignore
 from typing_extensions import Literal
 
 from librecval.extract_phrases import AudioSegment, RecordingExtractor, Segment
-from librecval.recording_session import parse_metadata, SessionID
+from librecval.recording_session import parse_metadata, SessionID, SessionMetadata
 from librecval.transcode_recording import transcode_to_aac
 
-from validation.models import RecordingSession, Recording, Phrase
+from validation.models import RecordingSession, Recording, TranscriptionFile
 
 ImportRecording = Callable[[Segment, Path], None]
 
@@ -133,21 +133,25 @@ def save_recording(
     return recording_path
 
 
-def compute_session_hash(metadata):
+def compute_session_hash(metadata: SessionMetadata):
     # takes a single row from the metadata and hashes it
     metadata_to_hash = repr(metadata)
     return sha256(metadata_to_hash.encode("UTF-8")).hexdigest()
 
 
-def compute_recording_hash(audio):
+def compute_recording_hash(audio: AudioSegment):
     # takes the raw data from the AudioSegment and hashes it
     return sha256(audio.raw_data).hexdigest()
+
+
+def compute_transcription_hash(annotation_path: Path):
+    return sha256(annotation_path.read_bytes()).hexdigest()
 
 
 def should_import(info, audio, metadata):
     # look for a recording with this hash; if none
     # look for a recording with the same info but different hash
-    phrase_hash = info.compute_sha256hash()
+    transcription_hash = compute_transcription_hash(info.annotation_path)
     session_hash = compute_session_hash(metadata[info.session])
     recording_hash = compute_recording_hash(audio)
 
@@ -159,9 +163,20 @@ def should_import(info, audio, metadata):
         return True
 
     try:
-        # The recording uses the phrase_hash as its ID for some reason
-        recording = Recording.objects.get(id=phrase_hash)
+        # The recording uses the transcription_hash as its ID
+        recording = Recording.objects.get(id=info.compute_sha256hash())
     except Recording.DoesNotExist:
         return True
     if recording.recording_hash != recording_hash:
         return True
+
+    try:
+        transcription = TranscriptionFile.objects.get(
+            file_name=str(info.annotation_path.resolve())
+        )
+    except TranscriptionFile.DoesNotExist:
+        return True
+    if transcription.file_hash != transcription_hash:
+        return True
+
+    return False

@@ -78,11 +78,6 @@ class Phrase(models.Model):
         (NEW_WORD, "New word"),
     )
 
-    phrase_hash = models.CharField(
-        help_text="Unique hash to determine if phrase has changed",
-        max_length=SHA256_HEX_LENGTH,
-    )
-
     transcription = models.CharField(
         help_text="The transciption of the Cree phrase.",
         blank=False,
@@ -384,6 +379,19 @@ class Recording(models.Model):
         Returns the path to where compressed audio should be written to.
         """
         return Path(settings.MEDIA_ROOT) / settings.RECVAL_AUDIO_PREFIX
+
+
+class TranscriptionFile(models.Model):
+    """
+    A transcription file. Annotations made by students
+    """
+
+    session = models.ForeignKey(RecordingSession, on_delete=models.CASCADE)
+    file_name = models.CharField(max_length=1024)
+    file_hash = models.CharField(
+        help_text="Unique hash to determine if transcription has changed",
+        max_length=SHA256_HEX_LENGTH,
+    )
 
 
 # ############################### Utilities ############################### #
