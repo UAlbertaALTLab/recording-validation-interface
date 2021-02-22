@@ -38,7 +38,7 @@ from django.core.management.base import BaseCommand, CommandError  # type: ignor
 from librecval import REPOSITORY_ROOT
 from librecval.extract_phrases import Segment
 from librecval.import_recordings import initialize as import_recordings
-from librecval.import_recordings import KitchenSink
+from librecval.import_recordings import MediaInfo
 from validation.models import (
     Phrase,
     Recording,
@@ -122,7 +122,7 @@ class Command(BaseCommand):
 
 
 @logme.log
-def django_recording_importer(info: KitchenSink, recording_path: Path, logger) -> None:
+def django_recording_importer(info: MediaInfo, recording_path: Path, logger) -> None:
     """
     Imports a single recording.
     """

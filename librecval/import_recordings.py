@@ -52,7 +52,7 @@ class RecordingError(Exception):
 Format = Literal["wav", "m4a"]
 
 
-class KitchenSink:
+class MediaInfo:
     def __init__(self, info, audio, metadata):
         self.info = info
         self.audio = audio
@@ -102,7 +102,7 @@ class KitchenSink:
         return self.info.annotation_path
 
 
-ImportRecording = Callable[[KitchenSink, Path], None]
+ImportRecording = Callable[[MediaInfo, Path], None]
 
 
 @logme.log
@@ -132,7 +132,7 @@ def initialize(
     # Insert each thing found.
     ex = RecordingExtractor(metadata)
     segments = [
-        KitchenSink(info, audio, metadata)
+        MediaInfo(info, audio, metadata)
         for info, audio in ex.scan(root_directory=directory)
     ]
     segments_to_import = []
@@ -148,8 +148,9 @@ def initialize(
             )
         except RecordingError:
             logger.exception("Exception while saving recording; skipping.")
-        else:
-            import_recording(segment, recording_path)
+            continue
+
+        import_recording(segment, recording_path)
 
 
 @logme.log
@@ -206,7 +207,7 @@ def compute_transcription_hash(annotation_path: Path):
 
 
 @logme.log
-def should_import(segment: KitchenSink, logger=None):
+def should_import(segment: MediaInfo, logger=None):
     # Checks if the segment hash has changed or does not exist
     # Returns True if needs to be imported
 
