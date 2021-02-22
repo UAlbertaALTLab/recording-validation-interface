@@ -327,7 +327,6 @@ class Recording(models.Model):
     GOOD = "good"
     BAD = "bad"
     UNKNOWN = "unknown"
-    QUALITY_CHOICES = ((GOOD, _("Good")), (BAD, _("Bad")), (UNKNOWN, _("Unknown")))
 
     id = models.CharField(primary_key=True, max_length=SHA256_HEX_LENGTH)
 
@@ -346,7 +345,6 @@ class Recording(models.Model):
     # TODO: determine this automatically during import process
     quality = models.CharField(
         help_text="Is the recording clean? Is it suitable to use publicly?",
-        # **arguments_for_choices(QUALITY_CHOICES),
         max_length=64,
         blank=True,
     )

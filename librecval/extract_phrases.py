@@ -28,7 +28,6 @@ from hashlib import sha256
 from os import fspath
 from pathlib import Path
 from typing import Dict, NamedTuple, Optional
-import glob
 from typing_extensions import Literal
 
 import logme  # type: ignore
