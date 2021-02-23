@@ -215,3 +215,5 @@ MEDIA_ROOT = config("MEDIA_ROOT", default=BASE_DIR / "data", cast=str)
 LOGIN_REDIRECT_URL = "/"
 
 ITWEWINA_URL = "https://sapir.artsrn.ualberta.ca/cree-dictionary/"
+
+FIXTURE_DIRS = ("validation/management/fixtures/",)
