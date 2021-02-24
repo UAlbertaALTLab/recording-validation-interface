@@ -348,14 +348,14 @@ def speaker_view(request, speaker_code):
         speaker = speaker[0]
         full_name = speaker.full_name
         gender = speaker.gender or ""
-        speaker_code = speaker.code
 
-        if speaker_code == "JON":
-            image_url = "#"
-        else:
-            image_name = full_name.replace(" ", "") + ".jpg"
-            image_name = normalize_img_name(image_name)
-            image_url = f"/static/images/{image_name}"
+        image_name = full_name.replace(" ", "") + ".jpg"
+        image_name = normalize_img_name(image_name)
+        image_url = Path(f"/static/images/speakers/{image_name}")
+        if not Path(
+            f"validation/{settings.STATIC_URL}images/speakers/{image_name}"
+        ).exists():
+            image_url = Path("/static/images/missing.png")
     else:
         full_name = f"No speaker found for speaker code {speaker_code}"
         gender = ""
@@ -378,12 +378,13 @@ def all_speakers(request):
     for speaker in speaker_objects:
         full_name = speaker.full_name
 
-        if speaker.code == "JON":
-            image_url = "#"
-        else:
-            image_name = full_name.replace(" ", "") + ".jpg"
-            image_name = normalize_img_name(image_name)
-            image_url = f"/static/images/{image_name}"
+        image_name = full_name.replace(" ", "") + ".jpg"
+        image_name = normalize_img_name(image_name)
+        image_url = f"/static/images/speakers/{image_name}"
+        if not Path(
+            f"validation/{settings.STATIC_URL}images/speakers/{image_name}"
+        ).exists():
+            image_url = Path("/static/images/missing.png")
 
         speaker_dict = dict(full_name=full_name, code=speaker.code, img_src=image_url)
         speakers.append(speaker_dict)

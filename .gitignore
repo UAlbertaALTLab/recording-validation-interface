@@ -114,3 +114,4 @@ metadata.csv
 db.sqlite3
 node_modules
 .DS_Store
+validation/static/images/speakers/
