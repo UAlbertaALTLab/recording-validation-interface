@@ -194,9 +194,9 @@ def extract_translations(entry):
         for _def in entry["definitions"]:
             ret_val.append(
                 dict(
-                    translation=str(_def["text"]),
-                    analysis=str(entry["analysis"]),
-                    source=str(_def["source_ids"][0]),
+                    translation=str(_def["text"]) or None,
+                    analysis=str(entry["analysis"]) or None,
+                    source=str(_def["source_ids"][0]) or None,
                 )
             )
 

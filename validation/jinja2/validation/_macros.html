@@ -102,7 +102,7 @@
   #}
  {% macro td_suggestion_translation(user, suggestion, suggestions) %}
  <td data-cy="suggestion-translation" lang="en">
-   {{ suggestions[suggestion]['matches'][0]['translations'] or 'No translation available' }}
+   {{ suggestions[suggestion]['matches'][0]['translation'] or 'No translation available' }}
  </td>
  {% endmacro %}
 
@@ -113,6 +113,16 @@
  {% macro td_suggestion_analysis(user, suggestion, suggestions) %}
  <td data-cy="suggestion-analysis" lang="en">
    {{ suggestions[suggestion]['matches'][0]['analysis'] }}
+ </td>
+ {% endmacro %}
+
+{#
+  # Expands to a <td> that displays the dictionary source of the
+    # suggested translation
+  #}
+ {% macro td_dict_source(user, suggestion, suggestions) %}
+ <td data-cy="dict-source" lang="en">
+   {{ suggestions[suggestion]['matches'][0]['source'] or '' }}
  </td>
  {% endmacro %}
 
