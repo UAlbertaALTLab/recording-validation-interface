@@ -96,6 +96,7 @@
             <th scope="col"> MED </th>
             <th scope="col"> Translation </th>
             <th scope="col"> Analysis </th>
+            <th scope="col"> Source </th>
             {% if auth %}
             <th scope="col"> Options </th>
             {% endif %}
@@ -124,8 +125,9 @@
         {% if suggestions[suggestion]['len'] > 1 %}
           {% for match in suggestions[suggestion]['matches'] %}
             <tr>
-            <td>{{ match['translations'] }}</td>
+            <td>{{ match['translation'] }}</td>
             <td>{{ match['analysis'] }}</td>
+            <td>{{  match['source'] }}</td>
             {% if auth %}
             <td>
                 {% set transl = match["translations"] %}
