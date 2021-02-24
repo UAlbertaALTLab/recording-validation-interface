@@ -191,6 +191,15 @@ pipenv run python manage.py migrate
 
 This will create all the necessary tables in the SQLite3 database.
 
+### Pre-loading Speaker data
+
+Some speakers have pre-saved data associated with them. To load this data into the database, run:
+```sh
+pipenv run python manage.py loaddata speaker_info
+```
+
+This will load the speaker information found at `validation/management/fixtures/`
+
 
 ### Importing recordings
 

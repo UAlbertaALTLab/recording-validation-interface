@@ -324,9 +324,9 @@ class Recording(models.Model):
     A recording of a phrase.
     """
 
-    CLEAN = "clean"
-    UNUSABLE = "unusable"
-    QUALITY_CHOICES = ((CLEAN, _("Clean")), (UNUSABLE, _("Unusable")))
+    GOOD = "good"
+    BAD = "bad"
+    UNKNOWN = "unknown"
 
     id = models.CharField(primary_key=True, max_length=SHA256_HEX_LENGTH)
 
@@ -345,7 +345,13 @@ class Recording(models.Model):
     # TODO: determine this automatically during import process
     quality = models.CharField(
         help_text="Is the recording clean? Is it suitable to use publicly?",
-        **arguments_for_choices(QUALITY_CHOICES),
+        max_length=64,
+        blank=True,
+    )
+
+    comment = models.CharField(
+        help_text="The comment provided in the ELAN file",
+        max_length=256,
         blank=True,
     )
 
