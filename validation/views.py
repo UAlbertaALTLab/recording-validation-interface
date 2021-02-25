@@ -299,6 +299,8 @@ def segment_content_view(request, segment_id):
     phrase = phrases[0]
     if not phrase.validated:
         _match = perfect_match(segment_name, suggestions)
+
+        # only save the analysis if there is exactly one
         if exactly_one_analysis(_match):
             phrase.analysis = _match["matches"][0]["analysis"]
             phrase.validated = True
