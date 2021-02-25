@@ -38,7 +38,7 @@ from librecval.normalization import to_indexable_form
 
 from .crude_views import *
 from .models import Phrase, Recording, Speaker
-from .helpers import get_distance_with_translations
+from .helpers import get_distance_with_translations, perfect_match
 from .forms import EditSegment, Login, Register
 
 
@@ -294,6 +294,7 @@ def segment_content_view(request, segment_id):
     phrases = Phrase.objects.filter(id=segment_id)
     segment_name = phrases[0].transcription
     suggestions = get_distance_with_translations(segment_name)
+    print(perfect_match(segment_name, suggestions))
     history = phrases[0].history.all()
     auth = request.user.is_authenticated
 

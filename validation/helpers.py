@@ -212,3 +212,16 @@ def get_distance_with_translations(word):
         }
 
     return suggestions
+
+
+def perfect_match(word, suggestions):
+    print(word)
+    match = None
+    for suggestion in suggestions:
+        if suggestions[suggestion]["med"] == 0 or suggestion == word:
+            if match is None:
+                match = suggestions[suggestion]
+            else:
+                return None
+
+    return match
