@@ -38,7 +38,7 @@ from librecval.normalization import to_indexable_form
 
 from .crude_views import *
 from .models import Phrase, Recording, Speaker
-from .helpers import get_distance_with_translations, perfect_match
+from .helpers import get_distance_with_translations, perfect_match, exactly_one_analysis
 from .forms import EditSegment, Login, Register
 
 
@@ -294,7 +294,16 @@ def segment_content_view(request, segment_id):
     phrases = Phrase.objects.filter(id=segment_id)
     segment_name = phrases[0].transcription
     suggestions = get_distance_with_translations(segment_name)
-    print(perfect_match(segment_name, suggestions))
+
+    # check for auto-validation if phrase has not yet been validated
+    phrase = phrases[0]
+    if not phrase.validated:
+        _match = perfect_match(segment_name, suggestions)
+        if exactly_one_analysis(_match):
+            phrase.analysis = _match["matches"][0]["analysis"]
+            phrase.validated = True
+            phrase.save()
+
     history = phrases[0].history.all()
     auth = request.user.is_authenticated
 

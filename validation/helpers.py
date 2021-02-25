@@ -215,7 +215,6 @@ def get_distance_with_translations(word):
 
 
 def perfect_match(word, suggestions):
-    print(word)
     match = None
     for suggestion in suggestions:
         if suggestions[suggestion]["med"] == 0 or suggestion == word:
@@ -225,3 +224,18 @@ def perfect_match(word, suggestions):
                 return None
 
     return match
+
+
+def exactly_one_analysis(suggestion):
+    analysis = ""
+    if not suggestion:
+        return False
+
+    for wordform in suggestion["matches"]:
+        if analysis == "":
+            analysis = wordform["analysis"]
+        if wordform["analysis"] != analysis:
+            return False
+    if analysis == "":
+        return False
+    return True
