@@ -85,7 +85,7 @@ def search_phrases(request):
     cree_matches = Phrase.objects.filter(transcription__contains=query)
     english_matches = Phrase.objects.filter(translation__contains=query)
     all_matches = list(set().union(cree_matches, english_matches))
-    all_matches.sort(key=lambda phrase: phrase.transcription)
+    all_matches.sort(key=lambda phrase: phrase.field_transcription)
     paginator = Paginator(all_matches, 30)
     page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)
@@ -157,7 +157,7 @@ def advanced_search_results(request):
                 if recording.speaker.code in speakers:
                     all_matches.append(phrase)
 
-    all_matches.sort(key=lambda phrase: phrase.transcription)
+    all_matches.sort(key=lambda phrase: phrase.field_transcription)
 
     paginator = Paginator(all_matches, 30)
     page_no = request.GET.get("page", 1)
@@ -240,7 +240,7 @@ def search_recordings(request, query):
 
         recordings.extend(
             {
-                "wordform": rec.phrase.transcription,
+                "wordform": rec.phrase.field_transcription,
                 "speaker": rec.speaker.code,
                 "speaker_name": rec.speaker.full_name,
                 "anonymous": rec.speaker.anonymous,
@@ -292,8 +292,10 @@ def segment_content_view(request, segment_id):
             p.save()
 
     phrases = Phrase.objects.filter(id=segment_id)
+    field_transcription = phrases[0].field_transcription
+    suggestions = get_distance_with_translations(field_transcription)
+
     segment_name = phrases[0].transcription
-    suggestions = get_distance_with_translations(segment_name)
 
     history = phrases[0].history.all()
     auth = request.user.is_authenticated

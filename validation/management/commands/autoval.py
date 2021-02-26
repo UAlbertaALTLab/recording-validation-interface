@@ -40,12 +40,13 @@ class Command(BaseCommand):
         phrases = Phrase.objects.all()
         for phrase in tqdm(phrases):
             if not phrase.validated:
-                segment_name = phrase.transcription
+                segment_name = phrase.field_transcription
                 suggestions = get_distance_with_translations(segment_name)
                 _match = perfect_match(segment_name, suggestions)
 
                 # only save the analysis if there is exactly one
                 if exactly_one_analysis(_match):
+                    phrase.transcription = _match["transcription"]
                     phrase.analysis = _match["matches"][0]["analysis"]
                     phrase.validated = True
                     phrase.save()

@@ -206,6 +206,7 @@ def get_distance_with_translations(word):
         matches = get_translations(results)
 
         suggestions[word] = {
+            "transcription": word,
             "med": suggestions[word],
             "matches": matches,
             "len": len(matches) if len(matches) == 1 else len(matches) + 1,

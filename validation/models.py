@@ -74,11 +74,18 @@ class Phrase(models.Model):
         (NEW_WORD, "New word"),
     )
 
-    transcription = models.CharField(
-        help_text="The transciption of the Cree phrase.",
+    field_transcription = models.CharField(
+        help_text="The field transciption of the Cree phrase.",
         blank=False,
         max_length=MAX_TRANSCRIPTION_LENGTH,
     )
+
+    transcription = models.CharField(
+        help_text="The validated transciption of the Cree phrase.",
+        blank=False,
+        max_length=MAX_TRANSCRIPTION_LENGTH,
+    )
+
     translation = models.CharField(
         help_text="The English translation of the phrase.", blank=False, max_length=256
     )
@@ -151,16 +158,18 @@ class Phrase(models.Model):
         """
         Cleans the text fields.
         """
-        self.transcription = normalize_sro(self.transcription)
-        assert self.ALLOWED_TRANSCRIPTION_CHARACTERS.issuperset(self.transcription)
+        self.field_transcription = normalize_sro(self.field_transcription)
+        assert self.ALLOWED_TRANSCRIPTION_CHARACTERS.issuperset(
+            self.field_transcription
+        )
 
     def save(self, *args, **kwargs):
         # Make sure the fuzzy match is always up to date
-        self.fuzzy_transcription = to_indexable_form(self.transcription)
+        self.fuzzy_transcription = to_indexable_form(self.field_transcription)
         super().save(*args, **kwargs)
 
     def __str__(self) -> str:
-        return self.transcription
+        return self.field_transcription
 
 
 class Speaker(models.Model):

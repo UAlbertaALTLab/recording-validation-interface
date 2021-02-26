@@ -158,11 +158,11 @@ def test_phrase():
     Test that we can create a phrase instance.
     """
     phrase = baker.prepare(Phrase)
-    assert isinstance(phrase.transcription, str)
+    assert isinstance(phrase.field_transcription, str)
     assert isinstance(phrase.translation, str)
     assert phrase.kind in (Phrase.WORD, Phrase.SENTENCE)
     assert isinstance(phrase.validated, bool)
-    assert phrase.transcription in str(phrase)
+    assert phrase.field_transcription in str(phrase)
     assert phrase.origin in (None, Phrase.MASKWACÎS_DICTIONARY, Phrase.NEW_WORD)
 
 
@@ -184,13 +184,13 @@ def test_phrase_transcription_normalization(dirty_transcription):
     """
     phrase = Recipe(Phrase, transcription=dirty_transcription).prepare()
     phrase.clean()
-    assert phrase.transcription == nfc(phrase.transcription)
+    assert phrase.field_transcription == nfc(phrase.field_transcription)
     # Should not have any leading spaces
-    assert not phrase.transcription.startswith(" ")
+    assert not phrase.field_transcription.startswith(" ")
     # Should not have any trailing spaces
-    assert not phrase.transcription.endswith(" ")
+    assert not phrase.field_transcription.endswith(" ")
     # SRO is ALWAYS lowercase!
-    assert phrase.transcription.lower() == phrase.transcription
+    assert phrase.field_transcription.lower() == phrase.field_transcription
 
     vowels_with_macrons = {
         "\N{LATIN SMALL LETTER E WITH MACRON}",
@@ -200,7 +200,7 @@ def test_phrase_transcription_normalization(dirty_transcription):
     }
 
     # Ensure macrons are nowhere to be found in the transcription.
-    assert vowels_with_macrons.isdisjoint(phrase.transcription)
+    assert vowels_with_macrons.isdisjoint(phrase.field_transcription)
 
 
 @pytest.mark.parametrize(
@@ -217,7 +217,7 @@ def test_phrase_transcription_normalization_hyphenation(dirty_transcription, exp
     """
     phrase = Recipe(Phrase, transcription=dirty_transcription).prepare()
     phrase.clean()
-    assert phrase.transcription == expected
+    assert phrase.field_transcription == expected
 
 
 def test_phrase_transcription_normalize_ê():
@@ -226,7 +226,7 @@ def test_phrase_transcription_normalize_ê():
     """
     phrase = Recipe(Phrase, transcription="e-cacâstapiwet").prepare()
     phrase.clean()
-    assert phrase.transcription == "ê-cacâstapiwêt"
+    assert phrase.field_transcription == "ê-cacâstapiwêt"
 
 
 @pytest.mark.django_db
@@ -247,19 +247,19 @@ def test_phrase_has_history():
     # Fetch it and change it, to create a new historical version of it.
     # and fuggettaboutit.
     phrase = Phrase.objects.get(id=phrase_id)
-    phrase.transcription = changed
+    phrase.field_transcription = changed
     phrase.clean()
     phrase.save()
     del phrase
 
     # Time has passed, let's make sure all the historical changes are there:
     phrase = Phrase.objects.get(id=phrase_id)
-    assert phrase.transcription != original
-    assert phrase.transcription == changed
+    assert phrase.field_transcription != original
+    assert phrase.field_transcription == changed
 
     # Now, let's check the history!
     assert len(phrase.history.all()) == 2
-    assert phrase.history.earliest().transcription == original
+    assert phrase.history.earliest().field_transcription == original
 
 
 @pytest.mark.django_db
