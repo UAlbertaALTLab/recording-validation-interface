@@ -67,6 +67,13 @@ class Phrase(models.Model):
     SENTENCE = "sentence"
     KIND_CHOICES = ((WORD, "Word"), (SENTENCE, "Sentence"))
 
+    # Status values
+    NEW = "new"
+    AUTO = "auto-standardized"
+    STANDARDIZED = "standardized"
+    LINKED = "linked"
+    VALIDATED = "validated"
+
     MASKWACÎS_DICTIONARY = "MD"
     NEW_WORD = "new"
     ORIGIN_CHOICES = (
