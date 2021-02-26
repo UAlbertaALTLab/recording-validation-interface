@@ -49,7 +49,7 @@ def index(request):
     all_class = "button-success button-filter"
     validated_class = "button-success button-filter"
     unvalidated_class = "button-success button-filter"
-    mode = query = request.GET.get("mode")
+    mode = request.GET.get("mode")
     if mode == "all":
         all_phrases = Phrase.objects.all()
         all_class = "button-success button-filter button-filter-active"
@@ -85,7 +85,7 @@ def search_phrases(request):
     cree_matches = Phrase.objects.filter(transcription__contains=query)
     english_matches = Phrase.objects.filter(translation__contains=query)
     all_matches = list(set().union(cree_matches, english_matches))
-    all_matches.sort(key=lambda phrase: phrase.field_transcription)
+    all_matches.sort(key=lambda phrase: phrase.transcription)
     paginator = Paginator(all_matches, 30)
     page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)
@@ -131,11 +131,17 @@ def advanced_search_results(request):
         english_matches = []
 
     # TODO: filter by analysis
+    if analysis != "":
+        analysis_matches = Phrase.objects.filter(analysis__contains=analysis)
+    else:
+        analysis_matches = []
 
-    if transcription == "" and translation == "":
+    if transcription == "" and translation == "" and analysis == "":
         phrase_matches = Phrase.objects.all()
     else:
-        phrase_matches = list(set().union(cree_matches, english_matches))
+        phrase_matches = list(
+            set().union(cree_matches, english_matches, analysis_matches)
+        )
 
     if status != "all":
         if status == "validated":
@@ -157,7 +163,7 @@ def advanced_search_results(request):
                 if recording.speaker.code in speakers:
                     all_matches.append(phrase)
 
-    all_matches.sort(key=lambda phrase: phrase.field_transcription)
+    all_matches.sort(key=lambda phrase: phrase.transcription)
 
     paginator = Paginator(all_matches, 30)
     page_no = request.GET.get("page", 1)
