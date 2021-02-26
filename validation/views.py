@@ -295,17 +295,6 @@ def segment_content_view(request, segment_id):
     segment_name = phrases[0].transcription
     suggestions = get_distance_with_translations(segment_name)
 
-    # check for auto-validation if phrase has not yet been validated
-    phrase = phrases[0]
-    if not phrase.validated:
-        _match = perfect_match(segment_name, suggestions)
-
-        # only save the analysis if there is exactly one
-        if exactly_one_analysis(_match):
-            phrase.analysis = _match["matches"][0]["analysis"]
-            phrase.validated = True
-            phrase.save()
-
     history = phrases[0].history.all()
     auth = request.user.is_authenticated
 
