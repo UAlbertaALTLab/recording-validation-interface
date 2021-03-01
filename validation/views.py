@@ -86,10 +86,13 @@ def search_phrases(request):
     english_matches = Phrase.objects.filter(translation__contains=query)
     all_matches = list(set().union(cree_matches, english_matches))
     all_matches.sort(key=lambda phrase: phrase.transcription)
-    paginator = Paginator(all_matches, 30)
+
+    query_term = f"&query={query}"
+
+    paginator = Paginator(all_matches, 5)
     page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)
-    context = dict(phrases=phrases, search_term=query)
+    context = dict(phrases=phrases, search_term=query, query=query_term)
     return render(request, "validation/search.html", context)
 
 
@@ -159,10 +162,16 @@ def advanced_search_results(request):
 
     all_matches.sort(key=lambda phrase: phrase.transcription)
 
-    paginator = Paginator(all_matches, 30)
+    query = f"&transcription={transcription}&translation={translation}&analysis={analysis}&status={status}"
+    for speaker in speakers:
+        query += f"&speaker-options={speaker}"
+
+    query += "&speaker="
+
+    paginator = Paginator(all_matches, 5)
     page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)
-    context = dict(phrases=phrases, search_term="advanced search")
+    context = dict(phrases=phrases, search_term="advanced search", query=query)
     return render(request, "validation/search.html", context)
 
 
