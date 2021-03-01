@@ -29,6 +29,7 @@ from django.http import (
     HttpResponseBadRequest,
     JsonResponse,
     HttpResponseRedirect,
+    QueryDict,
 )
 from django.urls import reverse
 from django.contrib.auth.models import User
@@ -87,12 +88,17 @@ def search_phrases(request):
     all_matches = list(set().union(cree_matches, english_matches))
     all_matches.sort(key=lambda phrase: phrase.transcription)
 
-    query_term = f"&query={query}"
+    query_term = QueryDict(f"query={query}", mutable=True)
 
     paginator = Paginator(all_matches, 5)
     page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)
-    context = dict(phrases=phrases, search_term=query, query=query_term)
+    context = dict(
+        phrases=phrases,
+        search_term=query,
+        query=query_term,
+        encode_query_with_page=encode_query_with_page,
+    )
     return render(request, "validation/search.html", context)
 
 
@@ -162,16 +168,23 @@ def advanced_search_results(request):
 
     all_matches.sort(key=lambda phrase: phrase.transcription)
 
-    query = f"&transcription={transcription}&translation={translation}&analysis={analysis}&status={status}"
+    query = f"transcription={transcription}&translation={translation}&analysis={analysis}&status={status}"
     for speaker in speakers:
         query += f"&speaker-options={speaker}"
 
     query += "&speaker="
 
+    query = QueryDict(query, mutable=True)
+
     paginator = Paginator(all_matches, 5)
     page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)
-    context = dict(phrases=phrases, search_term="advanced search", query=query)
+    context = dict(
+        phrases=phrases,
+        search_term="advanced search",
+        query=query,
+        encode_query_with_page=encode_query_with_page,
+    )
     return render(request, "validation/search.html", context)
 
 
@@ -349,3 +362,8 @@ def register(request):
 
 
 # TODO: Speaker bio page like https://ojibwe.lib.umn.edu/about/voices
+
+
+def encode_query_with_page(query, page):
+    query["page"] = page
+    return query.urlencode()

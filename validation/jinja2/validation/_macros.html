@@ -56,13 +56,13 @@
  #
  # Adapted from: https://docs.djangoproject.com/en/2.1/topics/pagination/
  #}
-{% macro pagination_with_query(page, endpoint, query) %}
+{% macro pagination_with_query(page, endpoint, query, encode_query_with_page) %}
 <ul class="nav justify-content-center">
   {% if page.has_previous() %}
-  <li class="nav-item"><a class="link-nav" href="?page=1{{ query }}">
+  <li class="nav-item"><a class="link-nav" href={{ encode_query_with_page(query, page=1) }}>
       First
   </a></li>
-  <li class="nav-item"><a class="link-nav" href="?page={{ page.previous_page_number() }}{{ query }}">
+  <li class="nav-item"><a class="link-nav" href={{ encode_query_with_page(query, page=page.previous_page_number()) }}>
       Previous
   </a></li>
   {% endif %}
@@ -72,10 +72,10 @@
   </a></li>
 
   {% if page.has_next() %}
-  <li class="nav-item"><a class="link-nav" href="?page={{ page.next_page_number() }}{{ query }}">
+  <li class="nav-item"><a class="link-nav" href={{ encode_query_with_page(query, page=page.next_page_number()) }}>
       Next
   </a></li>
-  <li class="nav-item"><a class="link-nav" href="?page={{ page.paginator.num_pages }}{{ query }}">
+  <li class="nav-item"><a class="link-nav" href={{ encode_query_with_page(query, page=page.paginator.num_pages) }}>
       Last
   </a></li>
   {% endif %}
