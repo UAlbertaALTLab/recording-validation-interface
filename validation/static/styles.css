@@ -241,3 +241,32 @@ li.speaker_code {
   margin-bottom: 0;
   margin-left: -2rem;
 }
+
+.segment-card {
+  margin: 1rem;
+}
+
+.card-body > table {
+  width: 100%;
+  margin: 0.5rem 0;
+}
+
+.right {
+  float: right;
+}
+
+.card-header-green {
+  border-radius: calc(.25rem - 1px) calc(.25rem - 1px) 0 0;
+  background-color: var(--custom-green);
+  padding: .75rem 1.25rem;
+  margin-bottom: 0;
+  border-bottom: 1px solid rgba(0,0,0,.125);
+}
+
+.card-header-red {
+  border-radius: calc(.25rem - 1px) calc(.25rem - 1px) 0 0;
+  background-color: var(--custom-orange);
+  padding: .75rem 1.25rem;
+  margin-bottom: 0;
+  border-bottom: 1px solid rgba(0,0,0,.125);
+}

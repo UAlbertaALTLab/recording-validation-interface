@@ -63,7 +63,7 @@ def index(request):
         all_phrases = Phrase.objects.all()
         all_class = "button-success button-filter button-filter-active"
 
-    paginator = Paginator(all_phrases, 30)
+    paginator = Paginator(all_phrases, 5)
     page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)
     auth = request.user.is_authenticated
