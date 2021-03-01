@@ -38,7 +38,7 @@ from librecval.normalization import to_indexable_form
 
 from .crude_views import *
 from .models import Phrase, Recording, Speaker
-from .helpers import get_distance_with_translations
+from .helpers import get_distance_with_translations, validate_phrase
 from .forms import EditSegment, Login, Register
 
 
@@ -73,6 +73,7 @@ def index(request):
         validated_class=validated_class,
         unvalidated_class=unvalidated_class,
         auth=auth,
+        validate_phrase=validate_phrase,
     )
     return render(request, "validation/list_phrases.html", context)
 

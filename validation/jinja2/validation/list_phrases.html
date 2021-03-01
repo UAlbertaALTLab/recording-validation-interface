@@ -51,9 +51,13 @@
       <div class="card-body">
         <h3>{{ phrase.transcription }}</h3>
         <h5>Translation: {{ phrase.translation }}</h5>
+        <p>Is this translation accurate?
+            <button class="button-success" onclick="{{ validate_phrase }}">Yes</button>
+            <button class="button-fail">No</button></p>
         <table>
             <th>Recording</th>
             <th>Speaker</th>
+            <th>This recording is...</th>
 
             {% for recording in phrase.recordings %}
                 <tr>
@@ -64,6 +68,9 @@
               </td>
                 <td>
                     {{ macros.speaker(recording) }}
+                </td>
+                <td>
+                <button class="button-success">Good</button> <button class="button-fail">Bad</button>
                 </td>
                 </tr>
 
