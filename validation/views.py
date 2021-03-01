@@ -366,4 +366,4 @@ def register(request):
 
 def encode_query_with_page(query, page):
     query["page"] = page
-    return query.urlencode()
+    return f"?{query.urlencode()}" if query else ""
