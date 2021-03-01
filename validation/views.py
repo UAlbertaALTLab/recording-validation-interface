@@ -88,7 +88,8 @@ def search_phrases(request):
     all_matches = list(set().union(cree_matches, english_matches))
     all_matches.sort(key=lambda phrase: phrase.transcription)
 
-    query_term = QueryDict(f"query={query}", mutable=True)
+    query_term = QueryDict("", mutable=True)
+    query_term.update({"query": query})
 
     paginator = Paginator(all_matches, 5)
     page_no = request.GET.get("page", 1)
@@ -168,13 +169,17 @@ def advanced_search_results(request):
 
     all_matches.sort(key=lambda phrase: phrase.transcription)
 
-    query = f"transcription={transcription}&translation={translation}&analysis={analysis}&status={status}"
+    query = QueryDict("", mutable=True)
+    query.update(
+        {
+            "transcription": transcription,
+            "translation": translation,
+            "analysis": analysis,
+            "status": status,
+        }
+    )
     for speaker in speakers:
-        query += f"&speaker-options={speaker}"
-
-    query += "&speaker="
-
-    query = QueryDict(query, mutable=True)
+        query.appendlist("speaker-options", speaker)
 
     paginator = Paginator(all_matches, 5)
     page_no = request.GET.get("page", 1)
