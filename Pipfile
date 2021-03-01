@@ -7,7 +7,6 @@ name = "pypi"
 TextGrid = "*"
 django-simple-history = "*"
 docopt = "*"
-e1839a8 = {path = ".",editable = true}
 jinja2 = "*"
 logme = "*"
 pydub = "*"
@@ -15,9 +14,12 @@ python-decouple = "*"
 sh = "*"
 django = ">=2.2,<3"
 typing-extensions = "*"
+pympi-ling = "*"
+requests = "*"
+uwsgi = "*"
+divvunspell-python = {ref = "3aa656d36a2fa1ede90e53c320b2095c05cf7c05", git = "https://github.com/divvun/divvunspell-sdk-python"}
 
 [dev-packages]
-black = "*"
 gunicorn = "*"
 hypothesis = "*"
 isort = ">=5,<6"
@@ -30,6 +32,3 @@ django-extensions = "*"
 
 [requires]
 python_version = "3.7"
-
-[pipenv]
-allow_prereleases = true

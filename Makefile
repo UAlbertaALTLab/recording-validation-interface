@@ -32,3 +32,4 @@ migrate:
 
 reformat:
 	black librecval tests validation recvalsite
+

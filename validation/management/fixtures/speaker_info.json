@@ -1,0 +1,106 @@
+[
+  {
+    "model": "validation.speaker",
+    "fields": {
+      "code": "GOR",
+      "full_name": "kîsikâw",
+      "gender": "M"
+    }
+  },
+  {
+    "model": "validation.speaker",
+    "fields": {
+      "code": "LOU",
+      "full_name": "Louise Wildcat",
+      "gender": "F"
+    }
+  },
+  {
+    "model": "validation.speaker",
+    "fields": {
+      "code": "MAL",
+      "full_name": "Malorie",
+      "gender": "F"
+    }
+  },
+  {
+    "model": "validation.speaker",
+    "fields": {
+      "code": "ROS2",
+      "full_name": "Rosie Rowan",
+      "gender": "F"
+    }
+  },
+  {
+    "model": "validation.speaker",
+    "fields": {
+      "code": "MAR2",
+      "full_name": "Mariam",
+      "gender": "F"
+    }
+  },
+  {
+    "model": "validation.speaker",
+    "fields": {
+      "code": "ROS",
+      "full_name": "Rose Makinaw",
+      "gender": "F"
+    }
+  },
+  {
+    "model": "validation.speaker",
+    "fields": {
+      "code": "ANN",
+      "full_name": "Annette Lee",
+      "gender": "F"
+    }
+  },
+  {
+    "model": "validation.speaker",
+    "fields": {
+      "code": "HAR",
+      "full_name": "Harley Simon",
+      "gender": "M"
+    }
+  },
+  {
+    "model": "validation.speaker",
+    "fields": {
+      "code": "IVY",
+      "full_name": "Ivy Raine",
+      "gender": "F"
+    }
+  },
+  {
+    "model": "validation.speaker",
+    "fields": {
+      "code": "LIN",
+      "full_name": "Linda Oldpan",
+      "gender": "F"
+    }
+  },
+  {
+    "model": "validation.speaker",
+    "fields": {
+      "code": "JER",
+      "full_name": "Jerry Roasting",
+      "gender": "M"
+    }
+  },
+  {
+    "model": "validation.speaker",
+    "fields": {
+      "code": "MAR",
+      "full_name": "Mary Jane Littlechild",
+      "gender": "F"
+    }
+  },
+  {
+    "model": "validation.speaker",
+    "fields": {
+      "code": "BET",
+      "full_name": "Betty Simon",
+      "gender": "F"
+    }
+  }
+]

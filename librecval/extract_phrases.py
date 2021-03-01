@@ -28,12 +28,14 @@ from hashlib import sha256
 from os import fspath
 from pathlib import Path
 from typing import Dict, NamedTuple, Optional
+from typing_extensions import Literal
 
 import logme  # type: ignore
 from librecval.normalization import normalize
 from librecval.recording_session import SessionID, SessionMetadata
 from pydub import AudioSegment  # type: ignore
-from textgrid import IntervalTier, TextGrid  # type: ignore
+from pympi.Elan import Eaf  # type: ignore
+
 
 # ############################### Exceptions ############################### #
 
@@ -50,42 +52,63 @@ class MissingMetadataError(RuntimeError):
     """
 
 
-class InvalidTextGridName(RuntimeError):
+class InvalidFileName(RuntimeError):
     """
-    Raised when the TextGrid name does not follow an appropriate pattern.
+    Raised when the ELAN name does not follow an appropriate pattern.
     """
+
+
+class MissingTranslationError(RuntimeError):
+    """
+    Raised when the 'English (word)' and 'English (sentence)' tiers
+    can not be found in a .eaf file suggesting that the word or phrase
+    does not have an existing translation
+    """
+
+    # TODO: this is a weird assumption to make. So far it hasn't been an issue though?
 
 
 # ########################################################################## #
 
+WordOrSentence = Literal["word", "sentence"]
 
-class RecordingInfo(NamedTuple):
+
+class Segment(NamedTuple):
     """
-    All the information you could possible want to know about a recorded
-    snippet.
+    Stores an audio segment extracted from a .eaf file
     """
 
-    session: SessionID
+    english_translation: str
+    cree_transcription: str
+    type: WordOrSentence
+    start: int
+    stop: int
+    comment: str
     speaker: str
-    type: str
-    timestamp: int  # in milliseconds
-    transcription: str
-    translation: str
+    quality: str  # one of: good, bad, unknown
+    session: SessionID
+    audio: AudioSegment
 
     def signature(self) -> str:
         # TODO: make this resilient to changing type, transcription, and speaker.
         return (
             f"session: {self.session}\n"
             f"speaker: {self.speaker}\n"
-            f"timestamp: {self.timestamp}\n"
-            f"{self.type}: {self.transcription}\n"
+            f"timestamp: {self.start}\n"
+            f"{self.type}: {self.cree_transcription}\n"
             "\n"
-            f"{self.translation}\n"
+            f"{self.english_translation}\n"
         )
 
     def compute_sha256hash(self) -> str:
         """
         Compute a hash that can be used as a ID for this recording.
+        We use the hash instead of including the word in the id for these reasons:
+        - we want people to validate the spelling of the word, so
+        the word itself might change, making the name meaningless
+        - Sapir's filesystem and backups don't like diacritics very much
+        - we get URL issues trying to load the audio if we use the name
+        - other reasons, and good ones, too
         """
         return sha256(self.signature().encode("UTF-8")).hexdigest()
 
@@ -106,9 +129,10 @@ class RecordingExtractor:
         """
         Scans the directory provided for sessions.
 
-        For each session directory found, its TextGrid/.wav file pairs are
+        For each session directory found, its ELAN/.eaf file pairs are
         scanned for words and sentences.
         """
+
         self.logger.debug("Scanning %s for sessions...", root_directory)
         for session_dir in root_directory.iterdir():
             if not session_dir.resolve().is_dir():
@@ -134,49 +158,305 @@ class RecordingExtractor:
         if session_id not in self.metadata:
             raise MissingMetadataError(f"Missing metadata for {session_id}")
 
-        self.logger.debug("Scanning %s for .TextGrid files", session_dir)
-        text_grids = list(session_dir.glob("*.TextGrid"))
-        self.logger.info("%d text grids in %s", len(text_grids), session_dir)
+        self.logger.debug("Scanning %s for .eaf files", session_dir)
+        annotations = list(session_dir.glob("*.eaf"))
+        self.logger.info("%d ELAN files in %s", len(annotations), session_dir)
 
-        for text_grid in text_grids:
-            # Find the cooresponding audio with a couple different strategies.
-            sound_file = find_audio_from_audacity_format(
-                text_grid
-            ) or find_audio_from_audition_format(text_grid)
+        for _path in annotations:
+            # Find the corresponding audio with a couple different strategies.
+            sound_file = (
+                find_audio_from_audacity_format(_path)
+                or find_audio_from_audition_format(_path)
+                or find_audio_oddities(_path)
+            )
 
             if sound_file is None:
-                self.logger.warn("Could not find cooresponding audio for %s", text_grid)
+                self.logger.warning("Could not find corresponding audio for %s", _path)
                 continue
 
-            assert text_grid.exists() and sound_file.exists()
-            self.logger.debug("Matching sound file for %s", text_grid)
+            assert _path.exists() and sound_file.exists()
+            self.logger.debug("Matching sound file for %s", _path)
 
             try:
-                mic_id = get_mic_id(text_grid.stem)
-            except InvalidTextGridName:
-                if len(text_grids) != 1:
+                mic_id = get_mic_id(_path.stem)
+            except InvalidFileName:
+                if len(annotations) != 1:
                     raise  # There's no way to determine the speaker.
                 mic_id = 1
-                self.logger.warn("Assuming single text grid is mic 1")
+                self.logger.warning("Assuming single ELAN file is mic 1")
 
             speaker = self.metadata[session_id][mic_id]
 
             self.logger.debug(
-                "Opening audio and text grid from %s for speaker %s",
+                "Opening audio and .eaf from %s for speaker %s",
                 sound_file,
                 speaker,
             )
-            extractor = PhraseExtractor(
-                session_id,
-                AudioSegment.from_file(fspath(sound_file)),
-                TextGrid.fromFile(fspath(text_grid)),
-                speaker,
-            )
-            yield from extractor.extract_all()
+
+            audio = AudioSegment.from_file(fspath(sound_file))
+            yield from generate_segments_from_eaf(_path, audio, speaker, session_id)
+
+
+def generate_segments_from_eaf(
+    annotation_path: Path, audio: AudioSegment, speaker: str, session_id: SessionID
+):
+
+    """
+    Yields segements from the annotation file
+    """
+
+    # open the EAF
+    eaf_file = Eaf(annotation_path)
+
+    keys = eaf_file.get_tier_names()
+
+    # get tiers from keys
+    english_word_tier, cree_word_tier = get_word_tiers(keys)
+    english_phrase_tier, cree_phrase_tier = get_phrase_tiers(keys)
+
+    comment_tier = "Comments" if "Comments" in keys else None
+
+    if not english_word_tier and english_phrase_tier:
+        # Assuming each entry needs to have a translation before continuining
+        # Again, this is a weird assumption to make
+        raise MissingTranslationError(
+            f"No English word or phrase found for data at {annotation_path}"
+        )
+
+    # Extract data for Cree words
+    cree_words = eaf_file.get_annotation_data_for_tier(cree_word_tier)
+    for cree_word in cree_words:
+        s, sound_bite = extract_data(
+            eaf_file,
+            "word",
+            cree_word,
+            audio,
+            speaker,
+            session_id,
+            english_word_tier,
+            comment_tier,
+        )
+
+        yield s, sound_bite
+
+    # Extract data for Cree phrases
+    cree_phrases = (
+        eaf_file.get_annotation_data_for_tier(cree_phrase_tier)
+        if cree_phrase_tier
+        else []
+    )
+    for cree_phrase in cree_phrases:
+        s, sound_bite = extract_data(
+            eaf_file,
+            "sentence",
+            cree_phrase,
+            audio,
+            speaker,
+            session_id,
+            english_phrase_tier,
+            comment_tier,
+        )
+        yield s, sound_bite
+
+
+def get_word_tiers(keys):
+
+    english_word_tier = "English (word)" if "English (word)" in keys else None
+    cree_word_tier = "Cree (word)" if "Cree (word)" in keys else None
+
+    return english_word_tier, cree_word_tier
+
+
+def get_phrase_tiers(keys):
+
+    english_phrase_tier = "English (sentence)" if "English (sentence)" in keys else None
+    cree_phrase_tier = "Cree (sentence)" if "Cree (sentence)" in keys else None
+
+    return english_phrase_tier, cree_phrase_tier
+
+
+def extract_data(
+    _file,
+    _type: WordOrSentence,
+    snippet,
+    audio,
+    speaker,
+    session_id,
+    english_tier,
+    comment_tier,
+) -> tuple:
+    """
+    Extracts all relevant data from a .eaf file, where "relevant data" is:
+    - translation
+    - transcription
+    - start time
+    - stop time
+    - comment
+    - quality
+    Returns a Segment and a sound bite
+    """
+
+    start = snippet[0]
+    stop = snippet[1]
+    transcription = snippet[2]
+
+    translation = _file.get_annotation_data_at_time(english_tier, start + 1)
+    translation = (
+        translation[0][2] if len(translation) > 0 and len(translation[0]) == 3 else ""
+    )
+
+    comment = _file.get_annotation_data_at_time(comment_tier, start + 1) or ""
+    comment = comment[0][2] if len(comment) > 0 and len(comment[0]) == 3 else ""
+
+    quality = "unknown"
+    if "good" in comment.lower() or "best" in comment.lower():
+        quality = "good"
+    elif "bad" in comment.lower():
+        quality = "bad"
+
+    sound_bite = audio[start:stop]
+
+    # normalize
+    transcription = normalize(transcription)
+    translation = normalize(translation)
+    sound_bite = sound_bite.normalize(headroom=0.1)
+
+    s = Segment(
+        english_translation=translation,
+        cree_transcription=transcription,
+        type=_type,
+        start=start,
+        stop=stop,
+        comment=comment,
+        speaker=speaker,
+        quality=quality,
+        session=session_id,
+        audio=sound_bite,
+    )
+
+    return s, sound_bite
 
 
 @logme.log
-def find_audio_from_audacity_format(annotation_path: Path, logger=None) -> Optional[Path]:
+def find_audio_oddities(annotation_path: Path, logger=None) -> Optional[Path]:
+    """
+    Finds the associated audio in Audacity's format.
+    """
+
+    # Get folder name without expected track name
+    _path = annotation_path.parent
+    sound_file = None
+
+    # the track number is between the last - and the last .
+    match = re.match(
+        r"""
+        .*-(
+            [^-]+ 
+            )
+            \.
+            [^-.]+
+        """,
+        str(annotation_path),
+        re.VERBOSE,
+    )
+    if match:
+        track = match.group(1)
+        track_1 = track.split("_")[0]
+
+        # try 1: the .wav file is in a subfolder, but it has 'Track number' in it
+        dirs = list(_path.glob(f"**/{track}*.wav"))
+        sound_file = Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
+
+    if not sound_file:
+        # try 2: the .wav file has no space between 'Track' and the number
+        track_2 = track_1.replace(" ", "")
+        dirs = list(_path.glob(f"**/{track_2}*.wav"))
+        sound_file = Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
+
+    if not sound_file:
+        # try 3: the .wav file does have a space between 'Track' and the number
+        # This try covers audio file names that DO NOT have the date in them
+        track_split = track.split("_")
+        n = 0
+        j = 0
+        for n in range(len(track_split)):
+            if "TRACK" in track_split[n].upper():
+                j = n
+            n += 1
+
+        track_3 = ""
+        while j < len(track_split):
+            track_3 = track_3 + str(track_split[j]) + "_"
+            j += 1
+
+        track_3 = track_3[:-1]
+        dirs = list(_path.glob(f"**/{track_3}*.wav"))
+        sound_file = Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
+        if not sound_file:
+            track_4 = track_3.replace("Track", "Track ")
+            dirs = list(_path.glob(f"**/{track_4}*.wav"))
+            sound_file = (
+                Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
+            )
+        if not sound_file:
+            track_5 = track_3.replace(" ", "")
+            track_5 = track_3.replace("Track_", "Track ")
+            dirs = list(_path.glob(f"**/{track_5}*.wav"))
+            sound_file = (
+                Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
+            )
+        if not sound_file:
+            track_6 = track_3.replace("track", "Track")
+            dirs = list(_path.glob(f"**/{track_6}*.wav"))
+            sound_file = (
+                Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
+            )
+        if not sound_file:
+            track_7 = track_3.replace("Track 0", "Track ")
+            dirs = list(_path.glob(f"**/{track_6}*.wav"))
+            sound_file = (
+                Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
+            )
+
+    if not sound_file:
+        # try 8: the .wav file has the same name as the .eaf file
+        # EXCEPT the .eaf file has the word 'Track_' in it
+        # This option DOES NOT have the word 'Track' in it
+        # and it DOES have the date in it
+        track_8 = str(annotation_path.stem)
+        track_8 = track_8.replace("Track_", "")
+        dirs = list(_path.glob(f"**/{track_8}*.wav"))
+        sound_file = Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
+        if not sound_file:
+            track_9 = track_8.replace("am", "")
+            track_9 = track_9.replace("pm", "")
+            track_9 = track_9.replace("AM", "")
+            track_9 = track_9.replace("PM", "")
+            dirs = list(_path.glob(f"**/{track_9}*.wav"))
+            sound_file = (
+                Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
+            )
+
+    if not sound_file:
+        # try 13: the .wav file is not in a subfolder, but also doesn't have the word "Track" in it
+        # BUT ALSO the .eaf file has am/pm in it and the .wav file does not
+        track_13 = str(annotation_path.stem)
+        track_13 = track_13.replace("am", "")
+        track_13 = track_13.replace("AM", "")
+        track_13 = track_13.replace("pm", "")
+        track_13 = track_13.replace("PM", "")
+
+        dirs = list(_path.glob(f"{track_13}*.wav"))
+        sound_file = Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
+
+    logger.debug("[Recorded Subfolder] Trying %s...", sound_file)
+    return sound_file
+
+
+@logme.log
+def find_audio_from_audacity_format(
+    annotation_path: Path, logger=None
+) -> Optional[Path]:
     """
     Finds the associated audio in Audacity's format.
     """
@@ -187,7 +467,9 @@ def find_audio_from_audacity_format(annotation_path: Path, logger=None) -> Optio
 
 
 @logme.log
-def find_audio_from_audition_format(annotation_path: Path, logger=None) -> Optional[Path]:
+def find_audio_from_audition_format(
+    annotation_path: Path, logger=None
+) -> Optional[Path]:
     #  Gross code to try Adobe Audition recorded files
     session_dir = annotation_path.parent
 
@@ -212,155 +494,25 @@ SENTENCE_TIER_ENGLISH = 2
 SENTENCE_TIER_CREE = 3
 
 
-@logme.log
-class PhraseExtractor:
-    """
-    Extracts recorings from a session directory.
-    """
-
-    logger: logging.Logger
-
-    def __init__(
-        self,
-        session: SessionID,
-        sound: AudioSegment,
-        text_grid: TextGrid,
-        speaker: str,  # Something like "ABC"
-    ) -> None:
-        self.session = session
-        self.sound = sound
-        self.text_grid = text_grid
-        self.speaker = speaker
-
-    def extract_all(self):
-        assert len(self.text_grid.tiers) >= 4, "TextGrid has too few tiers"
-
-        self.logger.debug("Extracting words from %s/%s", self.session, self.speaker)
-        yield from self.extract_words(
-            cree_tier=self.text_grid.tiers[WORD_TIER_CREE],
-            english_tier=self.text_grid.tiers[WORD_TIER_ENGLISH],
-        )
-
-        self.logger.debug("Extracting sentences from %s/%s", self.session, self.speaker)
-        yield from self.extract_sentences(
-            cree_tier=self.text_grid.tiers[SENTENCE_TIER_CREE],
-            english_tier=self.text_grid.tiers[SENTENCE_TIER_ENGLISH],
-        )
-
-    def extract_words(self, cree_tier, english_tier):
-        yield from self.extract_phrases("word", cree_tier, english_tier)
-
-    def extract_sentences(self, cree_tier, english_tier):
-        yield from self.extract_phrases("sentence", cree_tier, english_tier)
-
-    def extract_phrases(
-        self, type_: str, cree_tier: IntervalTier, english_tier: IntervalTier
-    ):
-        assert is_cree_tier(cree_tier), cree_tier.name
-        assert is_english_tier(english_tier), english_tier.name
-
-        for interval in cree_tier:
-            if not interval.mark or interval.mark.strip() == "":
-                # This interval is empty, for some reason.
-                continue
-
-            transcription = normalize(interval.mark)
-
-            start = to_milliseconds(interval.minTime)
-            end = to_milliseconds(interval.maxTime)
-            midtime = (interval.minTime + interval.maxTime) / 2
-
-            # Figure out if this word belongs to a sentence.
-            if type_ == "word" and self.timestamp_within_sentence(midtime):
-                # It's an example sentence; leave it for the next loop.
-                # TODO: WHY ARE WE SKIPPING IT AGAIN?
-                self.logger.debug("%r is in a sentence", transcription)
-                continue
-
-            # Get the word's English gloss.
-            english_interval = english_tier.intervalContaining(midtime)
-            if english_interval is None:
-                self.logger.warn("Could not find translation for %r", interval)
-                continue
-
-            translation = normalize(english_interval.mark)
-
-            # Snip out the sounds.
-            sound_bite = self.sound[start:end]
-            # tmills: normalize sound levels (some speakers are very quiet)
-            sound_bite = sound_bite.normalize(headroom=0.1)  # dB
-
-            yield self.info_for(type_, transcription, translation, start, sound_bite)
-
-    def info_for(
-        self,
-        type_: str,
-        transcription: str,
-        translation: str,
-        timestamp: int,
-        sound_bite: AudioSegment,
-    ):
-        """
-        Return a tuple of the phrase and its audio.
-        """
-        assert type_ in ("word", "sentence")
-        info = RecordingInfo(
-            session=self.session,
-            speaker=self.speaker,
-            type=type_,
-            timestamp=timestamp,
-            transcription=transcription,
-            translation=translation,
-        )
-        return info, sound_bite
-
-    def timestamp_within_sentence(self, timestamp: Decimal):
-        """
-        Return True when the timestamp is found inside a Cree sentence.
-        """
-        sentences = self.text_grid.tiers[SENTENCE_TIER_CREE]
-        sentence = sentences.intervalContaining(timestamp)
-        return sentence and sentence.mark != ""
-
-
-cree_pattern = re.compile(r"\b(?:cree|crk)\b", re.IGNORECASE)
-english_pattern = re.compile(r"\b(?:english|eng|en)\b", re.IGNORECASE)
-
-
-def is_english_tier(tier: IntervalTier) -> bool:
-    return bool(english_pattern.search(tier.name))
-
-
-def is_cree_tier(tier: IntervalTier) -> bool:
-    return bool(cree_pattern.search(tier.name))
-
-
-def to_milliseconds(seconds: Decimal) -> int:
-    """
-    Converts interval times to an integer in milliseconds.
-    """
-    return int(seconds * 1000)
-
-
 def get_mic_id(name: str) -> int:
     """
-    Return the microphone number from the filename of the wav file.
+    Return the microphone number from the filename of the ELAN file.
 
-    There are at lease five formats in which TextGrid files are named:
-    >>> get_mic_id('2_003.TextGrid')
+    There are at lease five formats in which ELAN files are named:
+    >>> get_mic_id('2_003.eaf')
     2
-    >>> get_mic_id('2015-05-11am-03.TextGrid')
+    >>> get_mic_id('2015-05-11am-03.eaf')
     3
-    >>> get_mic_id('2016-02-24am-Track 2_001.TextGrid')
+    >>> get_mic_id('2016-02-24am-Track 2_001.eaf')
     2
-    >>> get_mic_id('Track 4_001.TextGrid')
+    >>> get_mic_id('Track 4_001.eaf')
     4
 
     This one is the most annoying format:
     >>> get_mic_id('2015-03-19-Rain-03')
     3
     """
-    # Match something like '2016-02-24am-Track 2_001.TextGrid'
+    # Match something like '2016-02-24am-Track 2_001.eaf'
     m = re.match(
         r"""
         ^
@@ -380,7 +532,7 @@ def get_mic_id(name: str) -> int:
         (\d+)               # THE MIC NUMBER!
 
         _\d{3}
-        (?:[.]TextGrid)?$
+        (?:[.]eaf)?$
         """,
         name,
         re.VERBOSE,
@@ -396,11 +548,11 @@ def get_mic_id(name: str) -> int:
         )?
 
         (\d+)
-        (?:[.]TextGrid)?$
+        (?:[.]eaf)?$
         """,
         name,
         re.VERBOSE,
     )
     if not m:
-        raise InvalidTextGridName(name)
+        raise InvalidFileName(name)
     return int(m.group(1), 10)

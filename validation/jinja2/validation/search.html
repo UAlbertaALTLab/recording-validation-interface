@@ -33,19 +33,32 @@
         <th scope="col"> Transcription </th>
         <th scope="col"> Translation </th>
         <th scope="col"> Recordings </th>
+        <th scope="col"> Speaker </th>
       </tr>
     </thead>
     {% for phrase in phrases %}
     <tr>
-      {{ macros.td_transcription(user, phrase) }}
+      {{ macros.td_transcription_link(user, phrase) }}
       {{ macros.td_translation(user, phrase) }}
       <td>
         <ul class="recordings">
         {% for recording in phrase.recordings %}
           <li>
-            <audio controls preload=none>
-              <source src="{{ recording | audio_url }}" type="audio/aac" />
-            </audio>
+            <div class="rec-height">
+              {{ macros.player(recording) }}
+            </div>
+          </li>
+
+        {% endfor %}{# for recording in phrase.recordings #}
+        </ul>
+      </td>
+      <td>
+        <ul class="speaker">
+        {% for recording in phrase.recordings %}
+          <li>
+            <div class="rec-height">
+              {{ macros.speaker(recording) }}
+            </div>
           </li>
 
         {% endfor %}{# for recording in phrase.recordings #}
@@ -57,7 +70,7 @@
 </div>
 
 <nav>
-  {{ macros.pagination(phrases, 'validation:search_phrases') }}
+  {{ macros.pagination_with_query(phrases, 'validation:search_phrases', query, encode_query_with_page) }}
 </nav>
 {% endblock content %}
 

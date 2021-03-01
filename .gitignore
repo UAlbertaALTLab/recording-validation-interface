@@ -112,3 +112,6 @@ ENV/
 metadata.csv
 /data/
 db.sqlite3
+node_modules
+.DS_Store
+crk.zhfst

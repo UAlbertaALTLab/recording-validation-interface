@@ -22,31 +22,67 @@
  # Adapted from: https://docs.djangoproject.com/en/2.1/topics/pagination/
  #}
 {% macro pagination(page, endpoint) %}
-<ul class="nav nav-pills justify-content-center">
+<ul class="nav justify-content-center">
   {% if page.has_previous() %}
-  <li class="nav-item"><a class="nav-link" href="?page=1">
+  <li class="nav-item"><a class="link-nav" href="?page=1">
       First
   </a></li>
-  <li class="nav-item"><a class="nav-link" href="?page={{ page.previous_page_number() }}">
+  <li class="nav-item"><a class="link-nav" href="?page={{ page.previous_page_number() }}">
       Previous
   </a></li>
   {% endif %}
 
-  <li class="nav-item"><a class="nav-link active" href="#">
+  <li class="nav-item"><a class="nav-link active button-nav" href="#">
       Page {{ page.number }}
   </a></li>
 
   {% if page.has_next() %}
-  <li class="nav-item"><a class="nav-link" href="?page={{ page.next_page_number() }}">
+  <li class="nav-item"><a class="link-nav" href="?page={{ page.next_page_number() }}">
       Next
   </a></li>
-  <li class="nav-item"><a class="nav-link" href="?page={{ page.paginator.num_pages }}">
+  <li class="nav-item"><a class="link-nav" href="?page={{ page.paginator.num_pages }}">
       Last
   </a></li>
   {% endif %}
 
 </ul>
 {% endmacro %}
+
+
+{#
+ # pagination_with_query() -- renders navigation links for a pagination object.
+ #  e.g,. {1} [2] [3] ... [100]
+ # links need query terms in the search pages
+ #
+ # Adapted from: https://docs.djangoproject.com/en/2.1/topics/pagination/
+ #}
+{% macro pagination_with_query(page, endpoint, query, encode_query_with_page) %}
+<ul class="nav justify-content-center">
+  {% if page.has_previous() %}
+  <li class="nav-item"><a class="link-nav" href={{ encode_query_with_page(query, page=1) }}>
+      First
+  </a></li>
+  <li class="nav-item"><a class="link-nav" href={{ encode_query_with_page(query, page=page.previous_page_number()) }}>
+      Previous
+  </a></li>
+  {% endif %}
+
+  <li class="nav-item"><a class="nav-link active button-nav" href="#">
+      Page {{ page.number }}
+  </a></li>
+
+  {% if page.has_next() %}
+  <li class="nav-item"><a class="link-nav" href={{ encode_query_with_page(query, page=page.next_page_number()) }}>
+      Next
+  </a></li>
+  <li class="nav-item"><a class="link-nav" href={{ encode_query_with_page(query, page=page.paginator.num_pages) }}>
+      Last
+  </a></li>
+  {% endif %}
+
+</ul>
+{% endmacro %}
+
 
 {#
  # An audio player for a recording.
@@ -59,20 +95,78 @@
 
 {#
  # Expands to a <td> that displays the Cree transcription.
+  # Creates link from phrase to view more details 
  #}
-{% macro td_transcription(user, phrase) %}
+{% macro td_transcription_link(user, phrase) %}
 <td lang="crk">
-  {{ phrase.transcription }}
+  <a name="word-link" id="{{ phrase.transcription }}" href="{{ url('validation:segment_detail', phrase.id) }} ">
+    {{ phrase.transcription }}
+  </a>
 </td>
 {% endmacro %}
+
+{#
+  # Expands to a <td> that displays the Cree transcription.
+  #}
+ {% macro td_transcription(user, phrase) %}
+ <td data-cy="segment-transcription" lang="crk">
+     {{ phrase.transcription }}
+ </td>
+ {% endmacro %}
 
 {#
  # Expands to a <td> that displays the English translation.
  #}
 {% macro td_translation(user, phrase) %}
-<td lang="en">
+<td data-cy="segment-translation" lang="en" id="{{ phrase }}-translation" class="restrict-content">
   {{ phrase.translation }}
 </td>
 {% endmacro %}
+
+{#
+  # Expands to a <td> that displays the Cree suggestion from itwêwina.
+  #}
+ {% macro td_suggestion_transcription(user, suggestion, suggestions) %}
+ <td data-cy="suggestion-transcription" lang="crk" rowspan="{{ suggestions[suggestion]['len'] }}">
+   {{ suggestion }}
+ </td>
+ {% endmacro %}
+
+{#
+  # Expands to a <td> that displays the English translation
+    # of the Cree suggestion from itwêwina.
+  #}
+ {% macro td_suggestion_translation(user, suggestion, suggestions) %}
+ <td data-cy="suggestion-translation" lang="en">
+   {{ suggestions[suggestion]['matches'][0]['translations'] or 'No translation available' }}
+ </td>
+ {% endmacro %}
+
+ {#
+  # Expands to a <td> that displays the linguistic analysis
+    # of the Cree suggestion from itwêwina.
+  #}
+ {% macro td_suggestion_analysis(user, suggestion, suggestions) %}
+ <td data-cy="suggestion-analysis" lang="en">
+   {{ suggestions[suggestion]['matches'][0]['analysis'] }}
+ </td>
+ {% endmacro %}
+
+ {#
+  # Expands to a <td> that displays the English translation
+    # of the Cree suggestion from itwêwina.
+  #}
+ {% macro td_suggestion_med(user, suggestion, suggestions) %}
+ <td lang="en" rowspan="{{ suggestions[suggestion]['len'] }}">
+   {{ suggestions[suggestion]['med'] }}
+ </td>
+ {% endmacro %}
+
+{#
+  # Returns the recording speaker
+  #}
+ {% macro speaker(recording) %}
+   {{ recording.speaker }}
+ {% endmacro %}
 
 {# vim: set ft=htmldjango :#}

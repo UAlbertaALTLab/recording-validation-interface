@@ -4,38 +4,19 @@
   {% block head %}
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="icon" type="image/png" href="/static/images/little-m.png">
+  <link rel="stylesheet" href="/static/styles.css" type="text/css">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
   <title>{% block title %} Maskwacîs Recordings Validation {% endblock title %}</title>
-  <style>
-  main {
-    margin: 1em auto;
-  }
-
-  ul.recordings {
-    padding: auto 0;
-    list-style: none;
-  }
-
-  li .speaker {
-    display: inline-block;
-    min-width: 4rem;
-    text-align: center;
-    margin: .5rem;
-  }
-
-  .recordings audio {
-    max-width: 100%;
-  }
-  </style>
   {% endblock head %}
 
 </head>
 <body>
 
   {# The header #}
-  <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+  <nav class="navbar navbar-expand-md navbar-dark header-dark">
     <a class="navbar-brand" href="{{ url('validation:index') }}">
       <span lang="en" class="d-none d-sm-inline"> Maskwacîs </span>
       <span lang="crk" class="d-sm-none"> ᒪᐢᑿᒋᐢ </span>
@@ -50,9 +31,21 @@
       <form class="form-inline ml-2 my-2 my-lg-0" method="GET" action="{{
         url('validation:search_phrases')
       }}">
-        <input class="form-control mr-sm-2" name="q" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        <input class="form-control mr-sm-2" name="query" type="search" placeholder="Search" aria-label="Search">
+        <button class="my-2 my-sm-0 button-success" type="submit">Search</button>
+        &nbsp;
+        <a data-cy="advanced-search-button" href="{{ url('validation:advanced_search') }}" class="btn button-fail my-2 my-sm-0">Advanced Search</a>
+    
       </form>
+    </div>
+
+    {# Login button #}
+    <div>
+        {% if auth %}
+        <a href="/logout" id="logout-link" style="color: white;">Logout</a>
+        {% else %}
+        <a href="/login" id="login-link" style="color: white;">Login</a>
+        {% endif %}
     </div>
   </nav>
 

@@ -19,14 +19,11 @@
 """
 Django management command to import recordings. This assumes the database has
 been created.
-
 Its defaults are configured using the following settings:
-
     MEDIA_ROOT
     RECVAL_AUDIO_PREFIX
     RECVAL_METADATA_PATH
     RECVAL_SESSIONS_DIR
-
 See recvalsite/settings.py for more information.
 """
 
@@ -39,7 +36,7 @@ from django.core.files.base import ContentFile  # type: ignore
 from django.core.management.base import BaseCommand, CommandError  # type: ignore
 
 from librecval import REPOSITORY_ROOT
-from librecval.extract_phrases import RecordingInfo
+from librecval.extract_phrases import Segment
 from librecval.import_recordings import initialize as import_recordings
 from validation.models import Phrase, Recording, RecordingSession, Speaker
 
@@ -118,9 +115,7 @@ class Command(BaseCommand):
 
 
 @logme.log
-def django_recording_importer(
-    info: RecordingInfo, recording_path: Path, logger
-) -> None:
+def django_recording_importer(info: Segment, recording_path: Path, logger) -> None:
     """
     Imports a single recording.
     """
@@ -140,9 +135,11 @@ def django_recording_importer(
         logger.info("New session: %s", session)
 
     phrase, phrase_created = Phrase.objects.get_or_create(
-        transcription=info.transcription,
+        transcription=info.cree_transcription,
         kind=info.type,
-        defaults=dict(translation=info.translation, validated=False, origin=None),
+        defaults=dict(
+            translation=info.english_translation, validated=False, origin=None
+        ),
     )
     if phrase_created:
         logger.info("New phrase: %s", phrase)
@@ -157,10 +154,11 @@ def django_recording_importer(
         id=info.compute_sha256hash(),
         speaker=speaker,
         compressed_audio=django_file,
-        timestamp=info.timestamp,
+        timestamp=info.start,
         phrase=phrase,
         session=session,
-        quality="",
+        quality=info.quality,
+        comment=info.comment,
     )
     recording.clean()
 
@@ -168,7 +166,7 @@ def django_recording_importer(
     recording.save()
 
 
-def null_recording_importer(info: RecordingInfo, recording_path: Path) -> None:
+def null_recording_importer(info: Segment, recording_path: Path) -> None:
     """
     Does nothing!
     """
