@@ -43,7 +43,7 @@
 
       </div>
     {% else %}
-        <div class="card-header-red">
+        <div class="card-header-grey">
           &nbsp;
 
       </div>
@@ -52,8 +52,8 @@
         <h3>{{ phrase.transcription }}</h3>
         <h5>Translation: {{ phrase.translation }}</h5>
         <p>Is this translation accurate?
-            <button class="button-success" onclick="{{ validate_phrase }}">Yes</button>
-            <button class="button-fail">No</button></p>
+            <button class="button-success translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }}>Yes</button>
+            <button class="button-fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }}>No</button></p>
         <table>
             <th>Recording</th>
             <th>Speaker</th>
