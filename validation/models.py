@@ -74,6 +74,14 @@ class Phrase(models.Model):
     LINKED = "linked"
     VALIDATED = "validated"
 
+    STATUS_CHOICES = (
+        (NEW, "New"),
+        (AUTO, "Auto-standardized"),
+        (STANDARDIZED, "Standardized"),
+        (LINKED, "Linked"),
+        (VALIDATED, "Validated"),
+    )
+
     MASKWACÎS_DICTIONARY = "MD"
     NEW_WORD = "new"
     ORIGIN_CHOICES = (
@@ -96,6 +104,13 @@ class Phrase(models.Model):
     )
     validated = models.BooleanField(
         help_text="Has this phrase be validated?", default=False
+    )
+
+    status = models.CharField(
+        help_text="Status in the validation process",
+        blank=False,
+        default=NEW,
+        **arguments_for_choices(STATUS_CHOICES),
     )
     # TODO: during the import process, try to determine automatically whether
     # the word came from the Maswkacîs dictionary.
