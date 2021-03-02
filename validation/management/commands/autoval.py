@@ -51,5 +51,3 @@ class Command(BaseCommand):
                     phrase.status = "auto-validated"
                     phrase.validated = True
                     phrase.save()
-
-        return
