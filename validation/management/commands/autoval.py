@@ -48,6 +48,7 @@ class Command(BaseCommand):
                 if exactly_one_analysis(_match):
                     phrase.transcription = _match["transcription"]
                     phrase.analysis = _match["matches"][0]["analysis"]
+                    phrase.status = "auto-validated"
                     phrase.validated = True
                     phrase.save()
 

@@ -137,6 +137,7 @@ def django_recording_importer(info: Segment, recording_path: Path, logger) -> No
     phrase, phrase_created = Phrase.objects.get_or_create(
         field_transcription=info.cree_transcription,
         transcription=info.cree_transcription,
+        status="new",
         kind=info.type,
         defaults=dict(
             translation=info.english_translation, validated=False, origin=None
