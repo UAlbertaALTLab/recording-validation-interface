@@ -120,9 +120,6 @@
 {% macro td_translation(user, phrase) %}
 <td data-cy="segment-translation" lang="en" id="{{ phrase }}-translation" class="restrict-content">
   {{ phrase.translation }}
-    {% if phrase.analysis %}
-        <p><br><strong>Analysis</strong><br>{{ phrase.analysis }}</p>
-    {% endif %} {# phrase.analysis #}
 </td>
 {% endmacro %}
 
