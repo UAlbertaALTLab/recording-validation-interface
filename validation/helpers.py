@@ -216,6 +216,10 @@ def get_distance_with_translations(word):
 
 
 def perfect_match(word, suggestions):
+    # Checks for exactly one entry with either
+    # MED = 0 or an exact match for spelling
+    # Returns none if no matches found, or if multiple matches found
+
     match = None
     for suggestion in suggestions:
         if suggestions[suggestion]["med"] == 0 or suggestion == word:
@@ -228,6 +232,10 @@ def perfect_match(word, suggestions):
 
 
 def exactly_one_analysis(suggestion):
+    # If there are multiple suggestions,
+    # we only want to save it is there's exactly one
+    # analysis shared by all suggestions
+
     analysis = ""
     if not suggestion:
         return False

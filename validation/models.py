@@ -187,11 +187,11 @@ class Phrase(models.Model):
 
     def save(self, *args, **kwargs):
         # Make sure the fuzzy match is always up to date
-        self.fuzzy_transcription = to_indexable_form(self.field_transcription)
+        self.fuzzy_transcription = to_indexable_form(self.transcription)
         super().save(*args, **kwargs)
 
     def __str__(self) -> str:
-        return self.field_transcription
+        return self.transcription
 
 
 class Speaker(models.Model):
