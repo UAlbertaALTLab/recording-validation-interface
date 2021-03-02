@@ -17,6 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import io
+import json
 from pathlib import Path
 import datetime
 
@@ -33,12 +34,13 @@ from django.http import (
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login as django_login
+from django.views.decorators.http import require_http_methods
 
 from librecval.normalization import to_indexable_form
 
 from .crude_views import *
 from .models import Phrase, Recording, Speaker
-from .helpers import get_distance_with_translations, validate_phrase
+from .helpers import get_distance_with_translations
 from .forms import EditSegment, Login, Register
 
 
@@ -73,7 +75,6 @@ def index(request):
         validated_class=validated_class,
         unvalidated_class=unvalidated_class,
         auth=auth,
-        validate_phrase=validate_phrase,
     )
     return render(request, "validation/list_phrases.html", context)
 
@@ -341,3 +342,20 @@ def register(request):
 
 
 # TODO: Speaker bio page like https://ojibwe.lib.umn.edu/about/voices
+
+
+@require_http_methods(["POST"])
+def record_translation_judgement(request, phrase_id):
+    # TODO: check that user is logged in
+    phrase = get_object_or_404(Phrase, id=phrase_id)
+    print(phrase)
+    judgement = json.loads(request.body)
+
+    if judgement["judgement"] == "yes":
+        phrase.validated = True
+    elif judgement["judgement"] == "no":
+        phrase.validated = False
+
+    phrase.save()
+    print("got request")
+    return JsonResponse({"status": "ok"})

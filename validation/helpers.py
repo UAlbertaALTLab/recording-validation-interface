@@ -214,14 +214,3 @@ def get_distance_with_translations(word):
         }
 
     return suggestions
-
-
-@validation.context_processor
-def phrase_processor():
-    def validate_phrase():
-        # print("hello")
-        # phrase.validated = True
-        # phrase.save()
-        return "hello"
-
-    return {"validate_phrase": validate_phrase}
