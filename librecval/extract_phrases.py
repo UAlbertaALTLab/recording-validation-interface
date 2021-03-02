@@ -132,7 +132,6 @@ class RecordingExtractor:
         For each session directory found, its ELAN/.eaf file pairs are
         scanned for words and sentences.
         """
-        count = 0
 
         self.logger.debug("Scanning %s for sessions...", root_directory)
         for session_dir in root_directory.iterdir():
@@ -140,15 +139,13 @@ class RecordingExtractor:
                 self.logger.debug("Rejecting %s; not a directory", session_dir)
                 continue
             try:
-                print(f"Processed folder number {count}")
-                count += 1
-                yield from self.extract_session(session_dir, count)
+                yield from self.extract_session(session_dir)
             except DuplicateSessionError:
                 self.logger.exception("Skipping %s: duplicate", session_dir)
             except MissingMetadataError:
                 self.logger.exception("Skipping %s: Missing metadata", session_dir)
 
-    def extract_session(self, session_dir: Path, folder_count):
+    def extract_session(self, session_dir: Path):
         """
         Extracts recordings from a single session.
         """
@@ -164,10 +161,9 @@ class RecordingExtractor:
         self.logger.debug("Scanning %s for .eaf files", session_dir)
         annotations = list(session_dir.glob("*.eaf"))
         self.logger.info("%d ELAN files in %s", len(annotations), session_dir)
-        count = 0
 
         for _path in annotations:
-            # Find the cooresponding audio with a couple different strategies.
+            # Find the corresponding audio with a couple different strategies.
             sound_file = (
                 find_audio_from_audacity_format(_path)
                 or find_audio_from_audition_format(_path)
@@ -175,7 +171,7 @@ class RecordingExtractor:
             )
 
             if sound_file is None:
-                self.logger.warn("Could not find corresponding audio for %s", _path)
+                self.logger.warning("Could not find corresponding audio for %s", _path)
                 continue
 
             assert _path.exists() and sound_file.exists()
@@ -184,10 +180,10 @@ class RecordingExtractor:
             try:
                 mic_id = get_mic_id(_path.stem)
             except InvalidFileName:
-                # if len(_path) != 1:
-                #    raise  # There's no way to determine the speaker.
+                if len(annotations) != 1:
+                    raise  # There's no way to determine the speaker.
                 mic_id = 1
-                self.logger.warn("Assuming single ELAN file is mic 1")
+                self.logger.warning("Assuming single ELAN file is mic 1")
 
             speaker = self.metadata[session_id][mic_id]
 
@@ -198,8 +194,6 @@ class RecordingExtractor:
             )
 
             audio = AudioSegment.from_file(fspath(sound_file))
-            print(f"Processed file number {count} from folder number {folder_count}")
-            count += 1
             yield from generate_segments_from_eaf(_path, audio, speaker, session_id)
 
 
@@ -215,7 +209,6 @@ def generate_segments_from_eaf(
     eaf_file = Eaf(annotation_path)
 
     keys = eaf_file.get_tier_names()
-    count = 0
 
     # get tiers from keys
     english_word_tier, cree_word_tier = get_word_tiers(keys)
@@ -243,8 +236,7 @@ def generate_segments_from_eaf(
             english_word_tier,
             comment_tier,
         )
-        count += 1
-        print(f"Processed audio segment number {count}")
+
         yield s, sound_bite
 
     # Extract data for Cree phrases
@@ -264,8 +256,6 @@ def generate_segments_from_eaf(
             english_phrase_tier,
             comment_tier,
         )
-        count += 1
-        print(f"Processed audio segment number {count}")
         yield s, sound_bite
 
 
@@ -358,13 +348,13 @@ def find_audio_oddities(annotation_path: Path, logger=None) -> Optional[Path]:
     sound_file = None
 
     # the track number is between the last - and the last .
-
     match = re.match(
         r"""
         .*-(
-            [^-]+   # looking for the string between the last / and the last .
+            [^-]+ 
             )
-            \.[^-.]+
+            \.
+            [^-.]+
         """,
         str(annotation_path),
         re.VERBOSE,

@@ -164,6 +164,11 @@ li.speaker_code {
   cursor: pointer;
 }
 
+.button-right {
+  float: right;
+  margin-bottom: 0.5rem;
+}
+
 .button-filter {
   padding: 0.3rem;
   margin-right: 0.2rem;
