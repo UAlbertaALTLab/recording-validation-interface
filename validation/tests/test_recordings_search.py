@@ -59,7 +59,7 @@ def test_search_recordings(client, bake_recording):
     assert isinstance(recordings, list)
     assert len(recordings) == 1
     recording = recordings[0]
-    assert recording.get("wordform") == phrase.field_transcription
+    assert recording.get("wordform") == phrase.transcription
     # TODO: Change field name to "speaker_code"?
     assert "speaker" in recording.keys()
     assert recording.get("gender") in ("M", "F")
@@ -87,7 +87,7 @@ def test_search_multiple_recordings(client, bake_recording):
         "validation.phrase", _quantity=MAX_RECORDING_QUERY_TERMS + 2
     )
     # We only want three of these word forms
-    query_forms = [phrase.field_transcription for phrase in phrases][
+    query_forms = [phrase.transcription for phrase in phrases][
         :MAX_RECORDING_QUERY_TERMS
     ]
 
@@ -122,7 +122,7 @@ def test_search_recording_not_found(client, bake_recording):
     recording = bake_recording()
 
     # Make the query never matches the only recording in the database:
-    query = recording.phrase.field_transcription + "h"
+    query = recording.phrase.transcription + "h"
     response = client.get(
         reverse("validation:search_recordings", kwargs={"query": query})
     )
@@ -145,7 +145,7 @@ def test_search_max_queries(client, bake_recording):
 
     # Try fetching the maximum
     query = ",".join(
-        phrase.field_transcription for phrase in phrases[:MAX_RECORDING_QUERY_TERMS]
+        phrase.transcription for phrase in phrases[:MAX_RECORDING_QUERY_TERMS]
     )
     response = client.get(
         reverse("validation:search_recordings", kwargs={"query": query})
@@ -153,7 +153,7 @@ def test_search_max_queries(client, bake_recording):
     assert response.status_code == 200
 
     # Fetch them!
-    query = ",".join(phrase.field_transcription for phrase in phrases)
+    query = ",".join(phrase.transcription for phrase in phrases)
     response = client.get(
         reverse("validation:search_recordings", kwargs={"query": query})
     )
@@ -175,9 +175,7 @@ def test_search_unique_word_forms(client, bake_recording):
 
     # The query will have the term more than once.
     assert MAX_RECORDING_QUERY_TERMS > 1
-    query = ",".join(
-        phrase.field_transcription for _ in range(MAX_RECORDING_QUERY_TERMS)
-    )
+    query = ",".join(phrase.transcription for _ in range(MAX_RECORDING_QUERY_TERMS))
 
     response = client.get(
         reverse("validation:search_recordings", kwargs={"query": query})
@@ -185,7 +183,7 @@ def test_search_unique_word_forms(client, bake_recording):
     assert response.status_code == 200
     recordings = response.json()
     assert len(recordings) == 1
-    assert recordings[0]["wordform"] == phrase.field_transcription
+    assert recordings[0]["wordform"] == phrase.transcription
 
 
 @pytest.mark.django_db
@@ -230,7 +228,7 @@ def test_search_fuzzy_match(client, bake_recording):
         resultant_recordings = [
             result
             for result in actual_recordings
-            if result["wordform"] == phrase.field_transcription
+            if result["wordform"] == phrase.transcription
         ]
         assert len(resultant_recordings) == RECORDINGS_PER_PHRASE
 
