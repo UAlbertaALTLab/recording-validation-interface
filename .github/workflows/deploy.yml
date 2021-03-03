@@ -1,6 +1,6 @@
 name: Deploy
 on:
-  push: production
+  push: [production]
 
 jobs:
   trigger-deployment:
