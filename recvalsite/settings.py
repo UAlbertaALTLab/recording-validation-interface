@@ -60,6 +60,7 @@ if DEBUG:
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -170,17 +171,10 @@ X_FRAME_OPTIONS = "DENY"
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
-# Derive the static path from WSGI SCRIPT_NAME variable
-# e.g.,  if SCRIPT_NAME=/validation,
-#        then static file URLs will point to /validation/static/
-# TODO: this is the wrong way to construct this variable?
 STATIC_URL = "/static/"
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
-]
 
 # Remember to run manage.py collectstatic!
-STATIC_ROOT = config("STATIC_ROOT", default="/var/www/recvalsite/static")
+STATIC_ROOT = config("STATIC_ROOT", default=os.fspath(BASE_DIR / "static"))
 
 # This is concatenated with MEDIA_ROOT and MEDIA_URL to store and serve the audio files.
 RECVAL_AUDIO_PREFIX = config("RECVAL_AUDIO_PREFIX", default="audio/")
