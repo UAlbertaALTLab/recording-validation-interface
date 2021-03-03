@@ -273,7 +273,7 @@ def search_recordings(request, query):
 
         recordings.extend(
             {
-                "wordform": rec.phrase.field_transcription,
+                "wordform": rec.phrase.transcription,
                 "speaker": rec.speaker.code,
                 "speaker_name": rec.speaker.full_name,
                 "anonymous": rec.speaker.anonymous,
