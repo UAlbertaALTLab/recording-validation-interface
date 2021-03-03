@@ -1,9 +1,12 @@
-version: '3.7'
+version: '3'
 services:
     web:
         build: .
+        restart: always
         ports:
-            - 127.0.0.1:8000:8000
+        - "8004:8000"
         volumes:
-            - "./db.sqlite3:/app/db.sqlite3"
-            - "./data/audio:/app/data/audio"
+        # HOST : CONTAINER
+        - "./.env:/app/.env"
+        - "/data/application-data/speech-db/db.sqlite3:/app/db.sqlite3"
+        - "/data/application-data/speech-db/audio:/app/data/audio"
