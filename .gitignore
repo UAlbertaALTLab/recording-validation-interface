@@ -115,3 +115,5 @@ db.sqlite3
 node_modules
 .DS_Store
 crk.zhfst
+# collected static files:
+/static/
