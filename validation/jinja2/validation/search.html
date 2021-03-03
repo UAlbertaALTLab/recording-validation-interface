@@ -65,7 +65,7 @@
     {% endfor %} {# phrase in phrases #}
 
 <nav>
-  {{ macros.pagination(phrases, 'validation:search_phrases') }}
+  {{ macros.pagination_with_query(phrases, 'validation:search_phrases', query, encode_query_with_page) }}
 </nav>
 {% endblock content %}
 
