@@ -17,6 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
+import unicodedata
 from pathlib import Path
 
 from django.conf import settings
@@ -90,7 +91,7 @@ class Phrase(models.Model):
     )
 
     field_transcription = models.CharField(
-        help_text="The field transciption of the Cree phrase.",
+        help_text="The transcription from the day of the recording. This should never change.",
         blank=False,
         max_length=MAX_TRANSCRIPTION_LENGTH,
     )
@@ -180,7 +181,10 @@ class Phrase(models.Model):
         """
         Cleans the text fields.
         """
-        self.field_transcription = normalize_sro(self.field_transcription)
+        self.field_transcription = unicodedata.normalize(
+            "NFC", self.field_transcription
+        )
+
         assert self.ALLOWED_TRANSCRIPTION_CHARACTERS.issuperset(
             self.field_transcription
         )
