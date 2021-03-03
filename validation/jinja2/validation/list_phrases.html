@@ -34,48 +34,52 @@
     </div>
   </form>
 </div>
-<div class="table-responsive">
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th scope="col"> Transcription </th>
-        <th scope="col"> Translation </th>
-        <th scope="col"> Recordings </th>
-        <th scope="col"> Speaker </th>
-      </tr>
-    </thead>
-    {% for phrase in phrases %}
-    <tr data-update-uri="{{ url('validation:update_text', phrase_id=phrase.id) }}">
-      {{ macros.td_transcription_link(user, phrase) }}
-      {{ macros.td_translation(user, phrase) }}
-      <td>
-        <ul class="recordings">
-        {% for recording in phrase.recordings %}
-          <li>
-            <div class="rec-height">
-              {{ macros.player(recording) }}
-            </div>
-          </li>
 
-        {% endfor %}{# for recording in phrase.recordings #}
-        </ul>
-      </td>
-      <td>
-        <ul class="speaker">
-        {% for recording in phrase.recordings %}
-          <li>
-            <div class="rec-height">
-              {{ macros.speaker(recording) }}
-            </div>
-          </li>
+    {%  for phrase in phrases %}
+    <div class="card segment-card">
+    {% if phrase.validated %}
+      <div class="card-header-green">
+          &nbsp;
 
-        {% endfor %}{# for recording in phrase.recordings #}
-        </ul>
-      </td>
-    </tr>
-    {% endfor %}{# for phrase in phrases #}
-  </table>
+      </div>
+    {% else %}
+        <div class="card-header-grey">
+          &nbsp;
+
+      </div>
+    {% endif %}
+      <div class="card-body">
+        <h3>{{ phrase.transcription }}</h3>
+        <h5>Translation: {{ phrase.translation }}</h5>
+        <p>Is this translation accurate?
+            <button class="button-success translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }}>Yes</button>
+            <button class="button-fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }}>No</button></p>
+        <table>
+            <th>Recording</th>
+            <th>Speaker</th>
+            <th>This recording is...</th>
+
+            {% for recording in phrase.recordings %}
+                <tr>
+              <td>
+                <div class="rec-height">
+                  {{ macros.player(recording) }}
+                </div>
+              </td>
+                <td>
+                    {{ macros.speaker(recording) }}
+                </td>
+                <td>
+                <button class="button-success">Good</button> <button class="button-fail">Bad</button>
+                </td>
+                </tr>
+
+            {% endfor %}{# for recording in phrase.recordings #}
+        </table>
+        <a href={{ url('validation:segment_detail', phrase.id) }} class="button-success right">More Options</a>
+      </div>
 </div>
+    {% endfor %} {# phrase in phrases #}
 
 <nav>
   {{ macros.pagination(phrases, 'list_phrases') }}
