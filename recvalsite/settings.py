@@ -34,7 +34,7 @@ if SECRET_KEY is None:
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", default=False, cast=bool)
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "sapir.artsrn.ualberta.ca"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "speech-db.altlab.app", "altlab-itw:8004"]
 
 
 # Application definition
