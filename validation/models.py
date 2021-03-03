@@ -184,7 +184,6 @@ class Phrase(models.Model):
         self.field_transcription = unicodedata.normalize(
             "NFC", self.field_transcription
         )
-
         assert self.ALLOWED_TRANSCRIPTION_CHARACTERS.issuperset(
             self.field_transcription
         )
