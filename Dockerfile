@@ -20,7 +20,7 @@ RUN PIPENV_VENV_IN_PROJECT=1 pipenv install --deploy --dev
 
 ############################# Application image ##############################
 
-FROM python:3.7-slim-buster
+FROM python:3.7
 
 # Choose an ID that will be consistent across all machines in the network
 # To avoid overlap with user IDs, use an ID over
