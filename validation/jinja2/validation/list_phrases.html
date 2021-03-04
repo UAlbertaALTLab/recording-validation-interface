@@ -38,23 +38,26 @@
     {%  for phrase in phrases %}
     <div class="card segment-card">
     {% if phrase.validated %}
-      <div class="card-header-green">
+      <div class="card-header-green card-top" data-phrase-id={{ phrase.id }}>
           &nbsp;
-
       </div>
     {% else %}
-        <div class="card-header-grey">
+        <div class="card-header-grey card-top" data-phrase-id={{ phrase.id }}>
           &nbsp;
-
       </div>
     {% endif %}
       <div class="card-body">
         <h3>{{ phrase.transcription }}</h3>
         <h5>Translation: {{ phrase.translation }}</h5>
         <p>Is this translation accurate?
-            <button class="button-success translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }}>Yes</button>
-            <button class="button-fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }}>No</button></p>
-        <table>
+            {% if phrase.status == "linked" %}
+                <button class="button-success-solid translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }}>Yes</button>
+                <button class="button-fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }}>No</button></p>
+            {% else %}
+                <button class="button-success translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }}>Yes</button>
+                <button class="button-fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }}>No</button></p>
+            {%  endif %}
+          <table>
             <th>Recording</th>
             <th>Speaker</th>
             <th>This recording is...</th>
@@ -76,7 +79,9 @@
 
             {% endfor %}{# for recording in phrase.recordings #}
         </table>
+      {% if not is_community %}
         <a href={{ url('validation:segment_detail', phrase.id) }} class="button-success right">More Options</a>
+      {% endif %} {# is community member #}
       </div>
 </div>
     {% endfor %} {# phrase in phrases #}

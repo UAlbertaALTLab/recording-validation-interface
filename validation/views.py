@@ -66,6 +66,12 @@ def index(request):
         all_phrases = Phrase.objects.all()
         all_class = "button-success button-filter button-filter-active"
 
+    is_community = False
+    if request.user.is_authenticated:
+        for g in request.user.groups.all():
+            if g.name == "Community":
+                is_community = True
+
     paginator = Paginator(all_phrases, 5)
     page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)
@@ -76,6 +82,7 @@ def index(request):
         validated_class=validated_class,
         unvalidated_class=unvalidated_class,
         auth=auth,
+        is_community=is_community,
     )
     return render(request, "validation/list_phrases.html", context)
 
@@ -396,8 +403,10 @@ def record_translation_judgement(request, phrase_id):
 
     if judgement["judgement"] == "yes":
         phrase.validated = True
+        phrase.status = "linked"
     elif judgement["judgement"] == "no":
         phrase.validated = False
+        phrase.status = "new"
 
     phrase.save()
     print("got request")
