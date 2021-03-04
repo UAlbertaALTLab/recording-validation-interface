@@ -33,7 +33,7 @@ from django.http import (
     QueryDict,
 )
 from django.urls import reverse
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.contrib.auth import authenticate, login as django_login
 from django.views.decorators.http import require_http_methods
 
@@ -370,6 +370,8 @@ def register(request):
                     last_name=last_name,
                 )
                 new_user.save()
+                community_group, _ = Group.objects.get_or_create(name="Community")
+                community_group.user_set.add(new_user)
                 response = HttpResponseRedirect("/login")
                 return response
 
