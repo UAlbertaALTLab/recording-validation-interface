@@ -25,9 +25,17 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
+                    "field_transcription",
+                    models.CharField(
+                        help_text="The field transciption of the Cree phrase.",
+                        max_length=256,
+                    ),
+                ),
+                (
                     "transcription",
                     models.CharField(
-                        help_text="The transciption of the Cree phrase.", max_length=256
+                        help_text="The validated transciption of the Cree phrase.",
+                        max_length=256,
                     ),
                 ),
                 (
@@ -49,6 +57,21 @@ class Migration(migrations.Migration):
                     "validated",
                     models.BooleanField(
                         default=False, help_text="Has this phrase be validated?"
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("new", "New"),
+                            ("auto-standardized", "Auto-standardized"),
+                            ("standardized", "Standardized"),
+                            ("linked", "Linked"),
+                            ("validated", "Validated"),
+                        ],
+                        default="new",
+                        help_text="Status in the validation process",
+                        max_length=17,
                     ),
                 ),
                 (
@@ -169,9 +192,17 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
+                    "field_transcription",
+                    models.CharField(
+                        help_text="The field transciption of the Cree phrase.",
+                        max_length=256,
+                    ),
+                ),
+                (
                     "transcription",
                     models.CharField(
-                        help_text="The transciption of the Cree phrase.", max_length=256
+                        help_text="The validated transciption of the Cree phrase.",
+                        max_length=256,
                     ),
                 ),
                 (
@@ -193,6 +224,21 @@ class Migration(migrations.Migration):
                     "validated",
                     models.BooleanField(
                         default=False, help_text="Has this phrase be validated?"
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("new", "New"),
+                            ("auto-standardized", "Auto-standardized"),
+                            ("standardized", "Standardized"),
+                            ("linked", "Linked"),
+                            ("validated", "Validated"),
+                        ],
+                        default="new",
+                        help_text="Status in the validation process",
+                        max_length=17,
                     ),
                 ),
                 (
