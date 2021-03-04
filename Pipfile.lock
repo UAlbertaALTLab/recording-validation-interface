@@ -343,6 +343,13 @@
                 "sha256:e683e409e5c45d5c9082dc1daf13f6374300806240719f95dc783d1fc942af10"
             ],
             "version": "==1.4.2"
+        "tqdm": {
+            "hashes": [
+                "sha256:2c44efa73b8914dba7807aefd09653ac63c22b5b4ea34f7a80973f418f1a3089",
+                "sha256:c23ac707e8e8aabb825e4d91f8e17247f9cc14b0d64dd9e97be0781e9e525bba"
+            ],
+            "index": "pypi",
+            "version": "==4.58.0"
         },
         "typing-extensions": {
             "hashes": [
@@ -425,6 +432,11 @@
             ],
             "index": "pypi",
             "version": "==6.3.4"
+                "sha256:a65d9673ffae041bbe9a0ab1939a38ecc83d54a786f2760bfff19489bcb85c2b",
+                "sha256:e1f46cff67cff1a3e41fad430a349ed8199d58bea9ea85bd7b37991b162ee0ec"
+            ],
+            "index": "pypi",
+            "version": "==6.3.3"
         },
         "importlib-metadata": {
             "hashes": [

@@ -41,7 +41,7 @@ from librecval.normalization import to_indexable_form
 
 from .crude_views import *
 from .models import Phrase, Recording, Speaker
-from .helpers import get_distance_with_translations
+from .helpers import get_distance_with_translations, perfect_match, exactly_one_analysis
 from .forms import EditSegment, Login, Register
 
 
@@ -52,7 +52,7 @@ def index(request):
     all_class = "button-success button-filter"
     validated_class = "button-success button-filter"
     unvalidated_class = "button-success button-filter"
-    mode = query = request.GET.get("mode")
+    mode = request.GET.get("mode")
     if mode == "all":
         all_phrases = Phrase.objects.all()
         all_class = "button-success button-filter button-filter-active"
@@ -143,11 +143,17 @@ def advanced_search_results(request):
         english_matches = []
 
     # TODO: filter by analysis
+    if analysis != "":
+        analysis_matches = Phrase.objects.filter(analysis__contains=analysis)
+    else:
+        analysis_matches = []
 
-    if transcription == "" and translation == "":
+    if transcription == "" and translation == "" and analysis == "":
         phrase_matches = Phrase.objects.all()
     else:
-        phrase_matches = list(set().union(cree_matches, english_matches))
+        phrase_matches = list(
+            set().union(cree_matches, english_matches, analysis_matches)
+        )
 
     if status != "all":
         if status == "validated":
@@ -321,8 +327,11 @@ def segment_content_view(request, segment_id):
             p.save()
 
     phrases = Phrase.objects.filter(id=segment_id)
+    field_transcription = phrases[0].field_transcription
+    suggestions = get_distance_with_translations(field_transcription)
+
     segment_name = phrases[0].transcription
-    suggestions = get_distance_with_translations(segment_name)
+
     history = phrases[0].history.all()
     auth = request.user.is_authenticated
 

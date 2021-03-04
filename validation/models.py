@@ -17,6 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
+import unicodedata
 from pathlib import Path
 
 from django.conf import settings
@@ -67,6 +68,21 @@ class Phrase(models.Model):
     SENTENCE = "sentence"
     KIND_CHOICES = ((WORD, "Word"), (SENTENCE, "Sentence"))
 
+    # Status values
+    NEW = "new"
+    AUTO = "auto-standardized"
+    STANDARDIZED = "standardized"
+    LINKED = "linked"
+    VALIDATED = "validated"
+
+    STATUS_CHOICES = (
+        (NEW, "New"),
+        (AUTO, "Auto-standardized"),
+        (STANDARDIZED, "Standardized"),
+        (LINKED, "Linked"),
+        (VALIDATED, "Validated"),
+    )
+
     MASKWACÎS_DICTIONARY = "MD"
     NEW_WORD = "new"
     ORIGIN_CHOICES = (
@@ -74,11 +90,18 @@ class Phrase(models.Model):
         (NEW_WORD, "New word"),
     )
 
-    transcription = models.CharField(
-        help_text="The transciption of the Cree phrase.",
+    field_transcription = models.CharField(
+        help_text="The transcription from the day of the recording. This should never change.",
         blank=False,
         max_length=MAX_TRANSCRIPTION_LENGTH,
     )
+
+    transcription = models.CharField(
+        help_text="The validated transciption of the Cree phrase.",
+        blank=False,
+        max_length=MAX_TRANSCRIPTION_LENGTH,
+    )
+
     translation = models.CharField(
         help_text="The English translation of the phrase.", blank=False, max_length=256
     )
@@ -89,6 +112,13 @@ class Phrase(models.Model):
     )
     validated = models.BooleanField(
         help_text="Has this phrase be validated?", default=False
+    )
+
+    status = models.CharField(
+        help_text="Status in the validation process",
+        blank=False,
+        default=NEW,
+        **arguments_for_choices(STATUS_CHOICES),
     )
     # TODO: during the import process, try to determine automatically whether
     # the word came from the Maswkacîs dictionary.
@@ -151,8 +181,12 @@ class Phrase(models.Model):
         """
         Cleans the text fields.
         """
-        self.transcription = normalize_sro(self.transcription)
-        assert self.ALLOWED_TRANSCRIPTION_CHARACTERS.issuperset(self.transcription)
+        self.field_transcription = unicodedata.normalize(
+            "NFC", self.field_transcription
+        )
+        assert self.ALLOWED_TRANSCRIPTION_CHARACTERS.issuperset(
+            self.field_transcription
+        )
 
     def save(self, *args, **kwargs):
         # Make sure the fuzzy match is always up to date
