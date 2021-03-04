@@ -28,9 +28,12 @@
     url('validation:index')
   }}">
     <div class="filters">
-      <button class="{{ all_class }}"" type="submit" id="filter-all" name="mode" value="all">All</button>
-      <button class="{{ validated_class }}" type="submit" id="filter-validated" name="mode" value="validated">Validated</button>
-      <button class="{{ unvalidated_class }}" type="submit" id="filter-unvalidated" name="mode" value="unvalidated">Unvalidated</button>
+      <button class="{{ all_class }}" type="submit" id="filter-all" name="mode" value="all">All</button>
+      <button class="{{ new_class }}" type="submit" id="filter-new" name="mode" value="new">New</button>
+      <button class="{{ linked_class }}" type="submit" id="filter-linked" name="mode" value="linked">Linked</button>
+        {% if is_linguist %}
+      <button class="{{ auto_validated_class }}" type="submit" id="filter-auto" name="mode" value="auto-validated">Auto-Validated</button>
+        {% endif %} {# if is_linguist #}
     </div>
   </form>
 </div>
@@ -79,9 +82,9 @@
 
             {% endfor %}{# for recording in phrase.recordings #}
         </table>
-      {% if not is_community %}
+      {% if is_linguist %}
         <a href={{ url('validation:segment_detail', phrase.id) }} class="button-success right">More Options</a>
-      {% endif %} {# is community member #}
+      {% endif %} {# is linguist #}
       </div>
 </div>
     {% endfor %} {# phrase in phrases #}
