@@ -129,7 +129,7 @@ def advanced_search(request):
     query = Speaker.objects.all()
     speakers = [q.code for q in query]
 
-    context = dict(speakers=speakers)
+    context = dict(speakers=speakers, is_linguist=user_is_linguist(request.user))
     return render(request, "validation/advanced_search.html", context)
 
 
@@ -173,10 +173,12 @@ def advanced_search_results(request):
         )
 
     if status != "all":
-        if status == "validated":
-            status_matches = Phrase.objects.filter(validated=True)
-        elif status == "unvalidated":
-            status_matches = Phrase.objects.filter(validated=False)
+        if status == "new":
+            status_matches = Phrase.objects.filter(status="new")
+        elif status == "linked":
+            status_matches = Phrase.objects.filter(status="linked")
+        elif status == "auto-val":
+            status_matches = Phrase.objects.filter(status="auto-validated")
         phrase_and_status_matches = list(
             set(phrase_matches).intersection(status_matches)
         )
