@@ -101,6 +101,7 @@ def search_phrases(request):
         search_term=query,
         query=query_term,
         encode_query_with_page=encode_query_with_page,
+        auth=request.user.is_authenticated,
     )
     return render(request, "validation/search.html", context)
 
@@ -112,7 +113,7 @@ def advanced_search(request):
     query = Speaker.objects.all()
     speakers = [q.code for q in query]
 
-    context = dict(speakers=speakers)
+    context = dict(speakers=speakers, auth=request.user.is_authenticated)
     return render(request, "validation/advanced_search.html", context)
 
 
@@ -197,6 +198,7 @@ def advanced_search_results(request):
         search_term="advanced search",
         query=query,
         encode_query_with_page=encode_query_with_page,
+        auth=request.user.is_authenticated,
     )
     return render(request, "validation/search.html", context)
 

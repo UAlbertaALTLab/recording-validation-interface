@@ -310,3 +310,7 @@ li.speaker_code {
   margin-bottom: 0;
   border-bottom: 1px solid rgba(0,0,0,.125);
 }
+
+.white-text {
+  color: var(--custom-white);
+}

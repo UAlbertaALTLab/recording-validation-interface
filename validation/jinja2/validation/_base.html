@@ -47,9 +47,9 @@ const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     {# Login button #}
     <div>
         {% if auth %}
-        <a href="/logout" id="logout-link" style="color: white;">Logout</a>
+            <a href="/logout" id="logout-link" class="white-text">Logout</a>
         {% else %}
-        <a href="/login" id="login-link" style="color: white;">Login</a>
+            <a href="/login" id="login-link" class="white-text">Login</a>
         {% endif %}
     </div>
   </nav>
