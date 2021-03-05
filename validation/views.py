@@ -106,6 +106,8 @@ def search_phrases(request):
     query_term = QueryDict("", mutable=True)
     query_term.update({"query": query})
 
+    is_linguist = user_is_linguist(request.user)
+
     paginator = Paginator(all_matches, 5)
     page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)
@@ -114,6 +116,8 @@ def search_phrases(request):
         search_term=query,
         query=query_term,
         encode_query_with_page=encode_query_with_page,
+        is_linguist=is_linguist,
+        auth=request.user.is_authenticated,
     )
     return render(request, "validation/search.html", context)
 
