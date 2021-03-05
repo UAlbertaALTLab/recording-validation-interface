@@ -63,7 +63,9 @@ class Command(BaseCommand):
         self.write_transcriptions(audio_dir, query)
 
     def write_transcriptions(self, audio_dir, query):
-        training_dir = Path("/Users/jolenepoulin/Documents/training/")
+        # Change this to Path("/where/you/want/training/data")
+        # if you want the data elsewhere
+        training_dir = audio_dir
         for audio_file in tqdm(audio_dir.iterdir()):
             audio_id = audio_file.stem
 
