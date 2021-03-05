@@ -44,7 +44,7 @@ class Command(BaseCommand):
         audio_dir = Path(_path)
 
         query = """
-            select speaker_id, transcription from validation_recording as rec, validation_phrase as p
+            select speaker_id, field_transcription from validation_recording as rec, validation_phrase as p
             where rec.id = ?
             and rec.phrase_id = p.id;
             """
