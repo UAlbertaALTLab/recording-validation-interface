@@ -188,9 +188,7 @@ class RecordingExtractor:
             speaker = self.metadata[session_id][mic_id]
 
             self.logger.debug(
-                "Opening audio and .eaf from %s for speaker %s",
-                sound_file,
-                speaker,
+                "Opening audio and .eaf from %s for speaker %s", sound_file, speaker,
             )
 
             audio = AudioSegment.from_file(fspath(sound_file))
@@ -351,7 +349,7 @@ def find_audio_oddities(annotation_path: Path, logger=None) -> Optional[Path]:
     match = re.match(
         r"""
         .*-(
-            [^-]+ 
+            [^-]+
             )
             \.
             [^-.]+
@@ -507,6 +505,8 @@ def get_mic_id(name: str) -> int:
     2
     >>> get_mic_id('Track 4_001.eaf')
     4
+    >>> get_mic_id('2017-05-18pm-US-Track_03')
+    3
 
     This one is the most annoying format:
     >>> get_mic_id('2015-03-19-Rain-03')
@@ -516,23 +516,26 @@ def get_mic_id(name: str) -> int:
     m = re.match(
         r"""
         ^
-        (?:                 # An optional "yy-mm-ddtt-Track "
+        (?:                 # An optional "yy-mm-ddtt-US-Track "
             (?:             # An optional date/time code
                 \d{4}       # year
                 -
                 \d{2}       # month
                 -
                 \d{2}       # day
-                (?:[ap]m)
+                (?:[ap]m)   # AM/PM
+                (?:
+                   -[UD]S   # upstairs/downstairs
+                )?
                 -
             )?
-            Track\s
+            Track[_ ]
         )?
-
+        0*                  # ignore leading zeros
         (\d+)               # THE MIC NUMBER!
-
-        _\d{3}
-        (?:[.]eaf)?$
+        (?:_\d{3})?
+        (?:[.]eaf)?
+        $
         """,
         name,
         re.VERBOSE,
