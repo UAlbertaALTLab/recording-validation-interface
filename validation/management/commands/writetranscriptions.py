@@ -43,31 +43,32 @@ class Command(BaseCommand):
         # python3 manage.py importrecordings --wav --skip-db
         audio_dir = Path(_path)
 
-        query = """
-            select speaker_id, field_transcription from validation_recording as rec, validation_phrase as p
-            where rec.id = ?
-            and rec.phrase_id = p.id;
-            """
-
         print("Writing transcriptions for all phrases")
-        self.write_transcriptions(audio_dir, query)
-
-        query = """
-            select speaker_id, transcription from validation_recording as rec, validation_phrase as p
-            where rec.id = ?
-            and rec.phrase_id = p.id
-            and p.status = "auto-validated";
-            """
+        self.write_transcriptions(audio_dir, mode="all")
 
         print("Writing transcription for auto-validated phrases")
-        self.write_transcriptions(audio_dir, query)
+        self.write_transcriptions(audio_dir, mode="auto-validated")
 
-    def write_transcriptions(self, audio_dir, query):
+    def write_transcriptions(self, audio_dir, mode):
         # Change this to Path("/where/you/want/training/data")
         # if you want the data elsewhere
         training_dir = audio_dir
         for audio_file in tqdm(audio_dir.iterdir()):
             audio_id = audio_file.stem
+
+            if mode == "auto-validated":
+                query = """
+                    select speaker_id, transcription from validation_recording as rec, validation_phrase as p
+                    where rec.id = ?
+                    and rec.phrase_id = p.id
+                    and p.status = "auto-validated";
+                    """
+            else:
+                query = """
+                    select speaker_id, field_transcription from validation_recording as rec, validation_phrase as p
+                    where rec.id = ?
+                    and rec.phrase_id = p.id;
+                    """
 
             with closing(sqlite3.connect("./db.sqlite3")) as conn:
                 cur = conn.cursor()
@@ -87,7 +88,7 @@ class Command(BaseCommand):
 
             # Treat the transcription for Persephone and save it
             persephone_filename = audio_id + ".txt"
-            if "auto-validated" in query:
+            if mode == "auto-validated":
                 persephone_path = (
                     training_dir / speaker / "auto_val" / "label" / persephone_filename
                 )
@@ -100,7 +101,7 @@ class Command(BaseCommand):
 
             # Save the transcription for Simple4All
             s4a_filename = audio_id + ".txt"
-            if "auto-validated" in query:
+            if mode == "auto-validated":
                 s4a_path = training_dir / speaker / "auto_val" / "s4a" / s4a_filename
             else:
                 s4a_path = training_dir / speaker / "s4a" / s4a_filename
