@@ -17,6 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import io
+import json
 from pathlib import Path
 import datetime
 
@@ -34,6 +35,7 @@ from django.http import (
 from django.urls import reverse
 from django.contrib.auth.models import User, Group
 from django.contrib.auth import authenticate, login as django_login
+from django.views.decorators.http import require_http_methods
 
 from librecval.normalization import to_indexable_form
 
@@ -47,33 +49,46 @@ def index(request):
     """
     The home page.
     """
+    is_linguist = user_is_linguist(request.user)
+
     all_class = "button-success button-filter"
-    validated_class = "button-success button-filter"
-    unvalidated_class = "button-success button-filter"
+    new_class = "button-success button-filter"
+    linked_class = "button-success button-filter"
+    auto_validated_class = "button-success button-filter"
     mode = request.GET.get("mode")
+
     if mode == "all":
-        all_phrases = Phrase.objects.all()
+        if is_linguist:
+            all_phrases = Phrase.objects.all()
+        else:
+            all_phrases = Phrase.objects.filter(status="new")
         all_class = "button-success button-filter button-filter-active"
-    elif mode == "validated":
-        all_phrases = Phrase.objects.filter(validated=True)
-        validated_class = "button-success button-filter button-filter-active"
-    elif mode == "unvalidated":
-        all_phrases = Phrase.objects.filter(validated=False)
-        unvalidated_class = "button-success button-filter button-filter-active"
+    elif mode == "new":
+        all_phrases = Phrase.objects.filter(status="new")
+        new_class = "button-success button-filter button-filter-active"
+    elif mode == "linked":
+        all_phrases = Phrase.objects.filter(status="linked")
+        linked_class = "button-success button-filter button-filter-active"
+    elif mode == "auto-validated":
+        all_phrases = Phrase.objects.filter(status="auto-validated")
+        auto_validated_class = "button-success button-filter button-filter-active"
+
     else:
         all_phrases = Phrase.objects.all()
         all_class = "button-success button-filter button-filter-active"
 
-    paginator = Paginator(all_phrases, 30)
+    paginator = Paginator(all_phrases, 5)
     page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)
     auth = request.user.is_authenticated
     context = dict(
         phrases=phrases,
         all_class=all_class,
-        validated_class=validated_class,
-        unvalidated_class=unvalidated_class,
+        new_class=new_class,
+        linked_class=linked_class,
+        auto_validated_class=auto_validated_class,
         auth=auth,
+        is_linguist=is_linguist,
     )
     return render(request, "validation/list_phrases.html", context)
 
@@ -383,3 +398,31 @@ def register(request):
 def encode_query_with_page(query, page):
     query["page"] = page
     return f"?{query.urlencode()}"
+
+
+@require_http_methods(["POST"])
+def record_translation_judgement(request, phrase_id):
+    # TODO: check that user is logged in
+    phrase = get_object_or_404(Phrase, id=phrase_id)
+    print(phrase)
+    judgement = json.loads(request.body)
+
+    if judgement["judgement"] == "yes":
+        phrase.validated = True
+        phrase.status = "linked"
+    elif judgement["judgement"] == "no":
+        phrase.validated = False
+        phrase.status = "new"
+
+    phrase.save()
+    print("got request")
+    return JsonResponse({"status": "ok"})
+
+
+def user_is_linguist(user):
+    if user.is_authenticated:
+        for g in user.groups.all():
+            if g.name == "Linguist":
+                return True
+
+    return False

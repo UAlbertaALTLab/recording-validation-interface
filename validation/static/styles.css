@@ -135,7 +135,23 @@ li.speaker_code {
   transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
 
-.button-success:hover {
+.button-success-solid {
+  color: var(--custom-white);
+  background-color: var(--custom-pale-green);
+  border: 2px solid var(--custom-green);
+  border-radius: var(--button-radius);
+  display: inline-block;
+  font-weight: 400;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  padding: .375rem .75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+.button-success:hover, .button-success-solid:hover {
   color: var(--custom-white);
   background-color: var(--custom-green);
   border-color: var(--custom-green);
@@ -157,7 +173,23 @@ li.speaker_code {
   transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
 
-.button-fail:hover {
+.button-fail-solid {
+  color: var(--custom-white);
+  background-color: var(--custom-pale-orange);
+  border: 2px solid var(--custom-orange);
+  border-radius: var(--button-radius);
+  display: inline-block;
+  font-weight: 400;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  padding: .375rem .75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+.button-fail:hover, .button-fail-solid:hover {
   color: var(--custom-white);
   background-color: var(--custom-orange);
   border-color: var(--custom-orange);
@@ -240,4 +272,41 @@ li.speaker_code {
   font-style: italic;
   margin-bottom: 0;
   margin-left: -2rem;
+}
+
+.segment-card {
+  margin: 1rem;
+}
+
+.card-body > table {
+  width: 100%;
+  margin: 0.5rem 0;
+}
+
+.right {
+  float: right;
+}
+
+.card-header-green {
+  border-radius: calc(.25rem - 1px) calc(.25rem - 1px) 0 0;
+  background-color: var(--custom-green);
+  padding: .75rem 1.25rem;
+  margin-bottom: 0;
+  border-bottom: 1px solid rgba(0,0,0,.125);
+}
+
+.card-header-red {
+  border-radius: calc(.25rem - 1px) calc(.25rem - 1px) 0 0;
+  background-color: var(--custom-orange);
+  padding: .75rem 1.25rem;
+  margin-bottom: 0;
+  border-bottom: 1px solid rgba(0,0,0,.125);
+}
+
+.card-header-grey {
+  border-radius: calc(.25rem - 1px) calc(.25rem - 1px) 0 0;
+  background-color: var(--custom-grey);
+  padding: .75rem 1.25rem;
+  margin-bottom: 0;
+  border-bottom: 1px solid rgba(0,0,0,.125);
 }
