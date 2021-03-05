@@ -22,6 +22,7 @@ import shutil
 from contextlib import closing
 
 from django.core.management.base import BaseCommand, CommandError  # type: ignore
+from tqdm import tqdm
 
 
 class Command(BaseCommand):
@@ -41,18 +42,33 @@ class Command(BaseCommand):
         # Generate this folder by running:
         # python3 manage.py importrecordings --wav --skip-db
         audio_dir = Path(_path)
-        for audio_file in audio_dir.iterdir():
+
+        query = """
+            select speaker_id, transcription from validation_recording as rec, validation_phrase as p
+            where rec.id = ?
+            and rec.phrase_id = p.id;
+            """
+
+        print("Writing transcriptions for all phrases")
+        self.write_transcriptions(audio_dir, query)
+
+        query = """
+            select speaker_id, transcription from validation_recording as rec, validation_phrase as p
+            where rec.id = ?
+            and rec.phrase_id = p.id
+            and p.status = "auto-validated";
+            """
+
+        print("Writing transcription for auto-validated phrases")
+        self.write_transcriptions(audio_dir, query)
+
+    def write_transcriptions(self, audio_dir, query):
+        training_dir = Path("/Users/jolenepoulin/Documents/training/")
+        for audio_file in tqdm(audio_dir.iterdir()):
             audio_id = audio_file.stem
-            audio_filename = audio_id + ".wav"
 
             with closing(sqlite3.connect("./db.sqlite3")) as conn:
                 cur = conn.cursor()
-
-                query = """
-                select speaker_id, transcription from validation_recording as rec, validation_phrase as p
-                where rec.id = ?
-                and rec.phrase_id = p.id;
-                """
 
                 cur.execute(query, (str(audio_id),))
                 result = cur.fetchone()
@@ -64,40 +80,60 @@ class Command(BaseCommand):
             if not speaker:
                 continue
 
-            # Create necessary directories if they do not exist
-            speaker_dir = audio_dir / speaker
-            speaker_audio_dir = audio_dir / speaker / "wav"
-            speaker_persephone_dir = audio_dir / speaker / "label"
-            speaker_s4a_dir = audio_dir / speaker / "s4a"
-
-            for _dir in [
-                speaker_dir,
-                speaker_audio_dir,
-                speaker_persephone_dir,
-                speaker_s4a_dir,
-            ]:
-                _dir.mkdir(exist_ok=True)
-
-            # Copy the audio file
-            from_dir = audio_file
-            to_dir = audio_dir / speaker / "wav" / audio_filename
-            shutil.copyfile(from_dir, to_dir)
+            self.make_directories(training_dir, speaker)
+            self.copy_audio_file(training_dir, audio_file, speaker)
 
             # Treat the transcription for Persephone and save it
             persephone_filename = audio_id + ".txt"
-            persephone_path = audio_dir / speaker / "label" / persephone_filename
+            if "auto-validated" in query:
+                persephone_path = (
+                    training_dir / speaker / "auto_val" / "label" / persephone_filename
+                )
+            else:
+                persephone_path = training_dir / speaker / "label" / persephone_filename
+
             persephone_trans = self.create_persephone_transcription(transcription)
             with open(persephone_path, "w", encoding="UTF=8") as f:
                 f.write(persephone_trans)
 
             # Save the transcription for Simple4All
             s4a_filename = audio_id + ".txt"
-            s4a_path = audio_dir / speaker / "s4a" / s4a_filename
+            if "auto-validated" in query:
+                s4a_path = training_dir / speaker / "auto_val" / "s4a" / s4a_filename
+            else:
+                s4a_path = training_dir / speaker / "s4a" / s4a_filename
+
             with open(s4a_path, "w", encoding="UTF=8") as f:
                 f.write(transcription)
 
-            # Print so we know we're making progress
-            print(f"Added phrase {transcription} for speaker {speaker}")
+    def copy_audio_file(self, training_dir, audio_file, speaker):
+        # Copy the audio file
+        audio_filename = audio_file.stem + ".wav"
+        from_dir = audio_file
+        to_dir = training_dir / speaker / "wav" / audio_filename
+        if not to_dir.is_file():
+            shutil.copyfile(from_dir, to_dir)
+
+    def make_directories(self, training_dir, speaker):
+        # Create necessary directories if they do not exist
+        speaker_dir = training_dir / speaker
+        speaker_audio_dir = training_dir / speaker / "wav"
+        speaker_persephone_dir = training_dir / speaker / "label"
+        speaker_s4a_dir = training_dir / speaker / "s4a"
+        speaker_auto_val_dir = training_dir / speaker / "auto_val"
+        speaker_persephone_auto_val_dir = training_dir / speaker / "auto_val" / "label"
+        speaker_s4a_auto_val_dir = training_dir / speaker / "auto_val" / "s4a"
+
+        for _dir in [
+            speaker_dir,
+            speaker_audio_dir,
+            speaker_persephone_dir,
+            speaker_s4a_dir,
+            speaker_auto_val_dir,
+            speaker_persephone_auto_val_dir,
+            speaker_s4a_auto_val_dir,
+        ]:
+            _dir.mkdir(exist_ok=True)
 
     def create_persephone_transcription(self, transcription):
         """
