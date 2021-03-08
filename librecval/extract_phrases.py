@@ -515,7 +515,8 @@ def get_mic_id(name: str) -> int:
     2
     >>> get_mic_id('2016-11-21-AM-US-_Record_Track1_001')
     1
-
+    >>> get_mic_id('2016-06-13am1-Track 3_001')
+    3
 
     This one is the most annoying format:
     >>> get_mic_id('2015-03-19-Rain-03')
@@ -541,6 +542,7 @@ def get_mic_id(name: str) -> int:
                 \d{2}       # day
                 (?:-?
                     (?:am|pm|AM|PM)
+                    \d?     # subsession
                 )?
                 (?:
                    [-_]     # Location
