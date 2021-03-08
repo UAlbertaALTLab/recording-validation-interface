@@ -26,7 +26,7 @@
 {% block content %}
 <h2> Results for <q>{{ search_term }}</q> </h2>
 {%  for phrase in phrases %}
-    <article class="card">
+    <article class="card shadow-sm">
         {% if phrase.validated %}
             <div class="card__header card__header--green">
             &nbsp;
