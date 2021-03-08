@@ -7,8 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
     for (let judgement of ["yes", "no"]) {
         for (let button of document.querySelectorAll(`.translation-judgement-accuracy-${judgement}`)) {
             button.addEventListener("click", async (e) => {
-                console.log("You clicked on", e)
-                console.log(e.target.dataset.phraseId)
                 const phraseId = e.target.dataset.phraseId
 
                 const response = await fetch(`api/record_translation_judgement/${phraseId}`, {
@@ -21,13 +19,39 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: JSON.stringify({judgement})
                 })
                 await response.json().then((r) => {
-                    console.log(r['status'])
                     if (r['status'] === 'ok') {
                         if (judgement === 'yes') {
                             button.setAttribute("class", "button-success-solid translation-judgement-accuracy-yes")
+                            const noButtons =  document.getElementsByClassName("translation-judgement-accuracy-no");
+                            for (let b of noButtons) {
+                                if (b.dataset.phraseId === phraseId) {
+                                    b.setAttribute("class", "button-fail translation-judgement-accuracy-no")
+                                }
+                            }
+
+                            const headers = document.getElementsByClassName("card-top")
+                            for (let h of headers) {
+                                if (h.dataset.phraseId === phraseId) {
+                                    h.setAttribute("class", "card-top card-header-green")
+                                }
+                            }
 
                         } else if (judgement === 'no') {
-                            button.setAttribute("class", "button-fail-solid translation-judgement-accuracy-yes")
+                            const yesButtons =  document.getElementsByClassName("translation-judgement-accuracy-yes");
+                            for (let b of yesButtons) {
+                                if (b.dataset.phraseId === phraseId) {
+                                    b.setAttribute("class", "button-success translation-judgement-accuracy-yes")
+                                }
+                            }
+
+                             const headers = document.getElementsByClassName("card-top")
+                            for (let h of headers) {
+                                if (h.dataset.phraseId === phraseId) {
+                                    h.setAttribute("class", "card-top card-header-grey")
+                                }
+                            }
+
+                            button.setAttribute("class", "button-fail-solid translation-judgement-accuracy-no")
                         }
                     }
                 })
