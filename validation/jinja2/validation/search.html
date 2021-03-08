@@ -25,44 +25,45 @@
 
 {% block content %}
 <h2> Results for <q>{{ search_term }}</q> </h2>
-    {%  for phrase in phrases %}
-    <div class="card segment-card">
-    {% if phrase.validated %}
-      <div class="card-header-green">
-          &nbsp;
+{%  for phrase in phrases %}
+    <article class="card segment-card">
+        {% if phrase.validated %}
+            <div class="card-header-green">
+            &nbsp;
 
-      </div>
-    {% else %}
-        <div class="card-header-red">
-          &nbsp;
+            </div>
+        {% else %}
+            <div class="card-header-red">
+            &nbsp;
 
-      </div>
-    {% endif %}
-      <div class="card-body">
-        <h3>{{ phrase.transcription }}</h3>
-        <h5>Translation: {{ phrase.translation }}</h5>
-        <table>
-            <th>Recording</th>
-            <th>Speaker</th>
+            </div>
+        {% endif %}
 
-            {% for recording in phrase.recordings %}
-                <tr>
-              <td>
-                <div class="rec-height">
-                  {{ macros.player(recording) }}
-                </div>
-              </td>
-                <td>
-                    {{ macros.speaker(recording) }}
-                </td>
-                </tr>
+        <div class="card-body">
+            <h3>{{ phrase.transcription }}</h3>
+            <h5>Translation: {{ phrase.translation }}</h5>
+            <table>
+                <th>Recording</th>
+                <th>Speaker</th>
 
-            {% endfor %}{# for recording in phrase.recordings #}
-        </table>
-        <a href={{ url('validation:segment_detail', phrase.id) }} class="button-success right">More Options</a>
-      </div>
-</div>
-    {% endfor %} {# phrase in phrases #}
+                {% for recording in phrase.recordings %}
+                    <tr>
+                        <td>
+                            <div class="rec-height">
+                            {{ macros.player(recording) }}
+                            </div>
+                        </td>
+                        <td>
+                            {{ macros.speaker(recording) }}
+                        </td>
+                    </tr>
+
+                {% endfor %}{# for recording in phrase.recordings #}
+            </table>
+            <a href={{ url('validation:segment_detail', phrase.id) }} class="button-success right">More Options</a>
+        </div>
+    </article>
+{% endfor %} {# phrase in phrases #}
 
 <nav>
   {{ macros.pagination_with_query(phrases, 'validation:search_phrases', query, encode_query_with_page) }}

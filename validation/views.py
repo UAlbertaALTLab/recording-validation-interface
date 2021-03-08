@@ -386,16 +386,16 @@ def register(request):
 def record_translation_judgement(request, phrase_id):
     # TODO: check that user is logged in
     phrase = get_object_or_404(Phrase, id=phrase_id)
-    print(phrase)
     judgement = json.loads(request.body)
 
     if judgement["judgement"] == "yes":
         phrase.validated = True
     elif judgement["judgement"] == "no":
         phrase.validated = False
+    else:
+        return HttpResponseBadRequest()
 
     phrase.save()
-    print("got request")
     return JsonResponse({"status": "ok"})
 
 
