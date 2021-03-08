@@ -49,7 +49,9 @@ def index(request):
     """
     The home page.
     """
+
     is_linguist = user_is_linguist(request.user)
+    is_community = user_is_community(request.user)
 
     all_class = "button-success button-filter"
     new_class = "button-success button-filter"
@@ -89,6 +91,7 @@ def index(request):
         auto_validated_class=auto_validated_class,
         auth=auth,
         is_linguist=is_linguist,
+        is_community=is_community,
     )
     return render(request, "validation/list_phrases.html", context)
 
@@ -97,6 +100,9 @@ def search_phrases(request):
     """
     The search results for pages.
     """
+    is_linguist = user_is_linguist(request.user)
+    is_community = user_is_community(request.user)
+
     query = request.GET.get("query")
     cree_matches = Phrase.objects.filter(transcription__contains=query)
     english_matches = Phrase.objects.filter(translation__contains=query)
@@ -114,6 +120,8 @@ def search_phrases(request):
         search_term=query,
         query=query_term,
         encode_query_with_page=encode_query_with_page,
+        is_linguist=is_linguist,
+        is_community=is_community,
     )
     return render(request, "validation/search.html", context)
 
@@ -139,6 +147,9 @@ def advanced_search_results(request):
     INTERSECT status
     INTERSECT speaker
     """
+    is_linguist = user_is_linguist(request.user)
+    is_community = user_is_community(request.user)
+
     transcription = request.GET.get("transcription")
     translation = request.GET.get("translation")
     analysis = request.GET.get("analysis")
@@ -210,6 +221,8 @@ def advanced_search_results(request):
         search_term="advanced search",
         query=query,
         encode_query_with_page=encode_query_with_page,
+        is_linguist=is_linguist,
+        is_community=is_community,
     )
     return render(request, "validation/search.html", context)
 
@@ -433,6 +446,15 @@ def user_is_linguist(user):
     if user.is_authenticated:
         for g in user.groups.all():
             if g.name == "Linguist":
+                return True
+
+    return False
+
+
+def user_is_community(user):
+    if user.is_authenticated:
+        for g in user.groups.all():
+            if g.name == "Linguist" or g.name == "Community":
                 return True
 
     return False
