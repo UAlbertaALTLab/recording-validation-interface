@@ -496,23 +496,32 @@ def get_mic_id(name: str) -> int:
     """
     Return the microphone number from the filename of the ELAN file.
 
-    There are at lease five formats in which ELAN files are named:
+    Here are the currently known "conventions" for naming the ELAN files.
     >>> get_mic_id('2_003.eaf')
     2
     >>> get_mic_id('2015-05-11am-03.eaf')
     3
-    >>> get_mic_id('2016-02-24am-Track 2_001.eaf')
-    2
     >>> get_mic_id('Track 4_001.eaf')
     4
     >>> get_mic_id('2017-05-18pm-US-Track_03')
     3
     >>> get_mic_id('2018-04-25am-OFF-Track_01')
     1
+    >>> get_mic_id('2016-02-24am-Track 2_001.eaf')
+    2
+    >>> get_mic_id('2017-04-20am-US_Recorded_Track3_001')
+    3
 
     This one is the most annoying format:
     >>> get_mic_id('2015-03-19-Rain-03')
     3
+
+    Any unknown formats raise an error:
+
+    >>> get_mic_id("2015-04-03_Track5_002_3.eaf")
+    Traceback (most recent call last):
+    ...
+    extract_phrases.InvalidFileName: Could not determine mic number from: 2015-04-03_Track5_002_3.eaf
     """
     # Match something like '2016-02-24am-Track 2_001.eaf'
     m = re.match(
@@ -530,9 +539,10 @@ def get_mic_id(name: str) -> int:
                    -        # Location
                    (?: US|DS|KCH|OFF)
                 )?
-                -
+                (?:_Recorded)?
+                [_-]
             )?
-            Track[_ ]
+            Track[_ -]?
         )?
         0*                  # ignore leading zeros
         (\d+)               # THE MIC NUMBER!
@@ -560,5 +570,5 @@ def get_mic_id(name: str) -> int:
         re.VERBOSE,
     )
     if not m:
-        raise InvalidFileName(name)
+        raise InvalidFileName(f"Could not determine mic number from: {name}")
     return int(m.group(1), 10)
