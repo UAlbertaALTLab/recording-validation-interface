@@ -115,7 +115,7 @@ li.speaker_code {
 
 .login-form-wrapper {
   margin: 0 auto;
-  width: 16rem;
+  width: 20rem;
   padding: 1rem;
 }
 
@@ -313,9 +313,20 @@ li.speaker_code {
 
 label {
   padding-top: 0.75rem;
+  display: flex;
+  align-content: start;
 }
 
 #id_role {
   list-style: none;
   display: inline-block;
+}
+
+.helptext {
+  font-size: 0.9rem;
+  font-style: italic;
+  color: #797878;
+  display: inline-block;
+  margin-left: -3rem;
+  width: 150%;
 }

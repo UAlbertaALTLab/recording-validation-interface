@@ -39,7 +39,16 @@ class Register(forms.Form):
         ("instructor", "Instructor"),
     ]
     role = forms.ChoiceField(
-        label="I am a(n)...", choices=CHOICES, widget=forms.RadioSelect, required=False
+        label="I am a(n)...",
+        choices=CHOICES,
+        widget=forms.RadioSelect,
+        required=False,
+        help_text="""
+        Info: Community members can validate entries and recordings. <br>
+        Linguists have access to analyses and linguistic breakdowns of entries. <br>
+        Instructors can only flag entries for inspection.<br>
+        If you are unsure what your role is, select 'Community'.<br>
+        """,
     )
 
     def clean_username(self):
