@@ -33,6 +33,18 @@ class Register(forms.Form):
         widget=forms.PasswordInput(attrs={"class": "form-control form-restrict"}),
     )
 
+    CHOICES = [
+        ("community", "Community Member"),
+        ("linguist", "Linguist"),
+        ("instructor", "Instructor"),
+    ]
+    role = forms.ChoiceField(
+        label="I am a(n)...",
+        choices=CHOICES,
+        initial="community",
+        widget=forms.RadioSelect,
+    )
+
     def clean_username(self):
         username = self.cleaned_data["username"]
         if not re.search(
