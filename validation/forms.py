@@ -39,9 +39,7 @@ class Register(forms.Form):
         ("instructor", "Instructor"),
     ]
     role = forms.ChoiceField(
-        label="I am a(n)...",
-        choices=CHOICES,
-        widget=forms.RadioSelect,
+        label="I am a(n)...", choices=CHOICES, widget=forms.RadioSelect, required=False
     )
 
     def clean_username(self):

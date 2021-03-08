@@ -366,8 +366,7 @@ def register(request):
     """
     Serves the register page and creates a new user on success
     """
-    form = Register(request.POST, initial={"role": "community"})
-    # form.fields['role'].initial = 'Community Member'
+    form = Register(request.POST)
 
     if request.method == "POST":
         if form.is_valid():
@@ -375,6 +374,11 @@ def register(request):
             password = form.cleaned_data["password"]
             first_name = form.cleaned_data["first_name"]
             last_name = form.cleaned_data["last_name"]
+            group = form.cleaned_data["role"]
+            if not group:
+                group = "Community"
+            else:
+                group = group.title()
             user = authenticate(request, username=username, password=password)
             if user is None:
                 new_user = User.objects.create_user(
@@ -384,8 +388,8 @@ def register(request):
                     last_name=last_name,
                 )
                 new_user.save()
-                community_group, _ = Group.objects.get_or_create(name="Community")
-                community_group.user_set.add(new_user)
+                group, _ = Group.objects.get_or_create(name=group)
+                group.user_set.add(new_user)
                 response = HttpResponseRedirect("/login")
                 return response
 
