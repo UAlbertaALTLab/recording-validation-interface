@@ -41,7 +41,6 @@ class Register(forms.Form):
     role = forms.ChoiceField(
         label="I am a(n)...",
         choices=CHOICES,
-        initial="community",
         widget=forms.RadioSelect,
     )
 

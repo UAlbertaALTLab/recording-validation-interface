@@ -366,7 +366,8 @@ def register(request):
     """
     Serves the register page and creates a new user on success
     """
-    form = Register(request.POST)
+    form = Register(request.POST, initial={"role": "community"})
+    # form.fields['role'].initial = 'Community Member'
 
     if request.method == "POST":
         if form.is_valid():
