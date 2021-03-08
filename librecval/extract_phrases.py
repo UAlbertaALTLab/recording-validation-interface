@@ -513,8 +513,8 @@ def get_mic_id(name: str) -> int:
     3
     >>> get_mic_id('2016-11-21-AM-US-_Recorded_Track2_001')
     2
-
-
+    >>> get_mic_id('2016-11-21-AM-US-_Record_Track1_001')
+    1
 
 
     This one is the most annoying format:
@@ -546,7 +546,7 @@ def get_mic_id(name: str) -> int:
                    [-_]     # Location
                    (?: US|DS|KCH|OFF)
                 )?
-                (?: -? _Recorded)?
+                (?: -? _Record(?:ed)?)?
                 [_-]
             )?
             Track[_ -]?
