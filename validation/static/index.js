@@ -24,9 +24,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 if (judgement === 'yes') {
-                    button.setAttribute("class", "button-success-solid translation-judgement-accuracy-yes")
+                    button.setAttribute("class", "button button--success-solid translation-judgement-accuracy-yes")
                 } else if (judgement === 'no') {
-                    button.setAttribute("class", "button-fail-solid translation-judgement-accuracy-no")
+                    button.setAttribute("class", "button button--fail-solid translation-judgement-accuracy-no")
                 }
             })
         }

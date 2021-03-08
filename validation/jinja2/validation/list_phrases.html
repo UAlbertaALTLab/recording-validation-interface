@@ -27,8 +27,8 @@
   <form class="form-inline ml-2 my-2 my-lg-0" method="GET" action="{{
     url('validation:index')
   }}">
-    <div class="filters">
-      <button class="{{ all_class }}"" type="submit" id="filter-all" name="mode" value="all">All</button>
+    <div class="filter">
+      <button class="{{ all_class }}" type="submit" id="filter-all" name="mode" value="all">All</button>
       <button class="{{ validated_class }}" type="submit" id="filter-validated" name="mode" value="validated">Validated</button>
       <button class="{{ unvalidated_class }}" type="submit" id="filter-unvalidated" name="mode" value="unvalidated">Unvalidated</button>
     </div>
@@ -36,25 +36,25 @@
 </div>
 
     {%  for phrase in phrases %}
-    <div class="card segment-card">
+    <div class="card">
     {% if phrase.validated %}
-      <div class="card-header-green">
+      <div class="card__header card__header--green">
           &nbsp;
 
       </div>
     {% else %}
-        <div class="card-header-grey">
+        <div class="card__header card__header--grey">
           &nbsp;
 
       </div>
     {% endif %}
-      <div class="card-body">
-        <h3>{{ phrase.transcription }}</h3>
-        <h5>Translation: {{ phrase.translation }}</h5>
+      <div class="card__body">
+        <p class="card__title--cree">{{ phrase.transcription }}</p>
+        <p class="card__title--english">Translation: {{ phrase.translation }}</p>
         <p>Is this translation accurate?
-            <button class="button-success translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }}>Yes</button>
-            <button class="button-fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }}>No</button></p>
-        <table>
+            <button class="button button--success translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }}>Yes</button>
+            <button class="button button--fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }}>No</button></p>
+        <table class="card__body--table">
             <th>Recording</th>
             <th>Speaker</th>
             <th>This recording is...</th>
@@ -70,13 +70,13 @@
                     {{ macros.speaker(recording) }}
                 </td>
                 <td>
-                <button class="button-success">Good</button> <button class="button-fail">Bad</button>
+                <button class="button button--success">Good</button> <button class="button button--fail">Bad</button>
                 </td>
                 </tr>
 
             {% endfor %}{# for recording in phrase.recordings #}
         </table>
-        <a href={{ url('validation:segment_detail', phrase.id) }} class="button-success right">More Options</a>
+        <a href={{ url('validation:segment_detail', phrase.id) }} class="button button--success right">More Options</a>
       </div>
 </div>
     {% endfor %} {# phrase in phrases #}
