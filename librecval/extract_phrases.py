@@ -511,6 +511,11 @@ def get_mic_id(name: str) -> int:
     2
     >>> get_mic_id('2017-04-20am-US_Recorded_Track3_001')
     3
+    >>> get_mic_id('2016-11-21-AM-US-_Recorded_Track2_001')
+    2
+
+
+
 
     This one is the most annoying format:
     >>> get_mic_id('2015-03-19-Rain-03')
@@ -534,12 +539,14 @@ def get_mic_id(name: str) -> int:
                 \d{2}       # month
                 -
                 \d{2}       # day
-                (?:[ap]m)   # AM/PM
+                (?:-?
+                    (?:am|pm|AM|PM)
+                )?
                 (?:
-                   -        # Location
+                   [-_]     # Location
                    (?: US|DS|KCH|OFF)
                 )?
-                (?:_Recorded)?
+                (?: -? _Recorded)?
                 [_-]
             )?
             Track[_ -]?
