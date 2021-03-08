@@ -21,7 +21,7 @@ const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 <body>
 
   {# The header #}
-  <nav class="navbar navbar-expand-md navbar-dark header-dark">
+  <nav class="navbar navbar-expand-md navbar-dark header--dark">
     <a class="navbar-brand" href="{{ url('validation:index') }}">
       <span lang="en" class="d-none d-sm-inline"> Maskwacîs </span>
       <span lang="crk" class="d-sm-none"> ᒪᐢᑿᒋᐢ </span>
@@ -37,9 +37,9 @@ const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         url('validation:search_phrases')
       }}">
         <input class="form-control mr-sm-2" name="query" type="search" placeholder="Search" aria-label="Search">
-        <button class="my-2 my-sm-0 button-success" type="submit">Search</button>
+        <button class="my-2 my-sm-0 button button--success" type="submit">Search</button>
         &nbsp;
-        <a data-cy="advanced-search-button" href="{{ url('validation:advanced_search') }}" class="btn button-fail my-2 my-sm-0">Advanced Search</a>
+        <a data-cy="advanced-search-button" href="{{ url('validation:advanced_search') }}" class="btn button button--fail my-2 my-sm-0">Advanced Search</a>
     
       </form>
     </div>
@@ -47,9 +47,9 @@ const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     {# Login button #}
     <div>
         {% if auth %}
-        <a href="/logout" id="logout-link" style="color: white;">Logout</a>
+        <a href="/logout" id="logout__link" style="color: white;">Logout</a>
         {% else %}
-        <a href="/login" id="login-link" style="color: white;">Login</a>
+        <a href="/login" id="login__link" style="color: white;">Login</a>
         {% endif %}
     </div>
   </nav>

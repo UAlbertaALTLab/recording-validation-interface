@@ -51,10 +51,10 @@ def index(request):
     """
     is_linguist = user_is_linguist(request.user)
 
-    all_class = "button-success button-filter"
-    new_class = "button-success button-filter"
-    linked_class = "button-success button-filter"
-    auto_validated_class = "button-success button-filter"
+    all_class = "button button--success filter__button"
+    new_class = "button button--success filter__button"
+    linked_class = "button button--success filter__button"
+    auto_validated_class = "button button--success filter__button"
     mode = request.GET.get("mode")
 
     if mode == "all":
@@ -62,20 +62,21 @@ def index(request):
             all_phrases = Phrase.objects.all()
         else:
             all_phrases = Phrase.objects.filter(status="new")
-        all_class = "button-success button-filter button-filter-active"
+        all_class = "button button--success filter__button filter__button--active"
     elif mode == "new":
         all_phrases = Phrase.objects.filter(status="new")
-        new_class = "button-success button-filter button-filter-active"
+        new_class = "button button--success filter__button filter__button--active"
     elif mode == "linked":
         all_phrases = Phrase.objects.filter(status="linked")
-        linked_class = "button-success button-filter button-filter-active"
+        linked_class = "button button--success filter__button filter__button--active"
     elif mode == "auto-validated":
         all_phrases = Phrase.objects.filter(status="auto-validated")
-        auto_validated_class = "button-success button-filter button-filter-active"
-
+        auto_validated_class = (
+            "button button--success filter__button filter__button--active"
+        )
     else:
         all_phrases = Phrase.objects.all()
-        all_class = "button-success button-filter button-filter-active"
+        all_class = "button button--success filter__button filter__button--active"
 
     paginator = Paginator(all_phrases, 5)
     page_no = request.GET.get("page", 1)
@@ -404,7 +405,6 @@ def encode_query_with_page(query, page):
 def record_translation_judgement(request, phrase_id):
     # TODO: check that user is logged in
     phrase = get_object_or_404(Phrase, id=phrase_id)
-    print(phrase)
     judgement = json.loads(request.body)
 
     if judgement["judgement"] == "yes":
@@ -413,9 +413,10 @@ def record_translation_judgement(request, phrase_id):
     elif judgement["judgement"] == "no":
         phrase.validated = False
         phrase.status = "new"
+    else:
+        return HttpResponseBadRequest()
 
     phrase.save()
-    print("got request")
     return JsonResponse({"status": "ok"})
 
 
