@@ -95,11 +95,16 @@ def search_phrases(request):
     query_term = QueryDict("", mutable=True)
     query_term.update({"query": query})
 
+    recordings = {}
+    for phrase in all_matches:
+        recordings[phrase] = [recording for recording in phrase.recordings]
+
     paginator = Paginator(all_matches, 5)
     page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)
     context = dict(
         phrases=phrases,
+        recordings=recordings,
         search_term=query,
         query=query_term,
         encode_query_with_page=encode_query_with_page,
@@ -133,6 +138,7 @@ def advanced_search_results(request):
     analysis = request.GET.get("analysis")
     status = request.GET.get("status")
     speakers = request.GET.getlist("speaker-options")
+    quality = request.GET.get("quality")
 
     if transcription != "":
         cree_matches = Phrase.objects.filter(transcription__contains=transcription)
@@ -168,14 +174,19 @@ def advanced_search_results(request):
     else:
         phrase_and_status_matches = phrase_matches
 
+    recordings = {}
     all_matches = []
-    if "all" in speakers or speakers == []:
-        all_matches = [p for p in phrase_and_status_matches]
-    else:
-        for phrase in phrase_and_status_matches:
+    for phrase in phrase_and_status_matches:
+        recordings[phrase] = []
+        if ("all" in speakers or speakers == []) and (quality == "all" or not quality):
+            recordings[phrase] = list(phrase.recordings)
+        else:
             for recording in phrase.recordings:
-                if recording.speaker.code in speakers:
-                    all_matches.append(phrase)
+                if recording.speaker.code in speakers or recording.quality == quality:
+                    recordings[phrase].append(recording)
+
+        if recordings[phrase]:
+            all_matches.append(phrase)
 
     all_matches.sort(key=lambda phrase: phrase.transcription)
 
@@ -196,6 +207,7 @@ def advanced_search_results(request):
     phrases = paginator.get_page(page_no)
     context = dict(
         phrases=phrases,
+        recordings=recordings,
         search_term="advanced search",
         query=query,
         encode_query_with_page=encode_query_with_page,
