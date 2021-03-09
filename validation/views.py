@@ -58,6 +58,8 @@ def index(request):
     linked_class = "button button--success filter__button"
     auto_validated_class = "button button--success filter__button"
 
+    mode = request.GET.get("mode")
+
     if mode == "all":
         if is_linguist:
             all_phrases = Phrase.objects.all()
