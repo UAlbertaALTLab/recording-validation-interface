@@ -25,56 +25,45 @@
 
 {% block content %}
 <h2> Results for <q>{{ search_term }}</q> </h2>
-    {%  for phrase in phrases %}
-    <div class="card segment-card">
-    {% if phrase.validated %}
-      <div class="card-header-green card-top" data-phrase-id={{ phrase.id }}>
-          &nbsp;
-      </div>
-    {% else %}
-        <div class="card-header-grey card-top" data-phrase-id={{ phrase.id }}>
-          &nbsp;
-      </div>
-    {% endif %}
-      <div class="card-body">
-        <h3>{{ phrase.transcription }}</h3>
-        <h5>Translation: {{ phrase.translation }}</h5>
-        <p>Is this translation accurate?
-            {% if phrase.status == "linked" %}
-                <button class="button-success-solid translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }}>Yes</button>
-                <button class="button-fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }}>No</button></p>
-            {% else %}
-                <button class="button-success translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }}>Yes</button>
-                <button class="button-fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }}>No</button></p>
-            {%  endif %}
-          <table>
-            <th>Recording</th>
-            <th>Speaker</th>
-            <th>This recording is...</th>
+{%  for phrase in phrases %}
+    <article class="card shadow-sm">
+        {% if phrase.validated %}
+            <div class="card__header card__header--green">
+            &nbsp;
 
-            {% for recording in phrase.recordings %}
-                <tr>
-              <td>
-                <div class="rec-height">
-                  {{ macros.player(recording) }}
-                </div>
-              </td>
-                <td>
-                    {{ macros.speaker(recording) }}
-                </td>
-                <td>
-                <button class="button-success">Good</button> <button class="button-fail">Bad</button>
-                </td>
-                </tr>
+            </div>
+        {% else %}
+            <div class="card__header card__header--red">
+            &nbsp;
 
-            {% endfor %}{# for recording in phrase.recordings #}
-        </table>
-      {% if is_linguist %}
-        <a href={{ url('validation:segment_detail', phrase.id) }} class="button-success right">More Options</a>
-      {% endif %} {# is linguist #}
-      </div>
-</div>
-    {% endfor %} {# phrase in phrases #}
+            </div>
+        {% endif %}
+
+        <div class="card__body">
+            <h3>{{ phrase.transcription }}</h3>
+            <h5>Translation: {{ phrase.translation }}</h5>
+            <table class="card__body--table">
+                <th>Recording</th>
+                <th>Speaker</th>
+
+                {% for recording in phrase.recordings %}
+                    <tr>
+                        <td>
+                            <div class="rec-height">
+                            {{ macros.player(recording) }}
+                            </div>
+                        </td>
+                        <td>
+                            {{ macros.speaker(recording) }}
+                        </td>
+                    </tr>
+
+                {% endfor %}{# for recording in phrase.recordings #}
+            </table>
+            <a href={{ url('validation:segment_detail', phrase.id) }} class="button button--success right">More Options</a>
+        </div>
+    </article>
+{% endfor %} {# phrase in phrases #}
 
 <nav>
   {{ macros.pagination_with_query(phrases, 'validation:search_phrases', query, encode_query_with_page) }}
