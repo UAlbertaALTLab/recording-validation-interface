@@ -41,11 +41,11 @@
     {%  for phrase in phrases %}
     <div class="card shadow-sm">
     {% if phrase.validated %}
-      <div class="card__header card__header--green card-top" data-phrase-id={{ phrase.id }}>
+      <div class="card__header card__header--green" data-phrase-id={{ phrase.id }}>
           &nbsp;
       </div>
     {% else %}
-        <div class="card__header card__header--grey card-top" data-phrase-id={{ phrase.id }}>
+        <div class="card__header card__header--grey" data-phrase-id={{ phrase.id }}>
           &nbsp;
       </div>
     {% endif %}
