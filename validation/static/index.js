@@ -16,19 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     },
                     body: JSON.stringify({judgement})
                 })
-                await response.json().then((r) => {
-                    if (r['status'] === 'ok') {
-                        if (judgement === 'yes') {
-                            button.setAttribute("class", "button-success-solid translation-judgement-accuracy-yes")
-                            
-
-                        } else if (judgement === 'no') {
-                            
-
-                            button.setAttribute("class", "button-fail-solid translation-judgement-accuracy-no")
-                        }
-                    }
-                })
 
                 let r = await response.json()
 
@@ -42,14 +29,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     const noButtons =  document.getElementsByClassName("translation-judgement-accuracy-no");
                     for (let b of noButtons) {
                         if (b.dataset.phraseId === phraseId) {
-                            b.setAttribute("class", "button-fail translation-judgement-accuracy-no")
+                            b.setAttribute("class", "button button--fail translation-judgement-accuracy-no")
                         }
                     }
 
-                    const headers = document.getElementsByClassName("card-top")
+                    const headers = document.getElementsByClassName("card__header")
                     for (let h of headers) {
                         if (h.dataset.phraseId === phraseId) {
-                            h.setAttribute("class", "card-top card-header-green")
+                            h.setAttribute("class", "card__header card__header--green")
                         }
                     }
                 } else if (judgement === 'no') {
@@ -57,14 +44,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     const yesButtons =  document.getElementsByClassName("translation-judgement-accuracy-yes");
                         for (let b of yesButtons) {
                             if (b.dataset.phraseId === phraseId) {
-                                b.setAttribute("class", "button-success translation-judgement-accuracy-yes")
+                                b.setAttribute("class", "button button--success translation-judgement-accuracy-yes")
                             }
                         }
 
-                            const headers = document.getElementsByClassName("card-top")
+                            const headers = document.getElementsByClassName("card__header")
                         for (let h of headers) {
                             if (h.dataset.phraseId === phraseId) {
-                                h.setAttribute("class", "card-top card-header-grey")
+                                h.setAttribute("class", "card__header card__header--grey")
                             }
                         }
                     
