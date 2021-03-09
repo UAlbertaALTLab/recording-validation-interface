@@ -8,9 +8,13 @@
         <form action="" id="login__form" method="POST">
             <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
             {{ form }}
-            <input type="submit" value="Login" id="login-button" class="login__button">
+            <div class="center">
+                <input type="submit" value="Login" id="login-button" class="login__button">
+            </div>
         </form>
-        <a href="{{ url('validation:register') }}"><button id="register-button" class="register__button">Register</button></a>
+        <div class="center">
+            <a href="{{ url('validation:register') }}"><button id="register-button" class="register__button">Register</button></a>
+        </div>
     </div>
 </div>
 {% endblock content %}

@@ -25,26 +25,39 @@
 
 {% block content %}
 <h2> Results for <q>{{ search_term }}</q> </h2>
-{%  for phrase in phrases %}
-    <article class="card shadow-sm">
-        {% if phrase.validated %}
-            <div class="card__header card__header--green">
-            &nbsp;
+    {%  for phrase in phrases %}
+        <article class="card shadow-sm">
+            {% if phrase.validated %}
+                <div class="card__header card__header--green" data-phrase-id={{ phrase.id }}>
+                &nbsp;
+                </div>
+            {% else %}
+                <div class="card__header card__header--grey" data-phrase-id={{ phrase.id }}>
+                &nbsp;
+                </div>
+            {% endif %}
+            <div class="card__body">
+                <h3>{{ phrase.transcription }}</h3>
+                <h5>Translation: {{ phrase.translation }}</h5>
 
-            </div>
-        {% else %}
-            <div class="card__header card__header--red">
-            &nbsp;
+                {% if is_community %}
+                    <p>Is this translation accurate?
+                    {% if phrase.status == "linked" %}
+                        <button class="button button--success-solid translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }}>Yes</button>
+                        <button class="button button--fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }}>No</button></p>
+                    {% else %}
+                        <button class="button button--success translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }}>Yes</button>
+                        <button class="button button--fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }}>No</button></p>
+                    {%  endif %}
+                {% endif %} {# check for instructor privileges #}
 
-            </div>
-        {% endif %}
+                <table class="card__body--table">
+                    <th>Recording</th>
+                    <th>Speaker</th>
 
-        <div class="card__body">
-            <h3>{{ phrase.transcription }}</h3>
-            <h5>Translation: {{ phrase.translation }}</h5>
-            <table class="card__body--table">
-                <th>Recording</th>
-                <th>Speaker</th>
+                    {% if is_community %}
+                        <th>This recording is...</th>
+                    {% endif %}
 
                 {% for recording in recordings[phrase] %}
                     <tr>
@@ -56,14 +69,21 @@
                         <td>
                             {{ macros.speaker(recording) }}
                         </td>
-                    </tr>
+                            {% if is_community %}
+                                <td>
+                                    <button class="button button--success">Good</button> <button class="button button--fail">Bad</button>
+                                </td>
+                            {% endif %}
+                        </tr>
 
-                {% endfor %}{# for recording in phrase.recordings #}
-            </table>
-            <a href={{ url('validation:segment_detail', phrase.id) }} class="button button--success right">More Options</a>
-        </div>
-    </article>
-{% endfor %} {# phrase in phrases #}
+                    {% endfor %}{# for recording in phrase.recordings #}
+                </table>
+                {% if is_linguist %}
+                    <a href={{ url('validation:segment_detail', phrase.id) }} class="button button--success right">More Options</a>
+                {% endif %} {# is linguist #}
+            </div>
+        </article>
+    {% endfor %} {# phrase in phrases #}
 
 <nav>
   {{ macros.pagination_with_query(phrases, 'validation:search_phrases', query, encode_query_with_page) }}
