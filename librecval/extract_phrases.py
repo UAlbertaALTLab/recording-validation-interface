@@ -188,7 +188,9 @@ class RecordingExtractor:
             speaker = self.metadata[session_id][mic_id]
 
             self.logger.debug(
-                "Opening audio and .eaf from %s for speaker %s", sound_file, speaker,
+                "Opening audio and .eaf from %s for speaker %s",
+                sound_file,
+                speaker,
             )
 
             audio = AudioSegment.from_file(fspath(sound_file))
@@ -499,29 +501,31 @@ def get_mic_id(name: str) -> int:
     Here are the currently known "conventions" for naming the ELAN files.
     >>> get_mic_id('2_003.eaf')
     2
-    >>> get_mic_id('2015-05-11am-03.eaf')
-    3
     >>> get_mic_id('Track 4_001.eaf')
     4
+    >>> get_mic_id('2015-03-19-Rain-03')
+    3
+    >>> get_mic_id('2015-05-11am-03.eaf')
+    3
     >>> get_mic_id('2017-05-18pm-US-Track_03')
     3
     >>> get_mic_id('2018-04-25am-OFF-Track_01')
     1
+    >>> get_mic_id('2016-06-13am1-Track 3_001')
+    3
+    >>> get_mic_id('2016-10-17pm-ds-Track 2_001')
+    2
     >>> get_mic_id('2016-02-24am-Track 2_001.eaf')
     2
+    >>> get_mic_id('2016-11-21-AM-US-_Record_Track1_001')
+    1
     >>> get_mic_id('2017-04-20am-US_Recorded_Track3_001')
     3
     >>> get_mic_id('2016-11-21-AM-US-_Recorded_Track2_001')
     2
-    >>> get_mic_id('2016-11-21-AM-US-_Record_Track1_001')
-    1
-    >>> get_mic_id('2016-06-13am1-Track 3_001')
-    3
     >>> get_mic_id('2017-02-16pm-DS_Recorded_Track2_001_1')
     2
 
-    >>> get_mic_id('2015-03-19-Rain-03')
-    3
 
     Unknown formats will give a descriptive error message:
 
