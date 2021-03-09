@@ -79,12 +79,20 @@ def index(request):
         all_phrases = Phrase.objects.all()
         all_class = "button button--success filter__button filter__button--active"
 
+    # The _segment_card needs a dictionary of recordings
+    # in order to properly display search results
+    # so we're just going to play nice with it here
+    recordings = {}
+    for phrase in all_phrases:
+        recordings[phrase] = phrase.recordings
+
     paginator = Paginator(all_phrases, 5)
     page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)
     auth = request.user.is_authenticated
     context = dict(
         phrases=phrases,
+        recordings=recordings,
         all_class=all_class,
         new_class=new_class,
         linked_class=linked_class,
