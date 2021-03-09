@@ -2,8 +2,6 @@
 
 //    translation-judgement-accuracy-yes
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("hello")
-    console.log(csrftoken)
     for (let judgement of ["yes", "no"]) {
         for (let button of document.querySelectorAll(`.translation-judgement-accuracy-${judgement}`)) {
             button.addEventListener("click", async (e) => {
@@ -18,43 +16,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     },
                     body: JSON.stringify({judgement})
                 })
-                await response.json().then((r) => {
-                    if (r['status'] === 'ok') {
-                        if (judgement === 'yes') {
-                            button.setAttribute("class", "button-success-solid translation-judgement-accuracy-yes")
-                            const noButtons =  document.getElementsByClassName("translation-judgement-accuracy-no");
-                            for (let b of noButtons) {
-                                if (b.dataset.phraseId === phraseId) {
-                                    b.setAttribute("class", "button-fail translation-judgement-accuracy-no")
-                                }
-                            }
 
-                            const headers = document.getElementsByClassName("card-top")
-                            for (let h of headers) {
-                                if (h.dataset.phraseId === phraseId) {
-                                    h.setAttribute("class", "card-top card-header-green")
-                                }
-                            }
+                let r = await response.json()
 
-                        } else if (judgement === 'no') {
-                            const yesButtons =  document.getElementsByClassName("translation-judgement-accuracy-yes");
-                            for (let b of yesButtons) {
-                                if (b.dataset.phraseId === phraseId) {
-                                    b.setAttribute("class", "button-success translation-judgement-accuracy-yes")
-                                }
-                            }
+                if (r.status != 'ok') {
+                    return
+                }
 
-                             const headers = document.getElementsByClassName("card-top")
-                            for (let h of headers) {
-                                if (h.dataset.phraseId === phraseId) {
-                                    h.setAttribute("class", "card-top card-header-grey")
-                                }
-                            }
-
-                            button.setAttribute("class", "button-fail-solid translation-judgement-accuracy-no")
-                        }
-                    }
-                })
+                if (judgement === 'yes') {
+                    button.setAttribute("class", "button button--success-solid translation-judgement-accuracy-yes")
+                } else if (judgement === 'no') {
+                    button.setAttribute("class", "button button--fail-solid translation-judgement-accuracy-no")
+                }
             })
         }
     }
