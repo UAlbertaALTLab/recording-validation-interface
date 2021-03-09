@@ -451,6 +451,22 @@ def record_translation_judgement(request, phrase_id):
     return JsonResponse({"status": "ok"})
 
 
+@require_http_methods(["POST"])
+def record_audio_quality_judgement(request, recording_id):
+    # TODO: check that user is logged in
+    rec = get_object_or_404(Recording, id=recording_id)
+    print(recording_id)
+    judgement = json.loads(request.body)
+
+    if judgement["judgement"] in ["good", "bad"]:
+        rec.quality = judgement["judgement"]
+    else:
+        return HttpResponseBadRequest()
+
+    rec.save()
+    return JsonResponse({"status": "ok"})
+
+
 def encode_query_with_page(query, page):
     query["page"] = page
     return f"?{query.urlencode()}"

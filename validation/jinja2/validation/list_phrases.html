@@ -85,7 +85,8 @@
                             </td>
                             {% if is_community %}
                                 <td>
-                                    <button class="button button--success">Good</button> <button class="button button--fail">Bad</button>
+                                    <button class="button button--success audio-quality-good" data-rec-id={{ recording.id }}>Good</button>
+                                    <button class="button button--fail audio-quality-bad" data-rec-id={{ recording.id }}>Bad</button>
                                 </td>
                             {% endif %}
                         </tr>
