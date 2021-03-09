@@ -23,75 +23,77 @@
 {% import 'validation/_macros.html' as macros %}
 
 {% block content %}
-<div>
-  <form class="form-inline ml-2 my-2 my-lg-0" method="GET" action="{{
-    url('validation:index')
-  }}">
-    <div class="filters">
-      <button class="{{ all_class }}" type="submit" id="filter-all" name="mode" value="all">All</button>
-      <button class="{{ new_class }}" type="submit" id="filter-new" name="mode" value="new">New</button>
-      <button class="{{ linked_class }}" type="submit" id="filter-linked" name="mode" value="linked">Linked</button>
-        {% if is_linguist %}
-      <button class="{{ auto_validated_class }}" type="submit" id="filter-auto" name="mode" value="auto-validated">Auto-Validated</button>
-        {% endif %} {# if is_linguist #}
+    <div>
+      <form class="form-inline ml-2 my-2 my-lg-0" method="GET" action="{{
+        url('validation:index')
+      }}">
+        <div class="filters">
+          <button class="{{ all_class }}" type="submit" id="filter-all" name="mode" value="all">All</button>
+          <button class="{{ new_class }}" type="submit" id="filter-new" name="mode" value="new">New</button>
+          <button class="{{ linked_class }}" type="submit" id="filter-linked" name="mode" value="linked">Linked</button>
+            {% if is_linguist %}
+          <button class="{{ auto_validated_class }}" type="submit" id="filter-auto" name="mode" value="auto-validated">Auto-Validated</button>
+            {% endif %} {# if is_linguist #}
+        </div>
+      </form>
     </div>
-  </form>
-</div>
 
     {%  for phrase in phrases %}
-    <div class="card shadow-sm">
-    {% if phrase.validated %}
-      <div class="card__header card__header--green" data-phrase-id={{ phrase.id }}>
-          &nbsp;
-      </div>
-    {% else %}
-        <div class="card__header card__header--grey" data-phrase-id={{ phrase.id }}>
-          &nbsp;
-      </div>
-    {% endif %}
-      <div class="card__body">
-        <p class="card__title--cree">{{ phrase.transcription }}</p>
-        <p class="card__title--english">Translation: {{ phrase.translation }}</p>
-        <p>Is this translation accurate?
-            {% if phrase.status == "linked" %}
-                <button class="button-success-solid translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }}>Yes</button>
-                <button class="button-fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }}>No</button></p>
-            {% else %}
-                <button class="button-success translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }}>Yes</button>
-                <button class="button-fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }}>No</button></p>
-            {%  endif %}
-          <table class="card__body--table">
-            <th>Recording</th>
-            <th>Speaker</th>
-            <th>This recording is...</th>
-
-            {% for recording in phrase.recordings %}
-                <tr>
-              <td>
-                <div class="rec-height">
-                  {{ macros.player(recording) }}
+        <div class="card shadow-sm">
+            {% if phrase.validated %}
+                <div class="card__header card__header--green" data-phrase-id={{ phrase.id }}>
+                &nbsp;
                 </div>
-              </td>
-                <td>
-                    {{ macros.speaker(recording) }}
-                </td>
-                <td>
-                <button class="button button--success">Good</button> <button class="button button--fail">Bad</button>
-                </td>
-                </tr>
+            {% else %}
+                <div class="card__header card__header--grey" data-phrase-id={{ phrase.id }}>
+                &nbsp;
+                </div>
+            {% endif %}
 
-            {% endfor %}{# for recording in phrase.recordings #}
-        </table>
-      {% if is_linguist %}
-        <a href={{ url('validation:segment_detail', phrase.id) }} class="button-success right">More Options</a>
-      {% endif %} {# is linguist #}
-      </div>
-</div>
+            <div class="card__body">
+                <p class="card__title--cree">{{ phrase.transcription }}</p>
+                <p class="card__title--english">Translation: {{ phrase.translation }}</p>
+                <p>Is this translation accurate?
+                {% if phrase.status == "linked" %}
+                    <button class="button-success-solid translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }}>Yes</button>
+                    <button class="button-fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }}>No</button></p>
+                {% else %}
+                    <button class="button-success translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }}>Yes</button>
+                    <button class="button-fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }}>No</button></p>
+                {%  endif %}
+
+                <table class="card__body--table">
+                    <th>Recording</th>
+                    <th>Speaker</th>
+                    <th>This recording is...</th>
+
+                    {% for recording in phrase.recordings %}
+                        <tr>
+                            <td>
+                                <div class="rec-height">
+                                    {{ macros.player(recording) }}
+                                </div>
+                            </td>
+                            <td>
+                                {{ macros.speaker(recording) }}
+                            </td>
+                            <td>
+                                <button class="button button--success">Good</button> <button class="button button--fail">Bad</button>
+                            </td>
+                        </tr>
+
+                    {% endfor %}{# for recording in phrase.recordings #}
+                </table>
+                {% if is_linguist %}
+                    <a href={{ url('validation:segment_detail', phrase.id) }} class="button-success right">More Options</a>
+                {% endif %} {# is linguist #}
+            </div>
+        </div>
     {% endfor %} {# phrase in phrases #}
 
-<nav>
-  {{ macros.pagination(phrases, 'list_phrases') }}
-</nav>
+    <nav>
+      {{ macros.pagination(phrases, 'list_phrases') }}
+    </nav>
 {% endblock content %}
 
 {# vim: set ft=htmldjango :#}
