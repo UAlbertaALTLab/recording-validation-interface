@@ -84,8 +84,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (judgement === 'good') {
                     button.setAttribute("class", "button button--success-solid audio-quality-good")
+
+                    const badButtons =  document.getElementsByClassName("audio-quality-bad");
+                    for (let b of badButtons) {
+                        if (b.dataset.recId === recordingId) {
+                            b.setAttribute("class", "button button--fail audio-quality-bad")
+                        }
+                    }
                 } else if (judgement === 'bad') {
                     button.setAttribute("class", "button button--fail-solid audio-quality-bad")
+
+                    const goodButtons =  document.getElementsByClassName("audio-quality-good");
+                    for (let b of goodButtons) {
+                        if (b.dataset.recId === recordingId) {
+                            b.setAttribute("class", "button button--success audio-quality-good")
+                        }
+                    }
                 
                 }
         })
