@@ -25,8 +25,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (judgement === 'yes') {
                     button.setAttribute("class", "button button--success-solid translation-judgement-accuracy-yes")
+
+                    const noButtons =  document.getElementsByClassName("translation-judgement-accuracy-no");
+                    for (let b of noButtons) {
+                        if (b.dataset.phraseId === phraseId) {
+                            b.setAttribute("class", "button button--fail translation-judgement-accuracy-no")
+                        }
+                    }
+
+                    const headers = document.getElementsByClassName("card__header")
+                    for (let h of headers) {
+                        if (h.dataset.phraseId === phraseId) {
+                            h.setAttribute("class", "card__header card__header--green")
+                        }
+                    }
                 } else if (judgement === 'no') {
                     button.setAttribute("class", "button button--fail-solid translation-judgement-accuracy-no")
+
+                    const yesButtons =  document.getElementsByClassName("translation-judgement-accuracy-yes");
+                        for (let b of yesButtons) {
+                            if (b.dataset.phraseId === phraseId) {
+                                b.setAttribute("class", "button button--success translation-judgement-accuracy-yes")
+                            }
+                        }
+
+                            const headers = document.getElementsByClassName("card__header")
+                        for (let h of headers) {
+                            if (h.dataset.phraseId === phraseId) {
+                                h.setAttribute("class", "card__header card__header--grey")
+                            }
+                        }
+                    
                 }
             })
         }
@@ -57,8 +86,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     button.setAttribute("class", "button button--success-solid audio-quality-good")
                 } else if (judgement === 'bad') {
                     button.setAttribute("class", "button button--fail-solid audio-quality-bad")
+                
                 }
-            })
-        }
+        })
     }
+}
 })

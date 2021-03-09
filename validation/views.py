@@ -49,7 +49,6 @@ def index(request):
     """
     The home page.
     """
-
     is_linguist = user_is_linguist(request.user)
     is_community = user_is_community(request.user)
 
@@ -57,7 +56,6 @@ def index(request):
     new_class = "button button--success filter__button"
     linked_class = "button button--success filter__button"
     auto_validated_class = "button button--success filter__button"
-
     mode = request.GET.get("mode")
 
     if mode == "all":
@@ -441,9 +439,11 @@ def record_translation_judgement(request, phrase_id):
     if judgement["judgement"] == "yes":
         phrase.validated = True
         phrase.status = "linked"
+        phrase.modifier = str(request.user)
     elif judgement["judgement"] == "no":
         phrase.validated = False
         phrase.status = "new"
+        phrase.modifier = str(request.user)
     else:
         return HttpResponseBadRequest()
 
