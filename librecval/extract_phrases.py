@@ -545,12 +545,13 @@ def get_mic_id(name: str) -> int:
                 \d{2}       # month
                 -
                 \d{2}       # day
-                (?:-?
-                    (?:am|pm|AM|PM)
+                (?i:        # case-insensitve AM/PM
+                    -?
+                    [AP]M
                     \d?     # subsession
                 )?
-                (?:
-                   [-_]     # Location
+                (?i:        # case-insensitve Location
+                   [-_]
                    (?: US|DS|KCH|OFF)
                 )?
                 (?: -? _Record(?:ed)?)?
