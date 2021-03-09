@@ -27,7 +27,7 @@
   <form class="form-inline ml-2 my-2 my-lg-0" method="GET" action="{{
     url('validation:index')
   }}">
-    <div class="filters">
+    <div class="filter">
       <button class="{{ all_class }}" type="submit" id="filter-all" name="mode" value="all">All</button>
       <button class="{{ new_class }}" type="submit" id="filter-new" name="mode" value="new">New</button>
       <button class="{{ linked_class }}" type="submit" id="filter-linked" name="mode" value="linked">Linked</button>
@@ -54,11 +54,11 @@
         <p class="card__title--english">Translation: {{ phrase.translation }}</p>
         <p>Is this translation accurate?
             {% if phrase.status == "linked" %}
-                <button class="button-success-solid translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }}>Yes</button>
-                <button class="button-fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }}>No</button></p>
+                <button class="button button--success-solid translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }}>Yes</button>
+                <button class="button button--fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }}>No</button></p>
             {% else %}
-                <button class="button-success translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }}>Yes</button>
-                <button class="button-fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }}>No</button></p>
+                <button class="button button--success translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }}>Yes</button>
+                <button class="button button--fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }}>No</button></p>
             {%  endif %}
           <table class="card__body--table">
             <th>Recording</th>
@@ -83,7 +83,7 @@
             {% endfor %}{# for recording in phrase.recordings #}
         </table>
       {% if is_linguist %}
-        <a href={{ url('validation:segment_detail', phrase.id) }} class="button-success right">More Options</a>
+        <a href={{ url('validation:segment_detail', phrase.id) }} class="button button--success right">More Options</a>
       {% endif %} {# is linguist #}
       </div>
 </div>
