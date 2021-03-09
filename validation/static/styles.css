@@ -76,15 +76,13 @@ li.speaker_code {
   background-color: transparent;
   border: 2px solid var(--custom-purple);
   border-radius: var(--button-radius);
-  margin: 1rem 5rem;
+  padding: 0 0.5rem;
+  margin: 1rem;
 }
 
 .login-button:hover {
   color: var(--custom-white);
   background-color: var(--custom-purple);
-  border: 2px solid var(--custom-purple);
-  border-radius: var(--button-radius);
-  margin: 1rem 5rem;
   cursor: pointer;
 }
 
@@ -94,14 +92,12 @@ li.speaker_code {
   background-color: transparent;
   border: 2px solid var(--custom-purple);
   border-radius: var(--button-radius);
-  margin: 0rem 4.5rem;
+  padding: 0 0.5rem;
 }
 
 .register-button:hover {
   color: var(--custom-white);
   background-color: var(--custom-purple);
-  border: 2px solid var(--custom-purple);
-  border-radius: var(--button-radius);
   cursor: pointer;
 }
 
@@ -329,4 +325,8 @@ label {
   display: inline-block;
   margin-left: -3rem;
   width: 150%;
+}
+
+.center {
+  text-align: center;
 }
