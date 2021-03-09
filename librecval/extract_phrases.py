@@ -28,14 +28,14 @@ from hashlib import sha256
 from os import fspath
 from pathlib import Path
 from typing import Dict, NamedTuple, Optional
-from typing_extensions import Literal
 
 import logme  # type: ignore
-from librecval.normalization import normalize
-from librecval.recording_session import SessionID, SessionMetadata
 from pydub import AudioSegment  # type: ignore
 from pympi.Elan import Eaf  # type: ignore
+from typing_extensions import Literal
 
+from librecval.normalization import normalize
+from librecval.recording_session import SessionID, SessionMetadata
 
 # ############################### Exceptions ############################### #
 
@@ -188,9 +188,7 @@ class RecordingExtractor:
             speaker = self.metadata[session_id][mic_id]
 
             self.logger.debug(
-                "Opening audio and .eaf from %s for speaker %s",
-                sound_file,
-                speaker,
+                "Opening audio and .eaf from %s for speaker %s", sound_file, speaker,
             )
 
             audio = AudioSegment.from_file(fspath(sound_file))
@@ -515,6 +513,8 @@ def get_mic_id(name: str) -> int:
     3
     >>> get_mic_id('2016-10-17pm-ds-Track 2_001')
     2
+    >>> get_mic_id('2015-04-29-PM-___-_Track_02')
+    2
     >>> get_mic_id('2016-02-24am-Track 2_001.eaf')
     2
     >>> get_mic_id('2016-11-21-AM-US-_Record_Track1_001')
@@ -545,17 +545,18 @@ def get_mic_id(name: str) -> int:
                 \d{2}       # month
                 -
                 \d{2}       # day
-                (?i:        # case-insensitve AM/PM
+                (?i:        # case-insensitive AM/PM
                     -?
                     [AP]M
                     \d?     # subsession
                 )?
-                (?i:        # case-insensitve Location
+                (?i:        # case-insensitive Location
                    [-_]
-                   (?: US|DS|KCH|OFF)
+                   (?: US|DS|KCH|OFF|___)
                 )?
                 (?: -? _Record(?:ed)?)?
-                [_-]
+                [_-]        # one MANDATORY separator
+                [_-]?       # account for extra separator ¯\_(ツ)_/¯
             )?
             Track[_ -]?
         )?
