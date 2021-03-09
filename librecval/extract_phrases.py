@@ -513,6 +513,8 @@ def get_mic_id(name: str) -> int:
     3
     >>> get_mic_id('2016-10-17pm-ds-Track 2_001')
     2
+    >>> get_mic_id('2017-06-01pmUS-Track 1_001')
+    1
     >>> get_mic_id('2015-04-29-PM-___-_Track_02')
     2
     >>> get_mic_id('2016-02-24am-Track 2_001.eaf')
@@ -551,7 +553,7 @@ def get_mic_id(name: str) -> int:
                     \d?     # subsession
                 )?
                 (?i:        # case-insensitive Location
-                   [-_]
+                   [-_]?
                    (?: US|DS|KCH|OFF|___)
                 )?
                 (?: -? _Record(?:ed)?)?
