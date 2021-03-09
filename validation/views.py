@@ -49,22 +49,24 @@ def index(request):
     """
     The home page.
     """
-    all_class = "button-success button-filter"
-    validated_class = "button-success button-filter"
-    unvalidated_class = "button-success button-filter"
+    all_class = "button button--success filter__button"
+    validated_class = "button button--success filter__button"
+    unvalidated_class = "button button--success filter__button"
     mode = request.GET.get("mode")
     if mode == "all":
         all_phrases = Phrase.objects.all()
-        all_class = "button-success button-filter button-filter-active"
+        all_class = "button button--success filter__button filter__button--active"
     elif mode == "validated":
         all_phrases = Phrase.objects.filter(validated=True)
-        validated_class = "button-success button-filter button-filter-active"
+        validated_class = "button button--success filter__button filter__button--active"
     elif mode == "unvalidated":
         all_phrases = Phrase.objects.filter(validated=False)
-        unvalidated_class = "button-success button-filter button-filter-active"
+        unvalidated_class = (
+            "button button--success filter__button filter__button--active"
+        )
     else:
         all_phrases = Phrase.objects.all()
-        all_class = "button-success button-filter button-filter-active"
+        all_class = "button button--success filter__button filter__button--active"
 
     paginator = Paginator(all_phrases, 5)
     page_no = request.GET.get("page", 1)
@@ -388,16 +390,16 @@ def register(request):
 def record_translation_judgement(request, phrase_id):
     # TODO: check that user is logged in
     phrase = get_object_or_404(Phrase, id=phrase_id)
-    print(phrase)
     judgement = json.loads(request.body)
 
     if judgement["judgement"] == "yes":
         phrase.validated = True
     elif judgement["judgement"] == "no":
         phrase.validated = False
+    else:
+        return HttpResponseBadRequest()
 
     phrase.save()
-    print("got request")
     return JsonResponse({"status": "ok"})
 
 
