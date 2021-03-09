@@ -44,9 +44,9 @@ class Register(forms.Form):
         widget=forms.RadioSelect,
         required=False,
         help_text="""
-        Info: Community members can validate entries and recordings. <br>
-        Linguists have access to analyses and linguistic breakdowns of entries. <br>
-        Instructors can only flag entries for inspection.<br>
+        Community members are considered language experts or active members in a Cree-speaking community. <br>
+        Linguists are expected to look at analyses and lemmas. <br>
+        Instructors are those who are teaching others or advanced language learners.<br>
         If you are unsure what your role is, select 'Community'.<br>
         """,
     )
