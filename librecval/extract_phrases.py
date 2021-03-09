@@ -520,9 +520,15 @@ def get_mic_id(name: str) -> int:
     >>> get_mic_id('2017-02-16pm-DS_Recorded_Track2_001_1')
     2
 
-    This one is the most annoying format:
     >>> get_mic_id('2015-03-19-Rain-03')
     3
+
+    Unknown formats will give a descriptive error message:
+
+    >>> get_mic_id("💩.eaf")
+    Traceback (most recent call last):
+    ...
+    extract_phrases.InvalidFileName: Could not determine mic number from: 💩.eaf
     """
     # Match something like '2016-02-24am-Track 2_001.eaf'
     m = re.match(
