@@ -505,6 +505,8 @@ def get_mic_id(name: str) -> int:
     3
     >>> get_mic_id('2015-05-11am-03.eaf')
     3
+    >>> get_mic_id('2016-04-18am_track 4_')
+    4
     >>> get_mic_id('2017-05-18pm-US-Track_03')
     3
     >>> get_mic_id('2018-04-25am-OFF-Track_01')
@@ -560,13 +562,13 @@ def get_mic_id(name: str) -> int:
                 [_-]        # one MANDATORY separator
                 [_-]?       # account for extra separator ¯\_(ツ)_/¯
             )?
-            Track[_ -]?
+            [tT]rack[_ -]?
         )?
         0*                  # ignore leading zeros
         (\d+)               # THE MIC NUMBER!
-        (?:
-            _\d{3}
-            (?:_.*)?        # there might be stuff after, but we've already parsed the mic ID so.... ✌️
+        (?:                 # there might be stuff after, but we've already parsed the mic ID so.... ✌️
+            _
+            .*
         )?
         (?:[.]eaf)?
         $
