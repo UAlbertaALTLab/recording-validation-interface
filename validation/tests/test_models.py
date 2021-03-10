@@ -273,7 +273,7 @@ def test_recording():
 
     # Check all the fields.
     assert isinstance(recording.id, str)
-    assert recording.quality in {Recording.CLEAN, Recording.UNUSABLE, ""}
+    assert recording.quality in {Recording.GOOD, Recording.BAD, ""}
     assert isinstance(recording.timestamp, int)
     assert 0 <= recording.timestamp < MAX_RECORDING_LENGTH
     assert isinstance(recording.phrase, Phrase)
