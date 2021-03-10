@@ -16,31 +16,32 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import datetime
 import io
 from pathlib import Path
-import datetime
 
 from django.conf import settings
+from django.contrib.auth import authenticate
+from django.contrib.auth import login as django_login
+from django.contrib.auth.models import User
 from django.core.paginator import Paginator
-from django.shortcuts import get_object_or_404, render, redirect
 from django.http import (
     FileResponse,
     HttpResponse,
     HttpResponseBadRequest,
-    JsonResponse,
     HttpResponseRedirect,
+    JsonResponse,
     QueryDict,
 )
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login as django_login
 
 from librecval.normalization import to_indexable_form
 
 from .crude_views import *
-from .models import Phrase, Recording, Speaker
-from .helpers import get_distance_with_translations
 from .forms import EditSegment, Login, Register
+from .helpers import get_distance_with_translations
+from .models import Phrase, Recording, Speaker
 
 
 def index(request):
@@ -264,6 +265,8 @@ def search_recordings(request, query):
             phrase__fuzzy_transcription=fuzzy_transcription,
             speaker__gender__isnull=False,
         )
+        # No bad recordings!
+        result_set = result_set.exclude(quality=Recording.BAD)
 
         recordings.extend(
             {
