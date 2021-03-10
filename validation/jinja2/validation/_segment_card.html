@@ -84,6 +84,39 @@
                     <a href={{ url('validation:segment_detail', phrase.id) }} class="button button--success right">More Options</a>
                 {% endif %} {# is linguist #}
             </div>
+
+        <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Something's Wrong</button>
+
+<!-- Modal -->
+<div id="myModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">What's wrong with this entry?</h4>
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="#">
+            <input type="checkbox" id="recording" name="recording" value="recording">
+            <label for="recording"> This is not a recording of this word</label><br>
+            <input type="checkbox" id="transcription" name="transcription" value="transcription">
+            <label for="transcription"> There's a better Cree word for this English word</label><br>
+            <input type="checkbox" id="translation" name="translation" value="translation">
+            <label for="translation"> There's a better English word for this Cree word</label><br>
+            <input type="checkbox" id="other" name="other" value="other">
+            <label for="other"> Something else:</label>
+            <input class="form-control mr-sm-2" name="other" type="search" placeholder="Please specify" aria-label="Search"><br>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="close" data-dismiss="modal">bye</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
         </article>
 
 {% endmacro %}
