@@ -188,7 +188,9 @@ class RecordingExtractor:
             speaker = self.metadata[session_id][mic_id]
 
             self.logger.debug(
-                "Opening audio and .eaf from %s for speaker %s", sound_file, speaker,
+                "Opening audio and .eaf from %s for speaker %s",
+                sound_file,
+                speaker,
             )
 
             audio = AudioSegment.from_file(fspath(sound_file))
@@ -513,10 +515,12 @@ def get_mic_id(name: str) -> int:
     1
     >>> get_mic_id('2016-06-13am1-Track 3_001')
     3
-    >>> get_mic_id('2016-10-17pm-ds-Track 2_001')
+    >>> get_mic_id('2016-06-10pm-2-Track 2_001')
     2
     >>> get_mic_id('2017-06-01pmUS-Track 1_001')
     1
+    >>> get_mic_id('2016-10-17pm-ds-Track 2_001')
+    2
     >>> get_mic_id('2015-04-29-PM-___-_Track_02')
     2
     >>> get_mic_id('2016-02-24am-Track 2_001.eaf')
@@ -556,7 +560,7 @@ def get_mic_id(name: str) -> int:
                 )?
                 (?i:        # case-insensitive Location
                    [-_]?
-                   (?: US|DS|KCH|OFF|___)
+                   (?: US|DS|KCH|OFF|[1234]|___)
                 )?
                 (?: -? _Record(?:ed)?)?
                 [_-]        # one MANDATORY separator
