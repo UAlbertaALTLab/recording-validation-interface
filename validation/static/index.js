@@ -24,7 +24,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 if (judgement === 'yes') {
-                    button.setAttribute("class", "button button--success-solid translation-judgement-accuracy-yes")
+                    button.classList.add("button--success-solid")
+                    button.classList.remove("button--success")
                     
                     const noButtons =  document.getElementsByClassName("translation-judgement-accuracy-no");
                     for (let b of noButtons) {
@@ -42,7 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
                 } else if (judgement === 'no') {
-                    button.setAttribute("class", "button button--fail-solid translation-judgement-accuracy-no")
+                    button.classList.add("button--fail-solid")
+                    button.classList.remove("button--fail")
                     const yesButtons =  document.getElementsByClassName("translation-judgement-accuracy-yes");
                         for (let b of yesButtons) {
                             if (b.dataset.phraseId === phraseId) {
