@@ -36,7 +36,7 @@ const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
       <form class="form-inline ml-2 my-2 my-lg-0" method="GET" action="{{
         url('validation:search_phrases')
       }}">
-        <input class="form-control mr-sm-2" name="query" type="search" placeholder="Search" aria-label="Search">
+        <input class="form-control mr-sm-2" name="query" type="search" placeholder="Search" aria-label="Search" data-cy="search-bar">
         <button class="my-2 my-sm-0 button button--success" type="submit">Search</button>
         &nbsp;
         <a data-cy="advanced-search-button" href="{{ url('validation:advanced_search') }}" class="btn button button--fail my-2 my-sm-0">Advanced Search</a>

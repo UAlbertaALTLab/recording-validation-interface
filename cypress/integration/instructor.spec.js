@@ -26,8 +26,7 @@ describe("Instructors", () => {
         });
     })
 
-    it("can flag entries", () => {
+    it.skip("can flag entries", () => {
         // flagging entries isn't supported yet
-        this.skip()
     })
 })

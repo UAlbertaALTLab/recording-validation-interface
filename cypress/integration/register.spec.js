@@ -19,7 +19,8 @@ describe("Register", () => {
         // checks that all UI elements load
         cy.visit(Cypress.env('register_url'))
 
-        cy.get('h2')
+        cy.get('.login__title')
+            .should('be.visible')
             .contains('Register as a New User')
 
         cy.get('#register-form')
@@ -45,7 +46,8 @@ describe("Register", () => {
         // creates a new valid user
         cy.visit(Cypress.env('register_url'))
 
-        cy.get('h2')
+        cy.get('.login__title')
+            .should('be.visible')
             .contains('Register as a New User')
 
         cy.get('#register-form')
@@ -74,7 +76,8 @@ describe("Register", () => {
         // doesn't allow username duplication
         cy.visit(Cypress.env('register_url'))
 
-        cy.get('h2')
+        cy.get('.login__title')
+            .should('be.visible')
             .contains('Register as a New User')
 
         cy.get('#register-form')
@@ -107,7 +110,8 @@ describe("Register", () => {
     it("needs a first name to make a new user", () => {
         cy.visit(Cypress.env('register_url'))
 
-        cy.get('h2')
+        cy.get('.login__title')
+            .should('be.visible')
             .contains('Register as a New User')
 
         cy.get('#register-form')
@@ -124,7 +128,8 @@ describe("Register", () => {
     it("needs a last name to make a new user", () => {
         cy.visit(Cypress.env('register_url'))
 
-        cy.get('h2')
+        cy.get('.login__title')
+            .should('be.visible')
             .contains('Register as a New User')
 
         cy.get('#register-form')
@@ -144,7 +149,8 @@ describe("Register", () => {
     it("needs a username to make a new user", () => {
         cy.visit(Cypress.env('register_url'))
 
-        cy.get('h2')
+        cy.get('.login__title')
+            .should('be.visible')
             .contains('Register as a New User')
 
         cy.get('#register-form')
@@ -167,7 +173,8 @@ describe("Register", () => {
     it("needs a password to make a new user", () => {
         cy.visit(Cypress.env('register_url'))
 
-        cy.get('h2')
+        cy.get('.login__title')
+            .should('be.visible')
             .contains('Register as a New User')
 
         cy.get('#register-form')

@@ -16,8 +16,8 @@ describe("Edit segment", () => {
             url: Cypress.env("login_url"), 
             form: true,
             body: {
-              username: "cypress",
-              password: "1234asdf",
+              username: "linguist",
+              password: "1234567890",
             },
             headers: {
               "X-CSRFTOKEN": token,
@@ -30,22 +30,30 @@ describe("Edit segment", () => {
         
         cy.visit(Cypress.env('home'));
 
-        cy.get(".table")
-            .should("be.visible");
+        cy.get('[data-cy="segment-card"]:first')
+            .within(() => {
+                cy.get('[data-cy="transcription"]')
+                    .invoke('text')
+                    .as('transcription')
 
-        cy.get('a[name="word-link"]:first')
-            .then((word) => {
-                const word_id = word[0].id
-                cy.get('a[name="word-link"]:first')
+                 cy.get('[data-cy="translation"]')
+                     .invoke('text')
+                    .as('translation')
+
+                cy.get('[data-cy="options-button"]')
+                    .should('be.visible')
                     .click()
 
                 cy.location('pathname')
-                    .should('include', Cypress.env("segment_details_url"));
-
-                cy.get('#segment-table')
-                    .contains(word_id)
+                    .should('include', Cypress.env("segment_details_url"))
             })
+
+
+        cy.get("#segment-table").within(() => {
+            cy.get('@transcription')
+            cy.get('@translation')
         })
+    })
     
     it("shows all tables", () => {
         cy.visit(Cypress.env("segment_details_url"));
@@ -75,7 +83,7 @@ describe("Edit segment", () => {
         })
 
         cy.get('#edit')
-                .should('not.be.visible')
+            .should('not.be.visible')
     })
 
     it("shows all buttons", () => {
@@ -122,7 +130,7 @@ describe("Edit segment", () => {
                 cy.get('@transcription')
             })
 
-        cy.get('#id_transl')
+        cy.get('#id_translation')
             .should('be.visible')
             .within(() => {
                 cy.get('@translation')
@@ -163,7 +171,7 @@ describe("Edit segment", () => {
                 cy.get('@transcription')
             })
 
-        cy.get('#id_transl')
+        cy.get('#id_translation')
             .should('be.visible')
             .within(() => {
                 cy.get('@translation')
@@ -201,7 +209,7 @@ describe("Edit segment", () => {
                 cy.get('@transcription')
             })
 
-        cy.get('#id_transl')
+        cy.get('#id_translation')
             .should('be.visible')
             .within(() => {
                 cy.get('@translation')
@@ -235,7 +243,7 @@ describe("Edit segment", () => {
                 cy.get('@transcription')
             })
 
-        cy.get('#id_transl')
+        cy.get('#id_translation')
             .should('be.visible')
             .within(() => {
                 cy.get('@translation')
@@ -259,7 +267,7 @@ describe("Edit segment", () => {
 
         // Make sure the username of the editor was stored
         cy.get("#revision-table")
-            .contains('cypress')
+            .contains('linguist')
     })
 
     it("should not update the entry when clicking Cancel", () => {
@@ -302,7 +310,7 @@ describe("Edit segment", () => {
             })
             .type("DONT SAVE")
 
-        cy.get('#id_transl')
+        cy.get('#id_translation')
             .should('be.visible')
             .within(() => {
                 cy.get('@translation')
@@ -328,25 +336,17 @@ describe("Edit segment", () => {
 });
 
 describe("Edit segment, no auth", () => {
-    it("shows original word", () => {
+    it("can not see details page", () => {
         
         cy.visit(Cypress.env('home'));
 
-        cy.get(".table")
-            .should("be.visible");
+        cy.get('[data-cy="segment-card"]:first')
+            .within(() => {
 
-        cy.get('a[name="word-link"]:first')
-            .then((word) => {
-                const w = word[0].id
-                cy.get('a[name="word-link"]:first')
-                    .click()
-
-                cy.location('pathname')
-                    .should('include', Cypress.env("segment_details_url"));
-
-                cy.get('#segment-table')
-                    .contains(w)
+                cy.get('[data-cy="options-button"]')
+                    .should('not.exist')
             })
+
     })
 
     it("does not show options or edit", () => {
