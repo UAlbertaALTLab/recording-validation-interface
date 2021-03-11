@@ -20,10 +20,6 @@ uwsgi = "*"
 divvunspell-python = {ref = "3aa656d36a2fa1ede90e53c320b2095c05cf7c05", git = "https://github.com/divvun/divvunspell-sdk-python"}
 black = "==20.8b1"
 tqdm = "*"
-<<<<<<< HEAD
-
-=======
->>>>>>> bad7931dd6b7ad43c02a591687d692b629b8f7e6
 
 [dev-packages]
 gunicorn = "*"
