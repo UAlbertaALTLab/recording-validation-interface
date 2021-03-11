@@ -51,10 +51,10 @@ def index(request):
     """
     is_linguist = user_is_linguist(request.user)
 
-    all_class = "button-success button-filter"
-    new_class = "button-success button-filter"
-    linked_class = "button-success button-filter"
-    auto_validated_class = "button-success button-filter"
+    all_class = "button button--success filter__button"
+    new_class = "button button--success filter__button"
+    linked_class = "button button--success filter__button"
+    auto_validated_class = "button button--success filter__button"
     mode = request.GET.get("mode")
 
     if mode == "all":
@@ -411,8 +411,11 @@ def record_translation_judgement(request, phrase_id):
     if judgement["judgement"] == "yes":
         phrase.validated = True
         phrase.status = "linked"
+        phrase.modifier = str(request.user)
     elif judgement["judgement"] == "no":
         phrase.validated = False
+        phrase.status = "new"
+        phrase.modifier = str(request.user)
     else:
         return HttpResponseBadRequest()
 
