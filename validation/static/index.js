@@ -24,35 +24,40 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 if (judgement === 'yes') {
-                    button.setAttribute("class", "button button--success-solid translation-judgement-accuracy-yes")
-
+                    button.classList.add("button--success-solid")
+                    button.classList.remove("button--success")
+                    
                     const noButtons =  document.getElementsByClassName("translation-judgement-accuracy-no");
                     for (let b of noButtons) {
                         if (b.dataset.phraseId === phraseId) {
-                            b.setAttribute("class", "button button--fail translation-judgement-accuracy-no")
+                            b.classList.remove('button--fail-solid')
+                            b.classList.add('button--fail')
                         }
                     }
 
                     const headers = document.getElementsByClassName("card__header")
                     for (let h of headers) {
                         if (h.dataset.phraseId === phraseId) {
-                            h.setAttribute("class", "card__header card__header--green")
+                            h.classList.remove("card__header--grey")
+                            h.classList.add("card__header--green")
                         }
                     }
                 } else if (judgement === 'no') {
-                    button.setAttribute("class", "button button--fail-solid translation-judgement-accuracy-no")
-
+                    button.classList.add("button--fail-solid")
+                    button.classList.remove("button--fail")
                     const yesButtons =  document.getElementsByClassName("translation-judgement-accuracy-yes");
                         for (let b of yesButtons) {
                             if (b.dataset.phraseId === phraseId) {
-                                b.setAttribute("class", "button button--success translation-judgement-accuracy-yes")
+                                b.classList.remove('button--success-solid')
+                                b.classList.add('button--success')
                             }
                         }
 
                             const headers = document.getElementsByClassName("card__header")
                         for (let h of headers) {
                             if (h.dataset.phraseId === phraseId) {
-                                h.setAttribute("class", "card__header card__header--grey")
+                                h.classList.remove('card__header--green')
+                                h.classList.add('card__header--grey')
                             }
                         }
                     
