@@ -30,9 +30,9 @@
         {{ segment.segment_card(phrase, recordings, is_linguist, is_community) }}
     {% endfor %} {# phrase in phrases #}
 
-<nav>
-  {{ macros.pagination_with_query(phrases, 'validation:search_phrases', query, encode_query_with_page) }}
-</nav>
+    <nav>
+      {{ macros.pagination_with_query(phrases, 'validation:search_phrases', query, encode_query_with_page) }}
+    </nav>
 {% endblock content %}
 
 {# vim: set ft=htmldjango :#}

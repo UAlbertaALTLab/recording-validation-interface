@@ -136,6 +136,7 @@ def search_phrases(request):
         encode_query_with_page=encode_query_with_page,
         is_linguist=is_linguist,
         is_community=is_community,
+        auth=request.user.is_authenticated,
     )
     return render(request, "validation/search.html", context)
 
@@ -147,7 +148,11 @@ def advanced_search(request):
     query = Speaker.objects.all()
     speakers = [q.code for q in query]
 
-    context = dict(speakers=speakers)
+    context = dict(
+        speakers=speakers,
+        auth=request.user.is_authenticated,
+        is_linguist=user_is_linguist(request.user),
+    )
     return render(request, "validation/advanced_search.html", context)
 
 
@@ -195,10 +200,12 @@ def advanced_search_results(request):
         )
 
     if status != "all":
-        if status == "validated":
-            status_matches = Phrase.objects.filter(validated=True)
-        elif status == "unvalidated":
-            status_matches = Phrase.objects.filter(validated=False)
+        if status == "new":
+            status_matches = Phrase.objects.filter(status="new")
+        elif status == "linked":
+            status_matches = Phrase.objects.filter(status="linked")
+        elif status == "auto-val":
+            status_matches = Phrase.objects.filter(status="auto-validated")
         phrase_and_status_matches = list(
             set(phrase_matches).intersection(status_matches)
         )
@@ -244,6 +251,7 @@ def advanced_search_results(request):
         encode_query_with_page=encode_query_with_page,
         is_linguist=is_linguist,
         is_community=is_community,
+        auth=request.user.is_authenticated,
     )
     return render(request, "validation/search.html", context)
 
@@ -432,11 +440,6 @@ def register(request):
 
 
 # TODO: Speaker bio page like https://ojibwe.lib.umn.edu/about/voices
-
-
-def encode_query_with_page(query, page):
-    query["page"] = page
-    return f"?{query.urlencode()}"
 
 
 @require_http_methods(["POST"])

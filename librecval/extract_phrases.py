@@ -28,14 +28,14 @@ from hashlib import sha256
 from os import fspath
 from pathlib import Path
 from typing import Dict, NamedTuple, Optional
-from typing_extensions import Literal
 
 import logme  # type: ignore
-from librecval.normalization import normalize
-from librecval.recording_session import SessionID, SessionMetadata
 from pydub import AudioSegment  # type: ignore
 from pympi.Elan import Eaf  # type: ignore
+from typing_extensions import Literal
 
+from librecval.normalization import normalize
+from librecval.recording_session import SessionID, SessionMetadata
 
 # ############################### Exceptions ############################### #
 
@@ -351,7 +351,7 @@ def find_audio_oddities(annotation_path: Path, logger=None) -> Optional[Path]:
     match = re.match(
         r"""
         .*-(
-            [^-]+ 
+            [^-]+
             )
             \.
             [^-.]+
@@ -498,41 +498,89 @@ def get_mic_id(name: str) -> int:
     """
     Return the microphone number from the filename of the ELAN file.
 
-    There are at lease five formats in which ELAN files are named:
+    Here are the currently known "conventions" for naming the ELAN files.
     >>> get_mic_id('2_003.eaf')
-    2
-    >>> get_mic_id('2015-05-11am-03.eaf')
-    3
-    >>> get_mic_id('2016-02-24am-Track 2_001.eaf')
     2
     >>> get_mic_id('Track 4_001.eaf')
     4
-
-    This one is the most annoying format:
     >>> get_mic_id('2015-03-19-Rain-03')
     3
+    >>> get_mic_id('2015-05-11am-03.eaf')
+    3
+    >>> get_mic_id('2016-04-18am_track 4_')
+    4
+    >>> get_mic_id('2017-05-18pm-US-Track_03')
+    3
+    >>> get_mic_id('2018-04-25am-OFF-Track_01')
+    1
+    >>> get_mic_id('2016-06-13am1-Track 3_001')
+    3
+    >>> get_mic_id('2016-06-10pm-2-Track 2_001')
+    2
+    >>> get_mic_id('2017-06-01pmUS-Track 1_001')
+    1
+    >>> get_mic_id('2016-10-17pm-ds-Track 2_001')
+    2
+    >>> get_mic_id('2015-04-29-PM-___-_Track_02')
+    2
+    >>> get_mic_id('2016-02-24am-Track 2_001.eaf')
+    2
+    >>> get_mic_id('2016-11-21-AM-US-_Record_Track1_001')
+    1
+    >>> get_mic_id('2017-04-20am-US_Recorded_Track3_001')
+    3
+    >>> get_mic_id('2016-11-28am_-US-Recorded_Track2_001')
+    2
+    >>> get_mic_id('2016-11-21-AM-US-_Recorded_Track2_001')
+    2
+    >>> get_mic_id('2017-02-16pm-DS_Recorded_Track2_001_1')
+    2
+
+
+    Unknown formats will give a descriptive error message:
+
+    >>> get_mic_id("💩.eaf")
+    Traceback (most recent call last):
+    ...
+    extract_phrases.InvalidFileName: Could not determine mic number from: 💩.eaf
     """
     # Match something like '2016-02-24am-Track 2_001.eaf'
     m = re.match(
         r"""
         ^
-        (?:                 # An optional "yy-mm-ddtt-Track "
+        (?:                 # An optional "yy-mm-ddtt-US-Track "
             (?:             # An optional date/time code
                 \d{4}       # year
                 -
                 \d{2}       # month
                 -
                 \d{2}       # day
-                (?:[ap]m)
-                -
+                (?i:        # case-insensitive AM/PM
+                    -?
+                    [AP]M
+                    \d?     # subsession
+                )?
+                (?i:        # case-insensitive Location
+                   [_-]*
+                   (?: US|DS|KCH|OFF|[1234]|___)
+                )?
+                (?:
+                    [_-]+
+                    Record(?:ed)?
+                )?
+                [_-]        # one MANDATORY separator
+                [_-]?       # account for extra separator ¯\_(ツ)_/¯
             )?
-            Track\s
+            [tT]rack[_ -]?
         )?
-
+        0*                  # ignore leading zeros
         (\d+)               # THE MIC NUMBER!
-
-        _\d{3}
-        (?:[.]eaf)?$
+        (?:                 # there might be stuff after, but we've already parsed the mic ID so.... ✌️
+            _
+            .*
+        )?
+        (?:[.]eaf)?
+        $
         """,
         name,
         re.VERBOSE,
@@ -554,5 +602,5 @@ def get_mic_id(name: str) -> int:
         re.VERBOSE,
     )
     if not m:
-        raise InvalidFileName(name)
+        raise InvalidFileName(f"Could not determine mic number from: {name}")
     return int(m.group(1), 10)
