@@ -107,6 +107,8 @@ def search_phrases(request):
     query_term = QueryDict("", mutable=True)
     query_term.update({"query": query})
 
+    is_linguist = user_is_linguist(request.user)
+
     paginator = Paginator(all_matches, 5)
     page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)
@@ -115,6 +117,8 @@ def search_phrases(request):
         search_term=query,
         query=query_term,
         encode_query_with_page=encode_query_with_page,
+        is_linguist=is_linguist,
+        auth=request.user.is_authenticated,
     )
     return render(request, "validation/search.html", context)
 
@@ -126,7 +130,7 @@ def advanced_search(request):
     query = Speaker.objects.all()
     speakers = [q.code for q in query]
 
-    context = dict(speakers=speakers)
+    context = dict(speakers=speakers, is_linguist=user_is_linguist(request.user))
     return render(request, "validation/advanced_search.html", context)
 
 
@@ -170,10 +174,12 @@ def advanced_search_results(request):
         )
 
     if status != "all":
-        if status == "validated":
-            status_matches = Phrase.objects.filter(validated=True)
-        elif status == "unvalidated":
-            status_matches = Phrase.objects.filter(validated=False)
+        if status == "new":
+            status_matches = Phrase.objects.filter(status="new")
+        elif status == "linked":
+            status_matches = Phrase.objects.filter(status="linked")
+        elif status == "auto-val":
+            status_matches = Phrase.objects.filter(status="auto-validated")
         phrase_and_status_matches = list(
             set(phrase_matches).intersection(status_matches)
         )
@@ -396,11 +402,6 @@ def register(request):
 # TODO: Speaker bio page like https://ojibwe.lib.umn.edu/about/voices
 
 
-def encode_query_with_page(query, page):
-    query["page"] = page
-    return f"?{query.urlencode()}"
-
-
 @require_http_methods(["POST"])
 def record_translation_judgement(request, phrase_id):
     # TODO: check that user is logged in
@@ -429,3 +430,8 @@ def user_is_linguist(user):
                 return True
 
     return False
+
+
+def encode_query_with_page(query, page):
+    query["page"] = page
+    return f"?{query.urlencode()}"
