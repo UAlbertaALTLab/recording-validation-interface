@@ -33,6 +33,24 @@ class Register(forms.Form):
         widget=forms.PasswordInput(attrs={"class": "form-control form-restrict"}),
     )
 
+    CHOICES = [
+        ("community", "Community Member"),
+        ("linguist", "Linguist"),
+        ("instructor", "Instructor"),
+    ]
+    role = forms.ChoiceField(
+        label="I am a(n)...",
+        choices=CHOICES,
+        widget=forms.RadioSelect,
+        required=False,
+        help_text="""
+        Community members are considered language experts or active members in a Cree-speaking community. <br>
+        Linguists are expected to look at analyses and lemmas. <br>
+        Instructors are those who are teaching others or advanced language learners.<br>
+        If you are unsure what your role is, select 'Community'.<br>
+        """,
+    )
+
     def clean_username(self):
         username = self.cleaned_data["username"]
         if not re.search(
