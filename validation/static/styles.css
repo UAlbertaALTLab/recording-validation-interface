@@ -177,6 +177,12 @@ a:hover {
   margin-bottom: 0.5rem;
 }
 
+.button--small {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.1rem 0.2rem;
+}
+
 .filter {
   margin: 0 auto;
 }
@@ -299,4 +305,9 @@ a:hover {
 
 .right {
   float: right;
+}
+
+.select {
+  display: flex;
+  justify-content: center;
 }

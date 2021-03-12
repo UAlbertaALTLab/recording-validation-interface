@@ -40,7 +40,7 @@ from django.views.decorators.http import require_http_methods
 from librecval.normalization import to_indexable_form
 
 from .crude_views import *
-from .models import Phrase, Recording, Speaker
+from .models import Phrase, Recording, Speaker, RecordingSession
 from .helpers import get_distance_with_translations, perfect_match, exactly_one_analysis
 from .forms import EditSegment, Login, Register
 
@@ -78,6 +78,11 @@ def index(request):
         all_phrases = Phrase.objects.all()
         all_class = "button button--success filter__button filter__button--active"
 
+    sessions = RecordingSession.objects.order_by().values("date").distinct()
+    session = request.GET.get("session")
+    if session != "all" and session:
+        all_phrases = get_phrases_from_session(session, all_phrases)
+
     paginator = Paginator(all_phrases, 5)
     page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)
@@ -90,6 +95,7 @@ def index(request):
         auto_validated_class=auto_validated_class,
         auth=auth,
         is_linguist=is_linguist,
+        sessions=sessions,
     )
     return render(request, "validation/list_phrases.html", context)
 
@@ -440,3 +446,17 @@ def user_is_linguist(user):
 def encode_query_with_page(query, page):
     query["page"] = page
     return f"?{query.urlencode()}"
+
+
+def get_phrases_from_session(session, all_phrases):
+    phrases_from_session = []
+    for phrase in all_phrases:
+        for recording in phrase.recordings:
+            if (
+                recording.session.date
+                == datetime.datetime.strptime(session, "%Y-%m-%d").date()
+            ):
+                phrases_from_session.append(phrase)
+                continue
+
+    return phrases_from_session

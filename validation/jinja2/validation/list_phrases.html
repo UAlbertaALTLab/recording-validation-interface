@@ -35,17 +35,18 @@
     </form>
 </div>
 
-    <div>
-        <form action="/action_page.php">
-          <label for="cars">Choose a car:</label>
-          <select name="cars" id="cars">
-            <option value="volvo">Volvo</option>
-            <option value="saab">Saab</option>
-            <option value="opel">Opel</option>
-            <option value="audi">Audi</option>
+    <div class="select">
+        <form method="GET" action="{{
+  url('validation:index')
+}}">
+          <label for="session">Choose a recording session:</label>
+          <select name="session" id="sessions">
+          <option value="all">All Sessions</option>
+              {% for session in sessions %}
+                  <option value="{{ session.date }}">{{ session.date }}</option>
+              {% endfor %}
           </select>
-          <br><br>
-          <input type="submit" value="Submit">
+          <input type="submit" value="Select" class="button button--success button--small">
         </form>
     </div>
 
