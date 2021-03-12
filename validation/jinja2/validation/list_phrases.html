@@ -44,7 +44,7 @@
                 <div class="card__header card__header--grey" data-phrase-id={{ phrase.id }}>
                 &nbsp;
                 </div>
-            {% endif %}
+            {% endif %} {# phrase.validated #}
 
             <div class="card__body">
                 <p class="card__title--cree">{{ phrase.transcription }}</p>
@@ -60,7 +60,7 @@
                         <button class="button button--success translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }}>Yes</button>
                         <button class="button button--fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }}>No</button></p>
                     {%  endif %}
-                {% endif %} {# check for instructor privileges #}
+                {% endif %} {# is_community #}
 
                 <table class="card__body--table">
                     <th>Recording</th>
