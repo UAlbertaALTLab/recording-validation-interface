@@ -21,7 +21,6 @@ divvunspell-python = {ref = "3aa656d36a2fa1ede90e53c320b2095c05cf7c05", git = "h
 black = "==20.8b1"
 tqdm = "*"
 
-
 [dev-packages]
 gunicorn = "*"
 hypothesis = "*"

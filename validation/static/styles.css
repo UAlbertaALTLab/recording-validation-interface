@@ -311,6 +311,8 @@ label {
 
 .center {
   text-align: center;
+.white-text {
+  color: var(--custom-white);
 }
 
 .right {
