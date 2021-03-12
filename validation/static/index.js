@@ -88,7 +88,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 if (judgement === 'good') {
-                    button.setAttribute("class", "button button--success-solid audio-quality-good")
+                    button.classList.remove('button--success')
+                    button.classList.add('button--success-solid')
 
                     const badButtons =  document.getElementsByClassName("audio-quality-bad");
                     for (let b of badButtons) {
@@ -98,7 +99,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
                 } else if (judgement === 'bad') {
-                    button.setAttribute("class", "button button--fail-solid audio-quality-bad")
+                    button.classList.remove('button--fail')
+                    button.classList.add('button--fail-solid')
 
                     const goodButtons =  document.getElementsByClassName("audio-quality-good");
                     for (let b of goodButtons) {
