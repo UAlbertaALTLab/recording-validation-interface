@@ -95,7 +95,7 @@ class Command(BaseCommand):
             else:
                 persephone_path = training_dir / speaker / "label" / persephone_filename
 
-            persephone_trans = self.create_persephone_transcription(transcription)
+            persephone_trans = create_persephone_transcription(transcription)
             with open(persephone_path, "w", encoding="UTF=8") as f:
                 f.write(persephone_trans)
 
@@ -138,20 +138,21 @@ class Command(BaseCommand):
         ]:
             _dir.mkdir(exist_ok=True)
 
-    def create_persephone_transcription(self, transcription):
-        """
-        Treats the transcription so it can be read by Persephone
-        As in, it places a space between all characters, and
-        2 spaces between words:
-        >>> create_persephone_transcription("wâpamêw")
-        w â p a m ê w
-        >>> create_persephone_transcription("kîkwây ôma")
-        k î k w â y  ô m a
-        """
-        assert "%" not in transcription
-        persephone_trans = transcription.replace(" ", "%")
-        persephone_trans = list(persephone_trans)
-        persephone_trans = " ".join(persephone_trans)
-        persephone_trans = persephone_trans.replace("%", " ")
 
-        return persephone_trans
+def create_persephone_transcription(transcription):
+    """
+    Treats the transcription so it can be read by Persephone
+    As in, it places a space between all characters, and
+    2 spaces between words:
+    >>> create_persephone_transcription("wâpamêw")
+    'w â p a m ê w'
+    >>> create_persephone_transcription("kîkwây ôma")
+    'k î k w â y  ô m a'
+    """
+    assert "%" not in transcription
+    persephone_trans = transcription.replace(" ", "%")
+    persephone_trans = list(persephone_trans)
+    persephone_trans = " ".join(persephone_trans)
+    persephone_trans = persephone_trans.replace("%", "")
+
+    return persephone_trans

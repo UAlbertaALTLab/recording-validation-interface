@@ -185,12 +185,7 @@ class Phrase(models.Model):
             "NFC", self.field_transcription
         )
 
-        assert self.ALLOWED_TRANSCRIPTION_CHARACTERS.issuperset(
-            self.field_transcription
-        )
-
-        self.transcription = unicodedata.normalize("NFC", self.transcription)
-
+        self.transcription = normalize_sro(self.transcription)
         assert self.ALLOWED_TRANSCRIPTION_CHARACTERS.issuperset(self.transcription)
 
     def save(self, *args, **kwargs):
