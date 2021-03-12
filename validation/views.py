@@ -49,19 +49,29 @@ def index(request):
     """
     The home page.
     """
+    is_linguist = user_is_linguist(request.user)
+
     all_class = "button button--success filter__button"
-    validated_class = "button button--success filter__button"
-    unvalidated_class = "button button--success filter__button"
+    new_class = "button button--success filter__button"
+    linked_class = "button button--success filter__button"
+    auto_validated_class = "button button--success filter__button"
     mode = request.GET.get("mode")
+
     if mode == "all":
-        all_phrases = Phrase.objects.all()
+        if is_linguist:
+            all_phrases = Phrase.objects.all()
+        else:
+            all_phrases = Phrase.objects.filter(status="new")
         all_class = "button button--success filter__button filter__button--active"
-    elif mode == "validated":
-        all_phrases = Phrase.objects.filter(validated=True)
-        validated_class = "button button--success filter__button filter__button--active"
-    elif mode == "unvalidated":
-        all_phrases = Phrase.objects.filter(validated=False)
-        unvalidated_class = (
+    elif mode == "new":
+        all_phrases = Phrase.objects.filter(status="new")
+        new_class = "button button--success filter__button filter__button--active"
+    elif mode == "linked":
+        all_phrases = Phrase.objects.filter(status="linked")
+        linked_class = "button button--success filter__button filter__button--active"
+    elif mode == "auto-validated":
+        all_phrases = Phrase.objects.filter(status="auto-validated")
+        auto_validated_class = (
             "button button--success filter__button filter__button--active"
         )
     else:
@@ -75,9 +85,11 @@ def index(request):
     context = dict(
         phrases=phrases,
         all_class=all_class,
-        validated_class=validated_class,
-        unvalidated_class=unvalidated_class,
+        new_class=new_class,
+        linked_class=linked_class,
+        auto_validated_class=auto_validated_class,
         auth=auth,
+        is_linguist=is_linguist,
     )
     return render(request, "validation/list_phrases.html", context)
 
@@ -95,6 +107,8 @@ def search_phrases(request):
     query_term = QueryDict("", mutable=True)
     query_term.update({"query": query})
 
+    is_linguist = user_is_linguist(request.user)
+
     paginator = Paginator(all_matches, 5)
     page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)
@@ -103,6 +117,8 @@ def search_phrases(request):
         search_term=query,
         query=query_term,
         encode_query_with_page=encode_query_with_page,
+        is_linguist=is_linguist,
+        auth=request.user.is_authenticated,
     )
     return render(request, "validation/search.html", context)
 
@@ -114,7 +130,11 @@ def advanced_search(request):
     query = Speaker.objects.all()
     speakers = [q.code for q in query]
 
-    context = dict(speakers=speakers)
+    context = dict(
+        speakers=speakers,
+        auth=request.user.is_authenticated,
+        is_linguist=user_is_linguist(request.user),
+    )
     return render(request, "validation/advanced_search.html", context)
 
 
@@ -158,10 +178,12 @@ def advanced_search_results(request):
         )
 
     if status != "all":
-        if status == "validated":
-            status_matches = Phrase.objects.filter(validated=True)
-        elif status == "unvalidated":
-            status_matches = Phrase.objects.filter(validated=False)
+        if status == "new":
+            status_matches = Phrase.objects.filter(status="new")
+        elif status == "linked":
+            status_matches = Phrase.objects.filter(status="linked")
+        elif status == "auto-val":
+            status_matches = Phrase.objects.filter(status="auto-validated")
         phrase_and_status_matches = list(
             set(phrase_matches).intersection(status_matches)
         )
@@ -199,6 +221,7 @@ def advanced_search_results(request):
         search_term="advanced search",
         query=query,
         encode_query_with_page=encode_query_with_page,
+        auth=request.user.is_authenticated,
     )
     return render(request, "validation/search.html", context)
 
@@ -392,13 +415,26 @@ def record_translation_judgement(request, phrase_id):
 
     if judgement["judgement"] == "yes":
         phrase.validated = True
+        phrase.status = "linked"
+        phrase.modifier = str(request.user)
     elif judgement["judgement"] == "no":
         phrase.validated = False
+        phrase.status = "new"
+        phrase.modifier = str(request.user)
     else:
         return HttpResponseBadRequest()
 
     phrase.save()
     return JsonResponse({"status": "ok"})
+
+
+def user_is_linguist(user):
+    if user.is_authenticated:
+        for g in user.groups.all():
+            if g.name == "Linguist":
+                return True
+
+    return False
 
 
 def encode_query_with_page(query, page):
