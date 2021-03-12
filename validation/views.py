@@ -62,6 +62,7 @@ def index(request):
         if is_linguist:
             all_phrases = Phrase.objects.all()
         else:
+            # TODO: this should be everything *except* auto-val, not just the new ones
             all_phrases = Phrase.objects.filter(status="new")
         all_class = "button button--success filter__button filter__button--active"
     elif mode == "new":
