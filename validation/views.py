@@ -17,6 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import io
+import json
 from pathlib import Path
 import datetime
 
@@ -34,6 +35,7 @@ from django.http import (
 from django.urls import reverse
 from django.contrib.auth.models import User, Group
 from django.contrib.auth import authenticate, login as django_login
+from django.views.decorators.http import require_http_methods
 
 from librecval.normalization import to_indexable_form
 
@@ -47,24 +49,26 @@ def index(request):
     """
     The home page.
     """
-    all_class = "button-success button-filter"
-    validated_class = "button-success button-filter"
-    unvalidated_class = "button-success button-filter"
+    all_class = "button button--success filter__button"
+    validated_class = "button button--success filter__button"
+    unvalidated_class = "button button--success filter__button"
     mode = request.GET.get("mode")
     if mode == "all":
         all_phrases = Phrase.objects.all()
-        all_class = "button-success button-filter button-filter-active"
+        all_class = "button button--success filter__button filter__button--active"
     elif mode == "validated":
         all_phrases = Phrase.objects.filter(validated=True)
-        validated_class = "button-success button-filter button-filter-active"
+        validated_class = "button button--success filter__button filter__button--active"
     elif mode == "unvalidated":
         all_phrases = Phrase.objects.filter(validated=False)
-        unvalidated_class = "button-success button-filter button-filter-active"
+        unvalidated_class = (
+            "button button--success filter__button filter__button--active"
+        )
     else:
         all_phrases = Phrase.objects.all()
-        all_class = "button-success button-filter button-filter-active"
+        all_class = "button button--success filter__button filter__button--active"
 
-    paginator = Paginator(all_phrases, 30)
+    paginator = Paginator(all_phrases, 5)
     page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)
     auth = request.user.is_authenticated
@@ -378,6 +382,23 @@ def register(request):
 
 
 # TODO: Speaker bio page like https://ojibwe.lib.umn.edu/about/voices
+
+
+@require_http_methods(["POST"])
+def record_translation_judgement(request, phrase_id):
+    # TODO: check that user is logged in
+    phrase = get_object_or_404(Phrase, id=phrase_id)
+    judgement = json.loads(request.body)
+
+    if judgement["judgement"] == "yes":
+        phrase.validated = True
+    elif judgement["judgement"] == "no":
+        phrase.validated = False
+    else:
+        return HttpResponseBadRequest()
+
+    phrase.save()
+    return JsonResponse({"status": "ok"})
 
 
 def encode_query_with_page(query, page):
