@@ -293,6 +293,10 @@ a:hover {
   background-color: var(--custom-grey);
 }
 
+.white-text {
+  color: var(--custom-white);
+}
+
 .right {
   float: right;
 }
