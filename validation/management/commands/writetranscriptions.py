@@ -143,9 +143,9 @@ class Command(BaseCommand):
         Treats the transcription so it can be read by Persephone
         As in, it places a space between all characters, and
         2 spaces between words:
-        >>> self.create_persephone_transcription("wâpamêw")
+        >>> create_persephone_transcription("wâpamêw")
         w â p a m ê w
-        >>> self.create_persephone_transcription("kîkwây ôma")
+        >>> create_persephone_transcription("kîkwây ôma")
         k î k w â y  ô m a
         """
         assert "%" not in transcription
