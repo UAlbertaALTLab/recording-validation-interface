@@ -88,7 +88,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const badButtons =  document.getElementsByClassName("audio-quality-bad");
                     for (let b of badButtons) {
                         if (b.dataset.recId === recordingId) {
-                            b.setAttribute("class", "button button--fail audio-quality-bad")
+                            b.classList.remove('button--fail-solid')
+                            b.classList.add('button--fail')
                         }
                     }
                 } else if (judgement === 'bad') {
@@ -97,7 +98,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const goodButtons =  document.getElementsByClassName("audio-quality-good");
                     for (let b of goodButtons) {
                         if (b.dataset.recId === recordingId) {
-                            b.setAttribute("class", "button button--success audio-quality-good")
+                            b.classList.remove('button--success-solid')
+                            b.classList.add('button--success')
                         }
                     }
                 
