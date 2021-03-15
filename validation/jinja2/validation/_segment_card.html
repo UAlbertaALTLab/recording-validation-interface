@@ -37,11 +37,11 @@
                     <p>Is this translation accurate?
                     {% if phrase.status == "linked" %}
                         <button class="button button--success-solid translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }}>Yes</button>
-                        <button class="button button--fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }}>No</button>
+                        <button class="button button--fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }} data-toggle="modal" data-target="#{{ phrase.id }}-modal">No</button>
                         <button class="button button--neutral translation-judgement-accuracy-idk" data-phrase-id={{ phrase.id }}>I don't know</button></p>
                     {% else %}
                         <button class="button button--success translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }}>Yes</button>
-                        <button class="button button--fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }}>No</button>
+                        <button class="button button--fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }} data-toggle="modal" data-target="#{{ phrase.id }}-modal">No</button>
                         <button class="button button--neutral translation-judgement-accuracy-idk" data-phrase-id={{ phrase.id }}>I don't know</button></p>
                     {%  endif %}
                 {% endif %} {# check for instructor privileges #}
@@ -90,7 +90,7 @@
         <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Something's Wrong</button>
 
 <!-- Modal -->
-<div id="myModal" class="modal fade" role="dialog">
+<div id="{{ phrase.id }}-modal" class="modal fade" role="dialog">
   <div class="modal-dialog">
 
     <!-- Modal content-->
@@ -109,6 +109,7 @@
             <input type="checkbox" id="other" name="other" value="other">
             <label for="other"> Something else:</label>
             <input class="form-control mr-sm-2" name="other" type="search" placeholder="Please specify" aria-label="Search"><br>
+            Comments: <input type="text" id="comments" name="comments">
         </form>
       </div>
       <div class="modal-footer">
