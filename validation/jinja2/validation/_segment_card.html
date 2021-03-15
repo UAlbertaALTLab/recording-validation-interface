@@ -37,10 +37,12 @@
                     <p>Is this translation accurate?
                     {% if phrase.status == "linked" %}
                         <button class="button button--success-solid translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }}>Yes</button>
-                        <button class="button button--fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }}>No</button></p>
+                        <button class="button button--fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }}>No</button>
+                        <button class="button button--neutral translation-judgement-accuracy-idk" data-phrase-id={{ phrase.id }}>I don't know</button></p>
                     {% else %}
                         <button class="button button--success translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }}>Yes</button>
-                        <button class="button button--fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }}>No</button></p>
+                        <button class="button button--fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }}>No</button>
+                        <button class="button button--neutral translation-judgement-accuracy-idk" data-phrase-id={{ phrase.id }}>I don't know</button></p>
                     {%  endif %}
                 {% endif %} {# check for instructor privileges #}
 

@@ -168,6 +168,18 @@ a:hover {
   cursor: pointer;
 }
 
+.button--neutral {
+  color: var(--mauve);
+  border: 2px solid var(--mauve);
+}
+
+.button--neutral:hover {
+  color: var(--custom-white);
+  border: 2px solid var(--mauve);
+  background-color: var(--mauve);
+  cursor: pointer;
+}
+
 .button--right {
   float: right;
   margin-bottom: 0.5rem;
