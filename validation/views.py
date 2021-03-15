@@ -36,6 +36,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User, Group
 from django.contrib.auth import authenticate, login as django_login
 from django.views.decorators.http import require_http_methods
+from django.contrib.auth.decorators import login_required
 
 from librecval.normalization import to_indexable_form
 
@@ -62,6 +63,7 @@ def index(request):
         if is_linguist:
             all_phrases = Phrase.objects.all()
         else:
+            # TODO: this should be everything *except* auto-val, not just the new ones
             all_phrases = Phrase.objects.filter(status="new")
         all_class = "button button--success filter__button filter__button--active"
     elif mode == "new":
@@ -135,6 +137,7 @@ def search_phrases(request):
         encode_query_with_page=encode_query_with_page,
         is_linguist=is_linguist,
         is_community=is_community,
+        auth=request.user.is_authenticated,
     )
     return render(request, "validation/search.html", context)
 
@@ -146,7 +149,11 @@ def advanced_search(request):
     query = Speaker.objects.all()
     speakers = [q.code for q in query]
 
-    context = dict(speakers=speakers)
+    context = dict(
+        speakers=speakers,
+        auth=request.user.is_authenticated,
+        is_linguist=user_is_linguist(request.user),
+    )
     return render(request, "validation/advanced_search.html", context)
 
 
@@ -194,10 +201,12 @@ def advanced_search_results(request):
         )
 
     if status != "all":
-        if status == "validated":
-            status_matches = Phrase.objects.filter(validated=True)
-        elif status == "unvalidated":
-            status_matches = Phrase.objects.filter(validated=False)
+        if status == "new":
+            status_matches = Phrase.objects.filter(status="new")
+        elif status == "linked":
+            status_matches = Phrase.objects.filter(status="linked")
+        elif status == "auto-val":
+            status_matches = Phrase.objects.filter(status="auto-validated")
         phrase_and_status_matches = list(
             set(phrase_matches).intersection(status_matches)
         )
@@ -243,6 +252,7 @@ def advanced_search_results(request):
         encode_query_with_page=encode_query_with_page,
         is_linguist=is_linguist,
         is_community=is_community,
+        auth=request.user.is_authenticated,
     )
     return render(request, "validation/search.html", context)
 
@@ -433,11 +443,7 @@ def register(request):
 # TODO: Speaker bio page like https://ojibwe.lib.umn.edu/about/voices
 
 
-def encode_query_with_page(query, page):
-    query["page"] = page
-    return f"?{query.urlencode()}"
-
-
+@login_required()
 @require_http_methods(["POST"])
 def record_translation_judgement(request, phrase_id):
     # TODO: check that user is logged in
@@ -459,11 +465,11 @@ def record_translation_judgement(request, phrase_id):
     return JsonResponse({"status": "ok"})
 
 
+@login_required()
 @require_http_methods(["POST"])
 def record_audio_quality_judgement(request, recording_id):
     # TODO: check that user is logged in
     rec = get_object_or_404(Recording, id=recording_id)
-    print(recording_id)
     judgement = json.loads(request.body)
 
     if judgement["judgement"] in ["good", "bad"]:
