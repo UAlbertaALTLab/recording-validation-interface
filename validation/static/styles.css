@@ -313,6 +313,15 @@ label {
   text-align: center;
 }
 
+.white-text {
+  color: var(--custom-white);
+}
+
+.white-text:hover {
+  text-decoration: none;
+  color: var(--custom-green);
+}
+
 .right {
   float: right;
 }
