@@ -188,7 +188,9 @@ class RecordingExtractor:
             speaker = self.metadata[session_id][mic_id]
 
             self.logger.debug(
-                "Opening audio and .eaf from %s for speaker %s", sound_file, speaker,
+                "Opening audio and .eaf from %s for speaker %s",
+                sound_file,
+                speaker,
             )
 
             audio = AudioSegment.from_file(fspath(sound_file))
@@ -398,7 +400,7 @@ def find_audio_oddities(annotation_path: Path, logger=None) -> Optional[Path]:
             )
         if not sound_file:
             track_5 = track_3.replace(" ", "")
-            track_5 = track_3.replace("Track_", "Track ")
+            track_5 = track_5.replace("Track_", "Track ")
             dirs = list(_path.glob(f"**/{track_5}*.wav"))
             sound_file = (
                 Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
@@ -411,7 +413,7 @@ def find_audio_oddities(annotation_path: Path, logger=None) -> Optional[Path]:
             )
         if not sound_file:
             track_7 = track_3.replace("Track 0", "Track ")
-            dirs = list(_path.glob(f"**/{track_6}*.wav"))
+            dirs = list(_path.glob(f"**/{track_7}*.wav"))
             sound_file = (
                 Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
             )
