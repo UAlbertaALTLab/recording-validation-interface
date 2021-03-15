@@ -50,7 +50,7 @@
                 <p class="card__title--cree">{{ phrase.transcription }}</p>
                 <p class="card__title--english">Translation: {{ phrase.translation }}</p>
 
-                {% if is_community %}
+                {% if is_expert %}
                     <p>Is this translation accurate?
 
                     {% if phrase.status == "linked" %}
@@ -60,13 +60,13 @@
                         <button class="button button--success translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }}>Yes</button>
                         <button class="button button--fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }}>No</button></p>
                     {%  endif %}
-                {% endif %} {# is_community #}
+                {% endif %} {# is_expert #}
 
                 <table class="card__body--table">
                     <th>Recording</th>
                     <th>Speaker</th>
 
-                    {% if is_community %}
+                    {% if is_expert %}
                         <th>This recording is...</th>
                     {% endif %}
 
@@ -80,7 +80,7 @@
                             <td>
                                 {{ macros.speaker(recording) }}
                             </td>
-                            {% if is_community %}
+                            {% if is_expert %}
                                 <td>
                                     <button class="button button--success">Good</button> <button class="button button--fail">Bad</button>
                                 </td>

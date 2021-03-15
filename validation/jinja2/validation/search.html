@@ -52,7 +52,7 @@
                 <table class="card__body--table">
                     <th>Recording</th>
                     <th>Speaker</th>
-                    {% if is_community %}
+                    {% if is_expert %}
                         <th>This recording is...</th>
                     {% endif %}
 
@@ -66,7 +66,7 @@
                             <td>
                                 {{ macros.speaker(recording) }}
                             </td>
-                            {% if is_community %}
+                            {% if is_expert %}
                                 <td>
                                     <button class="button button--success">Good</button> <button class="button button--fail">Bad</button>
                                 </td>

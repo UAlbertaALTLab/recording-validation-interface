@@ -34,7 +34,7 @@ class Register(forms.Form):
     )
 
     CHOICES = [
-        ("community", "Community Member"),
+        ("expert", "Language Expert"),
         ("linguist", "Linguist"),
         ("instructor", "Instructor"),
         ("learner", "Learner"),
