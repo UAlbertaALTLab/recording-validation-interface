@@ -36,6 +36,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User, Group
 from django.contrib.auth import authenticate, login as django_login
 from django.views.decorators.http import require_http_methods
+from django.contrib.auth.decorators import login_required
 
 from librecval.normalization import to_indexable_form
 
@@ -442,6 +443,7 @@ def register(request):
 # TODO: Speaker bio page like https://ojibwe.lib.umn.edu/about/voices
 
 
+@login_required()
 @require_http_methods(["POST"])
 def record_translation_judgement(request, phrase_id):
     # TODO: check that user is logged in
@@ -463,11 +465,11 @@ def record_translation_judgement(request, phrase_id):
     return JsonResponse({"status": "ok"})
 
 
+@login_required()
 @require_http_methods(["POST"])
 def record_audio_quality_judgement(request, recording_id):
     # TODO: check that user is logged in
     rec = get_object_or_404(Recording, id=recording_id)
-    print(recording_id)
     judgement = json.loads(request.body)
 
     if judgement["judgement"] in ["good", "bad"]:
