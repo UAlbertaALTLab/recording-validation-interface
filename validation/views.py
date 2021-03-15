@@ -452,12 +452,10 @@ def record_translation_judgement(request, phrase_id):
         phrase.validated = True
         phrase.status = "linked"
         phrase.modifier = str(request.user)
-    elif judgement["judgement"] == "no":
+    elif judgement["judgement"] in ["no", "idk"]:
         phrase.validated = False
         phrase.status = "new"
         phrase.modifier = str(request.user)
-    elif judgement["judgement"] == "idk":
-        return JsonResponse({"status": "ok"})
     else:
         return HttpResponseBadRequest()
 
