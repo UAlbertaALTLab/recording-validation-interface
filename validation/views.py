@@ -42,7 +42,7 @@ from librecval.normalization import to_indexable_form
 from .crude_views import *
 from .models import Phrase, Recording, Speaker
 from .helpers import get_distance_with_translations, perfect_match, exactly_one_analysis
-from .forms import EditSegment, Login, Register
+from .forms import EditSegment, Login, Register, FlagSegment
 
 
 def index(request):
@@ -86,6 +86,8 @@ def index(request):
     for phrase in all_phrases:
         recordings[phrase] = phrase.recordings
 
+    form = FlagSegment(request.POST)
+
     paginator = Paginator(all_phrases, 5)
     page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)
@@ -100,6 +102,7 @@ def index(request):
         auth=auth,
         is_linguist=is_linguist,
         is_community=is_community,
+        form=form,
     )
     return render(request, "validation/list_phrases.html", context)
 
@@ -476,6 +479,12 @@ def record_audio_quality_judgement(request, recording_id):
         return HttpResponseBadRequest()
 
     rec.save()
+    return JsonResponse({"status": "ok"})
+
+
+@require_http_methods(["POST"])
+def save_notes(request):
+    print("hello")
     return JsonResponse({"status": "ok"})
 
 

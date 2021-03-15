@@ -17,9 +17,9 @@
 
 {% import 'validation/_macros.html' as macros %}
 
-{% macro segment_card(phrase, recordings, is_linguist, is_community) %}
+{% macro segment_card(phrase, recordings, is_linguist, is_community, form) %}
 
-<article class="card shadow-sm">
+    <article class="card shadow-sm">
             {% if phrase.validated %}
                 <div class="card__header card__header--green" data-phrase-id={{ phrase.id }}>
                 &nbsp;
@@ -87,39 +87,46 @@
                 {% endif %} {# is linguist #}
             </div>
 
-        <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Something's Wrong</button>
+        <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#{{ phrase.id }}-modal">Something's Wrong</button>
 
-<!-- Modal -->
-<div id="{{ phrase.id }}-modal" class="modal fade" role="dialog">
-  <div class="modal-dialog">
+        <!-- Modal -->
+        <div id="{{ phrase.id }}-modal" class="modal fade" role="dialog">
+          <div class="modal-dialog">
 
-    <!-- Modal content-->
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title">What's wrong with this entry?</h4>
-      </div>
-      <div class="modal-body">
-        <form method="POST" action="#">
-            <input type="checkbox" id="recording" name="recording" value="recording">
-            <label for="recording"> This is not a recording of this word</label><br>
-            <input type="checkbox" id="transcription" name="transcription" value="transcription">
-            <label for="transcription"> There's a better Cree word for this English word</label><br>
-            <input type="checkbox" id="translation" name="translation" value="translation">
-            <label for="translation"> There's a better English word for this Cree word</label><br>
-            <input type="checkbox" id="other" name="other" value="other">
-            <label for="other"> Something else:</label>
-            <input class="form-control mr-sm-2" name="other" type="search" placeholder="Please specify" aria-label="Search"><br>
-            Comments: <input type="text" id="comments" name="comments">
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="close" data-dismiss="modal">bye</button>
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      </div>
-    </div>
+            <!-- Modal content-->
+            <div class="modal-content">
+              <div class="modal-header">
+                <h4 class="modal-title">What's wrong with this entry?</h4>
+              </div>
+                  <form action="" method="post">
+                    <div class="modal-body">
+                        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                        {{ form }}
 
-  </div>
-</div>
-        </article>
+{#                <form action="/api/save_notes" method="POST">#}
+{#                    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">#}
+{#                    <input type="checkbox" id="recording" name="recording" value="recording">#}
+{#                    <label for="recording"> This is not a recording of this word</label><br>#}
+{#                    <input type="checkbox" id="transcription" name="transcription" value="transcription">#}
+{#                    <label for="transcription"> There's a better Cree word for this English word</label><br>#}
+{#                    <input type="checkbox" id="translation" name="translation" value="translation">#}
+{#                    <label for="translation"> There's a better English word for this Cree word</label><br>#}
+{#                    <input type="checkbox" id="other" name="other" value="other">#}
+{#                    <label for="other"> Something else:</label>#}
+{#                    <input class="form-control mr-sm-2" name="other" type="search" placeholder="Please specify" aria-label="Search"><br>#}
+{#                    Comments: <input type="text" id="comments" name="comments">#}
+{#                </form>#}
+                    </div>
+                    <div class="modal-footer">
+    {#                <button type="button" class="button button--fail" data-dismiss="modal">Cancel</button>#}
+    {#                <button type="submit" class="button button--success" data-dismiss="modal">Submit</button>#}
+                      <input data-cy="cancel-button" type="button" class="button button--fail" data-dismiss="modal" value="Cancel">
+                      <input data-cy="save-button" type="submit" class="button button--success" value="Save">
+                    </div>
+                  </form>
+            </div>
+          </div>
+        </div>
+    </article>
 
 {% endmacro %}

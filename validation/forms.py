@@ -79,3 +79,13 @@ class EditSegment(forms.Form):
         required=False,
         widget=forms.TextInput(attrs={"class": "form-control bottom-margin"}),
     )
+
+
+class FlagSegment(forms.Form):
+    ISSUES = [
+        ("bad_cree", "There's a better Cree word for this translation"),
+        ("bad_english", "There's a better translation for this Cree word"),
+        ("bad_rec", "One or more of these recordings are not of this word"),
+        ("other", "Something else (please specify)"),
+    ]
+    issues = forms.MultipleChoiceField(choices=ISSUES, required=False)
