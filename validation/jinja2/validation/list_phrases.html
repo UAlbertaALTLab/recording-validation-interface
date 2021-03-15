@@ -20,11 +20,19 @@
 {% import 'validation/_macros.html' as macros %}
 
 {% block content %}
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        let session_mode = document.getElementById("session_mode")
+        if (params.get('session')) {
+            session_mode.value = params.get('session');
+        }
+    </script>
 <div>
 <form class="form-inline ml-2 my-2 my-lg-0" method="GET" action="{{
   url('validation:index')
 }}">
   <div class="filter">
+    <input type="hidden" name="session" id="session_mode" value="">
     <button class="{{ all_class }}" type="submit" id="filter-all" name="mode" value="all">All</button>
     <button class="{{ new_class }}" type="submit" id="filter-new" name="mode" value="new">New</button>
     <button class="{{ linked_class }}" type="submit" id="filter-linked" name="mode" value="linked">Linked</button>
