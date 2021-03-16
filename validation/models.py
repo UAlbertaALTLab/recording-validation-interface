@@ -384,9 +384,7 @@ class Recording(models.Model):
     )
 
     comment = models.CharField(
-        help_text="The comment provided in the ELAN file",
-        max_length=256,
-        blank=True,
+        help_text="The comment provided in the ELAN file", max_length=256, blank=True,
     )
 
     # Keep track of the recording's history.
