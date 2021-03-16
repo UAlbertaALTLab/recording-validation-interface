@@ -58,6 +58,12 @@ class InvalidFileName(RuntimeError):
     """
 
 
+class InvalidAnnotationError(RuntimeError):
+    """
+    Raised when the ELAN file is unusable and should be ignored!
+    """
+
+
 class MissingTranslationError(RuntimeError):
     """
     Raised when the 'English (word)' and 'English (sentence)' tiers
@@ -544,6 +550,26 @@ def get_mic_id(name: str) -> int:
     ...
     extract_phrases.InvalidFileName: Could not determine mic number from: 💩.eaf
     """
+
+    IDIOSYNCRACTIC_FORMATS = {
+        "Track 3 _001 2016-10-03am-ds": 3,
+        "2017-03-USpm-Track 3_001": 3,
+        "2016-05-02pm_ Track 1_003": 1,
+        "2016-04-20am_ Track 2": 2,
+    }
+
+    KNOWN_BAD_ANNOTATION_FILES = {
+        # Looks like annotator tried annotating ALL THREE TRACKS in this file at once,
+        # but then gave up and made separate files for each track (as became standard).
+        # See: /data/av/backup-mwe/2015-05-12pm
+        "2105-05-12pm",
+        # There are newer, better annotations in this directory that superceed this
+        # annotation which is for mic 2, but should be disregarded in preference for the
+        # newer annotations.
+        # See: /data/av/backup-mwe/2015-03-19
+        "2015-03-10-Rain_data",
+    }
+
     # Match something like '2016-02-24am-Track 2_001.eaf'
     m = re.match(
         r"""
@@ -605,5 +631,11 @@ def get_mic_id(name: str) -> int:
         re.VERBOSE,
     )
     if not m:
+        if name in KNOWN_BAD_ANNOTATION_FILES:
+            raise InvalidAnnotationError(
+                f"Tried to get mic for known bad annotation file: {name}"
+            )
+        if name in IDIOSYNCRACTIC_FORMATS:
+            return IDIOSYNCRACTIC_FORMATS[name]
         raise InvalidFileName(f"Could not determine mic number from: {name}")
     return int(m.group(1), 10)
