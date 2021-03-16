@@ -18,6 +18,7 @@
 
 {% extends 'validation/_base.html' %}
 {% import 'validation/_macros.html' as macros %}
+{% import 'validation/_segment_card.html' as segment %}
 
 {% block content %}
     <script>
@@ -28,87 +29,37 @@
         }
     </script>
 <div>
-<form class="form-inline ml-2 my-2 my-lg-0" method="GET" action="{{
-  url('validation:index')
+  <form class="form-inline ml-2 my-2 my-lg-0" method="GET" action="{{
+    url('validation:index')
+  }}">
+    <div class="filter">
+      <button class="{{ all_class }}" type="submit" id="filter-all" name="mode" value="all">All</button>
+      <button class="{{ new_class }}" type="submit" id="filter-new" name="mode" value="new">New</button>
+      <button class="{{ linked_class }}" type="submit" id="filter-linked" name="mode" value="linked">Linked</button>
+        {% if is_linguist %}
+      <button class="{{ auto_validated_class }}" type="submit" id="filter-auto" name="mode" value="auto-validated">Auto-Validated</button>
+        {% endif %} {# if is_linguist #}
+    </div>
+  </form>
+
+  <div class="select">
+    <form method="GET" action="{{
+url('validation:index')
 }}">
-  <div class="filter">
-    <input type="hidden" name="session" id="session_mode" value="">
-    <button class="{{ all_class }}" type="submit" id="filter-all" name="mode" value="all">All</button>
-    <button class="{{ new_class }}" type="submit" id="filter-new" name="mode" value="new">New</button>
-    <button class="{{ linked_class }}" type="submit" id="filter-linked" name="mode" value="linked">Linked</button>
-      {% if is_linguist %}
-    <button class="{{ auto_validated_class }}" type="submit" id="filter-auto" name="mode" value="auto-validated">Auto-Validated</button>
-      {% endif %} {# if is_linguist #}
-  </div>
+      <label for="session">Choose a recording session:</label>
+      <select name="session" id="sessions">
+      <option value="all">All Sessions</option>
+          {% for session in sessions %}
+              <option value="{{ session.date }}">{{ session.date }}</option>
+          {% endfor %}
+      </select>
+      <input type="submit" value="Select" class="button button--success button--small">
     </form>
 </div>
-
-    <div class="select">
-        <form method="GET" action="{{
-  url('validation:index')
-}}">
-          <label for="session">Choose a recording session:</label>
-          <select name="session" id="sessions">
-          <option value="all">All Sessions</option>
-              {% for session in sessions %}
-                  <option value="{{ session.date }}">{{ session.date }}</option>
-              {% endfor %}
-          </select>
-          <input type="submit" value="Select" class="button button--success button--small">
-        </form>
-    </div>
-
-
-  {%  for phrase in phrases %}
-  <div class="card shadow-sm">
-  {% if phrase.validated %}
-    <div class="card__header card__header--green" data-phrase-id={{ phrase.id }}>
-        &nbsp;
-    </div>
-  {% else %}
-      <div class="card__header card__header--grey" data-phrase-id={{ phrase.id }}>
-        &nbsp;
-    </div>
-  {% endif %}
-    <div class="card__body">
-      <p class="card__title--cree">{{ phrase.transcription }}</p>
-      <p class="card__title--english">Translation: {{ phrase.translation }}</p>
-      <p>Is this translation accurate?
-          {% if phrase.status == "linked" %}
-              <button class="button button--success-solid translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }}>Yes</button>
-              <button class="button button--fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }}>No</button></p>
-          {% else %}
-              <button class="button button--success translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }}>Yes</button>
-              <button class="button button--fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }}>No</button></p>
-          {%  endif %}
-        <table class="card__body--table">
-          <th>Recording</th>
-          <th>Speaker</th>
-          <th>This recording is...</th>
-
-          {% for recording in phrase.recordings %}
-              <tr>
-            <td>
-              <div class="rec-height">
-                {{ macros.player(recording) }}
-              </div>
-            </td>
-              <td>
-                  {{ macros.speaker(recording) }}
-              </td>
-              <td>
-              <button class="button button--success">Good</button> <button class="button button--fail">Bad</button>
-              </td>
-              </tr>
-
-          {% endfor %}{# for recording in phrase.recordings #}
-      </table>
-    {% if is_linguist %}
-      <a href={{ url('validation:segment_detail', phrase.id) }} class="button button--success right">More Options</a>
-    {% endif %} {# is linguist #}
-    </div>
 </div>
-  {% endfor %} {# phrase in phrases #}
+    {%  for phrase in phrases %}
+        {{ segment.segment_card(phrase, recordings, is_linguist, is_community) }}
+    {% endfor %} {# phrase in phrases #}
 
 <nav>
 {{ macros.pagination(phrases, 'list_phrases') }}

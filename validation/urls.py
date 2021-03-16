@@ -63,4 +63,9 @@ urlpatterns = [
         views.record_translation_judgement,
         name="record_translation_judgement",
     ),
+    path(
+        "api/record_audio_quality_judgement/<str:recording_id>",
+        views.record_audio_quality_judgement,
+        name="record_audio_quality_judgement",
+    ),
 ]
