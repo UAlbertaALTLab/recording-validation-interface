@@ -28,41 +28,45 @@
             session_mode.value = params.get('session');
         }
     </script>
-<div>
-  <form class="form-inline ml-2 my-2 my-lg-0" method="GET" action="{{
+<div class="center">
+  <form method="GET" action="{{
     url('validation:index')
   }}">
     <div class="filter">
-      <button class="{{ all_class }}" type="submit" id="filter-all" name="mode" value="all">All</button>
-      <button class="{{ new_class }}" type="submit" id="filter-new" name="mode" value="new">New</button>
-      <button class="{{ linked_class }}" type="submit" id="filter-linked" name="mode" value="linked">Linked</button>
+        Filter by:
+        <input type="radio" id="filter-all" name="mode" value="all">
+        <label for="all"> All</label>
+        <input type="radio" id="filter-new" name="mode" value="new">
+        <label for="new"> New</label>
+        <input type="radio" id="filter-linked" name="mode" value="linked">
+        <label for="linked"> Linked</label>
         {% if is_linguist %}
-      <button class="{{ auto_validated_class }}" type="submit" id="filter-auto" name="mode" value="auto-validated">Auto-Validated</button>
-        {% endif %} {# if is_linguist #}
+            <input type="radio" id="filter-auto" name="mode" value="auto-validated">
+            <label for="auto-validated"> Auto-Validated</label>
+        {% endif %}
+    </div>
+  <div class="filter">
+
+{#        <label for="session">#}
+            Choose a recording session:
+{#        </label>#}
+          <select name="session" id="sessions">
+          <option value="all">All Sessions</option>
+              {% for session in sessions %}
+                  <option value="{{ session.date }}">{{ session.date }}</option>
+              {% endfor %}
+          </select>
+          <input type="submit" value="Select" class="button button--success button--small">
     </div>
   </form>
 
-  <div class="select">
-    <form method="GET" action="{{
-url('validation:index')
-}}">
-      <label for="session">Choose a recording session:</label>
-      <select name="session" id="sessions">
-      <option value="all">All Sessions</option>
-          {% for session in sessions %}
-              <option value="{{ session.date }}">{{ session.date }}</option>
-          {% endfor %}
-      </select>
-      <input type="submit" value="Select" class="button button--success button--small">
-    </form>
-</div>
 </div>
     {%  for phrase in phrases %}
         {{ segment.segment_card(phrase, recordings, is_linguist, is_community) }}
     {% endfor %} {# phrase in phrases #}
 
 <nav>
-{{ macros.pagination(phrases, 'list_phrases') }}
+{{ macros.pagination_with_query(phrases, 'validation:list_phrases', query, encode_query_with_page) }}
 </nav>
 {% endblock content %}
 

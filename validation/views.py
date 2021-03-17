@@ -18,6 +18,7 @@
 
 import io
 import json
+import operator
 from pathlib import Path
 import datetime
 
@@ -53,10 +54,6 @@ def index(request):
     is_linguist = user_is_linguist(request.user)
     is_community = user_is_community(request.user)
 
-    all_class = "button button--success filter__button"
-    new_class = "button button--success filter__button"
-    linked_class = "button button--success filter__button"
-    auto_validated_class = "button button--success filter__button"
     mode = request.GET.get("mode")
 
     if mode == "all":
@@ -65,21 +62,14 @@ def index(request):
         else:
             # TODO: this should be everything *except* auto-val, not just the new ones
             all_phrases = Phrase.objects.filter(status="new")
-        all_class = "button button--success filter__button filter__button--active"
     elif mode == "new":
         all_phrases = Phrase.objects.filter(status="new")
-        new_class = "button button--success filter__button filter__button--active"
     elif mode == "linked":
         all_phrases = Phrase.objects.filter(status="linked")
-        linked_class = "button button--success filter__button filter__button--active"
     elif mode == "auto-validated":
         all_phrases = Phrase.objects.filter(status="auto-validated")
-        auto_validated_class = (
-            "button button--success filter__button filter__button--active"
-        )
     else:
         all_phrases = Phrase.objects.all()
-        all_class = "button button--success filter__button filter__button--active"
 
     sessions = RecordingSession.objects.order_by().values("date").distinct()
     session = request.GET.get("session")
@@ -93,6 +83,14 @@ def index(request):
     for phrase in all_phrases:
         recordings[phrase] = phrase.recordings
 
+    query_term = QueryDict("", mutable=True)
+    if session:
+        query_term.update({"session": session})
+    if mode:
+        query_term.update({"mode": mode})
+
+    all_phrases = sorted(all_phrases, key=operator.attrgetter("transcription"))
+
     paginator = Paginator(all_phrases, 5)
     page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)
@@ -100,14 +98,12 @@ def index(request):
     context = dict(
         phrases=phrases,
         recordings=recordings,
-        all_class=all_class,
-        new_class=new_class,
-        linked_class=linked_class,
-        auto_validated_class=auto_validated_class,
         auth=auth,
         is_linguist=is_linguist,
         is_community=is_community,
         sessions=sessions,
+        query=query_term,
+        encode_query_with_page=encode_query_with_page,
     )
     return render(request, "validation/list_phrases.html", context)
 

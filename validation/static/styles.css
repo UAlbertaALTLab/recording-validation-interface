@@ -196,6 +196,7 @@ a:hover {
   border-color: var(--custom-green);
 }
 
+
 /* nav styles */
 .nav__button {
   border-radius: var(--button-radius);
@@ -306,11 +307,11 @@ a:hover {
   color: var(--custom-white)
 }
 
-label {
-  padding-top: 0.75rem;
-  display: flex;
-  align-content: start;
-}
+/*label {*/
+/*  padding-top: 0.75rem;*/
+/*  display: flex;*/
+/*  align-content: start;*/
+/*}*/
 
 #id_role {
   list-style: none;
@@ -343,7 +344,6 @@ label {
   float: right;
 }
 
-.select {
-  display: flex;
-  justify-content: center;
+center {
+  margin: 0 auto;
 }
