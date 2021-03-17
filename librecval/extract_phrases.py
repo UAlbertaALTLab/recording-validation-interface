@@ -135,7 +135,7 @@ class RecordingExtractor:
         self.sessions: Dict[SessionID, Path] = {}
         self.metadata = metadata
 
-    def scan(self, root_directory: Path):
+    def scan(self, root_directory: Path) -> Iterable[SegmentAndAudio]:
         """
         Scans the directory provided for sessions.
 
@@ -155,15 +155,9 @@ class RecordingExtractor:
             except MissingMetadataError:
                 self.logger.exception("Skipping %s: Missing metadata", session_dir)
 
-    def extract_session(self, session_dir: Path):
+    def extract_session(self, session_dir: Path) -> Iterable[SegmentAndAudio]:
         """
         Extracts recordings from a single session.
-        """
-        yield from self._extract_session(session_dir)
-
-    def _extract_session(self, session_dir: Path):
-        """
-        Actually extracts recordings.
         """
         session_id = SessionID.from_name(session_dir.stem)
         if session_id in self.sessions:
