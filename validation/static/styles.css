@@ -344,6 +344,11 @@ a:hover {
   float: right;
 }
 
-center {
+.center {
   margin: 0 auto;
+}
+
+.description {
+  font-weight: 600;
+  font-size: 1.5rem;
 }

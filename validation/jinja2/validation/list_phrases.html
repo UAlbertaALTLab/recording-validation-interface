@@ -59,8 +59,10 @@
           <input type="submit" value="Select" class="button button--success button--small">
     </div>
   </form>
-
 </div>
+
+<p class="description">Showing {{ mode }} entries from {{ session }}</p>
+
     {%  for phrase in phrases %}
         {{ segment.segment_card(phrase, recordings, is_linguist, is_community) }}
     {% endfor %} {# phrase in phrases #}

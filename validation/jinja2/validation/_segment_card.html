@@ -22,11 +22,11 @@
 <article class="card shadow-sm">
             {% if phrase.validated %}
                 <div class="card__header card__header--green" data-phrase-id={{ phrase.id }}>
-{#                    <p class="card__date card__date--white" data-phrase-id={{ phrase.id }}>{{ recordings[phrase][0].session.date }}</p>#}
+                    <p class="card__date card__date--white" data-phrase-id={{ phrase.id }}>{{ recordings[phrase][0].session.date }}</p>
                 </div>
             {% else %}
                 <div class="card__header card__header--grey" data-phrase-id={{ phrase.id }}>
-{#                    <p class="card__date" data-phrase-id={{ phrase.id }}>{{ phrase.recordings[0].session.date }}</p>#}
+                    <p class="card__date" data-phrase-id={{ phrase.id }}>{{ recordings[phrase][0].session.date }}</p>
                 </div>
             {% endif %}
             <div class="card__body">

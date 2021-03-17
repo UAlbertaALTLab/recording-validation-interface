@@ -82,7 +82,6 @@ def index(request):
     recordings = {}
     for phrase in all_phrases:
         recordings[phrase] = [rec for rec in phrase.recordings]
-        # assert recordings[phrase]
 
     query_term = QueryDict("", mutable=True)
     if session:
@@ -91,6 +90,12 @@ def index(request):
         query_term.update({"mode": mode})
 
     all_phrases = sorted(all_phrases, key=operator.attrgetter("transcription"))
+
+    if not mode:
+        mode = "all"
+
+    if not session:
+        session = "all sessions"
 
     paginator = Paginator(all_phrases, 5)
     page_no = request.GET.get("page", 1)
@@ -104,6 +109,8 @@ def index(request):
         is_community=is_community,
         sessions=sessions,
         query=query_term,
+        session=session,
+        mode=mode,
         encode_query_with_page=encode_query_with_page,
     )
     return render(request, "validation/list_phrases.html", context)
@@ -507,6 +514,7 @@ def get_phrases_from_session(session, all_phrases):
                 phrase not in phrases_from_session
             ):
                 phrases_from_session.append(phrase)
+                continue
 
     return phrases_from_session
 
