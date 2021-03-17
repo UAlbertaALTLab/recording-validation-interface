@@ -148,12 +148,18 @@ class RecordingExtractor:
             if not session_dir.resolve().is_dir():
                 self.logger.debug("Rejecting %s; not a directory", session_dir)
                 continue
-            try:
-                yield from self.extract_session(session_dir)
-            except DuplicateSessionError:
-                self.logger.exception("Skipping %s: duplicate", session_dir)
-            except MissingMetadataError:
-                self.logger.exception("Skipping %s: Missing metadata", session_dir)
+
+            yield from self.extract_all_recordings_from_session(session_dir)
+
+    def extract_all_recordings_from_session(
+        self, session_dir: Path
+    ) -> Iterable[SegmentAndAudio]:
+        try:
+            yield from self.extract_session(session_dir)
+        except DuplicateSessionError:
+            self.logger.exception("Skipping %s: duplicate", session_dir)
+        except MissingMetadataError:
+            self.logger.exception("Skipping %s: Missing metadata", session_dir)
 
     def extract_session(self, session_dir: Path) -> Iterable[SegmentAndAudio]:
         """
