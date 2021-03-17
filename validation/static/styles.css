@@ -296,17 +296,6 @@ a:hover {
   background-color: var(--custom-grey);
 }
 
-.card__date {
-  float: right;
-  font-weight: 500;
-  font-size: 1.25rem;
-  margin-bottom: 0;
-}
-
-.card__date--white {
-  color: var(--custom-white)
-}
-
 /*label {*/
 /*  padding-top: 0.75rem;*/
 /*  display: flex;*/
