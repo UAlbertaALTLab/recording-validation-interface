@@ -61,7 +61,7 @@ def index(request):
             all_phrases = Phrase.objects.all()
         else:
             # TODO: this should be everything *except* auto-val, not just the new ones
-            all_phrases = Phrase.objects.filter(status="new")
+            all_phrases = Phrase.objects.filter(status="auto-validated")
     elif mode == "new":
         all_phrases = Phrase.objects.filter(status="new")
     elif mode == "linked":
@@ -81,7 +81,8 @@ def index(request):
     # so we're just going to play nice with it here
     recordings = {}
     for phrase in all_phrases:
-        recordings[phrase] = phrase.recordings
+        recordings[phrase] = [rec for rec in phrase.recordings]
+        # assert recordings[phrase]
 
     query_term = QueryDict("", mutable=True)
     if session:
@@ -499,14 +500,13 @@ def user_is_linguist(user):
 
 def get_phrases_from_session(session, all_phrases):
     phrases_from_session = []
+    session_date = datetime.datetime.strptime(session, "%Y-%m-%d").date()
     for phrase in all_phrases:
         for recording in phrase.recordings:
-            if (
-                recording.session.date
-                == datetime.datetime.strptime(session, "%Y-%m-%d").date()
+            if (recording.session.date == session_date) and (
+                phrase not in phrases_from_session
             ):
                 phrases_from_session.append(phrase)
-                continue
 
     return phrases_from_session
 
