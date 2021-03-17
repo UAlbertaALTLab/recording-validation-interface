@@ -27,7 +27,7 @@ from decimal import Decimal
 from hashlib import sha256
 from os import fspath
 from pathlib import Path
-from typing import Dict, NamedTuple, Optional
+from typing import Dict, Iterable, NamedTuple, Optional, Tuple
 
 import logme  # type: ignore
 from pydub import AudioSegment  # type: ignore
@@ -119,6 +119,10 @@ class Segment(NamedTuple):
         return sha256(self.signature().encode("UTF-8")).hexdigest()
 
 
+# One recording, with all its metadata along with its audio.
+SegmentAndAudio = Tuple[Segment, AudioSegment]
+
+
 @logme.log
 class RecordingExtractor:
     """
@@ -154,6 +158,12 @@ class RecordingExtractor:
     def extract_session(self, session_dir: Path):
         """
         Extracts recordings from a single session.
+        """
+        yield from self._extract_session(session_dir)
+
+    def _extract_session(self, session_dir: Path):
+        """
+        Actually extracts recordings.
         """
         session_id = SessionID.from_name(session_dir.stem)
         if session_id in self.sessions:
@@ -203,8 +213,7 @@ class RecordingExtractor:
 
 def generate_segments_from_eaf(
     annotation_path: Path, audio: AudioSegment, speaker: str, session_id: SessionID
-):
-
+) -> Iterable[SegmentAndAudio]:
     """
     Yields segements from the annotation file
     """
@@ -288,7 +297,7 @@ def extract_data(
     session_id,
     english_tier,
     comment_tier,
-) -> tuple:
+) -> SegmentAndAudio:
     """
     Extracts all relevant data from a .eaf file, where "relevant data" is:
     - translation
