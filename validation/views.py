@@ -56,20 +56,17 @@ def index(request):
 
     mode = request.GET.get("mode")
 
-    if mode == "all":
+    if mode == "all" or not mode:
         if is_linguist:
             all_phrases = Phrase.objects.all()
         else:
-            # TODO: this should be everything *except* auto-val, not just the new ones
-            all_phrases = Phrase.objects.filter(status="auto-validated")
+            all_phrases = Phrase.objects.exclude(status="auto-validated")
     elif mode == "new":
         all_phrases = Phrase.objects.filter(status="new")
     elif mode == "linked":
         all_phrases = Phrase.objects.filter(status="linked")
     elif mode == "auto-validated":
         all_phrases = Phrase.objects.filter(status="auto-validated")
-    else:
-        all_phrases = Phrase.objects.all()
 
     sessions = RecordingSession.objects.order_by().values("date").distinct()
     session = request.GET.get("session")
