@@ -144,11 +144,16 @@ class RecordingExtractor:
         """
 
         self.logger.debug("Scanning %s for sessions...", root_directory)
+
+        valid_session_directories = []
+
         for session_dir in root_directory.iterdir():
             if not session_dir.resolve().is_dir():
                 self.logger.debug("Rejecting %s; not a directory", session_dir)
                 continue
+            valid_session_directories.append(session_dir)
 
+        for session_dir in valid_session_directories:
             yield from self.extract_all_recordings_from_session(session_dir)
 
     def extract_all_recordings_from_session(
