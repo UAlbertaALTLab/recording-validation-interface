@@ -2,27 +2,7 @@
 
 describe("Details View", () => {
     beforeEach(() => {
-
-        cy.visit(Cypress.env('login_url'));
-        cy.get("[name=csrfmiddlewaretoken]")
-            .should("exist")
-            .should("have.attr", "value")
-            .as("csrfToken");
-
-        cy.get("@csrfToken").then((token) => {
-            cy.request({
-                method: "POST",
-                url: Cypress.env("login_url"),
-                form: true,
-                body: {
-                    username: "linguist",
-                    password: "1234567890",
-                },
-                headers: {
-                    "X-CSRFTOKEN": token,
-                },
-            });
-        });
+        cy.login("linguist", "1234567890");
     })
 
     it("clicks on options button", () => {

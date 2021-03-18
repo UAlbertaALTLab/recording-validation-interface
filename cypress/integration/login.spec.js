@@ -3,9 +3,10 @@
 describe("Login", () => {
     it("loads the page", () => {
         // checks that all page elements load
+
         cy.visit(Cypress.env('login_url'))
-       cy.get('.login__title')
-           .should('be.visible')
+        cy.get('.login__title')
+            .should('be.visible')
 
         cy.get('.login__form')
             .should('be.visible');
