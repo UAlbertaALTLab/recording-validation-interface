@@ -19,28 +19,28 @@
 
 {% macro segment_card(phrase, recordings, is_linguist, is_community) %}
 
-<article class="card shadow-sm">
+<article class="card shadow-sm" data-cy="segment-card">
             {% if phrase.validated %}
-                <div class="card__header card__header--green" data-phrase-id={{ phrase.id }}>
+                <div class="card__header card__header--green" data-cy="card-header" data-phrase-id={{ phrase.id }}>
                 &nbsp;
                 </div>
             {% else %}
-                <div class="card__header card__header--grey" data-phrase-id={{ phrase.id }}>
+                <div class="card__header card__header--grey" data-cy="card-header" data-phrase-id={{ phrase.id }}>
                 &nbsp;
                 </div>
             {% endif %}
             <div class="card__body">
-                <p class="card__title--cree">{{ phrase.transcription }}</p>
-                <p class="card__title--english">Translation: {{ phrase.translation }}</p>
+                <p class="card__title--cree" data-cy="transcription">{{ phrase.transcription }}</p>
+                <p class="card__title--english" data-cy="translation">Translation: {{ phrase.translation }}</p>
 
                 {% if is_community %}
                     <p>Is this translation accurate?
                     {% if phrase.status == "linked" %}
-                        <button class="button button--success-solid translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }}>Yes</button>
-                        <button class="button button--fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }}>No</button></p>
+                        <button class="button button--success-solid translation-judgement-accuracy-yes" data-cy="yes-button" data-phrase-id={{ phrase.id }}>Yes</button>
+                        <button class="button button--fail translation-judgement-accuracy-no" data-cy="no-button" data-phrase-id={{ phrase.id }}>No</button></p>
                     {% else %}
-                        <button class="button button--success translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }}>Yes</button>
-                        <button class="button button--fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }}>No</button></p>
+                        <button class="button button--success translation-judgement-accuracy-yes" data-cy="yes-button" data-phrase-id={{ phrase.id }}>Yes</button>
+                        <button class="button button--fail translation-judgement-accuracy-no" data-cy="no-button" data-phrase-id={{ phrase.id }}>No</button></p>
                     {%  endif %}
                 {% endif %} {# check for instructor privileges #}
 
@@ -55,24 +55,24 @@
                 {% for recording in recordings[phrase] %}
                     <tr>
                         <td>
-                            <div class="rec-height">
+                            <div class="rec-height" data-cy="recording">
                             {{ macros.player(recording) }}
                             </div>
                         </td>
-                        <td>
+                        <td data-cy="speaker">
                             {{ macros.speaker(recording) }}
                         </td>
                             {% if is_community %}
                                 <td>
                                     {% if recording.quality == 'good' %}
-                                        <button class="button button--success-solid audio-quality-good" data-rec-id={{ recording.id }}>Good</button>
-                                        <button class="button button--fail audio-quality-bad" data-rec-id={{ recording.id }}>Bad</button>
+                                        <button class="button button--success-solid audio-quality-good" data-cy="good-button" data-rec-id={{ recording.id }}>Good</button>
+                                        <button class="button button--fail audio-quality-bad" data-cy="bad-button" data-rec-id={{ recording.id }}>Bad</button>
                                     {% elif recording.quality == 'bad' %}
-                                        <button class="button button--success audio-quality-good" data-rec-id={{ recording.id }}>Good</button>
-                                        <button class="button button--fail-solid audio-quality-bad" data-rec-id={{ recording.id }}>Bad</button>
+                                        <button class="button button--success audio-quality-good" data-cy="good-button" data-rec-id={{ recording.id }}>Good</button>
+                                        <button class="button button--fail-solid audio-quality-bad" data-cy="bad-button" data-rec-id={{ recording.id }}>Bad</button>
                                     {% else %}
-                                        <button class="button button--success audio-quality-good" data-rec-id={{ recording.id }}>Good</button>
-                                        <button class="button button--fail audio-quality-bad" data-rec-id={{ recording.id }}>Bad</button>
+                                        <button class="button button--success audio-quality-good" data-cy="good-button" data-rec-id={{ recording.id }}>Good</button>
+                                        <button class="button button--fail audio-quality-bad" data-cy="bad-button" data-rec-id={{ recording.id }}>Bad</button>
                                     {% endif %} {# recording quality #}
                                 </td>
                             {% endif %}
@@ -81,7 +81,7 @@
                     {% endfor %}{# for recording in phrase.recordings #}
                 </table>
                 {% if is_linguist %}
-                    <a href={{ url('validation:segment_detail', phrase.id) }} class="button button--success right">More Options</a>
+                    <a href={{ url('validation:segment_detail', phrase.id) }} class="button button--success right" data-cy="options-button">More Options</a>
                 {% endif %} {# is linguist #}
             </div>
         </article>
