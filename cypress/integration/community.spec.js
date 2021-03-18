@@ -20,11 +20,11 @@ describe("Community members", () => {
 
                 cy.get('[data-cy="yes-button"]')
                     .click()
-                    .should('have.css', 'background-color', 'rgba(102, 142, 63, 0.5)')
+                    .should('have.class', 'button--success-solid')
 
                 cy.get('[data-cy="no-button"]')
                     .click()
-                    .should('have.css', 'background-color', 'rgba(215, 130, 120, 0.5)')
+                    .should('have.class', 'button--fail-solid')
             })
     })
 
