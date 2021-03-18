@@ -1,4 +1,3 @@
-/// <reference types="cypress" />
 // Tests for login functionality
 
 describe("Login", () => {

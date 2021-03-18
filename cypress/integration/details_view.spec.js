@@ -1,4 +1,3 @@
-/// <reference types="cypress" />
 // Tests the single word view page
 
 describe("Details View", () => {
@@ -33,7 +32,6 @@ describe("Details View", () => {
             .within(() => {
 
                 cy.get('[data-cy="options-button"]')
-                    .should('be.visible')
                     .click()
 
                 cy.location('pathname')
@@ -55,7 +53,6 @@ describe("Details View", () => {
                     .as('translation')
 
                 cy.get('[data-cy="options-button"]')
-                    .should('be.visible')
                     .click()
 
                 cy.location('pathname')
@@ -76,7 +73,6 @@ describe("Details View", () => {
         cy.get('[data-cy="segment-card"]:first')
             .within(() => {
                 cy.get('[data-cy="options-button"]')
-                    .should('be.visible')
                     .click()
 
                 cy.location('pathname')

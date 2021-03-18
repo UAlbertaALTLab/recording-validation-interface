@@ -1,4 +1,3 @@
-/// <reference types="cypress" />
 // Tests for search and advanced search
 
 describe("Search", () => {

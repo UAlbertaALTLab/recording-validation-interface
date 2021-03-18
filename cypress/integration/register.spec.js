@@ -1,4 +1,3 @@
-/// <reference types="cypress" />
 // Tests for register UI functionality
 
 describe("Register", () => {

@@ -1,4 +1,3 @@
-/// <reference types="cypress" />
 // Tests the ability to edit a segment
 
 describe("Edit segment", () => {
@@ -41,7 +40,6 @@ describe("Edit segment", () => {
                     .as('translation')
 
                 cy.get('[data-cy="options-button"]')
-                    .should('be.visible')
                     .click()
 
                 cy.location('pathname')
@@ -188,7 +186,6 @@ describe("Edit segment", () => {
         cy.visit(Cypress.env("segment_details_url"));
 
         cy.get('[data-cy="edit-button"]')
-            .should('be.visible')
             .click()
 
         cy.get("#segment-table").within(() => {
@@ -256,7 +253,6 @@ describe("Edit segment", () => {
             })
 
         cy.get('[data-cy="save-button"]')
-            .should('be.visible')
             .click()
 
         cy.get("#segment-table").within(() => {
@@ -325,7 +321,6 @@ describe("Edit segment", () => {
             .type("DONT SAVE")
 
         cy.get('[data-cy="cancel-button"]')
-            .should('be.visible')
             .click()
 
         cy.get("#segment-table").within(() => {

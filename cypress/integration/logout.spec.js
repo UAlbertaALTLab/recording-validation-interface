@@ -1,4 +1,3 @@
-/// <reference types="cypress" />
 // Tests for logout functionality
 
 describe("Logout", () => {
