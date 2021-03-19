@@ -556,13 +556,7 @@ def get_mic_id(name: str) -> int:
     >>> get_mic_id('2017-02-16pm-DS_Recorded_Track2_001_1')
     2
 
-
-    Unknown formats will give a descriptive error message:
-
-    >>> get_mic_id("💩.eaf")
-    Traceback (most recent call last):
-    ...
-    extract_phrases.InvalidFileName: Could not determine mic number from: 💩.eaf
+    Unknown formats will raise InvalidFileName error.
     """
 
     IDIOSYNCRACTIC_FORMATS = {
