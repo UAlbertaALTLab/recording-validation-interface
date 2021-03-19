@@ -3,7 +3,7 @@ import re
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 
-from validation.models import Phrase
+from validation.models import Issue
 
 
 class Login(forms.Form):
@@ -96,5 +96,5 @@ class FlagSegment(forms.ModelForm):
     phrase_id = forms.CharField(widget=forms.HiddenInput(), required=False)
 
     class Meta:
-        model = Phrase
-        fields = ["issues", "phrase_id"]
+        model = Issue
+        fields = ["phrase_id"]

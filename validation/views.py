@@ -40,7 +40,7 @@ from django.views.decorators.http import require_http_methods
 from librecval.normalization import to_indexable_form
 
 from .crude_views import *
-from .models import Phrase, Recording, Speaker
+from .models import Phrase, Recording, Speaker, Issue
 from .helpers import get_distance_with_translations, perfect_match, exactly_one_analysis
 from .forms import EditSegment, Login, Register, FlagSegment
 
@@ -92,7 +92,7 @@ def index(request):
     form = FlagSegment(request.POST, initial={"phrase_id": "{{ phrase.id }}"})
 
     if request.method == "POST" and form.is_valid():
-        print(form.cleaned_data)
+        save_issue(form.cleaned_data)
 
     paginator = Paginator(all_phrases, 5)
     page_no = request.GET.get("page", 1)
@@ -514,3 +514,25 @@ def user_is_community(user):
                 return True
 
     return False
+
+
+def save_issue(data):
+    print(data)
+    phrase_id = data.phrase_id
+    issues = data.issues
+
+    phrase = Phrase.objects.get(id=phrase_id)
+
+    # bad_cree', 'bad_english', 'bad_rec', 'other'
+
+    new_issue = Issue(
+        phrase=phrase,
+        other="other" in issues,
+        bad_cree="bad_cree" in issues,
+        bad_english="bad_english" in issues,
+        bad_recording="bad_rec" in issues,
+        comment="",
+        other_reason="",
+    )
+
+    new_issue.save()
