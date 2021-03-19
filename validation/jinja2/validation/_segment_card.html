@@ -17,115 +17,112 @@
 
 {% import 'validation/_macros.html' as macros %}
 
-{% macro segment_card(phrase, recordings, is_linguist, is_community, form) %}
+{% macro segment_card(phrase, recordings, is_linguist, is_community, form, csrf_token) %}
 
     <article class="card shadow-sm">
-            {% if phrase.validated %}
-                <div class="card__header card__header--green" data-phrase-id={{ phrase.id }}>
-                &nbsp;
-                </div>
-            {% else %}
-                <div class="card__header card__header--grey" data-phrase-id={{ phrase.id }}>
-                &nbsp;
-                </div>
-            {% endif %}
-            <div class="card__body">
-                <p class="card__title--cree">{{ phrase.transcription }}</p>
-                <p class="card__title--english">Translation: {{ phrase.translation }}</p>
+        {% if phrase.validated %}
+            <div class="card__header card__header--green" data-phrase-id={{ phrase.id }}>
+            &nbsp;
+            </div>
+        {% else %}
+            <div class="card__header card__header--grey" data-phrase-id={{ phrase.id }}>
+            &nbsp;
+            </div>
+        {% endif %}
+
+        <div class="card__body">
+            <p class="card__title--cree">{{ phrase.transcription }}</p>
+            <p class="card__title--english">Translation: {{ phrase.translation }}</p>
+
+            {% if is_community %}
+                <p>Is this translation accurate?
+                {% if phrase.status == "linked" %}
+                    <button class="button button--success-solid translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }}>Yes</button>
+                    <button class="button button--fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }} data-toggle="modal" data-target="#{{ phrase.id }}-modal">No</button>
+                    <button class="button button--neutral translation-judgement-accuracy-idk" data-phrase-id={{ phrase.id }}>I don't know</button></p>
+                {% else %}
+                    <button class="button button--success translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }}>Yes</button>
+                    <button class="button button--fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }} data-toggle="modal" data-target="#{{ phrase.id }}-modal">No</button>
+                    <button class="button button--neutral translation-judgement-accuracy-idk" data-phrase-id={{ phrase.id }}>I don't know</button></p>
+                {%  endif %}
+            {% endif %} {# check for instructor privileges #}
+
+            <table class="card__body--table">
+                <th>Recording</th>
+                <th>Speaker</th>
 
                 {% if is_community %}
-                    <p>Is this translation accurate?
-                    {% if phrase.status == "linked" %}
-                        <button class="button button--success-solid translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }}>Yes</button>
-                        <button class="button button--fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }} data-toggle="modal" data-target="#{{ phrase.id }}-modal">No</button>
-                        <button class="button button--neutral translation-judgement-accuracy-idk" data-phrase-id={{ phrase.id }}>I don't know</button></p>
-                    {% else %}
-                        <button class="button button--success translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }}>Yes</button>
-                        <button class="button button--fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }} data-toggle="modal" data-target="#{{ phrase.id }}-modal">No</button>
-                        <button class="button button--neutral translation-judgement-accuracy-idk" data-phrase-id={{ phrase.id }}>I don't know</button></p>
-                    {%  endif %}
-                {% endif %} {# check for instructor privileges #}
-
-                <table class="card__body--table">
-                    <th>Recording</th>
-                    <th>Speaker</th>
-
-                    {% if is_community %}
-                        <th>This recording is...</th>
-                    {% endif %}
+                    <th>This recording is...</th>
+                {% endif %}
 
                 {% for recording in recordings[phrase] %}
                     <tr>
                         <td>
                             <div class="rec-height">
-                            {{ macros.player(recording) }}
+                                {{ macros.player(recording) }}
                             </div>
                         </td>
                         <td>
                             {{ macros.speaker(recording) }}
                         </td>
-                            {% if is_community %}
-                                <td>
-                                    {% if recording.quality == 'good' %}
-                                        <button class="button button--success-solid audio-quality-good" data-rec-id={{ recording.id }}>Good</button>
-                                        <button class="button button--fail audio-quality-bad" data-rec-id={{ recording.id }}>Bad</button>
-                                    {% elif recording.quality == 'bad' %}
-                                        <button class="button button--success audio-quality-good" data-rec-id={{ recording.id }}>Good</button>
-                                        <button class="button button--fail-solid audio-quality-bad" data-rec-id={{ recording.id }}>Bad</button>
-                                    {% else %}
-                                        <button class="button button--success audio-quality-good" data-rec-id={{ recording.id }}>Good</button>
-                                        <button class="button button--fail audio-quality-bad" data-rec-id={{ recording.id }}>Bad</button>
-                                    {% endif %} {# recording quality #}
-                                </td>
-                            {% endif %}
-                        </tr>
+                        {% if is_community %}
+                            <td>
+                            {% if recording.quality == 'good' %}
+                                <button class="button button--success-solid audio-quality-good" data-rec-id={{ recording.id }}>Good</button>
+                                <button class="button button--fail audio-quality-bad" data-rec-id={{ recording.id }}>Bad</button>
+                            {% elif recording.quality == 'bad' %}
+                                <button class="button button--success audio-quality-good" data-rec-id={{ recording.id }}>Good</button>
+                                <button class="button button--fail-solid audio-quality-bad" data-rec-id={{ recording.id }}>Bad</button>
+                            {% else %}
+                                <button class="button button--success audio-quality-good" data-rec-id={{ recording.id }}>Good</button>
+                                <button class="button button--fail audio-quality-bad" data-rec-id={{ recording.id }}>Bad</button>
+                            {% endif %} {# recording quality #}
+                            </td>
+                        {% endif %}
+                    </tr>
 
-                    {% endfor %}{# for recording in phrase.recordings #}
-                </table>
-                {% if is_linguist %}
-                    <a href={{ url('validation:segment_detail', phrase.id) }} class="button button--success right">More Options</a>
-                {% endif %} {# is linguist #}
-            </div>
+                {% endfor %}{# for recording in phrase.recordings #}
+            </table>
+            {% if is_linguist %}
+                <a href={{ url('validation:segment_detail', phrase.id) }} class="button button--success right">More Options</a>
+            {% endif %} {# is linguist #}
+        </div>
 
         <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#{{ phrase.id }}-modal">Something's Wrong</button>
 
         <!-- Modal -->
         <div id="{{ phrase.id }}-modal" class="modal fade" role="dialog">
-          <div class="modal-dialog">
+            <div class="modal-dialog">
 
-            <!-- Modal content-->
-            <div class="modal-content">
-              <div class="modal-header">
-                <h4 class="modal-title">What's wrong with this entry?</h4>
-              </div>
-                  <form action="" method="post">
-                    <div class="modal-body">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">What's wrong with this entry?</h4>
+                    </div>
+
+                    <form action="" method="post">
                         <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-                        {{ form }}
-
-{#                <form action="/api/save_notes" method="POST">#}
-{#                    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">#}
-{#                    <input type="checkbox" id="recording" name="recording" value="recording">#}
-{#                    <label for="recording"> This is not a recording of this word</label><br>#}
-{#                    <input type="checkbox" id="transcription" name="transcription" value="transcription">#}
-{#                    <label for="transcription"> There's a better Cree word for this English word</label><br>#}
-{#                    <input type="checkbox" id="translation" name="translation" value="translation">#}
-{#                    <label for="translation"> There's a better English word for this Cree word</label><br>#}
-{#                    <input type="checkbox" id="other" name="other" value="other">#}
-{#                    <label for="other"> Something else:</label>#}
-{#                    <input class="form-control mr-sm-2" name="other" type="search" placeholder="Please specify" aria-label="Search"><br>#}
-{#                    Comments: <input type="text" id="comments" name="comments">#}
-{#                </form>#}
-                    </div>
-                    <div class="modal-footer">
-    {#                <button type="button" class="button button--fail" data-dismiss="modal">Cancel</button>#}
-    {#                <button type="submit" class="button button--success" data-dismiss="modal">Submit</button>#}
-                      <input data-cy="cancel-button" type="button" class="button button--fail" data-dismiss="modal" value="Cancel">
-                      <input data-cy="save-button" type="submit" class="button button--success" value="Save">
-                    </div>
-                  </form>
+                        <div class="modal-body">
+                            {{ form }}
+                            <input type="hidden" name="phrase_id" value="{{ phrase.id }}">
+{#                            <input type="checkbox" id="recording" name="recording" value="recording">#}
+{#                            <label for="recording"> This is not a recording of this word</label><br>#}
+{#                            <input type="checkbox" id="transcription" name="transcription" value="transcription">#}
+{#                            <label for="transcription"> There's a better Cree word for this English word</label><br>#}
+{#                            <input type="checkbox" id="translation" name="translation" value="translation">#}
+{#                            <label for="translation"> There's a better English word for this Cree word</label><br>#}
+{#                            <input type="checkbox" id="other" name="other" value="other">#}
+{#                            <label for="other"> Something else:</label>#}
+{#                            <input class="form-control mr-sm-2" name="other" type="search" placeholder="Please specify" aria-label="Search"><br>#}
+{#                            Comments: <input type="text" id="comments" name="comments">#}
+                        </div>
+                        <div class="modal-footer">
+                            <input data-cy="cancel-button" type="button" class="button button--fail" data-dismiss="modal" value="Cancel">
+                            <input data-cy="save-button" type="submit" class="button button--success" value="Save">
+                        </div>
+                    </form>
+                </div>
             </div>
-          </div>
         </div>
     </article>
 

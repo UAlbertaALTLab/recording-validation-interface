@@ -21,6 +21,7 @@
 {% import 'validation/_segment_card.html' as segment %}
 
 {% block content %}
+    <script src="/static/modal.js"></script>
 <div>
   <form class="form-inline ml-2 my-2 my-lg-0" method="GET" action="{{
     url('validation:index')
@@ -36,7 +37,7 @@
   </form>
 </div>
     {%  for phrase in phrases %}
-        {{ segment.segment_card(phrase, recordings, is_linguist, is_community, form) }}
+        {{ segment.segment_card(phrase, recordings, is_linguist, is_community, form, csrf_token) }}
     {% endfor %} {# phrase in phrases #}
 
 <nav>

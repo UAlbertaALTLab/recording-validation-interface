@@ -3,6 +3,8 @@ import re
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 
+from validation.models import Phrase
+
 
 class Login(forms.Form):
     username = forms.CharField(
@@ -81,11 +83,18 @@ class EditSegment(forms.Form):
     )
 
 
-class FlagSegment(forms.Form):
+class FlagSegment(forms.ModelForm):
     ISSUES = [
         ("bad_cree", "There's a better Cree word for this translation"),
         ("bad_english", "There's a better translation for this Cree word"),
         ("bad_rec", "One or more of these recordings are not of this word"),
         ("other", "Something else (please specify)"),
     ]
-    issues = forms.MultipleChoiceField(choices=ISSUES, required=False)
+    issues = forms.MultipleChoiceField(
+        choices=ISSUES, required=False, widget=forms.CheckboxSelectMultiple
+    )
+    phrase_id = forms.CharField(widget=forms.HiddenInput(), required=False)
+
+    class Meta:
+        model = Phrase
+        fields = ["issues", "phrase_id"]

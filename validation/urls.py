@@ -68,9 +68,4 @@ urlpatterns = [
         views.record_audio_quality_judgement,
         name="record_audio_quality_judgement",
     ),
-    path(
-        "api/save_notes",
-        views.save_notes,
-        name="save_notes",
-    ),
 ]

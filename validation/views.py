@@ -49,6 +49,7 @@ def index(request):
     """
     The home page.
     """
+
     is_linguist = user_is_linguist(request.user)
     is_community = user_is_community(request.user)
 
@@ -62,21 +63,23 @@ def index(request):
         if is_linguist:
             all_phrases = Phrase.objects.all()
         else:
-            all_phrases = Phrase.objects.filter(status="new")
+            all_phrases = Phrase.objects.filter(status="new").order_by("transcription")
         all_class = "button button--success filter__button filter__button--active"
     elif mode == "new":
-        all_phrases = Phrase.objects.filter(status="new")
+        all_phrases = Phrase.objects.filter(status="new").order_by("transcription")
         new_class = "button button--success filter__button filter__button--active"
     elif mode == "linked":
-        all_phrases = Phrase.objects.filter(status="linked")
+        all_phrases = Phrase.objects.filter(status="linked").order_by("transcription")
         linked_class = "button button--success filter__button filter__button--active"
     elif mode == "auto-validated":
-        all_phrases = Phrase.objects.filter(status="auto-validated")
+        all_phrases = Phrase.objects.filter(status="auto-validated").order_by(
+            "transcription"
+        )
         auto_validated_class = (
             "button button--success filter__button filter__button--active"
         )
     else:
-        all_phrases = Phrase.objects.all()
+        all_phrases = Phrase.objects.all().order_by("transcription")
         all_class = "button button--success filter__button filter__button--active"
 
     # The _segment_card needs a dictionary of recordings
@@ -86,7 +89,10 @@ def index(request):
     for phrase in all_phrases:
         recordings[phrase] = phrase.recordings
 
-    form = FlagSegment(request.POST)
+    form = FlagSegment(request.POST, initial={"phrase_id": "{{ phrase.id }}"})
+
+    if request.method == "POST" and form.is_valid():
+        print(form.cleaned_data)
 
     paginator = Paginator(all_phrases, 5)
     page_no = request.GET.get("page", 1)
@@ -482,10 +488,9 @@ def record_audio_quality_judgement(request, recording_id):
     return JsonResponse({"status": "ok"})
 
 
-@require_http_methods(["POST"])
-def save_notes(request):
-    print("hello")
-    return JsonResponse({"status": "ok"})
+def save_modal(request, phrase_id):
+    print("hi")
+    return render(request, "validation/foo.html")
 
 
 def encode_query_with_page(query, page):
