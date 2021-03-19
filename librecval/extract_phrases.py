@@ -40,12 +40,6 @@ from librecval.recording_session import SessionID, SessionMetadata, SessionParse
 # ############################### Exceptions ############################### #
 
 
-class DuplicateSessionError(RuntimeError):
-    """
-    Raised when the session has already been found by another name.
-    """
-
-
 class MissingMetadataError(RuntimeError):
     """
     Raised when the cooresponding metadata cannot be found.
@@ -132,7 +126,6 @@ class RecordingExtractor:
     logger: logging.Logger
 
     def __init__(self, metadata=Dict[SessionID, SessionMetadata]) -> None:
-        self.sessions: Dict[SessionID, Path] = {}
         self.metadata = metadata
 
     def scan(self, root_directory: Path) -> Iterable[SegmentAndAudio]:
@@ -173,8 +166,6 @@ class RecordingExtractor:
     ) -> Iterable[SegmentAndAudio]:
         try:
             yield from self.extract_session(session_dir)
-        except DuplicateSessionError:
-            self.logger.exception("Skipping %s: duplicate", session_dir)
         except MissingMetadataError:
             self.logger.exception("Skipping %s: Missing metadata", session_dir)
 
@@ -183,11 +174,6 @@ class RecordingExtractor:
         Extracts recordings from a single session.
         """
         session_id = SessionID.from_name(session_dir.stem)
-        if session_id in self.sessions:
-            raise DuplicateSessionError(
-                f"Duplicate session: {session_id} "
-                f"found at {self.sessions[session_id]}"
-            )
         if session_id not in self.metadata:
             raise MissingMetadataError(f"Missing metadata for {session_id}")
 
