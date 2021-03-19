@@ -158,7 +158,9 @@ class RecordingExtractor:
                 failed_dir = Path.cwd() / "failed-sessions"
                 failed_dir.mkdir(exist_ok=True)
                 name = failed_dir / session_id.as_filename()
-                name.symlink_to(session_dir)
+                if not name.exists():
+                    self.logger.error("failed ONCE again: %s", session_dir)
+                    name.symlink_to(session_dir)
                 continue
 
     def extract_all_recordings_from_session(
