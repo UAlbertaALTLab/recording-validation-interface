@@ -35,7 +35,7 @@ from pympi.Elan import Eaf  # type: ignore
 from typing_extensions import Literal
 
 from librecval.normalization import normalize
-from librecval.recording_session import SessionID, SessionMetadata
+from librecval.recording_session import SessionID, SessionMetadata, SessionParseError
 
 # ############################### Exceptions ############################### #
 
@@ -154,7 +154,21 @@ class RecordingExtractor:
             valid_session_directories.append(session_dir)
 
         for session_dir in valid_session_directories:
-            yield from self.extract_all_recordings_from_session(session_dir)
+            try:
+                yield from self.extract_all_recordings_from_session(session_dir)
+            except Exception:
+                try:
+                    session_id = SessionID.from_name(session_dir.stem)
+                except SessionParseError:
+                    self.logger.exception("Invalid session name %s", session_dir)
+                    continue
+
+                self.logger.exception("Error extracting %s", session_dir)
+                failed_dir = Path.cwd() / "failed-sessions"
+                failed_dir.mkdir(exist_ok=True)
+                name = failed_dir / session_id.as_filename()
+                name.symlink_to(session_dir)
+                continue
 
     def extract_all_recordings_from_session(
         self, session_dir: Path
