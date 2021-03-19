@@ -157,10 +157,8 @@ class RecordingExtractor:
             try:
                 yield from self.extract_all_recordings_from_session(session_dir)
             except Exception:
-                try:
-                    session_id = SessionID.from_name(session_dir.stem)
-                except SessionParseError:
-                    self.logger.exception("Invalid session name %s", session_dir)
+                session_id = get_session_name_or_none(session_dir)
+                if session_id is None:
                     continue
 
                 self.logger.exception("Error extracting %s", session_dir)
@@ -661,3 +659,17 @@ def get_mic_id(name: str) -> int:
             return IDIOSYNCRACTIC_FORMATS[name]
         raise InvalidFileName(f"Could not determine mic number from: {name}")
     return int(m.group(1), 10)
+
+
+@logme.log
+def get_session_name_or_none(session_dir: Path, logger=None) -> Optional[SessionID]:
+    """
+    Returns the session ID from the given path and tries not to crash.
+    Returns None if it crashed :/
+    """
+    try:
+        session_id = SessionID.from_name(session_dir.stem)
+    except SessionParseError:
+        logger.exception("Invalid session name %s", session_dir)
+        return None
+    return session_id
