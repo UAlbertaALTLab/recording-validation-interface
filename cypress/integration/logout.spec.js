@@ -1,4 +1,3 @@
-/// <reference types="cypress" />
 // Tests for logout functionality
 
 describe("Logout", () => {
@@ -6,14 +5,14 @@ describe("Logout", () => {
         // TODO: don't make it log in through the UI
         cy.visit(Cypress.env('login_url'))
 
-        cy.get('#login-form')
+        cy.get('.login__form')
             .should('be.visible');
 
         cy.get('input[name=username]')
-            .type('test')
+            .type('community')
 
         cy.get('input[name=password]')
-            .type('1234')
+            .type('1234567890')
 
         cy.get('#login-button')
             .click()
