@@ -517,16 +517,15 @@ def user_is_community(user):
 
 
 def save_issue(data):
-    print(data)
-    phrase_id = data.phrase_id
-    issues = data.issues
+    phrase_id = data["phrase_id"]
+    issues = data["issues"]
 
     phrase = Phrase.objects.get(id=phrase_id)
 
     # bad_cree', 'bad_english', 'bad_rec', 'other'
 
     new_issue = Issue(
-        phrase=phrase,
+        # phrase=phrase,
         other="other" in issues,
         bad_cree="bad_cree" in issues,
         bad_english="bad_english" in issues,
@@ -536,3 +535,4 @@ def save_issue(data):
     )
 
     new_issue.save()
+    print("saved new issue")

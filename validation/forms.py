@@ -97,4 +97,5 @@ class FlagSegment(forms.ModelForm):
 
     class Meta:
         model = Issue
-        fields = ["phrase_id"]
+        fields = ["comment"]
+        # fields = ["comment", "other", "bad_cree", "bad_english", "bad_recording", "other_reason", "phrase"]
