@@ -43,12 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
 
-                    const dates = document.getElementsByClassName("card__date")
-                    for (let d of dates) {
-                        if (d.dataset.phraseId === phraseId) {
-                            d.classList.add("card__date--white")
-                        }
-                    }
                 } else if (judgement === 'no') {
                     button.classList.add("button--fail-solid")
                     button.classList.remove("button--fail")
@@ -67,13 +61,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                 h.classList.add('card__header--grey')
                             }
                         }
-
-                    const dates = document.getElementsByClassName("card__date")
-                    for (let d of dates) {
-                        if (d.dataset.phraseId === phraseId) {
-                            d.classList.remove("card__date--white")
-                        }
-                    }
                     
                 }
             })
