@@ -21,13 +21,6 @@
 {% import 'validation/_segment_card.html' as segment %}
 
 {% block content %}
-    <script>
-        const params = new URLSearchParams(window.location.search);
-        let session_mode = document.getElementById("session_mode")
-        if (params.get('session')) {
-            session_mode.value = params.get('session');
-        }
-    </script>
 <div class="center">
   <form method="GET" action="{{
     url('validation:index')
