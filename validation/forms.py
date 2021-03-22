@@ -93,9 +93,19 @@ class FlagSegment(forms.ModelForm):
     issues = forms.MultipleChoiceField(
         choices=ISSUES, required=False, widget=forms.CheckboxSelectMultiple
     )
+
+    other_reason = forms.CharField(
+        required=False,
+        widget=forms.TextInput(),
+    )
+
+    comment = forms.CharField(
+        required=False,
+        widget=forms.TextInput(),
+    )
+
     phrase_id = forms.CharField(widget=forms.HiddenInput(), required=False)
 
     class Meta:
         model = Issue
-        fields = ["comment"]
-        # fields = ["comment", "other", "bad_cree", "bad_english", "bad_recording", "other_reason", "phrase"]
+        fields = ()
