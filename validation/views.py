@@ -87,19 +87,7 @@ def index(request):
     page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)
 
-    # The _segment_card needs a dictionary of recordings
-    # in order to properly display search results
-    # so we're just going to play nice with it here
-    recordings = {}
-    forms = {}
-    for phrase in phrases:
-        recordings[phrase] = phrase.recordings
-        if request.method == "POST" and int(request.POST.get("phrase_id")) == phrase.id:
-            forms[phrase.id] = FlagSegment(
-                request.POST, initial={"phrase_id": phrase.id}
-            )
-        else:
-            forms[phrase.id] = FlagSegment(initial={"phrase_id": phrase.id})
+    recordings, forms = prep_phrase_data(request, phrases)
 
     if request.method == "POST":
         form = forms.get(int(request.POST.get("phrase_id")), None)
@@ -143,16 +131,11 @@ def search_phrases(request):
     query_term = QueryDict("", mutable=True)
     query_term.update({"query": query})
 
-    recordings = {}
-    forms = {}
-    for phrase in all_matches:
-        recordings[phrase] = [recording for recording in phrase.recordings]
-        if request.method == "POST" and int(request.POST.get("phrase_id")) == phrase.id:
-            forms[phrase.id] = FlagSegment(
-                request.POST, initial={"phrase_id": phrase.id}
-            )
-        else:
-            forms[phrase.id] = FlagSegment(initial={"phrase_id": phrase.id})
+    paginator = Paginator(all_matches, 5)
+    page_no = request.GET.get("page", 1)
+    phrases = paginator.get_page(page_no)
+
+    recordings, forms = prep_phrase_data(request, phrases)
 
     if request.method == "POST":
         form = forms.get(int(request.POST.get("phrase_id")), None)
@@ -164,9 +147,6 @@ def search_phrases(request):
                 print(request.POST)
                 print(form)
 
-    paginator = Paginator(all_matches, 5)
-    page_no = request.GET.get("page", 1)
-    phrases = paginator.get_page(page_no)
     context = dict(
         phrases=phrases,
         recordings=recordings,
@@ -541,6 +521,24 @@ def user_is_expert(user):
                 return True
 
     return False
+
+
+def prep_phrase_data(request, phrases):
+    # The _segment_card needs a dictionary of recordings
+    # in order to properly display search results
+    # so we're just going to play nice with it here
+    recordings = {}
+    forms = {}
+    for phrase in phrases:
+        recordings[phrase] = phrase.recordings
+        if request.method == "POST" and int(request.POST.get("phrase_id")) == phrase.id:
+            forms[phrase.id] = FlagSegment(
+                request.POST, initial={"phrase_id": phrase.id}
+            )
+        else:
+            forms[phrase.id] = FlagSegment(initial={"phrase_id": phrase.id})
+
+    return recordings, forms
 
 
 def save_issue(data):
