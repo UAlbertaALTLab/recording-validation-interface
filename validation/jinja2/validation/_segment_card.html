@@ -1,0 +1,89 @@
+{#
+      Copyright (C) 2021 Jolene Poulin <jcpoulin@ualberta.ca>
+
+      This program is free software: you can redistribute it and/or modify
+      it under the terms of the GNU Affero General Public License as
+      published by the Free Software Foundation, either version 3 of the
+      License, or (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      GNU Affero General Public License for more details.
+
+      You should have received a copy of the GNU Affero General Public License
+      along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#}
+
+{% import 'validation/_macros.html' as macros %}
+
+{% macro segment_card(phrase, recordings, is_linguist, is_expert) %}
+
+<article class="card shadow-sm" data-cy="segment-card">
+            {% if phrase.validated %}
+                <div class="card__header card__header--green" data-cy="card-header" data-phrase-id={{ phrase.id }}>
+                &nbsp;
+                </div>
+            {% else %}
+                <div class="card__header card__header--grey" data-cy="card-header" data-phrase-id={{ phrase.id }}>
+                &nbsp;
+                </div>
+            {% endif %}
+            <div class="card__body">
+                <p class="card__title--cree" data-cy="transcription">{{ phrase.transcription }}</p>
+                <p class="card__title--english" data-cy="translation">Translation: {{ phrase.translation }}</p>
+
+                {% if is_expert %}
+                    <p>Is this translation accurate?
+                    {% if phrase.status == "linked" %}
+                        <button class="button button--success-solid translation-judgement-accuracy-yes" data-cy="yes-button" data-phrase-id={{ phrase.id }}>Yes</button>
+                        <button class="button button--fail translation-judgement-accuracy-no" data-cy="no-button" data-phrase-id={{ phrase.id }}>No</button></p>
+                    {% else %}
+                        <button class="button button--success translation-judgement-accuracy-yes" data-cy="yes-button" data-phrase-id={{ phrase.id }}>Yes</button>
+                        <button class="button button--fail translation-judgement-accuracy-no" data-cy="no-button" data-phrase-id={{ phrase.id }}>No</button></p>
+                    {%  endif %}
+                {% endif %}
+
+                <table class="card__body--table">
+                    <th>Recording</th>
+                    <th>Speaker</th>
+
+                    {% if is_expert %}
+                        <th>This recording is...</th>
+                    {% endif %}
+
+                {% for recording in recordings[phrase] %}
+                    <tr>
+                        <td>
+                            <div class="rec-height" data-cy="recording">
+                            {{ macros.player(recording) }}
+                            </div>
+                        </td>
+                        <td data-cy="speaker">
+                            {{ macros.speaker(recording) }}
+                        </td>
+                            {% if is_expert %}
+                                <td>
+                                    {% if recording.quality == 'good' %}
+                                        <button class="button button--success-solid audio-quality-good" data-cy="good-button" data-rec-id={{ recording.id }}>Good</button>
+                                        <button class="button button--fail audio-quality-bad" data-cy="bad-button" data-rec-id={{ recording.id }}>Bad</button>
+                                    {% elif recording.quality == 'bad' %}
+                                        <button class="button button--success audio-quality-good" data-cy="good-button" data-rec-id={{ recording.id }}>Good</button>
+                                        <button class="button button--fail-solid audio-quality-bad" data-cy="bad-button" data-rec-id={{ recording.id }}>Bad</button>
+                                    {% else %}
+                                        <button class="button button--success audio-quality-good" data-cy="good-button" data-rec-id={{ recording.id }}>Good</button>
+                                        <button class="button button--fail audio-quality-bad" data-cy="bad-button" data-rec-id={{ recording.id }}>Bad</button>
+                                    {% endif %} {# recording quality #}
+                                </td>
+                            {% endif %}
+                        </tr>
+
+                    {% endfor %}{# for recording in phrase.recordings #}
+                </table>
+                {% if is_linguist %}
+                    <a href={{ url('validation:segment_detail', phrase.id) }} class="button button--success right" data-cy="options-button">More Options</a>
+                {% endif %} {# is linguist #}
+            </div>
+        </article>
+
+{% endmacro %}

@@ -36,6 +36,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User, Group
 from django.contrib.auth import authenticate, login as django_login
 from django.views.decorators.http import require_http_methods
+from django.contrib.auth.decorators import login_required
 
 from librecval.normalization import to_indexable_form
 
@@ -62,6 +63,7 @@ def index(request):
         if is_linguist:
             all_phrases = Phrase.objects.all()
         else:
+            # TODO: this should be everything *except* auto-val, not just the new ones
             all_phrases = Phrase.objects.filter(status="new")
         all_class = "button button--success filter__button filter__button--active"
     elif mode == "new":
@@ -79,12 +81,20 @@ def index(request):
         all_phrases = Phrase.objects.all()
         all_class = "button button--success filter__button filter__button--active"
 
+    # The _segment_card needs a dictionary of recordings
+    # in order to properly display search results
+    # so we're just going to play nice with it here
+    recordings = {}
+    for phrase in all_phrases:
+        recordings[phrase] = phrase.recordings
+
     paginator = Paginator(all_phrases, 5)
     page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)
     auth = request.user.is_authenticated
     context = dict(
         phrases=phrases,
+        recordings=recordings,
         all_class=all_class,
         new_class=new_class,
         linked_class=linked_class,
@@ -112,13 +122,16 @@ def search_phrases(request):
     query_term = QueryDict("", mutable=True)
     query_term.update({"query": query})
 
-    is_linguist = user_is_linguist(request.user)
+    recordings = {}
+    for phrase in all_matches:
+        recordings[phrase] = [recording for recording in phrase.recordings]
 
     paginator = Paginator(all_matches, 5)
     page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)
     context = dict(
         phrases=phrases,
+        recordings=recordings,
         search_term=query,
         query=query_term,
         encode_query_with_page=encode_query_with_page,
@@ -162,6 +175,7 @@ def advanced_search_results(request):
     analysis = request.GET.get("analysis")
     status = request.GET.get("status")
     speakers = request.GET.getlist("speaker-options")
+    quality = request.GET.get("quality")
 
     if transcription != "":
         cree_matches = Phrase.objects.filter(transcription__contains=transcription)
@@ -199,14 +213,19 @@ def advanced_search_results(request):
     else:
         phrase_and_status_matches = phrase_matches
 
+    recordings = {}
     all_matches = []
-    if "all" in speakers or speakers == []:
-        all_matches = [p for p in phrase_and_status_matches]
-    else:
-        for phrase in phrase_and_status_matches:
+    for phrase in phrase_and_status_matches:
+        recordings[phrase] = []
+        if ("all" in speakers or speakers == []) and (quality == "all" or not quality):
+            recordings[phrase] = list(phrase.recordings)
+        else:
             for recording in phrase.recordings:
-                if recording.speaker.code in speakers:
-                    all_matches.append(phrase)
+                if recording.speaker.code in speakers or recording.quality == quality:
+                    recordings[phrase].append(recording)
+
+        if recordings[phrase]:
+            all_matches.append(phrase)
 
     all_matches.sort(key=lambda phrase: phrase.transcription)
 
@@ -227,6 +246,7 @@ def advanced_search_results(request):
     phrases = paginator.get_page(page_no)
     context = dict(
         phrases=phrases,
+        recordings=recordings,
         search_term="advanced search",
         query=query,
         encode_query_with_page=encode_query_with_page,
@@ -423,6 +443,7 @@ def register(request):
 # TODO: Speaker bio page like https://ojibwe.lib.umn.edu/about/voices
 
 
+@login_required()
 @require_http_methods(["POST"])
 def record_translation_judgement(request, phrase_id):
     # TODO: check that user is logged in
@@ -441,6 +462,22 @@ def record_translation_judgement(request, phrase_id):
         return HttpResponseBadRequest()
 
     phrase.save()
+    return JsonResponse({"status": "ok"})
+
+
+@login_required()
+@require_http_methods(["POST"])
+def record_audio_quality_judgement(request, recording_id):
+    # TODO: check that user is logged in
+    rec = get_object_or_404(Recording, id=recording_id)
+    judgement = json.loads(request.body)
+
+    if judgement["judgement"] in ["good", "bad"]:
+        rec.quality = judgement["judgement"]
+    else:
+        return HttpResponseBadRequest()
+
+    rec.save()
     return JsonResponse({"status": "ok"})
 
 

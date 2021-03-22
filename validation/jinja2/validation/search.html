@@ -21,65 +21,13 @@
 
 {% extends 'validation/_base.html' %}
 {% import 'validation/_macros.html' as macros %}
+{% import 'validation/_segment_card.html' as segment %}
 
 
 {% block content %}
 <h2> Results for <q>{{ search_term }}</q> </h2>
     {%  for phrase in phrases %}
-        <article class="card shadow-sm">
-            {% if phrase.validated %}
-                <div class="card__header card__header--green" data-phrase-id={{ phrase.id }}>
-                &nbsp;
-                </div>
-            {% else %}
-                <div class="card__header card__header--grey" data-phrase-id={{ phrase.id }}>
-                &nbsp;
-                </div>
-            {% endif %}
-
-            <div class="card__body">
-                <p class="card__title--cree">{{ phrase.transcription }}</p>
-                <p class="card__title--english">Translation: {{ phrase.translation }}</p>
-                <p>Is this translation accurate?
-                {% if phrase.status == "linked" %}
-                    <button class="button button--success-solid translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }}>Yes</button>
-                    <button class="button button--fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }}>No</button></p>
-                {% else %}
-                    <button class="button button--success translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }}>Yes</button>
-                    <button class="button button--fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }}>No</button></p>
-                {%  endif %}
-
-                <table class="card__body--table">
-                    <th>Recording</th>
-                    <th>Speaker</th>
-                    {% if is_expert %}
-                        <th>This recording is...</th>
-                    {% endif %}
-
-                    {% for recording in phrase.recordings %}
-                        <tr>
-                            <td>
-                                <div class="rec-height">
-                                    {{ macros.player(recording) }}
-                                </div>
-                            </td>
-                            <td>
-                                {{ macros.speaker(recording) }}
-                            </td>
-                            {% if is_expert %}
-                                <td>
-                                    <button class="button button--success">Good</button> <button class="button button--fail">Bad</button>
-                                </td>
-                            {% endif %}
-                        </tr>
-
-                    {% endfor %}{# for recording in phrase.recordings #}
-                </table>
-                {% if is_linguist %}
-                    <a href={{ url('validation:segment_detail', phrase.id) }} class="button button--success right">More Options</a>
-                {% endif %} {# is linguist #}
-            </div>
-        </article>
+        {{ segment.segment_card(phrase, recordings, is_linguist, is_expert) }}
     {% endfor %} {# phrase in phrases #}
 
     <nav>
