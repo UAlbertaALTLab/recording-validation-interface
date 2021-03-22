@@ -37,6 +37,11 @@ from typing_extensions import Literal
 from librecval.normalization import normalize
 from librecval.recording_session import SessionID, SessionMetadata, SessionParseError
 
+# Path to project root directory.
+project_root = Path(__file__).parent.parent
+assert (project_root / "LICENSE").exists()
+
+
 # ############################### Exceptions ############################### #
 
 
@@ -155,7 +160,7 @@ class RecordingExtractor:
                     continue
 
                 self.logger.exception("Error extracting %s", session_dir)
-                failed_dir = Path.cwd() / "failed-sessions"
+                failed_dir = project_root / "failed-sessions"
                 failed_dir.mkdir(exist_ok=True)
                 name = failed_dir / session_id.as_filename()
                 if not name.exists():
