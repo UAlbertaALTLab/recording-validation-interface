@@ -214,7 +214,9 @@ class RecordingExtractor:
             speaker = self.metadata[session_id][mic_id]
 
             self.logger.debug(
-                "Opening audio and .eaf from %s for speaker %s", sound_file, speaker,
+                "Opening audio and .eaf from %s for speaker %s",
+                sound_file,
+                speaker,
             )
 
             audio = AudioSegment.from_file(fspath(sound_file))
