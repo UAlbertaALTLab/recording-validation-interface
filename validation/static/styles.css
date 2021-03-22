@@ -301,11 +301,11 @@ a:hover {
   background-color: var(--custom-grey);
 }
 
-label {
-  padding-top: 0.75rem;
-  display: flex;
-  align-content: start;
-}
+/*label {*/
+/*  padding-top: 0.75rem;*/
+/*  display: flex;*/
+/*  align-content: start;*/
+/*}*/
 
 #id_role {
   list-style: none;
@@ -336,4 +336,8 @@ label {
 
 .right {
   float: right;
+}
+
+.modal-body li {
+  list-style: none;
 }

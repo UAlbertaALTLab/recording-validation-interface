@@ -95,13 +95,14 @@ class FlagSegment(forms.ModelForm):
     )
 
     other_reason = forms.CharField(
+        label="Specify reason here",
         required=False,
-        widget=forms.TextInput(),
+        widget=forms.TextInput(attrs={"class": "form-control bottom-margin"}),
     )
 
     comment = forms.CharField(
         required=False,
-        widget=forms.TextInput(),
+        widget=forms.TextInput(attrs={"class": "form-control bottom-margin"}),
     )
 
     phrase_id = forms.CharField(widget=forms.HiddenInput(), required=False)
