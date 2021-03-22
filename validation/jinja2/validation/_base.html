@@ -39,7 +39,7 @@ const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         <input class="form-control mr-sm-2" name="query" type="search" placeholder="Search" aria-label="Search" data-cy="search-bar">
         <button class="my-2 my-sm-0 button button--success" type="submit">Search</button>
         &nbsp;
-        <a data-cy="advanced-search-button" href="{{ url('validation:advanced_search') }}" class="btn button button--fail my-2 my-sm-0">Advanced Search</a>
+        <a data-cy="advanced-search-button" href="{{ url('validation:advanced_search') }}" class="button button--fail my-2 my-sm-0 button--adv-search">Advanced Search</a>
     
       </form>
     </div>
