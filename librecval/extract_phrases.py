@@ -27,7 +27,7 @@ from decimal import Decimal
 from hashlib import sha256
 from os import fspath
 from pathlib import Path
-from typing import Dict, NamedTuple, Optional
+from typing import Dict, Iterable, NamedTuple, Optional, Tuple
 
 import logme  # type: ignore
 from pydub import AudioSegment  # type: ignore
@@ -35,15 +35,14 @@ from pympi.Elan import Eaf  # type: ignore
 from typing_extensions import Literal
 
 from librecval.normalization import normalize
-from librecval.recording_session import SessionID, SessionMetadata
+from librecval.recording_session import SessionID, SessionMetadata, SessionParseError
+
+# Path to project root directory.
+project_root = Path(__file__).parent.parent
+assert (project_root / "LICENSE").exists()
+
 
 # ############################### Exceptions ############################### #
-
-
-class DuplicateSessionError(RuntimeError):
-    """
-    Raised when the session has already been found by another name.
-    """
 
 
 class MissingMetadataError(RuntimeError):
@@ -119,6 +118,10 @@ class Segment(NamedTuple):
         return sha256(self.signature().encode("UTF-8")).hexdigest()
 
 
+# One recording, with all its metadata along with its audio.
+SegmentAndAudio = Tuple[Segment, AudioSegment]
+
+
 @logme.log
 class RecordingExtractor:
     """
@@ -128,10 +131,9 @@ class RecordingExtractor:
     logger: logging.Logger
 
     def __init__(self, metadata=Dict[SessionID, SessionMetadata]) -> None:
-        self.sessions: Dict[SessionID, Path] = {}
         self.metadata = metadata
 
-    def scan(self, root_directory: Path):
+    def scan(self, root_directory: Path) -> Iterable[SegmentAndAudio]:
         """
         Scans the directory provided for sessions.
 
@@ -140,27 +142,45 @@ class RecordingExtractor:
         """
 
         self.logger.debug("Scanning %s for sessions...", root_directory)
+
+        valid_session_directories = []
+
         for session_dir in root_directory.iterdir():
             if not session_dir.resolve().is_dir():
                 self.logger.debug("Rejecting %s; not a directory", session_dir)
                 continue
-            try:
-                yield from self.extract_session(session_dir)
-            except DuplicateSessionError:
-                self.logger.exception("Skipping %s: duplicate", session_dir)
-            except MissingMetadataError:
-                self.logger.exception("Skipping %s: Missing metadata", session_dir)
+            valid_session_directories.append(session_dir)
 
-    def extract_session(self, session_dir: Path):
+        for session_dir in valid_session_directories:
+            try:
+                yield from self.extract_all_recordings_from_session(session_dir)
+            except Exception:
+                session_id = get_session_name_or_none(session_dir)
+                if session_id is None:
+                    continue
+
+                self.logger.exception("Error extracting %s", session_dir)
+                failed_dir = project_root / "failed-sessions"
+                failed_dir.mkdir(exist_ok=True)
+                name = failed_dir / session_id.as_filename()
+                if not name.exists():
+                    self.logger.error("failed ONCE again: %s", session_dir)
+                    name.symlink_to(session_dir)
+                continue
+
+    def extract_all_recordings_from_session(
+        self, session_dir: Path
+    ) -> Iterable[SegmentAndAudio]:
+        try:
+            yield from self.extract_session(session_dir)
+        except MissingMetadataError:
+            self.logger.exception("Skipping %s: Missing metadata", session_dir)
+
+    def extract_session(self, session_dir: Path) -> Iterable[SegmentAndAudio]:
         """
         Extracts recordings from a single session.
         """
         session_id = SessionID.from_name(session_dir.stem)
-        if session_id in self.sessions:
-            raise DuplicateSessionError(
-                f"Duplicate session: {session_id} "
-                f"found at {self.sessions[session_id]}"
-            )
         if session_id not in self.metadata:
             raise MissingMetadataError(f"Missing metadata for {session_id}")
 
@@ -203,8 +223,7 @@ class RecordingExtractor:
 
 def generate_segments_from_eaf(
     annotation_path: Path, audio: AudioSegment, speaker: str, session_id: SessionID
-):
-
+) -> Iterable[SegmentAndAudio]:
     """
     Yields segements from the annotation file
     """
@@ -288,7 +307,7 @@ def extract_data(
     session_id,
     english_tier,
     comment_tier,
-) -> tuple:
+) -> SegmentAndAudio:
     """
     Extracts all relevant data from a .eaf file, where "relevant data" is:
     - translation
@@ -542,13 +561,7 @@ def get_mic_id(name: str) -> int:
     >>> get_mic_id('2017-02-16pm-DS_Recorded_Track2_001_1')
     2
 
-
-    Unknown formats will give a descriptive error message:
-
-    >>> get_mic_id("💩.eaf")
-    Traceback (most recent call last):
-    ...
-    extract_phrases.InvalidFileName: Could not determine mic number from: 💩.eaf
+    Unknown formats will raise InvalidFileName error.
     """
 
     IDIOSYNCRACTIC_FORMATS = {
@@ -639,3 +652,17 @@ def get_mic_id(name: str) -> int:
             return IDIOSYNCRACTIC_FORMATS[name]
         raise InvalidFileName(f"Could not determine mic number from: {name}")
     return int(m.group(1), 10)
+
+
+@logme.log
+def get_session_name_or_none(session_dir: Path, logger=None) -> Optional[SessionID]:
+    """
+    Returns the session ID from the given path and tries not to crash.
+    Returns None if it crashed :/
+    """
+    try:
+        session_id = SessionID.from_name(session_dir.stem)
+    except SessionParseError:
+        logger.exception("Invalid session name %s", session_dir)
+        return None
+    return session_id
