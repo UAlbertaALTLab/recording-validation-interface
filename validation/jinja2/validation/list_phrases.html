@@ -37,7 +37,7 @@
   </form>
 </div>
     {%  for phrase in phrases %}
-        {{ segment.segment_card(phrase, recordings, is_linguist, is_community, form, csrf_token) }}
+        {{ segment.segment_card(phrase, recordings, is_linguist, is_expert, form, csrf_token) }}
     {% endfor %} {# phrase in phrases #}
 
 <nav>

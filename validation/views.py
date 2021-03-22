@@ -36,6 +36,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User, Group
 from django.contrib.auth import authenticate, login as django_login
 from django.views.decorators.http import require_http_methods
+from django.contrib.auth.decorators import login_required
 
 from librecval.normalization import to_indexable_form
 
@@ -51,7 +52,7 @@ def index(request):
     """
 
     is_linguist = user_is_linguist(request.user)
-    is_community = user_is_community(request.user)
+    is_expert = user_is_expert(request.user)
 
     all_class = "button button--success filter__button"
     new_class = "button button--success filter__button"
@@ -107,7 +108,7 @@ def index(request):
         auto_validated_class=auto_validated_class,
         auth=auth,
         is_linguist=is_linguist,
-        is_community=is_community,
+        is_expert=is_expert,
         form=form,
     )
     return render(request, "validation/list_phrases.html", context)
@@ -118,7 +119,7 @@ def search_phrases(request):
     The search results for pages.
     """
     is_linguist = user_is_linguist(request.user)
-    is_community = user_is_community(request.user)
+    is_expert = user_is_expert(request.user)
 
     query = request.GET.get("query")
     cree_matches = Phrase.objects.filter(transcription__contains=query)
@@ -132,7 +133,6 @@ def search_phrases(request):
     recordings = {}
     for phrase in all_matches:
         recordings[phrase] = [recording for recording in phrase.recordings]
-    is_linguist = user_is_linguist(request.user)
 
     paginator = Paginator(all_matches, 5)
     page_no = request.GET.get("page", 1)
@@ -144,7 +144,7 @@ def search_phrases(request):
         query=query_term,
         encode_query_with_page=encode_query_with_page,
         is_linguist=is_linguist,
-        is_community=is_community,
+        is_expert=is_expert,
         auth=request.user.is_authenticated,
     )
     return render(request, "validation/search.html", context)
@@ -176,7 +176,7 @@ def advanced_search_results(request):
     INTERSECT speaker
     """
     is_linguist = user_is_linguist(request.user)
-    is_community = user_is_community(request.user)
+    is_expert = user_is_expert(request.user)
 
     transcription = request.GET.get("transcription")
     translation = request.GET.get("translation")
@@ -259,7 +259,7 @@ def advanced_search_results(request):
         query=query,
         encode_query_with_page=encode_query_with_page,
         is_linguist=is_linguist,
-        is_community=is_community,
+        is_expert=is_expert,
         auth=request.user.is_authenticated,
     )
     return render(request, "validation/search.html", context)
@@ -451,6 +451,7 @@ def register(request):
 # TODO: Speaker bio page like https://ojibwe.lib.umn.edu/about/voices
 
 
+@login_required()
 @require_http_methods(["POST"])
 def record_translation_judgement(request, phrase_id):
     # TODO: check that user is logged in
@@ -472,11 +473,11 @@ def record_translation_judgement(request, phrase_id):
     return JsonResponse({"status": "ok"})
 
 
+@login_required()
 @require_http_methods(["POST"])
 def record_audio_quality_judgement(request, recording_id):
     # TODO: check that user is logged in
     rec = get_object_or_404(Recording, id=recording_id)
-    print(recording_id)
     judgement = json.loads(request.body)
 
     if judgement["judgement"] in ["good", "bad"]:
@@ -486,11 +487,6 @@ def record_audio_quality_judgement(request, recording_id):
 
     rec.save()
     return JsonResponse({"status": "ok"})
-
-
-def save_modal(request, phrase_id):
-    print("hi")
-    return render(request, "validation/foo.html")
 
 
 def encode_query_with_page(query, page):
@@ -507,10 +503,10 @@ def user_is_linguist(user):
     return False
 
 
-def user_is_community(user):
+def user_is_expert(user):
     if user.is_authenticated:
         for g in user.groups.all():
-            if g.name == "Linguist" or g.name == "Community":
+            if g.name == "Linguist" or g.name == "Expert":
                 return True
 
     return False

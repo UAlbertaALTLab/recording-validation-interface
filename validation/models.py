@@ -184,9 +184,9 @@ class Phrase(models.Model):
         self.field_transcription = unicodedata.normalize(
             "NFC", self.field_transcription
         )
-        assert self.ALLOWED_TRANSCRIPTION_CHARACTERS.issuperset(
-            self.field_transcription
-        )
+
+        self.transcription = normalize_sro(self.transcription)
+        assert self.ALLOWED_TRANSCRIPTION_CHARACTERS.issuperset(self.transcription)
 
     def save(self, *args, **kwargs):
         # Make sure the fuzzy match is always up to date

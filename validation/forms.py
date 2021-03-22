@@ -36,9 +36,10 @@ class Register(forms.Form):
     )
 
     CHOICES = [
-        ("community", "Community Member"),
+        ("expert", "Language Expert"),
         ("linguist", "Linguist"),
         ("instructor", "Instructor"),
+        ("learner", "Learner"),
     ]
     role = forms.ChoiceField(
         label="I am a(n)...",
@@ -49,7 +50,7 @@ class Register(forms.Form):
         Community members are considered language experts or active members in a Cree-speaking community. <br>
         Linguists are expected to look at analyses and lemmas. <br>
         Instructors are those who are teaching others or advanced language learners.<br>
-        If you are unsure what your role is, select 'Community'.<br>
+        Learners are students or other people currently learning the language.<br>
         """,
     )
 

@@ -74,9 +74,11 @@ class Command(BaseCommand):
         store_db=True,
         wav=False,
         audio_dir: Path = Path("./audio"),
+        sessions_dir=None,
         **options
     ) -> None:
-        sessions_dir = options.get("session_dir", settings.RECVAL_SESSIONS_DIR)
+        if sessions_dir is None:
+            sessions_dir = settings.RECVAL_SESSIONS_DIR
 
         if store_db:
             self._handle_store_django(sessions_dir)
