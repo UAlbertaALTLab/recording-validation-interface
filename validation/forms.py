@@ -106,8 +106,8 @@ class FlagSegment(forms.ModelForm):
         widget=forms.TextInput(attrs={"class": "form-control bottom-margin"}),
     )
 
-    phrase_id = forms.CharField(widget=forms.HiddenInput(), required=False)
+    phrase_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
 
     class Meta:
         model = Issue
-        fields = ()
+        fields = ["phrase_id"]

@@ -17,7 +17,7 @@
 
 {% import 'validation/_macros.html' as macros %}
 
-{% macro segment_card(phrase, recordings, is_linguist, is_expert) %}
+{% macro segment_card(phrase, recordings, is_linguist, is_expert, forms, csrf_token) %}
 
 <article class="card shadow-sm" data-cy="segment-card">
             {% if phrase.validated %}
@@ -102,7 +102,7 @@
                     <form action="" method="post">
                         <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
                         <div class="modal-body">
-                            {{ form }}
+                            {{ forms[phrase.id] }}
                         </div>
                         <div class="modal-footer">
                             <input data-cy="cancel-button" type="button" class="button button--fail" data-dismiss="modal" value="Cancel">

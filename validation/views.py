@@ -83,21 +83,34 @@ def index(request):
         all_phrases = Phrase.objects.all().order_by("transcription")
         all_class = "button button--success filter__button filter__button--active"
 
+    paginator = Paginator(all_phrases, 5)
+    page_no = request.GET.get("page", 1)
+    phrases = paginator.get_page(page_no)
+
     # The _segment_card needs a dictionary of recordings
     # in order to properly display search results
     # so we're just going to play nice with it here
     recordings = {}
-    for phrase in all_phrases:
+    forms = {}
+    for phrase in phrases:
         recordings[phrase] = phrase.recordings
+        if request.method == "POST" and int(request.POST.get("phrase_id")) == phrase.id:
+            forms[phrase.id] = FlagSegment(
+                request.POST, initial={"phrase_id": phrase.id}
+            )
+        else:
+            forms[phrase.id] = FlagSegment(initial={"phrase_id": phrase.id})
 
-    form = FlagSegment(request.POST, initial={"phrase_id": "{{ phrase.id }}"})
+    if request.method == "POST":
+        form = forms.get(int(request.POST.get("phrase_id")), None)
+        if form is not None:
+            if form.is_valid():
+                save_issue(form.cleaned_data)
+            else:
+                print("Form not valid")
+                print(request.POST)
+                print(form)
 
-    if request.method == "POST" and form.is_valid():
-        save_issue(form.cleaned_data)
-
-    paginator = Paginator(all_phrases, 5)
-    page_no = request.GET.get("page", 1)
-    phrases = paginator.get_page(page_no)
     auth = request.user.is_authenticated
     context = dict(
         phrases=phrases,
@@ -109,7 +122,7 @@ def index(request):
         auth=auth,
         is_linguist=is_linguist,
         is_expert=is_expert,
-        form=form,
+        forms=forms,
     )
     return render(request, "validation/list_phrases.html", context)
 
@@ -131,8 +144,25 @@ def search_phrases(request):
     query_term.update({"query": query})
 
     recordings = {}
+    forms = {}
     for phrase in all_matches:
         recordings[phrase] = [recording for recording in phrase.recordings]
+        if request.method == "POST" and int(request.POST.get("phrase_id")) == phrase.id:
+            forms[phrase.id] = FlagSegment(
+                request.POST, initial={"phrase_id": phrase.id}
+            )
+        else:
+            forms[phrase.id] = FlagSegment(initial={"phrase_id": phrase.id})
+
+    if request.method == "POST":
+        form = forms.get(int(request.POST.get("phrase_id")), None)
+        if form is not None:
+            if form.is_valid():
+                save_issue(form.cleaned_data)
+            else:
+                print("Form not valid")
+                print(request.POST)
+                print(form)
 
     paginator = Paginator(all_matches, 5)
     page_no = request.GET.get("page", 1)
@@ -145,6 +175,7 @@ def search_phrases(request):
         encode_query_with_page=encode_query_with_page,
         is_linguist=is_linguist,
         is_expert=is_expert,
+        forms=forms,
         auth=request.user.is_authenticated,
     )
     return render(request, "validation/search.html", context)
@@ -513,10 +544,14 @@ def user_is_expert(user):
 
 
 def save_issue(data):
+    print(data)
     phrase_id = data["phrase_id"]
     issues = data["issues"]
     other_reason = data["other_reason"]
     comment = data["comment"]
+
+    print(f"PHRASE ID: {phrase_id}")
+    # assert phrase_id
 
     phrase = Phrase.objects.get(id=phrase_id)
 
