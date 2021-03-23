@@ -45,10 +45,8 @@ const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     </div>
 
     <div class="header-link">
-      <a href="/speakers/" data-cy="speakers-link" class="white-text more-space">Speakers</a>
-    </div>
-    {# Login button #}
-    <div class="header-link">
+      <a href="/speakers/" data-cy="speakers-link" class="white-text">Speakers</a>
+      &nbsp;
         {% if auth %}
             <a href="/logout" id="logout-link" class="white-text">Logout</a>
         {% else %}

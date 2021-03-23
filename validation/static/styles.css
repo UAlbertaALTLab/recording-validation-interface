@@ -262,7 +262,7 @@ a:hover {
   margin-left: -2rem;
 }
 
-.speakers-grid {
+.speakers--grid {
   max-width: 60rem;
   background-color: #F5F5F5;
   margin: 0 auto;
@@ -345,8 +345,4 @@ label {
 
 .right {
   float: right;
-}
-
-.more-space {
-  margin: 2rem;
 }
