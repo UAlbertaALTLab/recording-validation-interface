@@ -17,7 +17,7 @@
 
 {% import 'validation/_macros.html' as macros %}
 
-{% macro segment_card(phrase, recordings, is_linguist, is_expert, forms, csrf_token) %}
+{% macro segment_card(phrase, recordings, is_linguist, is_expert, auth, forms, csrf_token) %}
 
 <article class="card shadow-sm" data-cy="segment-card">
             {% if phrase.validated %}
@@ -30,7 +30,9 @@
                 </div>
             {% endif %}
             <div class="card__body">
-            <button type="button" class="button button--fail button--flag right" data-toggle="modal" data-target="#{{ phrase.id }}-modal">Something's wrong with this entry</button>
+                {% if auth %}
+                    <button type="button" class="button button--fail button--flag right" data-toggle="modal" data-target="#{{ phrase.id }}-modal">Something's wrong with this entry</button>
+                {% endif %}
                 <p class="card__title--cree" data-cy="transcription">{{ phrase.transcription }}</p>
                 <p class="card__title--english" data-cy="translation">Translation: {{ phrase.translation }}</p>
 
