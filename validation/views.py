@@ -52,7 +52,7 @@ def index(request):
     The home page.
     """
     is_linguist = user_is_linguist(request.user)
-    is_community = user_is_community(request.user)
+    is_expert = user_is_expert(request.user)
 
     mode = request.GET.get("mode")
 
@@ -103,7 +103,7 @@ def index(request):
         recordings=recordings,
         auth=auth,
         is_linguist=is_linguist,
-        is_community=is_community,
+        is_expert=is_expert,
         sessions=sessions,
         query=query_term,
         session=session,
@@ -118,7 +118,7 @@ def search_phrases(request):
     The search results for pages.
     """
     is_linguist = user_is_linguist(request.user)
-    is_community = user_is_community(request.user)
+    is_expert = user_is_expert(request.user)
 
     query = request.GET.get("query")
     cree_matches = Phrase.objects.filter(transcription__contains=query)
@@ -143,7 +143,7 @@ def search_phrases(request):
         query=query_term,
         encode_query_with_page=encode_query_with_page,
         is_linguist=is_linguist,
-        is_community=is_community,
+        is_expert=is_expert,
         auth=request.user.is_authenticated,
     )
     return render(request, "validation/search.html", context)
@@ -175,7 +175,7 @@ def advanced_search_results(request):
     INTERSECT speaker
     """
     is_linguist = user_is_linguist(request.user)
-    is_community = user_is_community(request.user)
+    is_expert = user_is_expert(request.user)
 
     transcription = request.GET.get("transcription")
     translation = request.GET.get("translation")
@@ -258,7 +258,7 @@ def advanced_search_results(request):
         query=query,
         encode_query_with_page=encode_query_with_page,
         is_linguist=is_linguist,
-        is_community=is_community,
+        is_expert=is_expert,
         auth=request.user.is_authenticated,
     )
     return render(request, "validation/search.html", context)
@@ -516,10 +516,10 @@ def get_phrases_from_session(session, all_phrases):
     return phrases_from_session
 
 
-def user_is_community(user):
+def user_is_expert(user):
     if user.is_authenticated:
         for g in user.groups.all():
-            if g.name == "Linguist" or g.name == "Community":
+            if g.name == "Linguist" or g.name == "Expert":
                 return True
 
     return False
