@@ -468,7 +468,6 @@ def register(request):
 @login_required()
 @require_http_methods(["POST"])
 def record_translation_judgement(request, phrase_id):
-    # TODO: check that user is logged in
     phrase = get_object_or_404(Phrase, id=phrase_id)
     judgement = json.loads(request.body)
 
@@ -476,10 +475,12 @@ def record_translation_judgement(request, phrase_id):
         phrase.validated = True
         phrase.status = "linked"
         phrase.modifier = str(request.user)
+        phrase.date = datetime.datetime.now()
     elif judgement["judgement"] in ["no", "idk"]:
         phrase.validated = False
         phrase.status = "new"
         phrase.modifier = str(request.user)
+        phrase.date = datetime.datetime.now()
     else:
         return HttpResponseBadRequest()
 
@@ -490,7 +491,6 @@ def record_translation_judgement(request, phrase_id):
 @login_required()
 @require_http_methods(["POST"])
 def record_audio_quality_judgement(request, recording_id):
-    # TODO: check that user is logged in
     rec = get_object_or_404(Recording, id=recording_id)
     judgement = json.loads(request.body)
 
