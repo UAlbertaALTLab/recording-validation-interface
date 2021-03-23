@@ -10,9 +10,14 @@
             <div class="card">
                 <img class="card-img-top" src="{{ speaker.img_src }}" alt="Image of {{ speaker.full_name }}">
                 <div class="card-body">
-                <h5 class="card-title">{{ speaker.full_name }}</h5>
-                <p class="card-text">This is where the first line/few words of the speaker bio will go</p>
-                <a href="{{ url('validation:speaker_view', speaker.code) }}" class="btn button-success">Read More</a>
+                    {% if speaker.full_name %}
+                        <h5 class="card-title">{{ speaker.full_name }}</h5>
+                    {% else %}
+                        <h5 class="card-title">{{ speaker.code }}</h5>
+                    {% endif %}
+                    {# TODO: add this back in once we have the speaker bios #}
+{#                  <p class="card-text">This is where the first line/few words of the speaker bio will go</p>#}
+                <a href="{{ url('validation:speaker_view', speaker.code) }}" class="button button--success">Learn More</a>
                 </div>
             </div>
         </div>

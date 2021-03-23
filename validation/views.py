@@ -471,7 +471,12 @@ def speaker_view(request, speaker_code):
     else:
         pronouns = ""
 
-    context = dict(full_name=full_name, pronouns=pronouns, img_src=image_url)
+    context = dict(
+        full_name=full_name,
+        pronouns=pronouns,
+        img_src=image_url,
+        auth=request.user.is_authenticated,
+    )
     return render(request, "validation/speaker_view.html", context)
 
 
@@ -479,6 +484,9 @@ def all_speakers(request):
     speakers = []
     speaker_objects = Speaker.objects.all()
     for speaker in speaker_objects:
+        if "E-" in speaker.code or "ELICIT" in speaker.code:
+            continue
+
         full_name = speaker.full_name
 
         image_name = full_name.replace(" ", "") + ".jpg"
@@ -492,7 +500,7 @@ def all_speakers(request):
         speaker_dict = dict(full_name=full_name, code=speaker.code, img_src=image_url)
         speakers.append(speaker_dict)
 
-    context = dict(speakers=speakers)
+    context = dict(speakers=speakers, auth=request.user.is_authenticated)
     return render(request, "validation/all_speakers.html", context)
 
 

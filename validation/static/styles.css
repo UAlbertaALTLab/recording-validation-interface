@@ -346,3 +346,7 @@ label {
 .right {
   float: right;
 }
+
+.more-space {
+  margin: 2rem;
+}
