@@ -94,7 +94,7 @@ def index(request):
         form = forms.get(int(request.POST.get("phrase_id")), None)
         if form is not None:
             if form.is_valid():
-                save_issue(form.cleaned_data)
+                save_issue(form.cleaned_data, request.user)
 
     auth = request.user.is_authenticated
     context = dict(
@@ -142,7 +142,7 @@ def search_phrases(request):
         form = forms.get(int(request.POST.get("phrase_id")), None)
         if form is not None:
             if form.is_valid():
-                save_issue(form.cleaned_data)
+                save_issue(form.cleaned_data, request.user)
 
     context = dict(
         phrases=phrases,
@@ -537,7 +537,7 @@ def prep_phrase_data(request, phrases):
     return recordings, forms
 
 
-def save_issue(data):
+def save_issue(data, user):
     phrase_id = data["phrase_id"]
     issues = data["issues"]
     other_reason = data["other_reason"]
@@ -553,6 +553,8 @@ def save_issue(data):
         bad_recording="bad_rec" in issues,
         comment=comment,
         other_reason=other_reason,
+        created_by=user,
+        created_on=datetime.datetime.now(),
     )
 
     new_issue.save()

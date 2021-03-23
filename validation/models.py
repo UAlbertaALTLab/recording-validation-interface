@@ -25,6 +25,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
 
@@ -433,6 +434,16 @@ class Issue(models.Model):
     )
 
     phrase = models.ForeignKey(Phrase, on_delete=models.CASCADE)
+
+    created_by = models.CharField(
+        help_text="The person who filed this issue",
+        default="",
+        max_length=64,
+    )
+
+    created_on = models.DateField(
+        help_text="When was this issue filed?", default=timezone.now()
+    )
 
 
 # ############################### Utilities ############################### #
