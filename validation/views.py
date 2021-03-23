@@ -503,14 +503,12 @@ def user_is_linguist(user):
 
 
 def get_phrases_from_session(session, all_phrases):
-    phrases_from_session = []
+    phrases_from_session = set()
     session_date = datetime.datetime.strptime(session, "%Y-%m-%d").date()
     for phrase in all_phrases:
         for recording in phrase.recordings:
-            if (recording.session.date == session_date) and (
-                phrase not in phrases_from_session
-            ):
-                phrases_from_session.append(phrase)
+            if recording.session.date == session_date:
+                phrases_from_session.add(phrase)
                 continue
 
     return phrases_from_session
