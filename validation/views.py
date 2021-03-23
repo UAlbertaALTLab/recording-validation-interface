@@ -120,15 +120,17 @@ def search_phrases(request):
     is_expert = user_is_expert(request.user)
 
     query = request.GET.get("query")
-    cree_matches = Phrase.objects.filter(transcription__contains=query)
-    english_matches = Phrase.objects.filter(translation__contains=query)
+    cree_matches = Phrase.objects.filter(
+        transcription__contains=query
+    ).prefetch_related("recording_set__speaker")
+    english_matches = Phrase.objects.filter(
+        translation__contains=query
+    ).prefetch_related("recording_set__speaker")
     all_matches = list(set().union(cree_matches, english_matches))
     all_matches.sort(key=lambda phrase: phrase.transcription)
 
     query_term = QueryDict("", mutable=True)
     query_term.update({"query": query})
-
-    all_matches = all_matches.prefetch_related("recording_set__speaker")
 
     paginator = Paginator(all_matches, 5)
     page_no = request.GET.get("page", 1)
