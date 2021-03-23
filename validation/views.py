@@ -83,6 +83,7 @@ def index(request):
         all_phrases = Phrase.objects.all().order_by("transcription")
         all_class = "button button--success filter__button filter__button--active"
 
+    all_phrases = all_phrases.prefetch_related("recording_set__speaker")
     paginator = Paginator(all_phrases, 5)
     page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)
@@ -130,6 +131,8 @@ def search_phrases(request):
 
     query_term = QueryDict("", mutable=True)
     query_term.update({"query": query})
+
+    all_matches = all_matches.prefetch_related("recording_set__speaker")
 
     paginator = Paginator(all_matches, 5)
     page_no = request.GET.get("page", 1)

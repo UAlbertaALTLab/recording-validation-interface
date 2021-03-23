@@ -57,6 +57,7 @@ INSTALLED_APPS = [
 # Apps used only during debug mode
 if DEBUG:
     INSTALLED_APPS.append("django_extensions")
+    INSTALLED_APPS.append("debug_toolbar")
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -69,6 +70,9 @@ MIDDLEWARE = [
     # Automatically insert user that changed a model with history.
     "simple_history.middleware.HistoryRequestMiddleware",
 ]
+
+if DEBUG:
+    MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
 
 ROOT_URLCONF = "recvalsite.urls"
 
@@ -175,12 +179,15 @@ X_FRAME_OPTIONS = "DENY"
 #        then static file URLs will point to /validation/static/
 # TODO: this is the wrong way to construct this variable?
 STATIC_URL = "/static/"
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
-]
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, "static"),
+# ]
 
 # Remember to run manage.py collectstatic!
-STATIC_ROOT = config("STATIC_ROOT", default="/var/www/recvalsite/static")
+default_static_dir = "/var/www/recvalsite/static"
+if DEBUG:
+    default_static_dir = BASE_DIR / "static"
+STATIC_ROOT = config("STATIC_ROOT", default=default_static_dir)
 
 # This is concatenated with MEDIA_ROOT and MEDIA_URL to store and serve the audio files.
 RECVAL_AUDIO_PREFIX = config("RECVAL_AUDIO_PREFIX", default="audio/")
@@ -217,3 +224,5 @@ LOGIN_REDIRECT_URL = "/"
 ITWEWINA_URL = "https://itwewina.altlab.app/"
 
 FIXTURE_DIRS = ("validation/management/fixtures/",)
+
+INTERNAL_IPS = ["127.0.0.1"]

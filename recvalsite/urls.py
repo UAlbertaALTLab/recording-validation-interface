@@ -22,3 +22,8 @@ from media_with_range.urls import media_with_range
 urlpatterns = [path("admin/", admin.site.urls), path("", include("validation.urls"))]
 # URLs for media files:
 urlpatterns.extend(media_with_range())
+if settings.DEBUG:
+    import debug_toolbar
+
+    # necessary for debug_toolbar to work
+    urlpatterns.append(path("__debug__/", include(debug_toolbar.urls)))
