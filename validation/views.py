@@ -521,7 +521,6 @@ def user_is_expert(user):
 def prep_phrase_data(request, phrases):
     # The _segment_card needs a dictionary of recordings
     # in order to properly display search results
-    # so we're just going to play nice with it here
     recordings = {}
     forms = {}
     for phrase in phrases:
