@@ -27,23 +27,22 @@ from decimal import Decimal
 from hashlib import sha256
 from os import fspath
 from pathlib import Path
-from typing import Dict, NamedTuple, Optional
-from typing_extensions import Literal
+from typing import Dict, Iterable, NamedTuple, Optional, Tuple
 
 import logme  # type: ignore
-from librecval.normalization import normalize
-from librecval.recording_session import SessionID, SessionMetadata
 from pydub import AudioSegment  # type: ignore
 from pympi.Elan import Eaf  # type: ignore
+from typing_extensions import Literal
+
+from librecval.normalization import normalize
+from librecval.recording_session import SessionID, SessionMetadata, SessionParseError
+
+# Path to project root directory.
+project_root = Path(__file__).parent.parent
+assert (project_root / "LICENSE").exists()
 
 
 # ############################### Exceptions ############################### #
-
-
-class DuplicateSessionError(RuntimeError):
-    """
-    Raised when the session has already been found by another name.
-    """
 
 
 class MissingMetadataError(RuntimeError):
@@ -55,6 +54,12 @@ class MissingMetadataError(RuntimeError):
 class InvalidFileName(RuntimeError):
     """
     Raised when the ELAN name does not follow an appropriate pattern.
+    """
+
+
+class InvalidAnnotationError(RuntimeError):
+    """
+    Raised when the ELAN file is unusable and should be ignored!
     """
 
 
@@ -113,6 +118,10 @@ class Segment(NamedTuple):
         return sha256(self.signature().encode("UTF-8")).hexdigest()
 
 
+# One recording, with all its metadata along with its audio.
+SegmentAndAudio = Tuple[Segment, AudioSegment]
+
+
 @logme.log
 class RecordingExtractor:
     """
@@ -122,52 +131,65 @@ class RecordingExtractor:
     logger: logging.Logger
 
     def __init__(self, metadata=Dict[SessionID, SessionMetadata]) -> None:
-        self.sessions: Dict[SessionID, Path] = {}
         self.metadata = metadata
 
-    def scan(self, root_directory: Path):
+    def scan(self, root_directory: Path) -> Iterable[SegmentAndAudio]:
         """
         Scans the directory provided for sessions.
 
         For each session directory found, its ELAN/.eaf file pairs are
         scanned for words and sentences.
         """
-        count = 0
 
         self.logger.debug("Scanning %s for sessions...", root_directory)
+
+        valid_session_directories = []
+
         for session_dir in root_directory.iterdir():
             if not session_dir.resolve().is_dir():
                 self.logger.debug("Rejecting %s; not a directory", session_dir)
                 continue
-            try:
-                print(f"Processed folder number {count}")
-                count += 1
-                yield from self.extract_session(session_dir, count)
-            except DuplicateSessionError:
-                self.logger.exception("Skipping %s: duplicate", session_dir)
-            except MissingMetadataError:
-                self.logger.exception("Skipping %s: Missing metadata", session_dir)
+            valid_session_directories.append(session_dir)
 
-    def extract_session(self, session_dir: Path, folder_count):
+        for session_dir in valid_session_directories:
+            try:
+                yield from self.extract_all_recordings_from_session(session_dir)
+            except Exception:
+                session_id = get_session_name_or_none(session_dir)
+                if session_id is None:
+                    continue
+
+                self.logger.exception("Error extracting %s", session_dir)
+                failed_dir = project_root / "failed-sessions"
+                failed_dir.mkdir(exist_ok=True)
+                name = failed_dir / session_id.as_filename()
+                if not name.exists():
+                    self.logger.error("failed ONCE again: %s", session_dir)
+                    name.symlink_to(session_dir)
+                continue
+
+    def extract_all_recordings_from_session(
+        self, session_dir: Path
+    ) -> Iterable[SegmentAndAudio]:
+        try:
+            yield from self.extract_session(session_dir)
+        except MissingMetadataError:
+            self.logger.exception("Skipping %s: Missing metadata", session_dir)
+
+    def extract_session(self, session_dir: Path) -> Iterable[SegmentAndAudio]:
         """
         Extracts recordings from a single session.
         """
         session_id = SessionID.from_name(session_dir.stem)
-        if session_id in self.sessions:
-            raise DuplicateSessionError(
-                f"Duplicate session: {session_id} "
-                f"found at {self.sessions[session_id]}"
-            )
         if session_id not in self.metadata:
             raise MissingMetadataError(f"Missing metadata for {session_id}")
 
         self.logger.debug("Scanning %s for .eaf files", session_dir)
         annotations = list(session_dir.glob("*.eaf"))
         self.logger.info("%d ELAN files in %s", len(annotations), session_dir)
-        count = 0
 
         for _path in annotations:
-            # Find the cooresponding audio with a couple different strategies.
+            # Find the corresponding audio with a couple different strategies.
             sound_file = (
                 find_audio_from_audacity_format(_path)
                 or find_audio_from_audition_format(_path)
@@ -175,7 +197,7 @@ class RecordingExtractor:
             )
 
             if sound_file is None:
-                self.logger.warn("Could not find corresponding audio for %s", _path)
+                self.logger.warning("Could not find corresponding audio for %s", _path)
                 continue
 
             assert _path.exists() and sound_file.exists()
@@ -184,10 +206,10 @@ class RecordingExtractor:
             try:
                 mic_id = get_mic_id(_path.stem)
             except InvalidFileName:
-                # if len(_path) != 1:
-                #    raise  # There's no way to determine the speaker.
+                if len(annotations) != 1:
+                    raise  # There's no way to determine the speaker.
                 mic_id = 1
-                self.logger.warn("Assuming single ELAN file is mic 1")
+                self.logger.warning("Assuming single ELAN file is mic 1")
 
             speaker = self.metadata[session_id][mic_id]
 
@@ -198,15 +220,12 @@ class RecordingExtractor:
             )
 
             audio = AudioSegment.from_file(fspath(sound_file))
-            print(f"Processed file number {count} from folder number {folder_count}")
-            count += 1
             yield from generate_segments_from_eaf(_path, audio, speaker, session_id)
 
 
 def generate_segments_from_eaf(
     annotation_path: Path, audio: AudioSegment, speaker: str, session_id: SessionID
-):
-
+) -> Iterable[SegmentAndAudio]:
     """
     Yields segements from the annotation file
     """
@@ -215,7 +234,6 @@ def generate_segments_from_eaf(
     eaf_file = Eaf(annotation_path)
 
     keys = eaf_file.get_tier_names()
-    count = 0
 
     # get tiers from keys
     english_word_tier, cree_word_tier = get_word_tiers(keys)
@@ -243,8 +261,7 @@ def generate_segments_from_eaf(
             english_word_tier,
             comment_tier,
         )
-        count += 1
-        print(f"Processed audio segment number {count}")
+
         yield s, sound_bite
 
     # Extract data for Cree phrases
@@ -264,8 +281,6 @@ def generate_segments_from_eaf(
             english_phrase_tier,
             comment_tier,
         )
-        count += 1
-        print(f"Processed audio segment number {count}")
         yield s, sound_bite
 
 
@@ -294,7 +309,7 @@ def extract_data(
     session_id,
     english_tier,
     comment_tier,
-) -> tuple:
+) -> SegmentAndAudio:
     """
     Extracts all relevant data from a .eaf file, where "relevant data" is:
     - translation
@@ -358,13 +373,13 @@ def find_audio_oddities(annotation_path: Path, logger=None) -> Optional[Path]:
     sound_file = None
 
     # the track number is between the last - and the last .
-
     match = re.match(
         r"""
         .*-(
-            [^-]+   # looking for the string between the last / and the last .
+            [^-]+
             )
-            \.[^-.]+
+            \.
+            [^-.]+
         """,
         str(annotation_path),
         re.VERBOSE,
@@ -410,7 +425,7 @@ def find_audio_oddities(annotation_path: Path, logger=None) -> Optional[Path]:
             )
         if not sound_file:
             track_5 = track_3.replace(" ", "")
-            track_5 = track_3.replace("Track_", "Track ")
+            track_5 = track_5.replace("Track_", "Track ")
             dirs = list(_path.glob(f"**/{track_5}*.wav"))
             sound_file = (
                 Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
@@ -423,7 +438,7 @@ def find_audio_oddities(annotation_path: Path, logger=None) -> Optional[Path]:
             )
         if not sound_file:
             track_7 = track_3.replace("Track 0", "Track ")
-            dirs = list(_path.glob(f"**/{track_6}*.wav"))
+            dirs = list(_path.glob(f"**/{track_7}*.wav"))
             sound_file = (
                 Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
             )
@@ -508,41 +523,108 @@ def get_mic_id(name: str) -> int:
     """
     Return the microphone number from the filename of the ELAN file.
 
-    There are at lease five formats in which ELAN files are named:
+    Here are the currently known "conventions" for naming the ELAN files.
     >>> get_mic_id('2_003.eaf')
-    2
-    >>> get_mic_id('2015-05-11am-03.eaf')
-    3
-    >>> get_mic_id('2016-02-24am-Track 2_001.eaf')
     2
     >>> get_mic_id('Track 4_001.eaf')
     4
-
-    This one is the most annoying format:
     >>> get_mic_id('2015-03-19-Rain-03')
     3
+    >>> get_mic_id('2015-05-11am-03.eaf')
+    3
+    >>> get_mic_id('2016-04-18am_track 4_')
+    4
+    >>> get_mic_id('2017-05-18pm-US-Track_03')
+    3
+    >>> get_mic_id('2018-04-25am-OFF-Track_01')
+    1
+    >>> get_mic_id('2016-06-13am1-Track 3_001')
+    3
+    >>> get_mic_id('2016-06-10pm-2-Track 2_001')
+    2
+    >>> get_mic_id('2017-06-01pmUS-Track 1_001')
+    1
+    >>> get_mic_id('2017-03-09U Spm-Track 1_001')
+    1
+    >>> get_mic_id('2016-10-17pm-ds-Track 2_001')
+    2
+    >>> get_mic_id('2015-04-29-PM-___-_Track_02')
+    2
+    >>> get_mic_id('2016-02-24am-Track 2_001.eaf')
+    2
+    >>> get_mic_id('2016-11-21-AM-US-_Record_Track1_001')
+    1
+    >>> get_mic_id('2017-04-20am-US_Recorded_Track3_001')
+    3
+    >>> get_mic_id('2016-11-28am_-US-Recorded_Track2_001')
+    2
+    >>> get_mic_id('2016-11-21-AM-US-_Recorded_Track2_001')
+    2
+    >>> get_mic_id('2017-02-16pm-DS_Recorded_Track2_001_1')
+    2
+
+    Unknown formats will raise InvalidFileName error.
     """
+
+    IDIOSYNCRACTIC_FORMATS = {
+        "Track 3 _001 2016-10-03am-ds": 3,
+        "2017-03-USpm-Track 3_001": 3,
+        "2016-05-02pm_ Track 1_003": 1,
+        "2016-04-20am_ Track 2": 2,
+    }
+
+    KNOWN_BAD_ANNOTATION_FILES = {
+        # Looks like annotator tried annotating ALL THREE TRACKS in this file at once,
+        # but then gave up and made separate files for each track (as became standard).
+        # See: /data/av/backup-mwe/2015-05-12pm
+        "2105-05-12pm",
+        # There are newer, better annotations in this directory that superceed this
+        # annotation which is for mic 2, but should be disregarded in preference for the
+        # newer annotations.
+        # See: /data/av/backup-mwe/2015-03-19
+        "2015-03-10-Rain_data",
+    }
+
     # Match something like '2016-02-24am-Track 2_001.eaf'
     m = re.match(
         r"""
         ^
-        (?:                 # An optional "yy-mm-ddtt-Track "
+        (?:                 # An optional "yy-mm-ddtt-US-Track "
             (?:             # An optional date/time code
                 \d{4}       # year
                 -
                 \d{2}       # month
                 -
                 \d{2}       # day
-                (?:[ap]m)
-                -
+                (?:         # the first possible place for the location 😨
+                    [UD][ ]?S
+                )?
+                (?i:        # case-insensitive AM/PM
+                    -?
+                    [AP]M
+                    \d?     # subsession
+                )?
+                (?i:        # case-insensitive Location
+                   [_-]*
+                   (?: US|DS|KCH|OFF|[1234]|___)
+                )?
+                (?:
+                    [_-]+
+                    Record(?:ed)?
+                )?
+                [_-]        # one MANDATORY separator
+                [_-]?       # account for extra separator ¯\_(ツ)_/¯
             )?
-            Track\s
+            [tT]rack[_ -]?
         )?
-
-        (\d+)               # THE MIC NUMBER!
-
-        _\d{3}
-        (?:[.]eaf)?$
+        0*                  # ignore leading zeros
+        (\d)                # THE MIC NUMBER!
+        (?:                 # there might be stuff after, but we've already parsed the mic ID so.... ✌️
+            _
+            .*
+        )?
+        (?:[.]eaf)?
+        $
         """,
         name,
         re.VERBOSE,
@@ -564,5 +646,25 @@ def get_mic_id(name: str) -> int:
         re.VERBOSE,
     )
     if not m:
-        raise InvalidFileName(name)
+        if name in KNOWN_BAD_ANNOTATION_FILES:
+            raise InvalidAnnotationError(
+                f"Tried to get mic for known bad annotation file: {name}"
+            )
+        if name in IDIOSYNCRACTIC_FORMATS:
+            return IDIOSYNCRACTIC_FORMATS[name]
+        raise InvalidFileName(f"Could not determine mic number from: {name}")
     return int(m.group(1), 10)
+
+
+@logme.log
+def get_session_name_or_none(session_dir: Path, logger=None) -> Optional[SessionID]:
+    """
+    Returns the session ID from the given path and tries not to crash.
+    Returns None if it crashed :/
+    """
+    try:
+        session_id = SessionID.from_name(session_dir.stem)
+    except SessionParseError:
+        logger.exception("Invalid session name %s", session_dir)
+        return None
+    return session_id

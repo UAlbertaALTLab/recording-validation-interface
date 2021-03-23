@@ -1,37 +1,27 @@
-/// <reference types="cypress" />
 // Tests for search and advanced search
 
 describe("Search", () => {
     it("should search for then display the first word on the main page", () => { 
         cy.visit(Cypress.env("home"))
+        let word = 'ihkatawâw'
 
-        cy.get('a[name="word-link"]:first')
-            .then((anchorElements) => {
-                const word = anchorElements[0].id
-                cy.get("input[name='query']")
-                    .click()
-                    .type(word)
-                    .type('{enter}')
+        cy.get('[data-cy="search-bar"]')
+            .click()
+            .type(word)
+            .type('{enter}')
 
-                cy.get('h2')
-                    .contains(word)
-                
-                cy.get(".table")
-                    .should("be.visible")
-                    .contains("Transcription")
-                cy.get(".table")
-                    .contains("Translation")
-                cy.get(".table")
-                    .contains("Recordings")
-                cy.get(".table")
-                    .contains(word)
-            })
+        cy.get('h2')
+            .contains(word)
+
+        cy.get('[data-cy="segment-card"]')
+            .should("be.visible")
+            .contains(word)
     })
 
 })
 
 describe("Advanced Search", () => {
-    it("should display the advanced search results", () => { 
+    it("should display the advanced search results", () => {
         cy.visit(Cypress.env("home"))
 
         cy.get('[data-cy="advanced-search-button"]')
@@ -39,29 +29,21 @@ describe("Advanced Search", () => {
 
         cy.get("input[name='transcription']")
             .click()
-            .type('kwâskwêpitêw')
+            .type('ihkatawâw')
 
         cy.get("input[name='translation']")
             .click()
-            .type('hook')
+            .type('Slough')
 
         cy.get('[data-cy="advanced-form-submit"]')
             .click()
 
         cy.get('h2')
             .contains("advanced search")
-        
-        cy.get(".table")
+
+        cy.get('[data-cy="segment-card"]')
             .should("be.visible")
-            .contains("Transcription")
-        cy.get(".table")
-            .contains("Translation")
-        cy.get(".table")
-            .contains("Recordings")
-        cy.get(".table")
-            .contains("kwâskwêpitêw")
-        cy.get(".table")
-            .contains("hook")
+            .contains('ihkatawâw')
     })
 
     // TODO: add tests for analysis matching, validation state matching,

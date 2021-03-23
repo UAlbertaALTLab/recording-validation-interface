@@ -115,3 +115,7 @@ db.sqlite3
 node_modules
 .DS_Store
 validation/static/images/speakers/
+crk.zhfst
+
+# Directory of broken dreams:
+failed-sessions/
