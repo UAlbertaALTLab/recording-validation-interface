@@ -179,9 +179,6 @@ X_FRAME_OPTIONS = "DENY"
 #        then static file URLs will point to /validation/static/
 # TODO: this is the wrong way to construct this variable?
 STATIC_URL = "/static/"
-# STATICFILES_DIRS = [
-#     os.path.join(BASE_DIR, "static"),
-# ]
 
 # Remember to run manage.py collectstatic!
 default_static_dir = "/var/www/recvalsite/static"

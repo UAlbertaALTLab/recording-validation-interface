@@ -95,10 +95,6 @@ def index(request):
         if form is not None:
             if form.is_valid():
                 save_issue(form.cleaned_data)
-            else:
-                print("Form not valid")
-                print(request.POST)
-                print(form)
 
     auth = request.user.is_authenticated
     context = dict(
@@ -145,10 +141,6 @@ def search_phrases(request):
         if form is not None:
             if form.is_valid():
                 save_issue(form.cleaned_data)
-            else:
-                print("Form not valid")
-                print(request.POST)
-                print(form)
 
     context = dict(
         phrases=phrases,
@@ -545,14 +537,10 @@ def prep_phrase_data(request, phrases):
 
 
 def save_issue(data):
-    print(data)
     phrase_id = data["phrase_id"]
     issues = data["issues"]
     other_reason = data["other_reason"]
     comment = data["comment"]
-
-    print(f"PHRASE ID: {phrase_id}")
-    # assert phrase_id
 
     phrase = Phrase.objects.get(id=phrase_id)
 
@@ -567,4 +555,3 @@ def save_issue(data):
     )
 
     new_issue.save()
-    print("saved new issue")
