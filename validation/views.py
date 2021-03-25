@@ -71,7 +71,10 @@ def index(request):
     sessions = RecordingSession.objects.order_by().values("date").distinct()
     session = request.GET.get("session")
     if session != "all" and session:
-        all_phrases = get_phrases_from_session(session, all_phrases)
+        session_date = datetime.datetime.strptime(session, "%Y-%m-%d").date()
+        all_phrases = all_phrases.filter(
+            recording__session__date=session_date
+        ).distinct()
 
     # The _segment_card needs a dictionary of recordings
     # in order to properly display search results
@@ -500,18 +503,6 @@ def user_is_linguist(user):
                 return True
 
     return False
-
-
-def get_phrases_from_session(session, all_phrases):
-    phrases_from_session = set()
-    session_date = datetime.datetime.strptime(session, "%Y-%m-%d").date()
-    for phrase in all_phrases:
-        for recording in phrase.recordings:
-            if recording.session.date == session_date:
-                phrases_from_session.add(phrase)
-                continue
-
-    return phrases_from_session
 
 
 def user_is_expert(user):
