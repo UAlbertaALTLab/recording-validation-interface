@@ -219,7 +219,7 @@ class RecordingExtractor:
 
             speaker = self.metadata[session_id][mic_id]
 
-            if invalid_speaker(speaker):
+            if speaker is None:
                 raise InvalidSpeakerCode
 
             self.logger.debug(
@@ -520,12 +520,6 @@ def find_audio_from_audition_format(
     )
     logger.debug("[Audition Format] Trying %s...", sound_file)
     return sound_file if sound_file.exists() else None
-
-
-def invalid_speaker(speaker):
-    if not speaker:
-        return True
-    return False
 
 
 WORD_TIER_ENGLISH = 0
