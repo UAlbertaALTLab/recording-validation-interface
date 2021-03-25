@@ -63,6 +63,12 @@ class InvalidAnnotationError(RuntimeError):
     """
 
 
+class InvalidSpeakerCode(RuntimeError):
+    """
+    Raised when the speaker code is null
+    """
+
+
 class MissingTranslationError(RuntimeError):
     """
     Raised when the 'English (word)' and 'English (sentence)' tiers
@@ -212,6 +218,9 @@ class RecordingExtractor:
                 self.logger.warning("Assuming single ELAN file is mic 1")
 
             speaker = self.metadata[session_id][mic_id]
+
+            if invalid_speaker(speaker):
+                raise InvalidSpeakerCode
 
             self.logger.debug(
                 "Opening audio and .eaf from %s for speaker %s",
@@ -511,6 +520,12 @@ def find_audio_from_audition_format(
     )
     logger.debug("[Audition Format] Trying %s...", sound_file)
     return sound_file if sound_file.exists() else None
+
+
+def invalid_speaker(speaker):
+    if not speaker:
+        return True
+    return False
 
 
 WORD_TIER_ENGLISH = 0
