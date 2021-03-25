@@ -42,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             h.classList.add("card__header--green")
                         }
                     }
+
                 } else if (judgement === 'no') {
                     button.classList.add("button--fail-solid")
                     button.classList.remove("button--fail")
@@ -53,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
                         }
 
-                            const headers = document.getElementsByClassName("card__header")
+                    const headers = document.getElementsByClassName("card__header")
                         for (let h of headers) {
                             if (h.dataset.phraseId === phraseId) {
                                 h.classList.remove('card__header--green')

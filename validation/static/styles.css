@@ -173,6 +173,12 @@ a:hover {
   margin-bottom: 0.5rem;
 }
 
+.button--small {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.1rem 0.2rem;
+}
+
 .filter {
   margin: 0 auto;
 }
@@ -189,6 +195,7 @@ a:hover {
   background-color: var(--custom-green);
   border-color: var(--custom-green);
 }
+
 
 /* nav styles */
 .nav__button {
@@ -289,11 +296,11 @@ a:hover {
   background-color: var(--custom-grey);
 }
 
-label {
-  padding-top: 0.75rem;
-  display: flex;
-  align-content: start;
-}
+/*label {*/
+/*  padding-top: 0.75rem;*/
+/*  display: flex;*/
+/*  align-content: start;*/
+/*}*/
 
 #id_role {
   list-style: none;
@@ -324,4 +331,13 @@ label {
 
 .right {
   float: right;
+}
+
+.center {
+  margin: 0 auto;
+}
+
+.description {
+  font-weight: 600;
+  font-size: 1.5rem;
 }

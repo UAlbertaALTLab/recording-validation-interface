@@ -52,16 +52,20 @@
                         <th>This recording is...</th>
                     {% endif %}
 
-                {% for recording in recordings[phrase] %}
-                    <tr>
-                        <td>
-                            <div class="rec-height" data-cy="recording">
-                            {{ macros.player(recording) }}
-                            </div>
-                        </td>
-                        <td data-cy="speaker">
-                            {{ macros.speaker(recording) }}
-                        </td>
+                    {% if is_linguist %}
+                        <th>Recording Session</th>
+                    {% endif %}
+
+                    {% for recording in recordings[phrase] %}
+                        <tr>
+                            <td>
+                                <div class="rec-height" data-cy="recording">
+                                {{ macros.player(recording) }}
+                                </div>
+                            </td>
+                            <td data-cy="speaker">
+                                {{ macros.speaker(recording) }}
+                            </td>
                             {% if is_expert %}
                                 <td>
                                     {% if recording.quality == 'good' %}
@@ -75,6 +79,9 @@
                                         <button class="button button--fail audio-quality-bad" data-cy="bad-button" data-rec-id={{ recording.id }}>Bad</button>
                                     {% endif %} {# recording quality #}
                                 </td>
+                            {% endif %}
+                            {% if is_linguist %}
+                                <td>{{ recording.session.date }}</td>
                             {% endif %}
                         </tr>
 
