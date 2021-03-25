@@ -320,12 +320,8 @@ npx cypress open
 This opens the interactive Cypress testing window. Select `Run integration specs` to run 
 all tests.
 
-> **Note:** These tests will run against whichever database is present. Meaning if you're developing
-> locally, they will use that database; if you're running on production, they will use that database. **DO NOT** run
-> Cypress tests on Production: this will validate some entries due to the nature of the tests.
-> 
-> Additionally, at least 1 test will always fail: either one of the `register` tests or one of the `login` 
-> tests. This is because a) the username is already taken or b) the user does not exist. This is fine.
+**Note: DO NOT** try to run Cypress tests on production: this will validate
+some entries due to the nature of the tests.
 
 Web API
 -------
