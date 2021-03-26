@@ -102,7 +102,9 @@ class FlagSegment(forms.ModelForm):
     )
 
     comment = forms.CharField(
-        required=False,
+        help_text="Use the space above to suggest a new spelling or make a few notes about why you're reporting an issue "
+        "with this entry",
+        required=True,
         widget=forms.TextInput(attrs={"class": "form-control bottom-margin"}),
     )
 
