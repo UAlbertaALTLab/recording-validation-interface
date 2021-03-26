@@ -18,6 +18,7 @@
 
 import io
 import json
+import operator
 from pathlib import Path
 import datetime
 
@@ -41,7 +42,7 @@ from django.contrib.auth.decorators import login_required
 from librecval.normalization import to_indexable_form
 
 from .crude_views import *
-from .models import Phrase, Recording, Speaker, Issue
+from .models import Phrase, Recording, Speaker, RecordingSession, Issue
 from .helpers import get_distance_with_translations, perfect_match, exactly_one_analysis
 from .forms import EditSegment, Login, Register, FlagSegment
 
@@ -54,36 +55,48 @@ def index(request):
     is_linguist = user_is_linguist(request.user)
     is_expert = user_is_expert(request.user)
 
-    all_class = "button button--success filter__button"
-    new_class = "button button--success filter__button"
-    linked_class = "button button--success filter__button"
-    auto_validated_class = "button button--success filter__button"
     mode = request.GET.get("mode")
 
-    if mode == "all":
+    if mode == "all" or not mode:
         if is_linguist:
             all_phrases = Phrase.objects.all()
         else:
-            all_phrases = Phrase.objects.filter(status="new").order_by("transcription")
-        all_class = "button button--success filter__button filter__button--active"
+            all_phrases = Phrase.objects.exclude(status="auto-validated").order_by(
+                "transcription"
+            )
     elif mode == "new":
         all_phrases = Phrase.objects.filter(status="new").order_by("transcription")
-        new_class = "button button--success filter__button filter__button--active"
     elif mode == "linked":
         all_phrases = Phrase.objects.filter(status="linked").order_by("transcription")
-        linked_class = "button button--success filter__button filter__button--active"
     elif mode == "auto-validated":
         all_phrases = Phrase.objects.filter(status="auto-validated").order_by(
             "transcription"
         )
-        auto_validated_class = (
-            "button button--success filter__button filter__button--active"
-        )
-    else:
-        all_phrases = Phrase.objects.all().order_by("transcription")
-        all_class = "button button--success filter__button filter__button--active"
 
     all_phrases = all_phrases.prefetch_related("recording_set__speaker")
+
+    sessions = RecordingSession.objects.order_by().values("date").distinct()
+    session = request.GET.get("session")
+    if session != "all" and session:
+        session_date = datetime.datetime.strptime(session, "%Y-%m-%d").date()
+        all_phrases = all_phrases.filter(
+            recording__session__date=session_date
+        ).distinct()
+
+    query_term = QueryDict("", mutable=True)
+    if session:
+        query_term.update({"session": session})
+    if mode:
+        query_term.update({"mode": mode})
+
+    all_phrases = sorted(all_phrases, key=operator.attrgetter("transcription"))
+
+    if not mode:
+        mode = "all"
+
+    if not session:
+        session = "all sessions"
+
     paginator = Paginator(all_phrases, 5)
     page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)
@@ -100,14 +113,15 @@ def index(request):
     context = dict(
         phrases=phrases,
         recordings=recordings,
-        all_class=all_class,
-        new_class=new_class,
-        linked_class=linked_class,
-        auto_validated_class=auto_validated_class,
         auth=auth,
         is_linguist=is_linguist,
         is_expert=is_expert,
         forms=forms,
+        sessions=sessions,
+        query=query_term,
+        session=session,
+        mode=mode,
+        encode_query_with_page=encode_query_with_page,
     )
     return render(request, "validation/list_phrases.html", context)
 

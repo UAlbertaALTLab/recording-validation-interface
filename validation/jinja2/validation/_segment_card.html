@@ -57,6 +57,10 @@
                         <th>This recording is...</th>
                     {% endif %}
 
+                    {% if is_linguist %}
+                        <th>Recording Session</th>
+                    {% endif %}
+
                 {% for recording in recordings[phrase] %}
                     <tr>
                         <td>
@@ -80,6 +84,9 @@
                                 <button class="button button--fail audio-quality-bad" data-cy="bad-button" data-rec-id={{ recording.id }}>Bad</button>
                             {% endif %} {# recording quality #}
                         </td>
+                        {% endif %}
+                        {% if is_linguist %}
+                            <td>{{ recording.session.date }}</td>
                         {% endif %}
                     </tr>
 

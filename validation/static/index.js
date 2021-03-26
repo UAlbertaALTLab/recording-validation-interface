@@ -42,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             h.classList.add("card__header--green")
                         }
                     }
+
                 } else if (judgement === 'no') {
                     button.classList.add("button--fail-solid")
                     button.classList.remove("button--fail")
