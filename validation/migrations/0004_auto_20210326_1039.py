@@ -23,7 +23,6 @@ class Migration(migrations.Migration):
             model_name="issue",
             name="created_on",
             field=models.DateField(
-                default=datetime.datetime(2021, 3, 26, 16, 39, 46, 988947, tzinfo=utc),
                 help_text="When was this issue filed?",
             ),
         ),
