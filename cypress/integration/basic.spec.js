@@ -23,7 +23,7 @@ describe("On load", () => {
                     .should('be.visible')
             })
 
-        cy.get('[data-cy="nav-button"]')
+        cy.get('[data-cy="nav-button-with-query"]')
             .should('be.visible')
     })
 })

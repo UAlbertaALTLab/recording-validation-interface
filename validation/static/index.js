@@ -2,7 +2,7 @@
 
 //    translation-judgement-accuracy-yes
 document.addEventListener('DOMContentLoaded', () => {
-    for (let judgement of ["yes", "no"]) {
+    for (let judgement of ["yes", "no", "idk"]) {
         for (let button of document.querySelectorAll(`.translation-judgement-accuracy-${judgement}`)) {
             button.addEventListener("click", async (e) => {
                 const phraseId = e.target.dataset.phraseId
@@ -47,21 +47,46 @@ document.addEventListener('DOMContentLoaded', () => {
                     button.classList.add("button--fail-solid")
                     button.classList.remove("button--fail")
                     const yesButtons =  document.getElementsByClassName("translation-judgement-accuracy-yes");
-                        for (let b of yesButtons) {
-                            if (b.dataset.phraseId === phraseId) {
-                                b.classList.remove('button--success-solid')
-                                b.classList.add('button--success')
-                            }
+                    for (let b of yesButtons) {
+                        if (b.dataset.phraseId === phraseId) {
+                            b.classList.remove('button--success-solid')
+                            b.classList.add('button--success')
                         }
+                    }
 
                     const headers = document.getElementsByClassName("card__header")
-                        for (let h of headers) {
-                            if (h.dataset.phraseId === phraseId) {
-                                h.classList.remove('card__header--green')
-                                h.classList.add('card__header--grey')
-                            }
+                    for (let h of headers) {
+                        if (h.dataset.phraseId === phraseId) {
+                            h.classList.remove('card__header--green')
+                            h.classList.add('card__header--grey')
                         }
+                    }
                     
+                } else if (judgement === "idk") {
+                    const yesButtons =  document.getElementsByClassName("translation-judgement-accuracy-yes");
+                    for (let b of yesButtons) {
+                        if (b.dataset.phraseId === phraseId) {
+                            b.classList.remove('button--success-solid')
+                            b.classList.add('button--success')
+                        }
+                    }
+
+                    const noButtons =  document.getElementsByClassName("translation-judgement-accuracy-no");
+                    for (let b of noButtons) {
+                        if (b.dataset.phraseId === phraseId) {
+                            b.classList.remove('button--fail-solid')
+                            b.classList.add('button--fail')
+                        }
+                    }
+
+                    const headers = document.getElementsByClassName("card__header")
+                    for (let h of headers) {
+                        if (h.dataset.phraseId === phraseId) {
+                            h.classList.remove('card__header--green')
+                            h.classList.add('card__header--grey')
+                        }
+                    }
+
                 }
             })
         }

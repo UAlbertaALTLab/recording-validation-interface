@@ -121,6 +121,7 @@ a:hover {
 /* button styles */
 .button {
   border-radius: var(--button-radius);
+  background-color: var(--custom-light-grey);
   display: inline-block;
   font-weight: 400;
   text-align: center;
@@ -168,9 +169,36 @@ a:hover {
   cursor: pointer;
 }
 
+.button--neutral {
+  color: var(--mauve);
+  border: 2px solid var(--mauve);
+}
+
+.button--neutral:hover {
+  color: var(--custom-white);
+  border: 2px solid var(--mauve);
+  background-color: var(--mauve);
+  cursor: pointer;
+}
+
+.button--flag {
+  padding: 0.25rem;
+  font-size: 12pt;
+  margin: 0.5rem;
+}
+
 .button--right {
   float: right;
   margin-bottom: 0.5rem;
+}
+
+.button--adv-search {
+  background-color: transparent;
+  border: none;
+}
+
+.button--adv-search:hover {
+  text-decoration: none;
 }
 
 .button--small {
@@ -331,6 +359,16 @@ a:hover {
 
 .right {
   float: right;
+}
+
+.modal-body li {
+  list-style: none;
+}
+
+.modal-content .helptext {
+  width: 80%;
+  margin: 0 auto;
+  margin-top: -2rem;
 }
 
 .center {

@@ -42,15 +42,16 @@ from django.contrib.auth.decorators import login_required
 from librecval.normalization import to_indexable_form
 
 from .crude_views import *
-from .models import Phrase, Recording, Speaker, RecordingSession
+from .models import Phrase, Recording, Speaker, RecordingSession, Issue
 from .helpers import get_distance_with_translations, perfect_match, exactly_one_analysis
-from .forms import EditSegment, Login, Register
+from .forms import EditSegment, Login, Register, FlagSegment
 
 
 def index(request):
     """
     The home page.
     """
+
     is_linguist = user_is_linguist(request.user)
     is_expert = user_is_expert(request.user)
 
@@ -60,13 +61,19 @@ def index(request):
         if is_linguist:
             all_phrases = Phrase.objects.all()
         else:
-            all_phrases = Phrase.objects.exclude(status="auto-validated")
+            all_phrases = Phrase.objects.exclude(status="auto-validated").order_by(
+                "transcription"
+            )
     elif mode == "new":
-        all_phrases = Phrase.objects.filter(status="new")
+        all_phrases = Phrase.objects.filter(status="new").order_by("transcription")
     elif mode == "linked":
-        all_phrases = Phrase.objects.filter(status="linked")
+        all_phrases = Phrase.objects.filter(status="linked").order_by("transcription")
     elif mode == "auto-validated":
-        all_phrases = Phrase.objects.filter(status="auto-validated")
+        all_phrases = Phrase.objects.filter(status="auto-validated").order_by(
+            "transcription"
+        )
+
+    all_phrases = all_phrases.prefetch_related("recording_set__speaker")
 
     sessions = RecordingSession.objects.order_by().values("date").distinct()
     session = request.GET.get("session")
@@ -75,13 +82,6 @@ def index(request):
         all_phrases = all_phrases.filter(
             recording__session__date=session_date
         ).distinct()
-
-    # The _segment_card needs a dictionary of recordings
-    # in order to properly display search results
-    # so we're just going to play nice with it here
-    recordings = {}
-    for phrase in all_phrases:
-        recordings[phrase] = [rec for rec in phrase.recordings]
 
     query_term = QueryDict("", mutable=True)
     if session:
@@ -100,6 +100,15 @@ def index(request):
     paginator = Paginator(all_phrases, 5)
     page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)
+
+    recordings, forms = prep_phrase_data(request, phrases)
+
+    if request.method == "POST":
+        form = forms.get(int(request.POST.get("phrase_id")), None)
+        if form is not None:
+            if form.is_valid():
+                save_issue(form.cleaned_data, request.user)
+
     auth = request.user.is_authenticated
     context = dict(
         phrases=phrases,
@@ -107,6 +116,7 @@ def index(request):
         auth=auth,
         is_linguist=is_linguist,
         is_expert=is_expert,
+        forms=forms,
         sessions=sessions,
         query=query_term,
         session=session,
@@ -124,21 +134,30 @@ def search_phrases(request):
     is_expert = user_is_expert(request.user)
 
     query = request.GET.get("query")
-    cree_matches = Phrase.objects.filter(transcription__contains=query)
-    english_matches = Phrase.objects.filter(translation__contains=query)
+    cree_matches = Phrase.objects.filter(
+        transcription__contains=query
+    ).prefetch_related("recording_set__speaker")
+    english_matches = Phrase.objects.filter(
+        translation__contains=query
+    ).prefetch_related("recording_set__speaker")
     all_matches = list(set().union(cree_matches, english_matches))
     all_matches.sort(key=lambda phrase: phrase.transcription)
 
     query_term = QueryDict("", mutable=True)
     query_term.update({"query": query})
 
-    recordings = {}
-    for phrase in all_matches:
-        recordings[phrase] = [recording for recording in phrase.recordings]
-
     paginator = Paginator(all_matches, 5)
     page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)
+
+    recordings, forms = prep_phrase_data(request, phrases)
+
+    if request.method == "POST":
+        form = forms.get(int(request.POST.get("phrase_id")), None)
+        if form is not None:
+            if form.is_valid():
+                save_issue(form.cleaned_data, request.user)
+
     context = dict(
         phrases=phrases,
         recordings=recordings,
@@ -147,6 +166,7 @@ def search_phrases(request):
         encode_query_with_page=encode_query_with_page,
         is_linguist=is_linguist,
         is_expert=is_expert,
+        forms=forms,
         auth=request.user.is_authenticated,
     )
     return render(request, "validation/search.html", context)
@@ -188,23 +208,28 @@ def advanced_search_results(request):
     quality = request.GET.get("quality")
 
     if transcription != "":
-        cree_matches = Phrase.objects.filter(transcription__contains=transcription)
+        cree_matches = Phrase.objects.filter(
+            transcription__contains=transcription
+        ).prefetch_related("recording_set__speaker")
     else:
         cree_matches = []
 
     if translation != "":
-        english_matches = Phrase.objects.filter(translation__contains=translation)
+        english_matches = Phrase.objects.filter(
+            translation__contains=translation
+        ).prefetch_related("recording_set__speaker")
     else:
         english_matches = []
 
-    # TODO: filter by analysis
     if analysis != "":
-        analysis_matches = Phrase.objects.filter(analysis__contains=analysis)
+        analysis_matches = Phrase.objects.filter(
+            analysis__contains=analysis
+        ).prefetch_related("recording_set__speaker")
     else:
         analysis_matches = []
 
     if transcription == "" and translation == "" and analysis == "":
-        phrase_matches = Phrase.objects.all()
+        phrase_matches = Phrase.objects.all().prefetch_related("recording_set__speaker")
     else:
         phrase_matches = list(
             set().union(cree_matches, english_matches, analysis_matches)
@@ -238,6 +263,7 @@ def advanced_search_results(request):
             all_matches.append(phrase)
 
     all_matches.sort(key=lambda phrase: phrase.transcription)
+    _, forms = prep_phrase_data(request, all_matches)
 
     query = QueryDict("", mutable=True)
     query.update(
@@ -262,6 +288,7 @@ def advanced_search_results(request):
         encode_query_with_page=encode_query_with_page,
         is_linguist=is_linguist,
         is_expert=is_expert,
+        forms=forms,
         auth=request.user.is_authenticated,
     )
     return render(request, "validation/search.html", context)
@@ -456,7 +483,6 @@ def register(request):
 @login_required()
 @require_http_methods(["POST"])
 def record_translation_judgement(request, phrase_id):
-    # TODO: check that user is logged in
     phrase = get_object_or_404(Phrase, id=phrase_id)
     judgement = json.loads(request.body)
 
@@ -464,10 +490,12 @@ def record_translation_judgement(request, phrase_id):
         phrase.validated = True
         phrase.status = "linked"
         phrase.modifier = str(request.user)
-    elif judgement["judgement"] == "no":
+        phrase.date = datetime.datetime.now()
+    elif judgement["judgement"] in ["no", "idk"]:
         phrase.validated = False
         phrase.status = "new"
         phrase.modifier = str(request.user)
+        phrase.date = datetime.datetime.now()
     else:
         return HttpResponseBadRequest()
 
@@ -478,7 +506,6 @@ def record_translation_judgement(request, phrase_id):
 @login_required()
 @require_http_methods(["POST"])
 def record_audio_quality_judgement(request, recording_id):
-    # TODO: check that user is logged in
     rec = get_object_or_404(Recording, id=recording_id)
     judgement = json.loads(request.body)
 
@@ -512,3 +539,43 @@ def user_is_expert(user):
                 return True
 
     return False
+
+
+def prep_phrase_data(request, phrases):
+    # The _segment_card needs a dictionary of recordings
+    # in order to properly display search results
+    recordings = {}
+    forms = {}
+    for phrase in phrases:
+        recordings[phrase] = phrase.recordings
+        if request.method == "POST" and int(request.POST.get("phrase_id")) == phrase.id:
+            forms[phrase.id] = FlagSegment(
+                request.POST, initial={"phrase_id": phrase.id}
+            )
+        else:
+            forms[phrase.id] = FlagSegment(initial={"phrase_id": phrase.id})
+
+    return recordings, forms
+
+
+def save_issue(data, user):
+    phrase_id = data["phrase_id"]
+    issues = data["issues"]
+    other_reason = data["other_reason"]
+    comment = data["comment"]
+
+    phrase = Phrase.objects.get(id=phrase_id)
+
+    new_issue = Issue(
+        phrase=phrase,
+        other="other" in issues,
+        bad_cree="bad_cree" in issues,
+        bad_english="bad_english" in issues,
+        bad_recording="bad_rec" in issues,
+        comment=comment,
+        other_reason=other_reason,
+        created_by=user,
+        created_on=datetime.datetime.now(),
+    )
+
+    new_issue.save()

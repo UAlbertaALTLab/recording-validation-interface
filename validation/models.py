@@ -403,6 +403,48 @@ class Recording(models.Model):
         return Path(settings.MEDIA_ROOT) / settings.RECVAL_AUDIO_PREFIX
 
 
+class Issue(models.Model):
+    comment = models.CharField(
+        help_text="The comment left by the validator",
+        blank=False,
+        max_length=1024,
+    )
+
+    other_reason = models.CharField(
+        help_text="A reason other than the options provided for why the issue was filed",
+        blank=True,
+        max_length=1024,
+    )
+
+    other = models.BooleanField(
+        help_text="There's another reason this issue was filed", default=False
+    )
+
+    bad_cree = models.BooleanField(
+        help_text="There's a better Cree word for this translation", default=False
+    )
+
+    bad_english = models.BooleanField(
+        help_text="There's another English word for this transcription", default=False
+    )
+
+    bad_recording = models.BooleanField(
+        help_text="There's one or more bad recordings in this batch", default=False
+    )
+
+    phrase = models.ForeignKey(Phrase, on_delete=models.CASCADE)
+
+    created_by = models.CharField(
+        help_text="The person who filed this issue",
+        default="",
+        max_length=64,
+    )
+
+    created_on = models.DateField(
+        help_text="When was this issue filed?",
+    )
+
+
 # ############################### Utilities ############################### #
 
 
