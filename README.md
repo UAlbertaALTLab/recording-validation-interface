@@ -94,7 +94,7 @@ Replace the paths as appropriate.
 
 This directory contains all of the recording sessions. Each
 entry in the `RECVAL_SESSIONS_DIR/` is a subdirectory named in the
-normalized session format. Each subdirectory has `.TextGrid` and `.wav`
+normalized session format. Each subdirectory has `.eaf` and `.wav`
 files of the recording session.
 
 For example, if I have sessions for 2018-01-01 and 2018-01-07am in
@@ -124,11 +124,11 @@ ls -F $RECVAL_SESSIONS_DIR/2018-01-07-AM-___-_/
 
 I should get a directory containing files like this.
 
-    Track 2_001.TextGrid
+    Track 2_001.eaf
     Track 2_001.wav
-    Track 3_001.TextGrid
+    Track 3_001.eaf
     Track 3_001.wav
-    Track 4_001.TextGrid
+    Track 4_001.eaf
     Track 4_001.wav
     ...
 
@@ -227,17 +227,25 @@ For example, on Sapir, I might have something like this:
     2018-04-18-AM-KCH-_
     ...
 
-Each directory should have `*.TextGrid` files paired with a `*.wav` file:
+Each directory should have `*.eaf` files paired with a `*.wav` file:
 
     $ ls -F1 $RECVAL_SESSIONS_DIR/2015-05-08-AM-___-_/
-    2015-05-08-01.TextGrid
+    2015-05-08-01.eaf
     2015-05-08-01.wav
-    2015-05-08-02.TextGrid
+    2015-05-08-02.eaf
     2015-05-08-02.wav
-    2015-05-08-03.TextGrid
+    2015-05-08-03.eaf
     2015-05-08-03.wav
     ...
 
+### Auto-validating entries
+
+Some entries have very close spellings that can be auto-validated. This only needs to be done once after the initial 
+data import. Auto-validate entries by running:
+
+```shell
+python manage.py autoval
+```
 ### Collecting the static files
 
 > **NOTE**: this is not relevant when in development mode or when `DEBUG=True`
@@ -302,6 +310,18 @@ This will run the [mypy][] static type checker, and then [pytest][].
 To edit the tests for `librecval`, see `tests/`. For Django tests, look
 inside the `validation/tests` directory.
 
+### Cypress Tests
+
+There are also Cypress integrations tests that can be run by doing:
+
+```shell
+npx cypress open
+```
+This opens the interactive Cypress testing window. Select `Run integration specs` to run 
+all tests.
+
+**Note: DO NOT** try to run Cypress tests on production: this will validate
+some entries due to the nature of the tests.
 
 Web API
 -------
@@ -329,7 +349,7 @@ properties:
 
 ### Errors
 
-Will responds with HTTP **404** if no recordings match the query. Note
+Will respond with HTTP **404** if no recordings match the query. Note
 that the recordings' speaker's _must_ have a non-null gender before they
 appear in search results. So make sure all `Speaker` instances have
 a non-null value for `gender`!
@@ -421,7 +441,6 @@ The following steps should be performed from within the `pipenv shell`
 First, populate the database by running:
 
 ```
-python manage.py makemigrations
 python manage.py migrate
 python manage.py importrecordings
 ```
@@ -429,11 +448,18 @@ python manage.py importrecordings
 Then generate the .wav files:
 
 ```
-python manage.py importrecording --wav --skip-db
+python manage.py importrecordings --wav --skip-db
 ```
 
 This saves all the recording snippets to the `./audio` directory, unless otherwise specified 
 (not recommended for this task).
+
+Now auto-validate the recordings (you can skip this step if you just want the transcriptions files 
+for the raw data):
+
+```shell
+python manage.py autoval
+```
 
 Next, create the transcription files by running:
 
@@ -443,9 +469,13 @@ python manage.py writetranscriptions
 
 This should create:
 * A new folder for each speaker code, eg: `./audio/LOU`
-* A copy of the .wav file in the speaker folder, eg: `./audio/LOU/wav/audio_id.wav`
-* A transcription file to be used by **Persephone**, eg: `./audio/LOU/label/audio_id.txt`
-* A transcription file to be used by **Simple4All**, eg: `./audio/LOU/s4a/audio_id.txt`
+* A copy of each .wav file in the speaker folder, eg: `./audio/LOU/wav/audio_id.wav`
+* Transcription files to be used by **Persephone**, eg: `./audio/LOU/label/audio_id.txt`
+* Transcription files to be used by **Simple4All**, eg: `./audio/LOU/s4a/audio_id.txt`
+  
+If there are auto-validated entries in the database, it will also create:
+* Transcription files for the *auto-validated* data to be used by **Persephone**, eg: `./audio/LOU/auto-val/label/audio_id.txt`
+* Transcription files for the *auto-validated* data to be used by **Simple4All**, eg: `./audio/LOU/auto-val/audio_id.txt`
 
 
 Frequently Asked Questions
@@ -474,7 +504,7 @@ This aggregates all of the Django apps under one deployable website.
 License
 -------
 
-Copyright (C) 2018 Eddie Antonio Santos <easantos@ualberta.ca>
+Copyright (C) 2021 Eddie Antonio Santos <easantos@ualberta.ca>, Jolene Poulin <jcpoulin@ualberta.ca>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
