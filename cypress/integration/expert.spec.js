@@ -2,7 +2,8 @@
 
 describe("Community members", () => {
     beforeEach(() => {
-        cy.login("community", "1234567890");
+        cy.login("expert", "1234567890");
+        cy.get('#djHideToolBarButton').click();
     })
 
     it("can mark a translation as good or bad", () => {

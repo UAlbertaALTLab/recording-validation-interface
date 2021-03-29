@@ -208,23 +208,28 @@ def advanced_search_results(request):
     quality = request.GET.get("quality")
 
     if transcription != "":
-        cree_matches = Phrase.objects.filter(transcription__contains=transcription)
+        cree_matches = Phrase.objects.filter(
+            transcription__contains=transcription
+        ).prefetch_related("recording_set__speaker")
     else:
         cree_matches = []
 
     if translation != "":
-        english_matches = Phrase.objects.filter(translation__contains=translation)
+        english_matches = Phrase.objects.filter(
+            translation__contains=translation
+        ).prefetch_related("recording_set__speaker")
     else:
         english_matches = []
 
-    # TODO: filter by analysis
     if analysis != "":
-        analysis_matches = Phrase.objects.filter(analysis__contains=analysis)
+        analysis_matches = Phrase.objects.filter(
+            analysis__contains=analysis
+        ).prefetch_related("recording_set__speaker")
     else:
         analysis_matches = []
 
     if transcription == "" and translation == "" and analysis == "":
-        phrase_matches = Phrase.objects.all()
+        phrase_matches = Phrase.objects.all().prefetch_related("recording_set__speaker")
     else:
         phrase_matches = list(
             set().union(cree_matches, english_matches, analysis_matches)
@@ -258,6 +263,7 @@ def advanced_search_results(request):
             all_matches.append(phrase)
 
     all_matches.sort(key=lambda phrase: phrase.transcription)
+    _, forms = prep_phrase_data(request, all_matches)
 
     query = QueryDict("", mutable=True)
     query.update(
@@ -282,6 +288,7 @@ def advanced_search_results(request):
         encode_query_with_page=encode_query_with_page,
         is_linguist=is_linguist,
         is_expert=is_expert,
+        forms=forms,
         auth=request.user.is_authenticated,
     )
     return render(request, "validation/search.html", context)
