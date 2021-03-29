@@ -118,3 +118,6 @@ crk.zhfst
 
 # Directory of broken dreams:
 failed-sessions/
+
+# collected static files:
+/static/

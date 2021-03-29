@@ -20,7 +20,7 @@ RUN PIPENV_VENV_IN_PROJECT=1 pipenv install --deploy --dev
 
 ############################# Application image ##############################
 
-FROM python:3.7-slim-buster
+FROM python:3.7
 
 # Choose an ID that will be consistent across all machines in the network
 # To avoid overlap with user IDs, use an ID over
@@ -42,7 +42,7 @@ COPY --chown=${WSGI_USER}:${WSGI_USER} . .
 
 ENV VIRTUAL_ENV="/app/.venv"
 ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
-RUN mkdir static && STATIC_ROOT=/app/static python manage.py collectstatic
+RUN mkdir static && python manage.py collectstatic
 
 EXPOSE 8000
 ENV UWSGI_HTTP=:8000 UWSGI_MASTER=1 UWSGI_HTTP_KEEPALIVE=1 UWSGI_AUTO_CHUNKED=1 UWSGI_WSGI_ENV_BEHAVIOUR=holy

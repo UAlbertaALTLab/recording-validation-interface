@@ -27,6 +27,8 @@ from django.core.files.base import ContentFile
 from django.shortcuts import reverse  # type: ignore
 from model_bakery import baker  # type: ignore
 
+from validation.models import Recording
+
 MAX_RECORDING_QUERY_TERMS = 3  # TODO: will this be a configuration option?
 
 
@@ -231,6 +233,44 @@ def test_search_fuzzy_match(client, bake_recording):
             if result["wordform"] == phrase.transcription
         ]
         assert len(resultant_recordings) == RECORDINGS_PER_PHRASE
+
+
+@pytest.mark.django_db
+def test_does_not_return_bad_recordings(client, bake_recording):
+    """
+    General test of the recorings search, in the happy case.
+    """
+
+    # Store <enipat>, but search for the normatized form (as itwêwina would
+    # offer).
+    query = "ê-nipat"
+    phrase = baker.make_recipe("validation.phrase", transcription="enipat")
+    good_speaker = baker.make_recipe("validation.speaker")
+    bad_speaker = baker.make_recipe("validation.speaker")
+    mystery_speaker = baker.make_recipe("validation.speaker")
+
+    # Make two recordings. We want to make sure the query actually works by
+    # only retrieving the *relevant* recording.
+    good_recording = bake_recording(
+        phrase=phrase, speaker=good_speaker, quality=Recording.GOOD
+    )
+    bad_recording = bake_recording(
+        phrase=phrase, speaker=bad_speaker, quality=Recording.BAD
+    )
+    unknown_recording = bake_recording(
+        phrase=phrase, speaker=mystery_speaker, quality=""
+    )
+
+    response = client.get(
+        reverse("validation:search_recordings", kwargs={"query": query})
+    )
+
+    recordings = response.json()
+    assert len(recordings) == 2
+
+    for recording in recordings:
+        assert recording.get("speaker") in (good_speaker.code, mystery_speaker.code)
+        assert recording.get("speaker") != bad_speaker.code
 
 
 @pytest.fixture
