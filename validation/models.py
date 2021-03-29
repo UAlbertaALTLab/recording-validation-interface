@@ -442,7 +442,7 @@ class Issue(models.Model):
     )
 
     created_on = models.DateField(
-        help_text="When was this issue filed?", default=timezone.now()
+        help_text="When was this issue filed?",
     )
 
 
