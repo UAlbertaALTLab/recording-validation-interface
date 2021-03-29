@@ -6,7 +6,17 @@ describe("Instructors", () => {
         cy.get('#djHideToolBarButton').click();
     })
 
-    it.skip("can flag entries", () => {
-        // flagging entries isn't supported yet
+    it("can flag entries", () => {
+        cy.visit(Cypress.env('home'));
+
+        cy.get('[data-cy="segment-card"]:first')
+            .within(() => {
+
+                cy.get('[data-cy="flag-button"]')
+                    .click()
+
+                cy.get('[data-cy="modal"]')
+                    .should('be.visible')
+            })
     })
 })

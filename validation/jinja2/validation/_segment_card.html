@@ -31,7 +31,7 @@
             {% endif %}
             <div class="card__body">
                 {% if auth %}
-                    <button type="button" class="button button--fail button--flag right" data-toggle="modal" data-target="#{{ phrase.id }}-modal">Something's wrong with this entry</button>
+                    <button type="button" class="button button--fail button--flag right" data-toggle="modal" data-target="#{{ phrase.id }}-modal" data-cy="flag-button">Something's wrong with this entry</button>
                 {% endif %}
                 <p class="card__title--cree" data-cy="transcription">{{ phrase.transcription }}</p>
                 <p class="card__title--english" data-cy="translation">Translation: {{ phrase.translation }}</p>
@@ -102,7 +102,7 @@
             <div class="modal-dialog">
 
                 <!-- Modal content-->
-                <div class="modal-content">
+                <div class="modal-content" data-cy="modal">
                     <div class="modal-header">
                         <h4 class="modal-title">What's wrong with this entry?</h4>
                     </div>
