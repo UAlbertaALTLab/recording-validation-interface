@@ -8,7 +8,7 @@ describe("Community members", () => {
 
     it("can mark a translation as good or bad", () => {
         cy.visit(Cypress.env('home'));
-        
+
         cy.get('[data-cy="segment-card"]:first')
             .within(() => {
 
