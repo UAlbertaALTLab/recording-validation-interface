@@ -5,7 +5,6 @@ describe("Logout", () => {
     it("logs out when logged in", () => {
         // TODO: don't make it log in through the UI
         cy.visit(Cypress.env('login_url'))
-        cy.get('#djHideToolBarButton').click();
 
         cy.get('.login__form')
             .should('be.visible');
