@@ -20,11 +20,9 @@ describe("Language experts", () => {
 
                 cy.get('[data-cy="yes-button"]')
                     .click()
-                    .should('have.class', 'button--success-solid')
 
                 cy.get('[data-cy="no-button"]')
                     .click()
-                    .should('have.class', 'button--fail-solid')
             })
     })
 
@@ -36,11 +34,9 @@ describe("Language experts", () => {
 
                 cy.get('[data-cy="good-button"]:first')
                     .click()
-                    .should('have.class', 'button--success-solid')
 
                 cy.get('[data-cy="bad-button"]:first')
                     .click()
-                    .should('have.class', 'button--fail-solid')
             })
     })
 })
