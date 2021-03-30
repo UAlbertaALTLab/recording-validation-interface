@@ -114,7 +114,6 @@ metadata.csv
 db.sqlite3
 node_modules
 .DS_Store
-crk.zhfst
 
 # Directory of broken dreams:
 failed-sessions/
