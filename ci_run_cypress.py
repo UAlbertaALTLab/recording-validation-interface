@@ -1,12 +1,28 @@
 from subprocess import check_call, Popen
 import os
+from pathlib import Path
+
+
+def modified_env(**kwargs):
+    new_env = dict(os.environ)
+    new_env.update(kwargs)
+    return new_env
+
 
 TEST_SERVER_PORT = '3001'
-server = Popen(["python", "manage.py", "runserver", TEST_SERVER_PORT])
+TEST_DB = "test_db.sqlite"
+TEST_DB_FILE = Path(TEST_DB)
+
+if TEST_DB_FILE.exists():
+    TEST_DB_FILE.unlink()
+
+m_env = modified_env(RECVAL_SQLITE_DB_PATH=TEST_DB)
+check_call(["python", "manage.py", "ensuretestdb"], env=m_env)
+server = Popen(["python", "manage.py", "runserver", TEST_SERVER_PORT],
+               env=m_env)
 
 try:
-    cmd_env = dict(os.environ)
-    cmd_env['CYPRESS_BASE_URL'] = f"http://localhost:{TEST_SERVER_PORT}"
-    check_call(["node_modules/.bin/cypress", "run"], env=cmd_env)
+    check_call(["node_modules/.bin/cypress", "run", "--headed"],
+    env=modified_env(CYPRESS_BASE_URL=f"http://localhost:{TEST_SERVER_PORT}"))
 finally:
     server.terminate()
