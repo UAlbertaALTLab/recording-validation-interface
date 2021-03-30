@@ -8,14 +8,7 @@ describe("Community members", () => {
 
     it("can mark a translation as good or bad", () => {
         cy.visit(Cypress.env('home'));
-
-        let customGreen = null;
-
-        cy.window()
-            .then((win) => {
-                customGreen = win.getComputedStyle(win.document.documentElement).getPropertyValue('--custom-pale-green');
-            })
-
+        
         cy.get('[data-cy="segment-card"]:first')
             .within(() => {
 
