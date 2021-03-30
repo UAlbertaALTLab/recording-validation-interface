@@ -20,7 +20,7 @@ TEST_DB_FILE = Path(TEST_DB)
 if TEST_DB_FILE.exists():
     TEST_DB_FILE.unlink()
 
-m_env = modified_env(RECVAL_SQLITE_DB_PATH=TEST_DB)
+m_env = modified_env(RECVAL_SQLITE_DB_PATH=TEST_DB, DEBUG_DJANGO="False")
 check_call(["python", "manage.py", "ensuretestdb"], env=m_env)
 server = Popen(["python", "manage.py", "runserver", TEST_SERVER_PORT],
                env=m_env)
@@ -31,6 +31,6 @@ try:
         cypress_command = "open"
 
     check_call(["node_modules/.bin/cypress", cypress_command],
-    env=modified_env(CYPRESS_BASE_URL=f"http://localhost:{TEST_SERVER_PORT}"))
+    env=modified_env(CYPRESS_BASE_URL=f"http://localhost:{TEST_SERVER_PORT}", DEBUG_DJANGO="False"))
 finally:
     server.terminate()

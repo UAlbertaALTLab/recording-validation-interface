@@ -33,7 +33,7 @@ if SECRET_KEY is None:
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", default=False, cast=bool)
-DEBUG_DJANGO = False
+DEBUG_DJANGO = ""
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "speech-db.altlab.app", "altlab-itw:8004"]
 
