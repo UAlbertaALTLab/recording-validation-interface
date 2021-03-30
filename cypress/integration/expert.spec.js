@@ -1,6 +1,6 @@
 // Tests the functionality from the Community member perspective
 
-describe("Community members", () => {
+describe("Language experts", () => {
     beforeEach(() => {
         cy.login("expert", "1234567890");
     })
@@ -36,11 +36,11 @@ describe("Community members", () => {
 
                 cy.get('[data-cy="good-button"]:first')
                     .click()
-                    .should('have.css', 'background-color', 'rgba(102, 142, 63, 0.5)')
+                    .should('have.class', 'button--success-solid')
 
                 cy.get('[data-cy="bad-button"]:first')
                     .click()
-                    .should('have.css', 'background-color', 'rgba(215, 130, 120, 0.5)')
+                    .should('have.class', 'button--fail-solid')
             })
     })
 })
