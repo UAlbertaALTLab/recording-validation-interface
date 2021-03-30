@@ -3,7 +3,7 @@
 describe("Search", () => {
     it("should search for then display the first word on the main page", () => { 
         cy.visit(Cypress.env("home"))
-        let word = 'ihkatawâw'
+        let word = 'awas'
 
         cy.get('[data-cy="search-bar"]')
             .click()
@@ -29,7 +29,7 @@ describe("Advanced Search", () => {
 
         cy.get("input[name='transcription']")
             .click()
-            .type('ihkatawâw')
+            .type('awas')
 
         cy.get("input[name='translation']")
             .click()
@@ -43,7 +43,7 @@ describe("Advanced Search", () => {
 
         cy.get('[data-cy="segment-card"]')
             .should("be.visible")
-            .contains('ihkatawâw')
+            .contains('awas')
     })
 
     // TODO: add tests for analysis matching, validation state matching,

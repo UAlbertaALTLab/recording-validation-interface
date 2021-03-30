@@ -11,7 +11,7 @@ describe("Logout", () => {
             .should('be.visible');
 
         cy.get('input[name=username]')
-            .type('community')
+            .type('expert')
 
         cy.get('input[name=password]')
             .type('1234567890')

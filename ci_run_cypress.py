@@ -1,7 +1,11 @@
 from subprocess import check_call, Popen
 import os
 from pathlib import Path
+from argparse import ArgumentParser
 
+parser = ArgumentParser()
+parser.add_argument("--interactive", action="store_true")
+args = parser.parse_args()
 
 def modified_env(**kwargs):
     new_env = dict(os.environ)
@@ -22,7 +26,11 @@ server = Popen(["python", "manage.py", "runserver", TEST_SERVER_PORT],
                env=m_env)
 
 try:
-    check_call(["node_modules/.bin/cypress", "run", "--headed"],
+    cypress_command = "run"
+    if args.interactive:
+        cypress_command = "open"
+
+    check_call(["node_modules/.bin/cypress", cypress_command],
     env=modified_env(CYPRESS_BASE_URL=f"http://localhost:{TEST_SERVER_PORT}"))
 finally:
     server.terminate()

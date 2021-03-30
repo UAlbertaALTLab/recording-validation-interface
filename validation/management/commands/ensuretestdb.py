@@ -47,4 +47,4 @@ def create_test_user(username, group_name):
 
 def create_test_users():
     for username in ["expert", "instructor", "linguist", "learner"]:
-        create_test_user(username, username)
+        create_test_user(username, username.title())

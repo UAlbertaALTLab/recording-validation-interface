@@ -89,7 +89,7 @@ describe("Register", () => {
             .type('Last');
 
         cy.get('#id_username')
-            .type('jpoulin');
+            .type('linguist');
 
         cy.get('#id_password')
             .type('password');
