@@ -529,21 +529,11 @@ def encode_query_with_page(query, page):
 
 
 def user_is_linguist(user):
-    if user.is_authenticated:
-        for g in user.groups.all():
-            if g.name == "Linguist":
-                return True
-
-    return False
+    return user.groups.filter(name="Linguist").exists()
 
 
 def user_is_expert(user):
-    if user.is_authenticated:
-        for g in user.groups.all():
-            if g.name == "Linguist" or g.name == "Expert":
-                return True
-
-    return False
+    return user.groups.filter(name__in=["Linguist", "Expert"]).exists()
 
 
 def prep_phrase_data(request, phrases):
