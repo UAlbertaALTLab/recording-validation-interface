@@ -21,7 +21,6 @@ class Command(BaseCommand):
         call_command("migrate", verbosity=0)
 
         import_test_phrases()
-        # stub_recordings()
         create_test_users()
 
 
