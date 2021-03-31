@@ -320,6 +320,13 @@ npx cypress open
 This opens the interactive Cypress testing window. Select `Run integration specs` to run 
 all tests.
 
+To run Cypress tests against a test database, use:
+
+```shell
+make integration-test
+```
+This will call `ci_run_cypress.py` and create a test DB for you!
+
 **Note: DO NOT** try to run Cypress tests on production: this will validate
 some entries due to the nature of the tests.
 
