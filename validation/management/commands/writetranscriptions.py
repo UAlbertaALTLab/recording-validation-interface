@@ -120,12 +120,12 @@ class Command(BaseCommand):
     def make_directories(self, training_dir, speaker):
         # Create necessary directories if they do not exist
         speaker_dir = training_dir / speaker
-        speaker_audio_dir = training_dir / speaker / "wav"
-        speaker_persephone_dir = training_dir / speaker / "label"
-        speaker_s4a_dir = training_dir / speaker / "s4a"
-        speaker_auto_val_dir = training_dir / speaker / "auto_val"
-        speaker_persephone_auto_val_dir = training_dir / speaker / "auto_val" / "label"
-        speaker_s4a_auto_val_dir = training_dir / speaker / "auto_val" / "s4a"
+        speaker_audio_dir = speaker_dir / "wav"
+        speaker_persephone_dir = speaker_dir / "label"
+        speaker_s4a_dir = speaker_dir / "s4a"
+        speaker_auto_val_dir = speaker_dir / "auto_val"
+        speaker_persephone_auto_val_dir = speaker_auto_val_dir / "label"
+        speaker_s4a_auto_val_dir = speaker_auto_val_dir / "s4a"
 
         for _dir in [
             speaker_dir,

@@ -1,6 +1,5 @@
 "use strict";
 
-//    translation-judgement-accuracy-yes
 document.addEventListener('DOMContentLoaded', () => {
     for (let judgement of ["yes", "no", "idk"]) {
         for (let button of document.querySelectorAll(`.translation-judgement-accuracy-${judgement}`)) {
