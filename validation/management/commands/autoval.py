@@ -38,7 +38,7 @@ class Command(BaseCommand):
         matching analysis
         """
         phrases = Phrase.objects.all()
-        for phrase in tqdm(phrases):
+        for phrase in tqdm(phrases.iterator(), total=phrases.count()):
             if not phrase.validated:
                 segment_name = phrase.field_transcription
                 suggestions = get_distance_with_translations(segment_name)
