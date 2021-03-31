@@ -3,7 +3,6 @@
 describe("Instructors", () => {
     before(() => {
         cy.login("instructor", "1234567890");
-        cy.get('#djHideToolBarButton').click();
     })
 
     it("can flag entries", () => {

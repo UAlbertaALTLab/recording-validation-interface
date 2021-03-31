@@ -1,0 +1,121 @@
+[
+    {
+        "model": "validation.phrase",
+        "fields": {
+            "id": "1",
+            "transcription": "kwaskwepitew",
+            "translation": "He hooks him. Animate, as fish.; s/he catches s.o., s/he grabs s.o.; s/he hooks s.o., s/he jerks s.o. quickly (e.g. catching a fish)",
+            "kind": "word",
+            "validated": "1",
+            "status": "new",
+            "origin": "",
+            "fuzzy_transcription": "kwaskwepitew",
+            "date": "2021-03-29",
+            "analysis": "kwaskwepitew+V+TA+Ind+3Sg+4Sg/PlO",
+            "modifier": "linguist",
+            "field_transcription": "kwaskwepitew"
+        }
+    },
+    {
+        "model": "validation.phrase",
+        "fields": {
+            "id": "2",
+            "transcription": "kwaskwepitamawew",
+            "translation": "",
+            "kind": "word",
+            "validated": "1",
+            "status": "auto-validated",
+            "origin": "",
+            "fuzzy_transcription": "kwaskwepitamawew",
+            "date": "2021-03-17",
+            "analysis": "kwaskwepitamawew+V+TA+Ind+3Sg+4Sg/PlO",
+            "modifier": "AUTO",
+            "field_transcription": "kwaskwepitamawew"
+        }
+    },
+    {
+        "model": "validation.phrase",
+        "fields": {
+            "id": "3",
+            "transcription": "emicimikacikeyin",
+            "translation": "",
+            "kind": "word",
+            "validated": "0",
+            "status": "new",
+            "origin": "",
+            "fuzzy_transcription": "emicimikacikeyin",
+            "date": "2021-03-17",
+            "analysis": "",
+            "modifier": "AUTO",
+            "field_transcription": "emicimikacikeyin"
+        }
+    },
+    {
+        "model": "validation.phrase",
+        "fields": {
+            "id": "4",
+            "transcription": "kosapewin",
+            "translation": "sinking",
+            "kind": "word",
+            "validated": "1",
+            "status": "auto-validated",
+            "origin": "",
+            "fuzzy_transcription": "kosapewin",
+            "date": "2021-03-17",
+            "analysis": "kosapewin+N+I+Sg",
+            "modifier": "AUTO",
+            "field_transcription": "kosapewin"
+        }
+    },
+    {
+        "model": "validation.phrase",
+        "fields": {
+            "id": "5",
+            "transcription": "kosapew",
+            "translation": "",
+            "kind": "word",
+            "validated": "1",
+            "status": "auto-validated",
+            "origin": "",
+            "fuzzy_transcription": "kosapew",
+            "date": "2021-03-17",
+            "analysis": "kosapew+V+AI+Ind+3Sg",
+            "modifier": "AUTO",
+            "field_transcription": "kosapew"
+        }
+    },
+    {
+        "model": "validation.phrase",
+        "fields": {
+            "id": "6",
+            "transcription": "awas",
+            "translation": "shoo!",
+            "kind": "word",
+            "validated": "0",
+            "status": "new",
+            "origin": "",
+            "fuzzy_transcription": "awas",
+            "date": "2021-03-17",
+            "analysis": "",
+            "modifier": "AUTO",
+            "field_transcription": "awas"
+        }
+    },
+    {
+        "model": "validation.phrase",
+        "fields": {
+            "id": "7",
+            "transcription": "ocewipakamayikan",
+            "translation": "flyswatter",
+            "kind": "word",
+            "validated": "0",
+            "status": "new",
+            "origin": "",
+            "fuzzy_transcription": "ocewipakamayikan",
+            "date": "2021-03-17",
+            "analysis": "",
+            "modifier": "AUTO",
+            "field_transcription": "ocewipakamayikan"
+        }
+    }
+]

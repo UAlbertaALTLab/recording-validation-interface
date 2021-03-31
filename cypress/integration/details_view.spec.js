@@ -3,7 +3,6 @@
 describe("Details View", () => {
     beforeEach(() => {
         cy.login("linguist", "1234567890");
-        cy.get('#djHideToolBarButton').click();
     })
 
     it("clicks on options button", () => {

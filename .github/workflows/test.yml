@@ -6,7 +6,7 @@ on:
     - cron:  '05 16 * * *'
 
 jobs:
-  test:
+  unit-test:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -47,3 +47,57 @@ jobs:
       - run: pipenv install --dev
 
       - run: make test
+
+  integration-test:
+      runs-on: ${{ matrix.os }}
+      strategy:
+        matrix:
+          os: [ubuntu-latest]
+          python: [3.7]
+
+      steps:
+        - name: checkout
+          uses: actions/checkout@v2
+
+        - name: Do LFS checkout
+          # actions/checkout@v2 has a `with: lfs: true` option, but it only
+          # knows how to talk to GitHub’s LFS server.
+          #
+          # These actions are automatic if you have run `git lfs install`
+          # even once on your dev machine.
+          run: git lfs install --local && git lfs fetch && git lfs checkout
+
+        - name: Set up Python
+          uses: actions/setup-python@v2
+          with:
+            python-version: ${{ matrix.python }}
+
+        - run: pip install pipenv
+
+        # Copy-paste from
+        # https://github.com/actions/cache/blob/main/examples.md#python---pipenv
+        - uses: actions/cache@v2
+          with:
+            path: ~/.local/share/virtualenvs
+            key: ${{ runner.os }}-pipenv-${{ hashFiles('Pipfile.lock') }}
+            restore-keys: |
+              ${{ runner.os }}-pipenv-
+
+        - run: pipenv install --dev
+
+        - name: Setup Node 14
+          uses: actions/setup-node@v1
+          with:
+            node-version: '14'
+
+        - run: npm install
+
+        - uses: actions/cache@v2
+          with:
+            path: ~/.npm
+            key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+            restore-keys: |
+              ${{ runner.os }}-node-
+
+        - run: make integration-test
+

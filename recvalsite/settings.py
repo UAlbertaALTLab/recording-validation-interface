@@ -33,6 +33,7 @@ if SECRET_KEY is None:
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", default=False, cast=bool)
+USE_DJANGO_DEBUG_TOOLBAR = config("DEBUG_DJANGO", default=DEBUG, cast=bool)
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "speech-db.altlab.app", "altlab-itw:8004"]
 
@@ -57,7 +58,8 @@ INSTALLED_APPS = [
 # Apps used only during debug mode
 if DEBUG:
     INSTALLED_APPS.append("django_extensions")
-    INSTALLED_APPS.append("debug_toolbar")
+    if USE_DJANGO_DEBUG_TOOLBAR:
+        INSTALLED_APPS.append("debug_toolbar")
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -72,7 +74,7 @@ MIDDLEWARE = [
     "simple_history.middleware.HistoryRequestMiddleware",
 ]
 
-if DEBUG:
+if DEBUG and USE_DJANGO_DEBUG_TOOLBAR:
     MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
 
 ROOT_URLCONF = "recvalsite.urls"
