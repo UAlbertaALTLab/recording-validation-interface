@@ -19,10 +19,25 @@
     Status:
     <input type="radio" id="all" name="status" value="all" checked>
     <label for="all">All</label>  
-    <input type="radio" id="validated" name="status" value="validated">
-    <label for="validated">Validated</label>  
-    <input type="radio" id="unvalidated" name="status" value="unvalidated">
-    <label for="unvalidated">Unvalidated</label> <br>
+    <input type="radio" id="new" name="status" value="new">
+    <label for="new">New</label>
+    <input type="radio" id="linked" name="status" value="linked">
+    <label for="linked">Linked</label>
+    {% if is_linguist %}
+        <input type="radio" id="auto-val" name="status" value="auto-val">
+        <label for="auto-val">Auto-validated</label> <br>
+    {% else %}
+        <br>
+    {% endif %}
+
+
+    Recording quality:
+    <input type="radio" id="all" name="quality" value="all" checked>
+    <label for="all">All</label>
+    <input type="radio" id="good" name="quality" value="good">
+    <label for="good">Good</label>
+    <input type="radio" id="bad" name="quality" value="bad">
+    <label for="bad">Bad</label> <br>
 
     Speaker:
     <input type="checkbox" id="all_speakers" name="speaker-options" value="all">
@@ -34,7 +49,7 @@
 
     <input type="hidden" name="speaker" id="speaker">
 
-    <button data-cy="advanced-form-submit" class="btn button-success my-2 my-sm-0" type="submit">Search</button>
+    <button data-cy="advanced-form-submit" class="btn button button--success my-2 my-sm-0" type="submit">Search</button>
   </form>
 
   {% endblock content %}

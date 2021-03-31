@@ -1,13 +1,14 @@
-/// <reference types="cypress" />
 // Tests for login functionality
 
 describe("Login", () => {
     it("loads the page", () => {
         // checks that all page elements load
+
         cy.visit(Cypress.env('login_url'))
-        cy.get('h2')
-            .contains('Login to Validate Entries')
-        cy.get('#login-form')
+        cy.get('.login__title')
+            .should('be.visible')
+
+        cy.get('.login__form')
             .should('be.visible');
 
         cy.get('#id_username')
@@ -27,14 +28,14 @@ describe("Login", () => {
         // login as valid user works
         cy.visit(Cypress.env('login_url'))
 
-        cy.get('#login-form')
+        cy.get('.login__form')
             .should('be.visible');
 
         cy.get('input[name=username]')
-            .type('test')
+            .type('expert')
 
         cy.get('input[name=password]')
-            .type('1234')
+            .type('1234567890')
 
         cy.get('#login-button')
             .click()
@@ -48,7 +49,7 @@ describe("Login", () => {
         // login without password does not work
         cy.visit(Cypress.env('login_url'))
 
-        cy.get('#login-form')
+        cy.get('.login__form')
             .should('be.visible');
 
         cy.get('input[name=username]')
@@ -65,7 +66,7 @@ describe("Login", () => {
         // login with invalid password does not work
         cy.visit(Cypress.env('login_url'))
 
-        cy.get('#login-form')
+        cy.get('.login__form')
             .should('be.visible');
 
         cy.get('input[name=username]')
@@ -86,7 +87,7 @@ describe("Login", () => {
         // login with invalid password does not work
         cy.visit(Cypress.env('login_url'))
 
-        cy.get('#login-form')
+        cy.get('.login__form')
             .should('be.visible');
 
         cy.get('input[name=username]')

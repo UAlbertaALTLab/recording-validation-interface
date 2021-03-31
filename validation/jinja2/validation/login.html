@@ -3,14 +3,18 @@
 
 {% block content %}
 <div class="login">
-<h2>Login to Validate Entries</h2>
-    <div class="login-form-wrapper">
-        <form action="" id="login-form" method="POST">
+<p class="login__title">Login to Validate Entries</p>
+    <div class="login__form">
+        <form action="" id="login__form" method="POST">
             <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
             {{ form }}
-            <input type="submit" value="Login" id="login-button" class="login-button">
+            <div class="center">
+                <input type="submit" value="Login" id="login-button" class="login__button">
+            </div>
         </form>
-        <a href="{{ url('validation:register') }}"><button id="register-button" class="register-button">Register</button></a>
+        <div class="center">
+            <a href="{{ url('validation:register') }}"><button id="register-button" class="register__button">Register</button></a>
+        </div>
     </div>
 </div>
 {% endblock content %}

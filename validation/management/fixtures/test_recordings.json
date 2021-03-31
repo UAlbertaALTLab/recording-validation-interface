@@ -1,0 +1,93 @@
+[
+  {
+    "model": "validation.recording",
+    "fields": {
+      "id": "e0032855543e65ff360a95f9ead5e5d3e477c3f866000da506e98b754196de3c",
+      "compressed_audio": "audio/e0032855543e65ff360a95f9ead5e5d3e477c3f866000da506e98b754196de3c_tSeL3ry.m4a",
+      "timestamp": 51890,
+      "quality": "bad",
+      "comment": "Good",
+      "phrase_id": 1,
+      "session_id": "2015-05-29-AM-___-_",
+      "speaker_id": "MAR"
+    }
+  },
+  {
+    "model": "validation.recording",
+    "fields": {
+      "id": "393599db8d49bed8b830298a73b6550220645f515914aa82639d4025a209d917",
+      "compressed_audio": "audio/393599db8d49bed8b830298a73b6550220645f515914aa82639d4025a209d917_YPWziXy.m4a",
+      "timestamp": 64715,
+      "quality": "good",
+      "comment": "Good",
+      "phrase_id": 2,
+      "session_id": "2015-05-29-AM-___-_",
+      "speaker_id": "MAR"
+    }
+  },
+  {
+    "model": "validation.recording",
+    "fields": {
+      "id": "ed77c2857423eb0d9e0b8d095f7577f688359b24055a0573c53abc1b00b31ba6",
+      "compressed_audio": "audio/ed77c2857423eb0d9e0b8d095f7577f688359b24055a0573c53abc1b00b31ba6_UCCcHbD.m4a",
+      "timestamp": 979515,
+      "quality": "good",
+      "comment": "Good",
+      "phrase_id": 3,
+      "session_id": "2015-05-29-AM-___-_",
+      "speaker_id": "MAR"
+    }
+  },
+  {
+    "model": "validation.recording",
+    "fields": {
+      "id": "bfcfed043c160bcae321e1961b9209cee1270634372f343d2bfd10c9e67c249b",
+      "compressed_audio": "audio/bfcfed043c160bcae321e1961b9209cee1270634372f343d2bfd10c9e67c249b_kU7G3e0.m4a",
+      "timestamp": 1403435,
+      "quality": "good",
+      "comment": "Good",
+      "phrase_id": 4,
+      "session_id": "2015-05-29-AM-___-_",
+      "speaker_id": "MAR"
+    }
+  },
+  {
+    "model": "validation.recording",
+    "fields": {
+      "id": "c107cf6e20aca0567aac281fbdbdda35629a7f28c4c6eb66227460c8af1c81d0",
+      "compressed_audio": "audio/c107cf6e20aca0567aac281fbdbdda35629a7f28c4c6eb66227460c8af1c81d0_rpNHk1I.m4a",
+      "timestamp": 1555065,
+      "quality": "good",
+      "comment": "Good",
+      "phrase_id": 5,
+      "session_id": "2015-05-29-AM-___-_",
+      "speaker_id": "MAR"
+    }
+  },
+  {
+    "model": "validation.recording",
+    "fields": {
+      "id": "2c921d9b593d145a720a6461ba9e76d9cf0c9eb990b4306ef80546c5a7830ae0",
+      "compressed_audio": "audio/2c921d9b593d145a720a6461ba9e76d9cf0c9eb990b4306ef80546c5a7830ae0_GzQLuiD.m4a",
+      "timestamp": 2050226,
+      "quality": "good",
+      "comment": "Good",
+      "phrase_id": 6,
+      "session_id": "2015-05-29-AM-___-_",
+      "speaker_id": "MAR"
+    }
+  },
+  {
+    "model": "validation.recording",
+    "fields": {
+      "id": "3c238942dba27a0dd3713db63a11855f80b1ae94692addb2139233dd8097b17f",
+      "compressed_audio": "audio/3c238942dba27a0dd3713db63a11855f80b1ae94692addb2139233dd8097b17f_PwZc5FO.m4a",
+      "timestamp": 2403521,
+      "quality": "good",
+      "comment": "Good",
+      "phrase_id": 7,
+      "session_id": "2015-05-29-AM-___-_",
+      "speaker_id": "MAR"
+    }
+  }
+]

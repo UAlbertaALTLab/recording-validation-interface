@@ -114,6 +114,9 @@ metadata.csv
 db.sqlite3
 node_modules
 .DS_Store
-crk.zhfst
+
+# Directory of broken dreams:
+failed-sessions/
+
 # collected static files:
 /static/

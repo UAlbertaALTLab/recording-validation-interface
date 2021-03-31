@@ -58,4 +58,14 @@ urlpatterns = [
         name="crude_recordings",
     ),
     path("segment/<str:segment_id>", views.segment_content_view, name="segment_detail"),
+    path(
+        "api/record_translation_judgement/<int:phrase_id>",
+        views.record_translation_judgement,
+        name="record_translation_judgement",
+    ),
+    path(
+        "api/record_audio_quality_judgement/<str:recording_id>",
+        views.record_audio_quality_judgement,
+        name="record_audio_quality_judgement",
+    ),
 ]

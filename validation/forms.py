@@ -3,6 +3,8 @@ import re
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 
+from validation.models import Issue
+
 
 class Login(forms.Form):
     username = forms.CharField(
@@ -33,6 +35,25 @@ class Register(forms.Form):
         widget=forms.PasswordInput(attrs={"class": "form-control form-restrict"}),
     )
 
+    CHOICES = [
+        ("expert", "Language Expert"),
+        ("linguist", "Linguist"),
+        ("instructor", "Instructor"),
+        ("learner", "Learner"),
+    ]
+    role = forms.ChoiceField(
+        label="I am a(n)...",
+        choices=CHOICES,
+        widget=forms.RadioSelect,
+        required=False,
+        help_text="""
+        Community members are considered language experts or active members in a Cree-speaking community. <br>
+        Linguists are expected to look at analyses and lemmas. <br>
+        Instructors are those who are teaching others or advanced language learners.<br>
+        Learners are students or other people currently learning the language.<br>
+        """,
+    )
+
     def clean_username(self):
         username = self.cleaned_data["username"]
         if not re.search(
@@ -61,3 +82,34 @@ class EditSegment(forms.Form):
         required=False,
         widget=forms.TextInput(attrs={"class": "form-control bottom-margin"}),
     )
+
+
+class FlagSegment(forms.ModelForm):
+    ISSUES = [
+        ("bad_cree", "There's a better Cree word for this translation"),
+        ("bad_english", "There's a better translation for this Cree word"),
+        ("bad_rec", "One or more of these recordings are not of this word"),
+        ("other", "Something else (please specify)"),
+    ]
+    issues = forms.MultipleChoiceField(
+        choices=ISSUES, required=False, widget=forms.CheckboxSelectMultiple
+    )
+
+    other_reason = forms.CharField(
+        label="Specify reason here",
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control bottom-margin"}),
+    )
+
+    comment = forms.CharField(
+        help_text="Use the space above to suggest a new spelling or make a few notes about why you're reporting an issue "
+        "with this entry",
+        required=True,
+        widget=forms.TextInput(attrs={"class": "form-control bottom-margin"}),
+    )
+
+    phrase_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
+
+    class Meta:
+        model = Issue
+        fields = ["phrase_id"]

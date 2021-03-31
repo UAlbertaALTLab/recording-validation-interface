@@ -1,0 +1,12 @@
+[
+  {
+    "model": "validation.recordingsession",
+    "fields": {
+      "id": "2015-05-29-AM-___-_",
+      "date": "2015-05-29",
+      "time_of_day": "AM",
+      "location": "",
+      "subsession": null
+    }
+  }
+]

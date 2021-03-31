@@ -74,9 +74,11 @@ class Command(BaseCommand):
         store_db=True,
         wav=False,
         audio_dir: Path = Path("./audio"),
+        sessions_dir=None,
         **options
     ) -> None:
-        sessions_dir = options.get("session_dir", settings.RECVAL_SESSIONS_DIR)
+        if sessions_dir is None:
+            sessions_dir = settings.RECVAL_SESSIONS_DIR
 
         if store_db:
             self._handle_store_django(sessions_dir)
@@ -135,7 +137,9 @@ def django_recording_importer(info: Segment, recording_path: Path, logger) -> No
         logger.info("New session: %s", session)
 
     phrase, phrase_created = Phrase.objects.get_or_create(
+        field_transcription=info.cree_transcription,
         transcription=info.cree_transcription,
+        status="new",
         kind=info.type,
         defaults=dict(
             translation=info.english_translation, validated=False, origin=None

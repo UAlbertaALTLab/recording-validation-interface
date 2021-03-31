@@ -18,6 +18,7 @@ pympi-ling = "*"
 requests = "*"
 uwsgi = "*"
 divvunspell-python = {ref = "3aa656d36a2fa1ede90e53c320b2095c05cf7c05", git = "https://github.com/divvun/divvunspell-sdk-python"}
+tqdm = "*"
 whitenoise = "*"
 
 [dev-packages]
@@ -30,6 +31,8 @@ pytest = "*"
 pytest-django = "*"
 django-stubs = "*"
 django-extensions = "*"
+django-debug-toolbar = "*"
+black = "==20.8b1"
 
 [requires]
 python_version = "3.7"

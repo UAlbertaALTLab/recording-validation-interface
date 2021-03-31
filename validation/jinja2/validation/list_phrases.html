@@ -1,84 +1,67 @@
 {#
-      Copyright (C) 2018 Eddie Antonio Santos <easantos@ualberta.ca>
-
-      This program is free software: you can redistribute it and/or modify
-      it under the terms of the GNU Affero General Public License as
-      published by the Free Software Foundation, either version 3 of the
-      License, or (at your option) any later version.
-
-      This program is distributed in the hope that it will be useful,
-      but WITHOUT ANY WARRANTY; without even the implied warranty of
-      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-      GNU Affero General Public License for more details.
-
-      You should have received a copy of the GNU Affero General Public License
-      along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    Copyright (C) 2018 Eddie Antonio Santos <easantos@ualberta.ca>
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #}
 
 {#
- # Displays a list of phrases.
- #}
+# Displays a list of phrases.
+#}
 
 {% extends 'validation/_base.html' %}
 {% import 'validation/_macros.html' as macros %}
+{% import 'validation/_segment_card.html' as segment %}
 
 {% block content %}
-<div>
-  <form class="form-inline ml-2 my-2 my-lg-0" method="GET" action="{{
+<div class="center">
+  <form method="GET" action="{{
     url('validation:index')
   }}">
-    <div class="filters">
-      <button class="{{ all_class }}"" type="submit" id="filter-all" name="mode" value="all">All</button>
-      <button class="{{ validated_class }}" type="submit" id="filter-validated" name="mode" value="validated">Validated</button>
-      <button class="{{ unvalidated_class }}" type="submit" id="filter-unvalidated" name="mode" value="unvalidated">Unvalidated</button>
+    <div class="filter">
+        Filter by:
+        <input type="radio" id="filter-all" name="mode" value="all">
+        <label for="filter-all"> All</label>
+        <input type="radio" id="filter-new" name="mode" value="new">
+        <label for="filter-new"> New</label>
+        <input type="radio" id="filter-linked" name="mode" value="linked">
+        <label for="filter-linked"> Linked</label>
+        {% if is_linguist %}
+            <input type="radio" id="filter-auto" name="mode" value="auto-validated">
+            <label for="filter-auto"> Auto-Validated</label>
+        {% endif %}
+    </div>
+  <div class="filter">
+
+{#        <label for="session">#}
+            Choose a recording session:
+{#        </label>#}
+          <select name="session" id="sessions">
+          <option value="all">All Sessions</option>
+              {% for session in sessions %}
+                  <option value="{{ session.date }}">{{ session.date }}</option>
+              {% endfor %}
+          </select>
+          <input type="submit" value="Select" class="button button--success button--small">
     </div>
   </form>
 </div>
-<div class="table-responsive">
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th scope="col"> Transcription </th>
-        <th scope="col"> Translation </th>
-        <th scope="col"> Recordings </th>
-        <th scope="col"> Speaker </th>
-      </tr>
-    </thead>
-    {% for phrase in phrases %}
-    <tr data-update-uri="{{ url('validation:update_text', phrase_id=phrase.id) }}">
-      {{ macros.td_transcription_link(user, phrase) }}
-      {{ macros.td_translation(user, phrase) }}
-      <td>
-        <ul class="recordings">
-        {% for recording in phrase.recordings %}
-          <li>
-            <div class="rec-height">
-              {{ macros.player(recording) }}
-            </div>
-          </li>
 
-        {% endfor %}{# for recording in phrase.recordings #}
-        </ul>
-      </td>
-      <td>
-        <ul class="speaker">
-        {% for recording in phrase.recordings %}
-          <li>
-            <div class="rec-height">
-              {{ macros.speaker(recording) }}
-            </div>
-          </li>
+<p class="description">Showing {{ mode }} entries from {{ session }}</p>
 
-        {% endfor %}{# for recording in phrase.recordings #}
-        </ul>
-      </td>
-    </tr>
-    {% endfor %}{# for phrase in phrases #}
-  </table>
-</div>
+    {%  for phrase in phrases %}
+        {{ segment.segment_card(phrase, recordings, is_linguist, is_expert, auth, forms, csrf_token) }}
+    {% endfor %} {# phrase in phrases #}
 
 <nav>
-  {{ macros.pagination(phrases, 'list_phrases') }}
+{{ macros.pagination_with_query(phrases, 'validation:list_phrases', query, encode_query_with_page) }}
 </nav>
 {% endblock content %}
 

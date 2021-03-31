@@ -17,6 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
+import unicodedata
 from pathlib import Path
 
 from django.conf import settings
@@ -67,6 +68,21 @@ class Phrase(models.Model):
     SENTENCE = "sentence"
     KIND_CHOICES = ((WORD, "Word"), (SENTENCE, "Sentence"))
 
+    # Status values
+    NEW = "new"
+    AUTO = "auto-standardized"
+    STANDARDIZED = "standardized"
+    LINKED = "linked"
+    VALIDATED = "validated"
+
+    STATUS_CHOICES = (
+        (NEW, "New"),
+        (AUTO, "Auto-standardized"),
+        (STANDARDIZED, "Standardized"),
+        (LINKED, "Linked"),
+        (VALIDATED, "Validated"),
+    )
+
     MASKWACÎS_DICTIONARY = "MD"
     NEW_WORD = "new"
     ORIGIN_CHOICES = (
@@ -74,11 +90,18 @@ class Phrase(models.Model):
         (NEW_WORD, "New word"),
     )
 
-    transcription = models.CharField(
-        help_text="The transciption of the Cree phrase.",
+    field_transcription = models.CharField(
+        help_text="The transcription from the day of the recording. This should never change.",
         blank=False,
         max_length=MAX_TRANSCRIPTION_LENGTH,
     )
+
+    transcription = models.CharField(
+        help_text="The validated transciption of the Cree phrase.",
+        blank=False,
+        max_length=MAX_TRANSCRIPTION_LENGTH,
+    )
+
     translation = models.CharField(
         help_text="The English translation of the phrase.", blank=False, max_length=256
     )
@@ -89,6 +112,13 @@ class Phrase(models.Model):
     )
     validated = models.BooleanField(
         help_text="Has this phrase be validated?", default=False
+    )
+
+    status = models.CharField(
+        help_text="Status in the validation process",
+        blank=False,
+        default=NEW,
+        **arguments_for_choices(STATUS_CHOICES),
     )
     # TODO: during the import process, try to determine automatically whether
     # the word came from the Maswkacîs dictionary.
@@ -151,6 +181,10 @@ class Phrase(models.Model):
         """
         Cleans the text fields.
         """
+        self.field_transcription = unicodedata.normalize(
+            "NFC", self.field_transcription
+        )
+
         self.transcription = normalize_sro(self.transcription)
         assert self.ALLOWED_TRANSCRIPTION_CHARACTERS.issuperset(self.transcription)
 
@@ -350,7 +384,9 @@ class Recording(models.Model):
     )
 
     comment = models.CharField(
-        help_text="The comment provided in the ELAN file", max_length=256, blank=True,
+        help_text="The comment provided in the ELAN file",
+        max_length=256,
+        blank=True,
     )
 
     # Keep track of the recording's history.
@@ -365,6 +401,48 @@ class Recording(models.Model):
         Returns the path to where compressed audio should be written to.
         """
         return Path(settings.MEDIA_ROOT) / settings.RECVAL_AUDIO_PREFIX
+
+
+class Issue(models.Model):
+    comment = models.CharField(
+        help_text="The comment left by the validator",
+        blank=False,
+        max_length=1024,
+    )
+
+    other_reason = models.CharField(
+        help_text="A reason other than the options provided for why the issue was filed",
+        blank=True,
+        max_length=1024,
+    )
+
+    other = models.BooleanField(
+        help_text="There's another reason this issue was filed", default=False
+    )
+
+    bad_cree = models.BooleanField(
+        help_text="There's a better Cree word for this translation", default=False
+    )
+
+    bad_english = models.BooleanField(
+        help_text="There's another English word for this transcription", default=False
+    )
+
+    bad_recording = models.BooleanField(
+        help_text="There's one or more bad recordings in this batch", default=False
+    )
+
+    phrase = models.ForeignKey(Phrase, on_delete=models.CASCADE)
+
+    created_by = models.CharField(
+        help_text="The person who filed this issue",
+        default="",
+        max_length=64,
+    )
+
+    created_on = models.DateField(
+        help_text="When was this issue filed?",
+    )
 
 
 # ############################### Utilities ############################### #

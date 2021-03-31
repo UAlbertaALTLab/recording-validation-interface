@@ -182,7 +182,11 @@ def test_phrase_transcription_normalization(dirty_transcription):
     """
     Test that the transcription gets normalized as a Cree phrase.
     """
-    phrase = Recipe(Phrase, transcription=dirty_transcription).prepare()
+    phrase = Recipe(
+        Phrase,
+        transcription=dirty_transcription,
+        field_transcription=dirty_transcription,
+    ).prepare()
     phrase.clean()
     assert phrase.transcription == nfc(phrase.transcription)
     # Should not have any leading spaces
@@ -215,7 +219,11 @@ def test_phrase_transcription_normalization_hyphenation(dirty_transcription, exp
     Test that words in the transcriptions are separated by exactly one space,
     and have exactly one hyphen between morphemes.
     """
-    phrase = Recipe(Phrase, transcription=dirty_transcription).prepare()
+    phrase = Recipe(
+        Phrase,
+        transcription=dirty_transcription,
+        field_transcription=dirty_transcription,
+    ).prepare()
     phrase.clean()
     assert phrase.transcription == expected
 
@@ -224,7 +232,9 @@ def test_phrase_transcription_normalize_ê():
     """
     Tests that e gets converted to ê.
     """
-    phrase = Recipe(Phrase, transcription="e-cacâstapiwet").prepare()
+    phrase = Recipe(
+        Phrase, transcription="e-cacâstapiwet", field_transcription="e-cacâstapiwet"
+    ).prepare()
     phrase.clean()
     assert phrase.transcription == "ê-cacâstapiwêt"
 
@@ -238,7 +248,9 @@ def test_phrase_has_history():
 
     # Store a phrase in the database and forget about it.
     original = "ecastapiwet"
-    phrase = Recipe(Phrase, transcription=original).prepare()
+    phrase = Recipe(
+        Phrase, transcription=original, field_transcription=original
+    ).prepare()
     # Do NOT call clean, in order to simulate an initial import.
     phrase.save()
     phrase_id = phrase.id
@@ -248,6 +260,7 @@ def test_phrase_has_history():
     # and fuggettaboutit.
     phrase = Phrase.objects.get(id=phrase_id)
     phrase.transcription = changed
+    phrase.field_transcription = changed
     phrase.clean()
     phrase.save()
     del phrase
