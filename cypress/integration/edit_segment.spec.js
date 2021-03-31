@@ -115,50 +115,6 @@ describe("Edit segment", () => {
             })
     })
 
-    // The following test only works if the entries have a revision history
-    // Since the test-db is made when the tests are run, there is no revision history
-    // to test against
-    it.skip("should load content when clicking Revert", () => {
-        cy.visit(Cypress.env("segment_details_url"));
-
-        cy.get("#revision-table").within(() => {
-            cy.get('[data-cy="revision-transcription"]')
-                .first()
-                .invoke('text')
-                .as('transcription')
-            cy.get('[data-cy="revision-translation"]')
-                .first()
-                .invoke('text')
-                .as('translation')
-            cy.get('[data-cy="revision-analysis"]')
-                .first()
-                .invoke('text')
-                .as('analysis')
-            cy.get('input:first')
-                .should('have.value', 'Revert')
-                .click()
-        })
-
-        cy.get('[data-cy=edit-div]').should('be.visible')
-        cy.get('#id_cree')
-            .should('be.visible')
-            .within(() => {
-                cy.get('@transcription')
-            })
-
-        cy.get('#id_translation')
-            .should('be.visible')
-            .within(() => {
-                cy.get('@translation')
-            })
-
-        cy.get('#id_analysis')
-            .should('be.visible')
-            .within(() => {
-                cy.get('@analysis')
-            })
-    })
-
     it("should load content when clicking Edit", () => {
         cy.visit(Cypress.env("segment_details_url"));
 
@@ -241,6 +197,47 @@ describe("Edit segment", () => {
         // Make sure the username of the editor was stored
         cy.get("#revision-table")
             .contains('linguist')
+    })
+    
+    it("should load content when clicking Revert", () => {
+        cy.visit(Cypress.env("segment_details_url"));
+
+        cy.get("#revision-table").within(() => {
+            cy.get('[data-cy="revision-transcription"]')
+                .first()
+                .invoke('text')
+                .as('transcription')
+            cy.get('[data-cy="revision-translation"]')
+                .first()
+                .invoke('text')
+                .as('translation')
+            cy.get('[data-cy="revision-analysis"]')
+                .first()
+                .invoke('text')
+                .as('analysis')
+            cy.get('input:first')
+                .should('have.value', 'Revert')
+                .click()
+        })
+
+        cy.get('[data-cy=edit-div]').should('be.visible')
+        cy.get('#id_cree')
+            .should('be.visible')
+            .within(() => {
+                cy.get('@transcription')
+            })
+
+        cy.get('#id_translation')
+            .should('be.visible')
+            .within(() => {
+                cy.get('@translation')
+            })
+
+        cy.get('#id_analysis')
+            .should('be.visible')
+            .within(() => {
+                cy.get('@analysis')
+            })
     })
 
     it("should not update the entry when clicking Cancel", () => {
