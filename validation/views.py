@@ -20,6 +20,7 @@ import datetime
 import io
 import json
 import operator
+from functools import reduce
 from pathlib import Path
 
 from django.conf import settings
@@ -41,6 +42,7 @@ from django.contrib.auth.models import User, Group
 from django.contrib.auth import authenticate, login as django_login
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 
 from librecval.normalization import to_indexable_form
 
@@ -67,24 +69,21 @@ def index(request):
             all_phrases = Phrase.objects.exclude(status="auto-validated").order_by(
                 "transcription"
             )
-    elif mode == "new":
-        all_phrases = Phrase.objects.filter(status="new").order_by("transcription")
-    elif mode == "linked":
-        all_phrases = Phrase.objects.filter(status="linked").order_by("transcription")
-    elif mode == "auto-validated":
-        all_phrases = Phrase.objects.filter(status="auto-validated").order_by(
-            "transcription"
-        )
+    else:
+        all_phrases = Phrase.objects.filter(status=mode).order_by("transcription")
 
     all_phrases = all_phrases.prefetch_related("recording_set__speaker")
+    all_phrases = sorted(all_phrases, key=operator.attrgetter("transcription"))
+
+    paginator = Paginator(all_phrases, 5)
+    page_no = request.GET.get("page", 1)
+    phrases = paginator.get_page(page_no)
 
     sessions = RecordingSession.objects.order_by().values("date").distinct()
     session = request.GET.get("session")
     if session != "all" and session:
         session_date = datetime.datetime.strptime(session, "%Y-%m-%d").date()
-        all_phrases = all_phrases.filter(
-            recording__session__date=session_date
-        ).distinct()
+        phrases = phrases.filter(recording__session__date=session_date).distinct()
 
     query_term = QueryDict("", mutable=True)
     if session:
@@ -92,17 +91,11 @@ def index(request):
     if mode:
         query_term.update({"mode": mode})
 
-    all_phrases = sorted(all_phrases, key=operator.attrgetter("transcription"))
-
     if not mode:
         mode = "all"
 
-    if not session:
+    if not session or session == "all":
         session = "all sessions"
-
-    paginator = Paginator(all_phrases, 5)
-    page_no = request.GET.get("page", 1)
-    phrases = paginator.get_page(page_no)
 
     recordings, forms = prep_phrase_data(request, phrases)
 
@@ -137,13 +130,10 @@ def search_phrases(request):
     is_expert = user_is_expert(request.user)
 
     query = request.GET.get("query")
-    cree_matches = Phrase.objects.filter(
-        transcription__contains=query
+    all_matches = Phrase.objects.filter(
+        Q(transcription__contains=query) | Q(translation__contains=query)
     ).prefetch_related("recording_set__speaker")
-    english_matches = Phrase.objects.filter(
-        translation__contains=query
-    ).prefetch_related("recording_set__speaker")
-    all_matches = list(set().union(cree_matches, english_matches))
+    all_matches = list(all_matches)
     all_matches.sort(key=lambda phrase: phrase.transcription)
 
     query_term = QueryDict("", mutable=True)
@@ -210,58 +200,39 @@ def advanced_search_results(request):
     speakers = request.GET.getlist("speaker-options")
     quality = request.GET.get("quality")
 
-    if transcription != "":
-        cree_matches = Phrase.objects.filter(
-            transcription__contains=transcription
+    filter_query = []
+    if transcription:
+        filter_query.append(Q(transcription__contains=transcription))
+    if translation:
+        filter_query.append(Q(translation__contains=translation))
+    if analysis:
+        filter_query.append(Q(analysis__contains=analysis))
+    if status and status != "all":
+        filter_query.append(Q(status=status))
+
+    if filter_query:
+        phrase_matches = Phrase.objects.filter(
+            reduce(operator.or_, filter_query)
         ).prefetch_related("recording_set__speaker")
     else:
-        cree_matches = []
-
-    if translation != "":
-        english_matches = Phrase.objects.filter(
-            translation__contains=translation
-        ).prefetch_related("recording_set__speaker")
-    else:
-        english_matches = []
-
-    if analysis != "":
-        analysis_matches = Phrase.objects.filter(
-            analysis__contains=analysis
-        ).prefetch_related("recording_set__speaker")
-    else:
-        analysis_matches = []
-
-    if transcription == "" and translation == "" and analysis == "":
         phrase_matches = Phrase.objects.all().prefetch_related("recording_set__speaker")
-    else:
-        phrase_matches = list(
-            set().union(cree_matches, english_matches, analysis_matches)
-        )
-
-    if status != "all":
-        if status == "new":
-            status_matches = Phrase.objects.filter(status="new")
-        elif status == "linked":
-            status_matches = Phrase.objects.filter(status="linked")
-        elif status == "auto-val":
-            status_matches = Phrase.objects.filter(status="auto-validated")
-        phrase_and_status_matches = list(
-            set(phrase_matches).intersection(status_matches)
-        )
-    else:
-        phrase_and_status_matches = phrase_matches
 
     recordings = {}
     all_matches = []
-    for phrase in phrase_and_status_matches:
-        recordings[phrase] = []
-        if ("all" in speakers or speakers == []) and (quality == "all" or not quality):
-            recordings[phrase] = list(phrase.recordings)
-        else:
-            for recording in phrase.recordings:
-                if recording.speaker.code in speakers or recording.quality == quality:
-                    recordings[phrase].append(recording)
 
+    recordings_filter_query = []
+    if speakers and "all" not in speakers:
+        recordings_filter_query.append(~Q(speaker__in=speakers))
+    if quality and "all" not in quality:
+        recordings_filter_query.append(~Q(quality__in=quality))
+
+    for phrase in phrase_matches:
+        if recordings_filter_query:
+            recordings[phrase] = Recording.objects.filter(phrase_id=phrase.id).exclude(
+                reduce(operator.and_, recordings_filter_query)
+            )
+        else:
+            recordings[phrase] = list(phrase.recordings)
         if recordings[phrase]:
             all_matches.append(phrase)
 
