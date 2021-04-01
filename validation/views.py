@@ -220,6 +220,9 @@ def advanced_search_results(request):
     recordings = {}
     all_matches = []
 
+    # We use the negation of the query, ~Q, and .exclude here
+    # because we want to remove any entries and recordings that do not match
+    # the criteria, which cannot be accomplished with .filter
     recordings_filter_query = []
     if speakers and "all" not in speakers:
         recordings_filter_query.append(~Q(speaker__in=speakers))
@@ -228,7 +231,7 @@ def advanced_search_results(request):
 
     for phrase in phrase_matches:
         if recordings_filter_query:
-            recordings[phrase] = Recording.objects.filter(phrase_id=phrase.id).exclude(
+            recordings[phrase] = phrase.recordings.exclude(
                 reduce(operator.and_, recordings_filter_query)
             )
         else:
