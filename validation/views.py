@@ -70,19 +70,21 @@ def index(request):
     else:
         all_phrases = Phrase.objects.filter(status=mode)
 
-    all_phrases = all_phrases.order_by("transcription").prefetch_related(
-        "recording_set__speaker"
-    )
-
-    paginator = Paginator(all_phrases, 5)
-    page_no = request.GET.get("page", 1)
-    phrases = paginator.get_page(page_no)
+    all_phrases = all_phrases.prefetch_related("recording_set__speaker")
 
     sessions = RecordingSession.objects.order_by().values("date").distinct()
     session = request.GET.get("session")
     if session != "all" and session:
         session_date = datetime.datetime.strptime(session, "%Y-%m-%d").date()
-        phrases = phrases.filter(recording__session__date=session_date).distinct()
+        all_phrases = all_phrases.filter(
+            recording__session__date=session_date
+        ).distinct()
+
+    all_phrases = all_phrases.order_by("transcription")
+
+    paginator = Paginator(all_phrases, 5)
+    page_no = request.GET.get("page", 1)
+    phrases = paginator.get_page(page_no)
 
     query_term = QueryDict("", mutable=True)
     if session:
