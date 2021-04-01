@@ -8,5 +8,5 @@ services:
         volumes:
         # HOST : CONTAINER
         - "./.env:/app/.env"
-        - "/data/application-data/speech-db/db.sqlite3:/app/db.sqlite3"
+        - "./db.sqlite3:/app/db.sqlite3"
         - "/data/application-data/speech-db/audio:/app/data/audio"

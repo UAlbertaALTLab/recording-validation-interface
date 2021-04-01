@@ -222,3 +222,31 @@ ITWEWINA_URL = "https://itwewina.altlab.app/"
 FIXTURE_DIRS = ("validation/management/fixtures/",)
 
 INTERNAL_IPS = ["127.0.0.1"]
+
+log_level = 'INFO'
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            # The handler should print anything that gets to it, so that
+            # debugging can be enabled for specific loggers without also turning
+            # on debug loggers for all of django/python
+            "level": "NOTSET",
+            "class": "logging.StreamHandler",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": log_level,
+    },
+    "loggers": {
+        # learn how different loggers are used in Django: https://docs.djangoproject.com/en/3.0/topics/logging/#id3
+        "django": {
+            "handlers": [],
+            "level": log_level,
+            "propagate": True,
+        },
+    },
+}
+
