@@ -31,7 +31,8 @@ ARG WSGI_USER=speech-db
 RUN groupadd --system --gid ${UID_GID} ${WSGI_USER} \
  && useradd --no-log-init --system --gid ${WSGI_USER} --uid ${UID_GID} ${WSGI_USER} \
  && mkdir /app \
- && chown ${WSGI_USER}:${WSGI_USER} /app
+ && mkdir -p /var/www/recvalsite \
+ && chown ${WSGI_USER}:${WSGI_USER} /app /var/www/recvalsite
 
 USER ${WSGI_USER}:${WSGI_USER}
 WORKDIR /app/
@@ -42,8 +43,8 @@ COPY --chown=${WSGI_USER}:${WSGI_USER} . .
 
 ENV VIRTUAL_ENV="/app/.venv"
 ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
-RUN mkdir static && python manage.py collectstatic
+RUN python manage.py collectstatic
 
 EXPOSE 8000
 ENV UWSGI_HTTP=:8000 UWSGI_MASTER=1 UWSGI_HTTP_KEEPALIVE=1 UWSGI_AUTO_CHUNKED=1 UWSGI_WSGI_ENV_BEHAVIOUR=holy
-CMD ["uwsgi", "-w", "recvalsite.wsgi", "--static-map", "/static=/var/www/recvalsite/static"]
+CMD ["uwsgi", "-w", "recvalsite.wsgi", "--processes", "10", "--static-map", "/static=/var/www/recvalsite/static"]
