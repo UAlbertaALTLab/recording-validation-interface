@@ -66,14 +66,13 @@ def index(request):
         if is_linguist:
             all_phrases = Phrase.objects.all()
         else:
-            all_phrases = Phrase.objects.exclude(status="auto-validated").order_by(
-                "transcription"
-            )
+            all_phrases = Phrase.objects.exclude(status="auto-validated")
     else:
-        all_phrases = Phrase.objects.filter(status=mode).order_by("transcription")
+        all_phrases = Phrase.objects.filter(status=mode)
 
-    all_phrases = all_phrases.prefetch_related("recording_set__speaker")
-    all_phrases = sorted(all_phrases, key=operator.attrgetter("transcription"))
+    all_phrases = all_phrases.order_by("transcription").prefetch_related(
+        "recording_set__speaker"
+    )
 
     paginator = Paginator(all_phrases, 5)
     page_no = request.GET.get("page", 1)
@@ -223,16 +222,16 @@ def advanced_search_results(request):
     # We use the negation of the query, ~Q, and .exclude here
     # because we want to remove any entries and recordings that do not match
     # the criteria, which cannot be accomplished with .filter
-    recordings_filter_query = []
+    recordings_exclude_query = []
     if speakers and "all" not in speakers:
-        recordings_filter_query.append(~Q(speaker__in=speakers))
+        recordings_exclude_query.append(~Q(speaker__in=speakers))
     if quality and "all" not in quality:
-        recordings_filter_query.append(~Q(quality__in=quality))
+        recordings_exclude_query.append(~Q(quality__in=quality))
 
     for phrase in phrase_matches:
-        if recordings_filter_query:
+        if recordings_exclude_query:
             recordings[phrase] = phrase.recordings.exclude(
-                reduce(operator.and_, recordings_filter_query)
+                reduce(operator.and_, recordings_exclude_query)
             )
         else:
             recordings[phrase] = list(phrase.recordings)
