@@ -46,7 +46,11 @@
           <select name="session" id="sessions">
           <option value="all">All Sessions</option>
               {% for session in sessions %}
-                  <option value="{{ session.date }}">{{ session.date }}</option>
+                  {% if is_linguist %}
+                    <option value="{{ session.date }}">{{ session.id }}</option>
+                  {% else %}
+                    <option value="{{ session.date }}">{{ session.date }}</option>
+                  {% endif %}
               {% endfor %}
           </select>
           <input type="submit" value="Select" class="button button--success button--small">
