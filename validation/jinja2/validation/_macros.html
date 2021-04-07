@@ -68,7 +68,7 @@
   {% endif %}
 
   <li class="nav-item"><a class="nav__button active" data-cy="nav-button-with-query" href="#">
-      Page {{ page.number }}
+      Page {{ page.number }} of {{ page.paginator.num_pages }}
   </a></li>
 
   {% if page.has_next() %}

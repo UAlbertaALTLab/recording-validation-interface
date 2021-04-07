@@ -72,7 +72,7 @@ def index(request):
 
     all_phrases = all_phrases.prefetch_related("recording_set__speaker")
 
-    sessions = RecordingSession.objects.order_by("date").values("date").distinct()
+    sessions = RecordingSession.objects.order_by("id").values("id", "date").distinct()
     session = request.GET.get("session")
     if session != "all" and session:
         session_date = datetime.datetime.strptime(session, "%Y-%m-%d").date()
