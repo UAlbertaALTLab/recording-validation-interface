@@ -329,12 +329,6 @@ a:hover {
   background-color: var(--custom-grey);
 }
 
-/*label {*/
-/*  padding-top: 0.75rem;*/
-/*  display: flex;*/
-/*  align-content: start;*/
-/*}*/
-
 #id_role {
   list-style: none;
   display: inline-block;
@@ -371,9 +365,10 @@ a:hover {
 }
 
 .modal-content .helptext {
-  width: 80%;
+  width: 100%;
   margin: 0 auto;
   margin-top: -2rem;
+  padding-bottom: 1rem;
 }
 
 .center {

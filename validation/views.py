@@ -545,8 +545,9 @@ def prep_phrase_data(request, phrases):
 def save_issue(data, user):
     phrase_id = data["phrase_id"]
     issues = data["issues"]
-    other_reason = data["other_reason"]
     comment = data["comment"]
+    cree_suggestion = data["cree_suggestion"]
+    english_suggestion = data["english_suggestion"]
 
     phrase = Phrase.objects.get(id=phrase_id)
 
@@ -557,7 +558,8 @@ def save_issue(data, user):
         bad_english="bad_english" in issues,
         bad_recording="bad_rec" in issues,
         comment=comment,
-        other_reason=other_reason,
+        suggested_cree=cree_suggestion,
+        suggested_english=english_suggestion,
         created_by=user,
         created_on=datetime.datetime.now(),
     )

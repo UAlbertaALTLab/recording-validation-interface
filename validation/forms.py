@@ -95,17 +95,23 @@ class FlagSegment(forms.ModelForm):
         choices=ISSUES, required=False, widget=forms.CheckboxSelectMultiple
     )
 
-    other_reason = forms.CharField(
-        label="Specify reason here",
+    cree_suggestion = forms.CharField(
+        help_text="Suggest a better Cree spelling",
         required=False,
-        widget=forms.TextInput(attrs={"class": "form-control bottom-margin"}),
+        widget=forms.TextInput,
+    )
+
+    english_suggestion = forms.CharField(
+        help_text="Suggest a better English word or phrase",
+        required=False,
+        widget=forms.TextInput(attrs={"class": "commment"}),
     )
 
     comment = forms.CharField(
         help_text="Use the space above to suggest a new spelling or make a few notes about why you're reporting an issue "
         "with this entry",
         required=True,
-        widget=forms.TextInput(attrs={"class": "form-control bottom-margin"}),
+        widget=forms.Textarea(attrs={"class": "form-control bottom-margin"}),
     )
 
     phrase_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
