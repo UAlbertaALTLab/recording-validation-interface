@@ -491,6 +491,20 @@ def record_audio_quality_judgement(request, recording_id):
 
     if judgement["judgement"] in ["good", "bad"]:
         rec.quality = judgement["judgement"]
+    elif judgement["judgement"] == "wrong":
+        new_issue = Issue(
+            recording=rec,
+            other=False,
+            bad_cree=False,
+            bad_english=False,
+            bad_recording=True,
+            comment="This recording has the wrong speaker code",
+            created_by=request.user,
+            created_on=datetime.datetime.now(),
+        )
+        new_issue.save()
+
+        rec.quality = "bad"
     else:
         return HttpResponseBadRequest()
 
