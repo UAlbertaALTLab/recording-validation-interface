@@ -410,8 +410,14 @@ class Issue(models.Model):
         max_length=1024,
     )
 
-    other_reason = models.CharField(
-        help_text="A reason other than the options provided for why the issue was filed",
+    suggested_cree = models.CharField(
+        help_text="The Cree spelling suggested by the validator",
+        blank=True,
+        max_length=1024,
+    )
+
+    suggested_english = models.CharField(
+        help_text="The English spelling suggested by the validator",
         blank=True,
         max_length=1024,
     )
@@ -432,7 +438,11 @@ class Issue(models.Model):
         help_text="There's one or more bad recordings in this batch", default=False
     )
 
-    phrase = models.ForeignKey(Phrase, on_delete=models.CASCADE)
+    phrase = models.ForeignKey(Phrase, on_delete=models.CASCADE, blank=True, null=True)
+
+    recording = models.ForeignKey(
+        Recording, on_delete=models.CASCADE, blank=True, null=True
+    )
 
     created_by = models.CharField(
         help_text="The person who filed this issue",
