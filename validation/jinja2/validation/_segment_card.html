@@ -76,12 +76,15 @@
                             {% if recording.quality == 'good' %}
                                 <button class="button button--success-solid audio-quality-good" data-cy="good-button" data-rec-id={{ recording.id }}>Good</button>
                                 <button class="button button--fail audio-quality-bad" data-cy="bad-button" data-rec-id={{ recording.id }}>Bad</button>
+                                <button class="button button--neutral audio-quality-wrong" data-cy="wrong-button" data-rec-id={{ recording.id }}>Wrong Speaker</button>
                             {% elif recording.quality == 'bad' %}
                                 <button class="button button--success audio-quality-good" data-cy="good-button" data-rec-id={{ recording.id }}>Good</button>
                                 <button class="button button--fail-solid audio-quality-bad" data-cy="bad-button" data-rec-id={{ recording.id }}>Bad</button>
+                                <button class="button button--neutral audio-quality-wrong" data-cy="wrong-button" data-rec-id={{ recording.id }}>Wrong Speaker</button>
                             {% else %}
                                 <button class="button button--success audio-quality-good" data-cy="good-button" data-rec-id={{ recording.id }}>Good</button>
                                 <button class="button button--fail audio-quality-bad" data-cy="bad-button" data-rec-id={{ recording.id }}>Bad</button>
+                                <button class="button button--neutral audio-quality-wrong" data-cy="wrong-button" data-rec-id={{ recording.id }}>Wrong Speaker</button>
                             {% endif %} {# recording quality #}
                         </td>
                         {% endif %}

@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    for (let judgement of ["good", "bad"]) {
+    for (let judgement of ["good", "bad", "wrong"]) {
         for (let button of document.querySelectorAll(`.audio-quality-${judgement}`)) {
             button.addEventListener("click", async (e) => {
                 const recordingId = e.target.dataset.recId
@@ -123,6 +123,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             b.classList.add('button--fail')
                         }
                     }
+
+                    const wrongButtons = document.getElementsByClassName("audio-quality-wrong");
+                    for (let b of wrongButtons) {
+                        if (b.dataset.recId === recordingId) {
+                            b.classList.remove('button--neutral-solid')
+                            b.classList.add('button--neutral')
+                        }
+                    }
                 } else if (judgement === 'bad') {
                     button.classList.remove('button--fail')
                     button.classList.add('button--fail-solid')
@@ -134,7 +142,34 @@ document.addEventListener('DOMContentLoaded', () => {
                             b.classList.add('button--success')
                         }
                     }
+
+                    const wrongButtons = document.getElementsByClassName("audio-quality-wrong");
+                    for (let b of wrongButtons) {
+                        if (b.dataset.recId === recordingId) {
+                            b.classList.remove('button--neutral-solid')
+                            b.classList.add('button--neutral')
+                        }
+                    }
                 
+                } else if (judgement === "wrong") {
+                    button.classList.remove("button--neutral")
+                    button.classList.add("button--neutral-solid")
+
+                    const goodButtons =  document.getElementsByClassName("audio-quality-good");
+                    for (let b of goodButtons) {
+                        if (b.dataset.recId === recordingId) {
+                            b.classList.remove('button--success-solid')
+                            b.classList.add('button--success')
+                        }
+                    }
+
+                    const badButtons =  document.getElementsByClassName("audio-quality-bad");
+                    for (let b of badButtons) {
+                        if (b.dataset.recId === recordingId) {
+                            b.classList.remove('button--fail-solid')
+                            b.classList.add('button--fail')
+                        }
+                    }
                 }
         })
     }
