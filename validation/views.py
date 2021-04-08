@@ -66,7 +66,7 @@ def index(request):
         if is_linguist:
             all_phrases = Phrase.objects.all()
         else:
-            all_phrases = Phrase.objects.filter(origin="new").exclude(
+            all_phrases = Phrase.objects.exclude(origin="MD").exclude(
                 status="auto-validated"
             )
     else:
