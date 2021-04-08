@@ -15,15 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.conf import settings  # type: ignore
 from django.core.management.base import BaseCommand
 
 from librecval.normalization import normalize_sro
-from validation.helpers import (
-    perfect_match,
-    exactly_one_analysis,
-    get_distance_with_translations,
-)
 from validation.models import Phrase
 
 from tqdm import tqdm
@@ -42,7 +36,6 @@ class Command(BaseCommand):
         md_words = get_md_words()
         phrases = Phrase.objects.all()
         for phrase in tqdm(phrases.iterator(), total=phrases.count()):
-            print(phrase.origin)
             if not phrase.origin:
                 normalized = normalize_sro(phrase.transcription)
                 normalized = remove_diacritics(normalized)
