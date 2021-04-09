@@ -72,7 +72,7 @@ def index(request):
 
     all_phrases = all_phrases.prefetch_related("recording_set__speaker")
 
-    sessions = RecordingSession.objects.order_by("date").values("date").distinct()
+    sessions = RecordingSession.objects.order_by("id").values("id", "date").distinct()
     session = request.GET.get("session")
     if session != "all" and session:
         session_date = datetime.datetime.strptime(session, "%Y-%m-%d").date()
@@ -491,6 +491,20 @@ def record_audio_quality_judgement(request, recording_id):
 
     if judgement["judgement"] in ["good", "bad"]:
         rec.quality = judgement["judgement"]
+    elif judgement["judgement"] == "wrong":
+        new_issue = Issue(
+            recording=rec,
+            other=False,
+            bad_cree=False,
+            bad_english=False,
+            bad_recording=True,
+            comment="This recording has the wrong speaker code",
+            created_by=request.user,
+            created_on=datetime.datetime.now(),
+        )
+        new_issue.save()
+
+        rec.quality = "bad"
     else:
         return HttpResponseBadRequest()
 
@@ -531,8 +545,9 @@ def prep_phrase_data(request, phrases):
 def save_issue(data, user):
     phrase_id = data["phrase_id"]
     issues = data["issues"]
-    other_reason = data["other_reason"]
     comment = data["comment"]
+    cree_suggestion = data["cree_suggestion"]
+    english_suggestion = data["english_suggestion"]
 
     phrase = Phrase.objects.get(id=phrase_id)
 
@@ -543,7 +558,8 @@ def save_issue(data, user):
         bad_english="bad_english" in issues,
         bad_recording="bad_rec" in issues,
         comment=comment,
-        other_reason=other_reason,
+        suggested_cree=cree_suggestion,
+        suggested_english=english_suggestion,
         created_by=user,
         created_on=datetime.datetime.now(),
     )
