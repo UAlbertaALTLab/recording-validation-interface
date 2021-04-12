@@ -11,3 +11,4 @@ services:
         - "./db.sqlite3:/app/db.sqlite3"
         - "/data/application-data/speech-db/audio:/app/data/audio"
         - "/data/maskwacis-recordings/sessions:/app/data/sessions"
+        - "/data/application-data/speech-db/metadata.csv:/app/private/metadata.csv"
