@@ -175,7 +175,7 @@ a:hover {
 }
 
 .button--neutral-solid {
-  background-color: var(--pale-mauve);
+  background-color: var(--custom-purple);
   color: var(--custom-white)
 }
 
