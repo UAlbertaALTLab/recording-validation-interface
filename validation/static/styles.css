@@ -215,6 +215,18 @@ a:hover {
   padding: 0.1rem 0.2rem;
 }
 
+.button--none {
+  border: none;
+  background-color: transparent;
+  display: inline-block;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  padding: .375rem .75rem;
+  line-height: 1.5;
+  transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
 .filter {
   margin: 0 auto;
 }
@@ -332,6 +344,40 @@ a:hover {
   background-color: var(--custom-grey);
 }
 
+.menu__burger {
+  color: var(--custom-beige);
+  font-size: 24pt;
+}
+
+.menu__options {
+  background-color: var(--custom-beige);
+  color: var(--custom-purple);
+  position: absolute;
+  top: 4rem;
+  right: 2rem;
+  padding: 1rem;
+}
+
+.menu__options--list {
+  list-style: none;
+}
+
+.menu__options--right {
+  text-align: right;
+}
+
+menu__option-link {
+  color: var(--custom-purple);
+}
+
+.menu__none {
+  display: none;
+}
+
+.menu__block {
+  display: block;
+}
+
 #id_role {
   list-style: none;
   display: inline-block;
@@ -375,9 +421,9 @@ a:hover {
 }
 
 .logout-link, .login-link {
-  color: var(--custom-beige)
+  color: var(--custom-purple);
 }
 
 .logout-link:hover, .login-link:hover {
-  color: var(--custom-beige)
+  color: var(--custom-purple);
 }
