@@ -1,0 +1,35 @@
+{#
+      Copyright (C) 2021 Jolene Poulin <jcpoulin@ualberta.ca>
+
+      This program is free software: you can redistribute it and/or modify
+      it under the terms of the GNU Affero General Public License as
+      published by the Free Software Foundation, either version 3 of the
+      License, or (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      GNU Affero General Public License for more details.
+
+      You should have received a copy of the GNU Affero General Public License
+      along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#}
+
+
+{% macro menu_options(request, auth, showMacron) %}
+    <div class="menu__options menu__none" id="burger-menu">
+        <ul class="menu__options--list">
+            {% if auth %}
+                {% if request.COOKIES['macron'] == 'off' %}
+                    <li class="menu__options--right" onclick="showMacron('on')"><a href="#" class="menu__option-link">Show ê with macron</a></li>
+                {% else %}
+                    <li class="menu__options--right" onclick="showMacron('off')"><a href="#" class="menu__option-link">Show e without macron</a></li>
+                {% endif %}
+                <li class="menu__options--right"><a href="/logout" id="logout-link" class="logout-link">Logout</a></li>
+
+            {% else %}
+                <li><a href="/login" id="login-link" class="login-link">Login</a></li>
+            {% endif %}
+        </ul>
+    </div>
+{% endmacro %}

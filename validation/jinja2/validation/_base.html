@@ -15,32 +15,14 @@
 const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 </script>
       <script src="/static/index.js"></script>
+      <script src="/static/menu.js"></script>
       <title>{% block title %} Maskwacîs Recordings Validation {% endblock title %}</title>
   {% endblock head %}
 
 </head>
 <body>
-<script>
-    function showMenu() {
-        let menu = document.getElementById("burger-menu");
-        if (menu.classList.contains("menu__none")) {
-            menu.classList.remove("menu__none");
-            menu.classList.add("menu__block");
-        } else {
-            menu.classList.add("menu__none");
-            menu.classList.remove("menu__block");
-        }
 
-    }
-
-    function showMacron(option) {
-        document.cookie = "macron=" + option + "; SameSite=Lax;"
-        let menu = document.getElementById("burger-menu");
-        menu.classList.add("menu__none");
-        menu.classList.remove("menu__block");
-        location.reload();
-    }
-</script>
+{% import 'validation/_menu.html' as menu %}
 
   {# The header #}
   <nav class="navbar navbar-expand-md navbar-dark header--dark">
@@ -73,21 +55,7 @@ const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
   </nav>
 
   <main role="main" class="container">
-    <div class="menu__options menu__none" id="burger-menu">
-        <ul class="menu__options--list">
-            {% if auth %}
-                {% if request.COOKIES['macron'] == 'off' %}
-                    <li class="menu__options--right" onclick="showMacron('on')"><a href="#" class="menu__option-link">Show ê with macron</a></li>
-                {% else %}
-                    <li class="menu__options--right" onclick="showMacron('off')"><a href="#" class="menu__option-link">Show e without macron</a></li>
-                {% endif %}
-                <li class="menu__options--right"><a href="/logout" id="logout-link" class="logout-link">Logout</a></li>
-
-            {% else %}
-                <li><a href="/login" id="login-link" class="login-link">Login</a></li>
-            {% endif %}
-        </ul>
-    </div>
+  {{ menu.menu_options(request, auth, showMacron) }}
     {% block content %}
     <p class="error">
       If you're seeing this, something is wrong. Please contact
