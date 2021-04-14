@@ -100,6 +100,8 @@ def index(request):
 
     recordings, forms = prep_phrase_data(request, phrases)
 
+    speakers = Speaker.objects.all()
+
     if request.method == "POST":
         form = forms.get(int(request.POST.get("phrase_id")), None)
         if form is not None:
@@ -115,6 +117,7 @@ def index(request):
         is_expert=is_expert,
         forms=forms,
         sessions=sessions,
+        speakers=speakers,
         query=query_term,
         session=session,
         mode=mode,
@@ -146,6 +149,8 @@ def search_phrases(request):
 
     recordings, forms = prep_phrase_data(request, phrases)
 
+    speakers = Speaker.objects.all()
+
     if request.method == "POST":
         form = forms.get(int(request.POST.get("phrase_id")), None)
         if form is not None:
@@ -155,6 +160,7 @@ def search_phrases(request):
     context = dict(
         phrases=phrases,
         recordings=recordings,
+        speakers=speakers,
         search_term=query,
         query=query_term,
         encode_query_with_page=encode_query_with_page,
@@ -486,6 +492,7 @@ def record_translation_judgement(request, phrase_id):
 @login_required()
 @require_http_methods(["POST"])
 def record_audio_quality_judgement(request, recording_id):
+    print("hi")
     rec = get_object_or_404(Recording, id=recording_id)
     judgement = json.loads(request.body)
 
