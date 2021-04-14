@@ -83,7 +83,7 @@ jobs:
             restore-keys: |
               ${{ runner.os }}-pipenv-
 
-        - run: pipenv install --dev
+        - run: pipenv install
 
         - name: Setup Node 14
           uses: actions/setup-node@v1
