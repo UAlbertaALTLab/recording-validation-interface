@@ -99,5 +99,7 @@ jobs:
             restore-keys: |
               ${{ runner.os }}-node-
 
+        - run: python manage.py collectstatic
+
         - run: make integration-test
 
