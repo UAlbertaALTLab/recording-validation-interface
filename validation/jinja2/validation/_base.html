@@ -51,11 +51,12 @@ const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     {# Login button #}
     <div>
         <button class="button--none" onclick="showMenu()"><span class="menu__caret">Options <i class="fa fa-caret-down"></i></span></button>
-        {{ menu.menu_options(request, auth, showMacron) }}
+
     </div>
   </nav>
 
   <main role="main" class="container">
+    {{ menu.menu_options(request, auth, showMacron) }}
     {% block content %}
     <p class="error">
       If you're seeing this, something is wrong. Please contact
