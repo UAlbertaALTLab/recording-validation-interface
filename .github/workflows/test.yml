@@ -83,7 +83,7 @@ jobs:
             restore-keys: |
               ${{ runner.os }}-pipenv-
 
-        - run: pipenv install
+        - run: pipenv install --dev
 
         - name: Setup Node 14
           uses: actions/setup-node@v1
@@ -98,8 +98,6 @@ jobs:
             key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
             restore-keys: |
               ${{ runner.os }}-node-
-
-        - run: python manage.py collectstatic
 
         - run: make integration-test
 
