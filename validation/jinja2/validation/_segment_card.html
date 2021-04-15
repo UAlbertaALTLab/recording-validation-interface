@@ -101,7 +101,7 @@
                         {% endif %}
                     </tr>
 
-                    {{ speaker_code_modal.modal(recording.id, speakers, csrf_token) }}
+                    {{ speaker_code_modal.modal(recording.id, speakers, csrf_token, request) }}
 
                 {% endfor %}{# for recording in phrase.recordings #}
             </table>

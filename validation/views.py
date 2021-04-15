@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from http import HTTPStatus
 import datetime
 import io
 import json
@@ -523,6 +524,7 @@ def record_audio_quality_judgement(request, recording_id):
 def save_wrong_speaker_code(request, recording_id):
     rec = get_object_or_404(Recording, id=recording_id)
     speaker = request.POST.get("speaker-code-select")
+    referer = request.POST.get("referer")
 
     comment = "This recording has the wrong speaker code."
 
@@ -544,7 +546,14 @@ def save_wrong_speaker_code(request, recording_id):
     rec.quality = "bad"
 
     rec.save()
-    return JsonResponse({"status": "ok"})
+    if referer:
+        response = HttpResponse(status=HTTPStatus.SEE_OTHER)
+        response["Location"] = referer
+    else:
+        response = HttpResponse(status=HTTPStatus.SEE_OTHER)
+        response["Location"] = "/"
+
+    return response
 
 
 def encode_query_with_page(query, page):
