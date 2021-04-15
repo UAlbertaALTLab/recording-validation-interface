@@ -30,7 +30,7 @@
                         Yes, it should be...
                         <form id="{{ recording_id }}-form" method="POST" action="/api/save_wrong_speaker_code/{{ recording_id }}">
                             <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-                            <input type="hidden" name="referer" value="{{ request.build_absolute_uri() }}">
+                            <input type="hidden" name="referrer" value="{{ request.build_absolute_uri() }}">
                             <select name="speaker-code-select" id="speaker-code-select">
                                 <option value="idk">I'm not sure</option>
                                 {% for speaker in speakers %}

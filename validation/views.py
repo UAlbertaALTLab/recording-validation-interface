@@ -524,7 +524,7 @@ def record_audio_quality_judgement(request, recording_id):
 def save_wrong_speaker_code(request, recording_id):
     rec = get_object_or_404(Recording, id=recording_id)
     speaker = request.POST.get("speaker-code-select")
-    referer = request.POST.get("referer")
+    referrer = request.POST.get("referrer")
 
     comment = "This recording has the wrong speaker code."
 
@@ -546,9 +546,9 @@ def save_wrong_speaker_code(request, recording_id):
     rec.quality = "bad"
 
     rec.save()
-    if referer:
+    if referrer:
         response = HttpResponse(status=HTTPStatus.SEE_OTHER)
-        response["Location"] = referer
+        response["Location"] = referrer
     else:
         response = HttpResponse(status=HTTPStatus.SEE_OTHER)
         response["Location"] = "/"
