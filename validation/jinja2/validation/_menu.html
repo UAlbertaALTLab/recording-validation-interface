@@ -17,7 +17,7 @@
 
 
 {% macro menu_options(request, auth, showMacron) %}
-    <ul class="menu__options menu__options--list menu__options--right">
+    <ul id="options-menu" class="menu__options menu__options--list menu__options--right">
         {% if auth %}
             {% if request.COOKIES['macron'] == 'off' %}
                 <li onclick="showMacron('on')"><a href="#" class="menu__options-link">Show ê with circumflex</a></li>
