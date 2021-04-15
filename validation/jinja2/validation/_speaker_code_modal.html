@@ -26,7 +26,7 @@
                         <h4 class="modal-title">Do you know the correct speaker?</h4>
                     </div>
 
-                    <div>
+                    <div class="modal__speaker-select">
                         Yes, it should be...
                         <form id="{{ recording_id }}-form" method="POST" action="/api/save_wrong_speaker_code/{{ recording_id }}">
                             <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
@@ -41,7 +41,6 @@
                             </select>
 
                             <div class="modal-footer">
-                                <button form="{{ recording_id }}-form" data-cy="rec-cancel-button" type="button" class="button button--fail" data-dismiss="modal" value="Cancel">Cancel</button>
                                 <button form="{{ recording_id }}-form" data-rec-id="{{ recording_id }}" data-cy="rec-save-button" type="submit" class="button button--success audio-quality-wrong" value="Save">Save</button>
                             </div>
                         </form>
