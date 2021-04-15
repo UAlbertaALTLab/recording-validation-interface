@@ -36,6 +36,7 @@ if TEST_DB_FILE.exists():
 # Make the test DB!
 m_env = modified_env(RECVAL_SQLITE_DB_PATH=TEST_DB, USE_DJANGO_DEBUG_TOOLBAR="False")
 check_call(["python", "manage.py", "ensuretestdb"], env=m_env)
+check_call(["python", "manage.py", "collectstatic"], env=m_env)
 
 # Start up the server
 server = Popen(["python", "manage.py", "runserver", TEST_SERVER_PORT],
