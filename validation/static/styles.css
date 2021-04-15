@@ -215,6 +215,18 @@ a:hover {
   padding: 0.1rem 0.2rem;
 }
 
+.button--none {
+  border: none;
+  background-color: transparent;
+  display: inline-block;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  padding: .375rem .75rem;
+  line-height: 1.5;
+  transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
 .filter {
   margin: 0 auto;
 }
@@ -332,6 +344,48 @@ a:hover {
   background-color: var(--custom-grey);
 }
 
+.menu__caret {
+  color: var(--custom-beige);
+  margin: 1rem;
+
+}
+
+.menu__caret:hover {
+  cursor: pointer;
+}
+
+.menu__options {
+  background-color: var(--custom-beige);
+  z-index: 1;
+  padding: 1rem;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  max-width: 15rem;
+  margin: 1rem;
+  position: absolute;
+  right: 0;
+}
+
+.menu__options--list {
+  list-style: none;
+}
+
+
+.menu__options--right {
+  text-align: right;
+}
+
+.menu__options-link, .menu__options-link:hover {
+  color: var(--custom-purple);
+}
+
+.menu__none {
+  display: none;
+}
+
+.menu__block {
+  display: block;
+}
+
 #id_role {
   list-style: none;
   display: inline-block;
@@ -375,9 +429,9 @@ a:hover {
 }
 
 .logout-link, .login-link {
-  color: var(--custom-beige)
+  color: var(--custom-purple);
 }
 
 .logout-link:hover, .login-link:hover {
-  color: var(--custom-beige)
+  color: var(--custom-purple);
 }

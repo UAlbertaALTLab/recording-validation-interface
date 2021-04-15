@@ -61,7 +61,7 @@
 <p class="description">Showing {{ mode }} entries from {{ session }}</p>
 
     {%  for phrase in phrases %}
-        {{ segment.segment_card(phrase, recordings, is_linguist, is_expert, auth, forms, csrf_token) }}
+        {{ segment.segment_card(phrase, recordings, is_linguist, is_expert, auth, forms, csrf_token, request) }}
     {% endfor %} {# phrase in phrases #}
 
 <nav>
