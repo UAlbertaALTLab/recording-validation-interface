@@ -28,7 +28,8 @@
 
                     <div>
                         Yes, it should be...
-                        <form id="{{ recording_id }}-form" method="POST" action="/api/record_audio_quality_judgement/{{ recording_id }}">
+                        <form id="{{ recording_id }}-form" method="POST" action="/api/save_wrong_speaker_code/{{ recording_id }}">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
                             <select name="speaker-code-select" id="speaker-code-select">
                                 <option value="idk">I'm not sure</option>
                                 {% for speaker in speakers %}

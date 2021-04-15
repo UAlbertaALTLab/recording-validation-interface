@@ -492,7 +492,6 @@ def record_translation_judgement(request, phrase_id):
 @login_required()
 @require_http_methods(["POST"])
 def record_audio_quality_judgement(request, recording_id):
-    print("hi")
     rec = get_object_or_404(Recording, id=recording_id)
     judgement = json.loads(request.body)
 
@@ -514,6 +513,35 @@ def record_audio_quality_judgement(request, recording_id):
         rec.quality = "bad"
     else:
         return HttpResponseBadRequest()
+
+    rec.save()
+    return JsonResponse({"status": "ok"})
+
+
+@login_required()
+@require_http_methods(["POST"])
+def save_wrong_speaker_code(request, recording_id):
+    rec = get_object_or_404(Recording, id=recording_id)
+    speaker = request.POST.get("speaker-code-select")
+
+    comment = "This recording has the wrong speaker code."
+
+    if speaker != "idk":
+        comment += " The speaker should be: " + speaker
+
+    new_issue = Issue(
+        recording=rec,
+        other=False,
+        bad_cree=False,
+        bad_english=False,
+        bad_recording=True,
+        comment=comment,
+        created_by=request.user,
+        created_on=datetime.datetime.now(),
+    )
+    new_issue.save()
+
+    rec.quality = "bad"
 
     rec.save()
     return JsonResponse({"status": "ok"})

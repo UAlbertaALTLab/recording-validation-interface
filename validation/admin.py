@@ -23,7 +23,9 @@ admin.site.register(RecordingSession)
 admin.site.register(Speaker)  # TODO: use simplehistory
 admin.site.register(Recording, SimpleHistoryAdmin)
 
+
 class IssueAdmin(admin.ModelAdmin):
-    readonly_fields = ('phrase', 'recording')
+    readonly_fields = ("phrase", "recording")
+
 
 admin.site.register(Issue, IssueAdmin)
