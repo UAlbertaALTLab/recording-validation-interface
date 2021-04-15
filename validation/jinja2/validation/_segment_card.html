@@ -19,7 +19,7 @@
 {% import 'validation/_issue_modal.html' as issue_modal %}
 {% import 'validation/_speaker_code_modal.html' as speaker_code_modal %}
 
-{% macro segment_card(phrase, recordings, speakers, is_linguist, is_expert, auth, forms, csrf_token) %}
+{% macro segment_card(phrase, recordings, speakers, is_linguist, is_expert, auth, forms, csrf_token, request) %}
 
 <article class="card shadow-sm" data-cy="segment-card">
             {% if phrase.validated %}
@@ -35,7 +35,13 @@
                 {% if auth %}
                     <button type="button" class="button button--fail button--flag right" data-toggle="modal" data-target="#{{ phrase.id }}-modal" data-cy="flag-button">Something's wrong with this entry</button>
                 {% endif %}
-                <p class="card__title--cree" data-cy="transcription">{{ phrase.transcription }}</p>
+                <p class="card__title--cree" data-cy="transcription">
+                    {% if request.COOKIES['macron'] == 'on' %}
+                        {{ phrase.transcription }}
+                    {% else %}
+                        {{ phrase.transcription | replace("ê", "e") }}
+                    {% endif %}
+                </p>
                 <p class="card__title--english" data-cy="translation">Translation: {{ phrase.translation }}</p>
 
                 {% if is_expert %}
