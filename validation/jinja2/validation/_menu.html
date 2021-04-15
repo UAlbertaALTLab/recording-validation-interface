@@ -17,19 +17,17 @@
 
 
 {% macro menu_options(request, auth, showMacron) %}
-    <div class="menu__options menu__none" id="options-menu">
-        <ul class="menu__options--list">
-            {% if auth %}
-                {% if request.COOKIES['macron'] == 'off' %}
-                    <li class="menu__options--right" onclick="showMacron('on')"><a href="#" class="menu__options-link">Show ê with macron</a></li>
-                {% else %}
-                    <li class="menu__options--right" onclick="showMacron('off')"><a href="#" class="menu__options-link">Show e without macron</a></li>
-                {% endif %}
-                <li class="menu__options--right"><a href="/logout" id="logout-link" class="logout-link">Logout</a></li>
-
+    <ul class="menu__options menu__options--list menu__options--right">
+        {% if auth %}
+            {% if request.COOKIES['macron'] == 'off' %}
+                <li onclick="showMacron('on')"><a href="#" class="menu__options-link">Show ê with circumflex</a></li>
             {% else %}
-                <li><a href="/login" id="login-link" class="login-link">Login</a></li>
+                <li  onclick="showMacron('off')"><a href="#" class="menu__options-link">Show e without circumflex</a></li>
             {% endif %}
-        </ul>
-    </div>
+            <li><a href="/logout" id="logout-link" class="logout-link">Logout</a></li>
+
+        {% else %}
+            <li><a href="/login" id="login-link" class="login-link">Login</a></li>
+        {% endif %}
+    </ul>
 {% endmacro %}

@@ -47,16 +47,15 @@ const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     
       </form>
     </div>
+      <details>
+        <summary data-cy="options-button-header" class="menu__caret">Options</summary>
+        {{ menu.menu_options(request, auth, showMacron) }}
+      </details>
 
-    {# Login button #}
-    <div>
-        <button class="button--none" onclick="showMenu()" data-cy="options-button-header"><span class="menu__caret">Options <i class="fa fa-caret-down"></i></span></button>
-
-    </div>
   </nav>
 
+
   <main role="main" class="container">
-    {{ menu.menu_options(request, auth, showMacron) }}
     {% block content %}
     <p class="error">
       If you're seeing this, something is wrong. Please contact
