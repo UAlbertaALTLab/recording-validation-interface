@@ -155,47 +155,5 @@ document.addEventListener('DOMContentLoaded', () => {
             })
         }
     }
-
-    // for (let button of document.querySelectorAll(`.audio-quality-wrong`)) {
-    //     button.addEventListener("click", async (e) => {
-    //         const recordingId = e.target.dataset.rec_id
-    //
-    //         const response = await fetch(`/api/record_audio_quality_judgement/${recordingId}`, {
-    //             method: 'POST',
-    //             mode: 'same-origin',    // Do not send CSRF token to another domain.
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //                 'X-CSRFToken': csrftoken
-    //             },
-    //             body: JSON.stringify({judgement: "wrong"})
-    //         })
-    //
-    //         let r = await response.json()
-    //
-    //         if (r.status != 'ok') {
-    //             return
-    //         }
-    //
-    //
-    //         button.classList.remove("button--neutral")
-    //         button.classList.add("button--neutral-solid")
-    //
-    //         const goodButtons = document.getElementsByClassName("audio-quality-good");
-    //         for (let b of goodButtons) {
-    //             if (b.dataset.recId === recordingId) {
-    //                 b.classList.remove('button--success-solid')
-    //                 b.classList.add('button--success')
-    //             }
-    //         }
-    //
-    //         const badButtons = document.getElementsByClassName("audio-quality-bad");
-    //         for (let b of badButtons) {
-    //             if (b.dataset.recId === recordingId) {
-    //                 b.classList.remove('button--fail-solid')
-    //                 b.classList.add('button--fail')
-    //             }
-    //         }
-    //
-    //     })
-    // }
+    
 })
