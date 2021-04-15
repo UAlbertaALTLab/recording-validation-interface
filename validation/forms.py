@@ -86,8 +86,8 @@ class EditSegment(forms.Form):
 
 class FlagSegment(forms.ModelForm):
     ISSUES = [
-        ("bad_cree", "There's a better Cree word for this translation"),
-        ("bad_english", "There's a better translation for this Cree word"),
+        ("bad_cree", "There's a better spelling for the transcription (Cree word)"),
+        ("bad_english", "There's a better spelling for the translation (English word)"),
         ("bad_rec", "One or more of these recordings are not of this word"),
         ("other", "Something else (please specify)"),
     ]
@@ -110,7 +110,7 @@ class FlagSegment(forms.ModelForm):
     comment = forms.CharField(
         help_text="Use the space above to suggest a new spelling or make a few notes about why you're reporting an issue "
         "with this entry",
-        required=True,
+        required=False,
         widget=forms.Textarea(attrs={"class": "form-control bottom-margin"}),
     )
 

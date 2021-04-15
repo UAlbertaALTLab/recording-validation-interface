@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from http import HTTPStatus
 import datetime
 import io
 import json
@@ -100,6 +101,8 @@ def index(request):
 
     recordings, forms = prep_phrase_data(request, phrases)
 
+    speakers = Speaker.objects.all()
+
     if request.method == "POST":
         form = forms.get(int(request.POST.get("phrase_id")), None)
         if form is not None:
@@ -115,6 +118,7 @@ def index(request):
         is_expert=is_expert,
         forms=forms,
         sessions=sessions,
+        speakers=speakers,
         query=query_term,
         session=session,
         mode=mode,
@@ -146,6 +150,8 @@ def search_phrases(request):
 
     recordings, forms = prep_phrase_data(request, phrases)
 
+    speakers = Speaker.objects.all()
+
     if request.method == "POST":
         form = forms.get(int(request.POST.get("phrase_id")), None)
         if form is not None:
@@ -155,6 +161,7 @@ def search_phrases(request):
     context = dict(
         phrases=phrases,
         recordings=recordings,
+        speakers=speakers,
         search_term=query,
         query=query_term,
         encode_query_with_page=encode_query_with_page,
@@ -510,6 +517,43 @@ def record_audio_quality_judgement(request, recording_id):
 
     rec.save()
     return JsonResponse({"status": "ok"})
+
+
+@login_required()
+@require_http_methods(["POST"])
+def save_wrong_speaker_code(request, recording_id):
+    rec = get_object_or_404(Recording, id=recording_id)
+    speaker = request.POST.get("speaker-code-select")
+    referrer = request.POST.get("referrer")
+
+    comment = "This recording has the wrong speaker code."
+
+    if speaker != "idk":
+        comment += " The speaker should be: " + speaker
+
+    new_issue = Issue(
+        recording=rec,
+        other=False,
+        bad_cree=False,
+        bad_english=False,
+        bad_recording=True,
+        comment=comment,
+        created_by=request.user,
+        created_on=datetime.datetime.now(),
+    )
+    new_issue.save()
+
+    rec.quality = "bad"
+
+    rec.save()
+    if referrer:
+        response = HttpResponse(status=HTTPStatus.SEE_OTHER)
+        response["Location"] = referrer
+    else:
+        response = HttpResponse(status=HTTPStatus.SEE_OTHER)
+        response["Location"] = "/"
+
+    return response
 
 
 def encode_query_with_page(query, page):

@@ -406,7 +406,7 @@ class Recording(models.Model):
 class Issue(models.Model):
     comment = models.CharField(
         help_text="The comment left by the validator",
-        blank=False,
+        blank=True,
         max_length=1024,
     )
 

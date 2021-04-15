@@ -1,0 +1,52 @@
+{#
+      Copyright (C) 2021 Jolene Poulin <jcpoulin@ualberta.ca>
+
+      This program is free software: you can redistribute it and/or modify
+      it under the terms of the GNU Affero General Public License as
+      published by the Free Software Foundation, either version 3 of the
+      License, or (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      GNU Affero General Public License for more details.
+
+      You should have received a copy of the GNU Affero General Public License
+      along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#}
+
+
+{% macro modal(recording_id, speakers, csrf_token, request) %}
+    <div id="{{ recording_id }}-modal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content" data-cy="modal">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Do you know the correct speaker?</h4>
+                    </div>
+
+                    <div class="modal__speaker-select">
+                        Yes, it should be...
+                        <form id="{{ recording_id }}-form" method="POST" action="/api/save_wrong_speaker_code/{{ recording_id }}">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                            <input type="hidden" name="referrer" value="{{ request.build_absolute_uri() }}">
+                            <select name="speaker-code-select" id="speaker-code-select">
+                                <option value="idk">I'm not sure</option>
+                                {% for speaker in speakers %}
+                                    <option value="{{ speaker.code }}">{{ speaker.code }}
+                                    {% if speaker.full_name %}
+                                        - {{ speaker.full_name }}
+                                    {% endif %}</option>
+                                {% endfor %}
+                            </select>
+
+                            <div class="modal-footer">
+                                <button form="{{ recording_id }}-form" data-rec-id="{{ recording_id }}" data-cy="rec-save-button" type="submit" class="button button--success audio-quality-wrong" value="Save">Save</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+{% endmacro %}
