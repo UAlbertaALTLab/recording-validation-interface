@@ -18,12 +18,13 @@
 
 {% macro modal(forms, phrase_id, csrf_token) %}
     <div id="{{ phrase_id }}-modal" class="modal fade" role="dialog">
-            <div class="modal-dialog">
+            <div class="modal-dialog modal-lg">
 
                 <!-- Modal content-->
                 <div class="modal-content" data-cy="modal">
                     <div class="modal-header">
                         <h4 class="modal-title">What's wrong with this entry?</h4>
+                        <button form="{{ phrase_id }}-form" data-cy="save-button" type="submit" class="button button--success" value="Save">Save</button>
                     </div>
 
                     <form action="" method="post" id="{{ phrase_id }}-form">

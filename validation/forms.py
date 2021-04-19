@@ -98,13 +98,13 @@ class FlagSegment(forms.ModelForm):
     cree_suggestion = forms.CharField(
         help_text="Suggest a better Cree spelling",
         required=False,
-        widget=forms.TextInput,
+        widget=forms.Textarea,
     )
 
     english_suggestion = forms.CharField(
         help_text="Suggest a better English word or phrase",
         required=False,
-        widget=forms.TextInput(attrs={"class": "commment"}),
+        widget=forms.Textarea(attrs={"class": "commment"}),
     )
 
     comment = forms.CharField(
