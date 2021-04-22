@@ -155,5 +155,24 @@ document.addEventListener('DOMContentLoaded', () => {
             })
         }
     }
-
 })
+
+function showWrongWordDiv(recordingId) {
+    const wrongWordDivs = document.getElementsByClassName("rec-wrong-word");
+    for (let d of wrongWordDivs) {
+        if (d.dataset.recId === recordingId) {
+            d.classList.remove('menu__none')
+            d.classList.add('menu__block')
+        }
+    }
+}
+
+function hideWrongWordDiv(recordingId) {
+    const wrongWordDivs = document.getElementsByClassName("rec-wrong-word");
+    for (let d of wrongWordDivs) {
+        if (d.dataset.recId === recordingId) {
+            d.classList.add('menu__none')
+            d.classList.remove('menu__block')
+        }
+    }
+}

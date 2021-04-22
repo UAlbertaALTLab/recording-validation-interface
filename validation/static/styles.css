@@ -5,6 +5,10 @@ main {
   margin: 1em auto;
 }
 
+.main_container {
+  width: 90%;
+}
+
 a:hover {
   cursor: pointer;
 }

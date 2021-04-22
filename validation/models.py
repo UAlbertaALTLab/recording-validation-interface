@@ -74,6 +74,7 @@ class Phrase(models.Model):
     STANDARDIZED = "standardized"
     LINKED = "linked"
     VALIDATED = "validated"
+    REVIEW = "needs review"
 
     STATUS_CHOICES = (
         (NEW, "New"),
@@ -361,6 +362,8 @@ class Recording(models.Model):
     GOOD = "good"
     BAD = "bad"
     UNKNOWN = "unknown"
+    WRONG_SPEAKER = "wrong speaker"
+    WRONG_WORD = "wrong word"
 
     id = models.CharField(primary_key=True, max_length=SHA256_HEX_LENGTH)
 
