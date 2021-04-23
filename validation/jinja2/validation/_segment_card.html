@@ -27,6 +27,10 @@
                 <div class="card__header card__header--green" data-cy="card-header" data-phrase-id={{ phrase.id }}>
                 &nbsp;
                 </div>
+            {% elif phrase.status == "needs review" %}
+                <div class="card__header card__header--red" data-cy="card-header" data-phrase-id={{ phrase.id }}>
+                &nbsp;
+                </div>
             {% else %}
                 <div class="card__header card__header--grey" data-cy="card-header" data-phrase-id={{ phrase.id }}>
                 &nbsp;
@@ -34,7 +38,7 @@
             {% endif %}
             <div class="card__body">
                 {% if auth %}
-                    <button type="button" class="button button--fail button--flag right" data-toggle="modal" data-target="#{{ phrase.id }}-modal" data-cy="flag-button">Something's wrong with this entry</button>
+                    <button type="button" class="button button--fail button--flag right" data-toggle="modal" data-target="#{{ phrase.id }}-modal" data-cy="flag-button">Flag this entry for review</button>
                 {% endif %}
                 <p class="card__title--cree" data-cy="transcription">
                     {% if request.COOKIES['macron'] == 'on' %}
@@ -47,10 +51,15 @@
 
                 {% if is_expert %}
                     <p>Is this translation accurate?
-                        {% if phrase.status == "linked" %}
+                    {% if phrase.status == "linked" %}
                         <button class="button button--success-solid translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }} data-cy="yes-button">Yes</button>
                         <button class="button button--fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }} data-toggle="modal" data-target="#{{ phrase.id }}-modal" data-cy="no-button">No</button>
                         <button class="button button--neutral translation-judgement-accuracy-idk" data-phrase-id={{ phrase.id }} data-cy="idk-button">I don't know</button></p>
+                     {% elif phrase.status == "needs review" %}
+                        <button class="button button--success translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }} data-cy="yes-button">Yes</button>
+                        <button class="button button--fail-solid translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }} data-toggle="modal" data-target="#{{ phrase.id }}-modal" data-cy="no-button">No</button>
+                        <button class="button button--neutral translation-judgement-accuracy-idk" data-phrase-id={{ phrase.id }} data-cy="idk-button">I don't know</button></p>
+
                     {% else %}
                         <button class="button button--success translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }} data-cy="yes-button">Yes</button>
                         <button class="button button--fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }} data-toggle="modal" data-target="#{{ phrase.id }}-modal" data-cy="no-button">No</button>

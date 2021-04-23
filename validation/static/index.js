@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     for (let h of headers) {
                         if (h.dataset.phraseId === phraseId) {
                             h.classList.remove('card__header--green')
-                            h.classList.add('card__header--grey')
+                            h.classList.add('card__header--red')
                         }
                     }
                     
@@ -124,8 +124,16 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
 
-                    const wrongButtons = document.getElementsByClassName("audio-quality-wrong");
-                    for (let b of wrongButtons) {
+                    const wrongWordButtons = document.getElementsByClassName("wrong-word-button");
+                    for (let b of wrongWordButtons) {
+                        if (b.dataset.recId === recordingId) {
+                            b.classList.remove('button--neutral-solid')
+                            b.classList.add('button--neutral')
+                        }
+                    }
+
+                    const wrongSpeakerButtons = document.getElementsByClassName("wrong-speaker-button");
+                    for (let b of wrongSpeakerButtons) {
                         if (b.dataset.recId === recordingId) {
                             b.classList.remove('button--neutral-solid')
                             b.classList.add('button--neutral')
@@ -143,8 +151,16 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
 
-                    const wrongButtons = document.getElementsByClassName("audio-quality-wrong");
-                    for (let b of wrongButtons) {
+                    const wrongWordButtons = document.getElementsByClassName("wrong-word-button");
+                    for (let b of wrongWordButtons) {
+                        if (b.dataset.recId === recordingId) {
+                            b.classList.remove('button--neutral-solid')
+                            b.classList.add('button--neutral')
+                        }
+                    }
+
+                    const wrongSpeakerButtons = document.getElementsByClassName("wrong-speaker-button");
+                    for (let b of wrongSpeakerButtons) {
                         if (b.dataset.recId === recordingId) {
                             b.classList.remove('button--neutral-solid')
                             b.classList.add('button--neutral')

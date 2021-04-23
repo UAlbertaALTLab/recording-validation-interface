@@ -618,6 +618,9 @@ def save_issue(data, user):
     english_suggestion = data["english_suggestion"]
 
     phrase = Phrase.objects.get(id=phrase_id)
+    phrase.validated = False
+    phrase.status = "needs review"
+    phrase.save()
 
     new_issue = Issue(
         phrase=phrase,
