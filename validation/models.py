@@ -82,6 +82,7 @@ class Phrase(models.Model):
         (STANDARDIZED, "Standardized"),
         (LINKED, "Linked"),
         (VALIDATED, "Validated"),
+        (REVIEW, "Needs review"),
     )
 
     MASKWACÎS_DICTIONARY = "MD"
