@@ -36,7 +36,7 @@
                 <p class="card__title--cree" data-cy="transcription">{{ phrase.transcription }}</p>
                 <p class="card__title--english" data-cy="translation">Translation: {{ phrase.translation }}</p>
 
-                {% if is_expert %}
+                {% if is_expert and phrase.origin == "new" %}
                     <p>Is this translation accurate?
                         {% if phrase.status == "linked" %}
                         <button class="button button--success-solid translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }} data-cy="yes-button">Yes</button>
