@@ -33,7 +33,10 @@
             {% endif %}
             <div class="card__body">
                 {% if auth %}
-                    <button type="button" class="button button--fail button--flag right" data-toggle="modal" data-target="#{{ phrase.id }}-modal" data-cy="flag-button">Something's wrong with this entry</button>
+                    <button type="button" class="button button--fail button--flag button--right" data-toggle="modal" data-target="#{{ phrase.id }}-modal" data-cy="flag-button">Something's wrong with this entry</button><br>
+                    {% if is_linguist %}
+                        <a href="{{ url('validation:segment_detail', phrase.id) }}" class="button button--success button--more-options button--right"  data-cy="options-button">More Options</a>
+                    {% endif %} {# is linguist #}
                 {% endif %}
                 <p class="card__title--cree" data-cy="transcription">
                     {% if request.COOKIES['macron'] == 'on' %}
@@ -105,9 +108,6 @@
 
                 {% endfor %}{# for recording in phrase.recordings #}
             </table>
-            {% if is_linguist %}
-                <a href={{ url('validation:segment_detail', phrase.id) }} class="button button--success right"  data-cy="options-button">More Options</a>
-            {% endif %} {# is linguist #}
         </div>
 
         <!-- Modal -->
