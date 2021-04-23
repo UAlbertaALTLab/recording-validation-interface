@@ -22,69 +22,40 @@ document.addEventListener('DOMContentLoaded', () => {
                     return
                 }
 
-                if (judgement === 'yes') {
-                    button.classList.add("button--success-solid")
-                    button.classList.remove("button--success")
-                    
-                    const noButtons =  document.getElementsByClassName("translation-judgement-accuracy-no");
-                    for (let b of noButtons) {
-                        if (b.dataset.phraseId === phraseId) {
-                            b.classList.remove('button--fail-solid')
-                            b.classList.add('button--fail')
-                        }
-                    }
+                const header = getElementByPhraseId("card__header", phraseId)
+                const noButton =  getElementByPhraseId("translation-judgement-accuracy-no", phraseId)
+                const yesButton =  getElementByPhraseId("translation-judgement-accuracy-yes", phraseId);
+                const idkButton = getElementByPhraseId("translation-judgement-accuracy-idk", phraseId);
 
-                    const headers = document.getElementsByClassName("card__header")
-                    for (let h of headers) {
-                        if (h.dataset.phraseId === phraseId) {
-                            h.classList.remove("card__header--grey")
-                            h.classList.add("card__header--green")
-                        }
-                    }
+                if (judgement === 'yes') {
+                    button.classList.replace("button--success", "button--success-solid")
+
+                    noButton.classList.replace("button--fail-solid", "button--fail")
+                    idkButton.classList.replace("button--neutral-solid", "button--neutral")
+
+                    header.classList.remove("card__header--red")
+                    header.classList.remove("card__header--grey")
+                    header.classList.add("card__header--green")
 
                 } else if (judgement === 'no') {
-                    button.classList.add("button--fail-solid")
-                    button.classList.remove("button--fail")
-                    const yesButtons =  document.getElementsByClassName("translation-judgement-accuracy-yes");
-                    for (let b of yesButtons) {
-                        if (b.dataset.phraseId === phraseId) {
-                            b.classList.remove('button--success-solid')
-                            b.classList.add('button--success')
-                        }
-                    }
+                    button.classList.replace("button--fail", "button--fail-solid")
 
-                    const headers = document.getElementsByClassName("card__header")
-                    for (let h of headers) {
-                        if (h.dataset.phraseId === phraseId) {
-                            h.classList.remove('card__header--green')
-                            h.classList.add('card__header--red')
-                        }
-                    }
+                    yesButton.classList.replace("button--success-solid", "button--success")
+                    idkButton.classList.replace("button--neutral-solid", "button--neutral")
+
+                    header.classList.remove('card__header--green')
+                    header.classList.remove("card__header--grey")
+                    header.classList.add("card__header--red")
                     
                 } else if (judgement === "idk") {
-                    const yesButtons =  document.getElementsByClassName("translation-judgement-accuracy-yes");
-                    for (let b of yesButtons) {
-                        if (b.dataset.phraseId === phraseId) {
-                            b.classList.remove('button--success-solid')
-                            b.classList.add('button--success')
-                        }
-                    }
+                    button.classList.replace("button--neutral", "button--neutral-solid")
 
-                    const noButtons =  document.getElementsByClassName("translation-judgement-accuracy-no");
-                    for (let b of noButtons) {
-                        if (b.dataset.phraseId === phraseId) {
-                            b.classList.remove('button--fail-solid')
-                            b.classList.add('button--fail')
-                        }
-                    }
+                    yesButton.classList.replace("button--success-solid", "button--success")
+                    noButton.classList.replace("button--fail-solid", "button--fail")
 
-                    const headers = document.getElementsByClassName("card__header")
-                    for (let h of headers) {
-                        if (h.dataset.phraseId === phraseId) {
-                            h.classList.remove('card__header--green')
-                            h.classList.add('card__header--grey')
-                        }
-                    }
+                    header.classList.remove('card__header--green')
+                    header.classList.remove("card__header--red")
+                    header.classList.add("card__header--grey")
 
                 }
             })
@@ -112,61 +83,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     return
                 }
 
+                const goodButton = getElementByRecordingId("audio-quality-good", recordingId);
+                const badButton = getElementByRecordingId("audio-quality-bad", recordingId);
+                const wrongWordButton = getElementByRecordingId("wrong-word-button", recordingId);
+                const wrongSpeakerButton = getElementByRecordingId("wrong-speaker-button", recordingId);
+
+                wrongWordButton.classList.replace("button--neutral-solid", "button--neutral")
+                wrongSpeakerButton.classList.replace("button--neutral-solid", "button--neutral")
+
                 if (judgement === 'good') {
-                    button.classList.remove('button--success')
-                    button.classList.add('button--success-solid')
-
-                    const badButtons = document.getElementsByClassName("audio-quality-bad");
-                    for (let b of badButtons) {
-                        if (b.dataset.recId === recordingId) {
-                            b.classList.remove('button--fail-solid')
-                            b.classList.add('button--fail')
-                        }
-                    }
-
-                    const wrongWordButtons = document.getElementsByClassName("wrong-word-button");
-                    for (let b of wrongWordButtons) {
-                        if (b.dataset.recId === recordingId) {
-                            b.classList.remove('button--neutral-solid')
-                            b.classList.add('button--neutral')
-                        }
-                    }
-
-                    const wrongSpeakerButtons = document.getElementsByClassName("wrong-speaker-button");
-                    for (let b of wrongSpeakerButtons) {
-                        if (b.dataset.recId === recordingId) {
-                            b.classList.remove('button--neutral-solid')
-                            b.classList.add('button--neutral')
-                        }
-                    }
+                    button.classList.replace("button--success", "button--success-solid")
+                    badButton.classList.replace("button--fail-solid", "button--fail")
                 } else if (judgement === 'bad') {
-                    button.classList.remove('button--fail')
-                    button.classList.add('button--fail-solid')
-
-                    const goodButtons = document.getElementsByClassName("audio-quality-good");
-                    for (let b of goodButtons) {
-                        if (b.dataset.recId === recordingId) {
-                            b.classList.remove('button--success-solid')
-                            b.classList.add('button--success')
-                        }
-                    }
-
-                    const wrongWordButtons = document.getElementsByClassName("wrong-word-button");
-                    for (let b of wrongWordButtons) {
-                        if (b.dataset.recId === recordingId) {
-                            b.classList.remove('button--neutral-solid')
-                            b.classList.add('button--neutral')
-                        }
-                    }
-
-                    const wrongSpeakerButtons = document.getElementsByClassName("wrong-speaker-button");
-                    for (let b of wrongSpeakerButtons) {
-                        if (b.dataset.recId === recordingId) {
-                            b.classList.remove('button--neutral-solid')
-                            b.classList.add('button--neutral')
-                        }
-                    }
-
+                    button.classList.replace("button--fail", "button--fail-solid")
+                    goodButton.classList.replace("button--success-solid", "button--success")
                 }
             })
         }
@@ -174,21 +104,29 @@ document.addEventListener('DOMContentLoaded', () => {
 })
 
 function showWrongWordDiv(recordingId) {
-    const wrongWordDivs = document.getElementsByClassName("rec-wrong-word");
-    for (let d of wrongWordDivs) {
-        if (d.dataset.recId === recordingId) {
-            d.classList.remove('menu__none')
-            d.classList.add('menu__block')
+    const wrongWordDiv = getElementByRecordingId("rec-wrong-word", recordingId);
+    wrongWordDiv.classList.replace("menu__none", "menu__block");
+}
+
+function hideWrongWordDiv(recordingId) {
+    const wrongWordDiv = getElementByRecordingId("rec-wrong-word", recordingId);
+    wrongWordDiv.classList.replace("menu__block", "menu__none");
+}
+
+function getElementByPhraseId(className, phraseId) {
+    const elements =  document.getElementsByClassName(className);
+    for (let e of elements) {
+        if (e.dataset.phraseId === phraseId) {
+           return e
         }
     }
 }
 
-function hideWrongWordDiv(recordingId) {
-    const wrongWordDivs = document.getElementsByClassName("rec-wrong-word");
-    for (let d of wrongWordDivs) {
-        if (d.dataset.recId === recordingId) {
-            d.classList.add('menu__none')
-            d.classList.remove('menu__block')
+function getElementByRecordingId(className, recordingId) {
+    const elements =  document.getElementsByClassName(className);
+    for (let e of elements) {
+        if (e.dataset.recId === recordingId) {
+           return e
         }
     }
 }

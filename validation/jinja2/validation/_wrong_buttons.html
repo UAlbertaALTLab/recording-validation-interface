@@ -34,7 +34,7 @@
             What word is being spoken?
             <input type="text" id="wrong_word" name="wrong_word">
             <input form="{{ recording.id }}-wrong-word" type="submit" value="Save" class="button button--success button--small save-wrong-word" data-rec-id={{ recording.id }}>
-            <button class="button button--fail button--small cancel-wrong-word" data-rec-id={{ recording.id }})" onclick="hideWrongWordDiv('{{ recording.id }}')">Cancel</button>
+            <input type="button" class="button button--fail button--small" value="Cancel" data-rec-id={{ recording.id }})" onclick="hideWrongWordDiv('{{ recording.id }}')">
         </form>
     </div>
 

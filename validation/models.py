@@ -365,6 +365,14 @@ class Recording(models.Model):
     WRONG_SPEAKER = "wrong speaker"
     WRONG_WORD = "wrong word"
 
+    QUALITY_CHOICES = [
+        (GOOD, "Good"),
+        (BAD, "Bad"),
+        (UNKNOWN, "Unknown"),
+        (WRONG_SPEAKER, "Wrong Speaker"),
+        (WRONG_WORD, "Wrong Word"),
+    ]
+
     id = models.CharField(primary_key=True, max_length=SHA256_HEX_LENGTH)
 
     compressed_audio = models.FileField(
@@ -384,6 +392,7 @@ class Recording(models.Model):
         help_text="Is the recording clean? Is it suitable to use publicly?",
         max_length=64,
         blank=True,
+        choices=QUALITY_CHOICES,
     )
 
     comment = models.CharField(
