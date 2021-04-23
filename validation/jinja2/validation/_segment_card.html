@@ -22,7 +22,7 @@
 
 {% macro segment_card(phrase, recordings, speakers, is_linguist, is_expert, auth, forms, csrf_token, request) %}
 
-    <article class="card shadow-sm" data-cy="segment-card">
+    <article id='{{ phrase.id }}' class="card shadow-sm" data-cy="segment-card">
             {% if phrase.validated %}
                 <div class="card__header card__header--green" data-cy="card-header" data-phrase-id={{ phrase.id }}>
                 &nbsp;

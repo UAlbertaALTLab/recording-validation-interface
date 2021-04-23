@@ -534,7 +534,7 @@ def save_wrong_speaker_code(request, recording_id):
     rec.save()
     if referrer:
         response = HttpResponse(status=HTTPStatus.SEE_OTHER)
-        response["Location"] = referrer
+        response["Location"] = referrer + "#" + str(rec.phrase_id)
     else:
         response = HttpResponse(status=HTTPStatus.SEE_OTHER)
         response["Location"] = "/"
@@ -572,7 +572,7 @@ def save_wrong_word(request, recording_id):
 
     if referrer:
         response = HttpResponse(status=HTTPStatus.SEE_OTHER)
-        response["Location"] = referrer
+        response["Location"] = referrer + "#" + str(rec.phrase_id)
     else:
         response = HttpResponse(status=HTTPStatus.SEE_OTHER)
         response["Location"] = "/"
