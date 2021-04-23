@@ -44,7 +44,7 @@
                 </p>
                 <p class="card__title--english" data-cy="translation">Translation: {{ phrase.translation }}</p>
 
-                {% if is_expert and phrase.origin == "new" %}
+                {% if is_expert and phrase.origin == "NEW" %}
                     <p>Is this translation accurate?
                         {% if phrase.status == "linked" %}
                         <button class="button button--success-solid translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }} data-cy="yes-button">Yes</button>
