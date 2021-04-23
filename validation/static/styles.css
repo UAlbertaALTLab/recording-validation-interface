@@ -186,6 +186,14 @@ a:hover {
   cursor: pointer;
 }
 
+.button--edit {
+  margin: 0.5rem 10.5rem 0.5rem 0.5rem;
+}
+
+.button--back {
+  margin: 0.5rem 0.5rem 0.5rem 0;
+}
+
 .button--flag {
   padding: 0.25rem;
   font-size: 12pt;
