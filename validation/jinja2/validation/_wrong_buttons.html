@@ -1,0 +1,42 @@
+{#
+      Copyright (C) 2021 Jolene Poulin <jcpoulin@ualberta.ca>
+
+      This program is free software: you can redistribute it and/or modify
+      it under the terms of the GNU Affero General Public License as
+      published by the Free Software Foundation, either version 3 of the
+      License, or (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      GNU Affero General Public License for more details.
+
+      You should have received a copy of the GNU Affero General Public License
+      along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#}
+
+{% macro button_col(recording, csrf_token, request) %}
+
+    {% if recording.quality == "wrong word" %}
+        <button class="button button--neutral wrong-speaker-button" data-cy="wrong-button" data-toggle="modal" data-target="#{{ recording.id }}-modal" data-rec-id={{ recording.id }}>Wrong Speaker</button>
+        <button class="button button--neutral-solid wrong-word-button" data-cy="wrong-button" data-rec-id={{ recording.id }} onclick="showWrongWordDiv('{{ recording.id }}')">Wrong Word</button>
+    {% elif recording.quality == "wrong speaker" %}
+        <button class="button button--neutral-solid wrong-speaker-button" data-cy="wrong-button" data-toggle="modal" data-target="#{{ recording.id }}-modal" data-rec-id={{ recording.id }}>Wrong Speaker</button>
+        <button class="button button--neutral wrong-word-button" data-cy="wrong-button" data-rec-id={{ recording.id }} onclick="showWrongWordDiv('{{ recording.id }}')">Wrong Word</button>
+    {% else %}
+        <button class="button button--neutral wrong-speaker-button" data-cy="wrong-button" data-toggle="modal" data-target="#{{ recording.id }}-modal" data-rec-id={{ recording.id }}>Wrong Speaker</button>
+        <button class="button button--neutral wrong-word-button" data-cy="wrong-button" data-rec-id={{ recording.id }} onclick="showWrongWordDiv('{{ recording.id }}')">Wrong Word</button>
+    {% endif %}
+    <div class="menu__none rec-wrong-word" data-rec-id={{ recording.id }}>
+        <form id="{{ recording.id }}-wrong-word" method="POST" action="/api/save_wrong_word/{{ recording.id }}">
+            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+            <input type="hidden" name="referrer" value="{{ request.build_absolute_uri() }}">
+            What word is being spoken?
+            <input type="text" id="wrong_word" name="wrong_word">
+            <input form="{{ recording.id }}-wrong-word" type="submit" value="Save" class="button button--success button--small save-wrong-word" data-rec-id={{ recording.id }}>
+            <button class="button button--fail button--small cancel-wrong-word" data-rec-id={{ recording.id }})" onclick="hideWrongWordDiv('{{ recording.id }}')">Cancel</button>
+        </form>
+    </div>
+
+
+{% endmacro %}
