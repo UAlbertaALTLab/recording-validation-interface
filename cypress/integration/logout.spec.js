@@ -21,6 +21,9 @@ describe("Logout", () => {
         cy.location('pathname')
             .should('not.include', 'login')
 
+        cy.get('[data-cy="options-button-header"]')
+            .click()
+
         cy.get('#logout-link')
             .click()
 

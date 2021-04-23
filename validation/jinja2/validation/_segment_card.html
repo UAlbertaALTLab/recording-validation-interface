@@ -16,8 +16,10 @@
 #}
 
 {% import 'validation/_macros.html' as macros %}
+{% import 'validation/_issue_modal.html' as issue_modal %}
+{% import 'validation/_speaker_code_modal.html' as speaker_code_modal %}
 
-{% macro segment_card(phrase, recordings, is_linguist, is_expert, auth, forms, csrf_token) %}
+{% macro segment_card(phrase, recordings, speakers, is_linguist, is_expert, auth, forms, csrf_token, request) %}
 
 <article class="card shadow-sm" data-cy="segment-card">
             {% if phrase.validated %}
@@ -33,7 +35,13 @@
                 {% if auth %}
                     <button type="button" class="button button--fail button--flag right" data-toggle="modal" data-target="#{{ phrase.id }}-modal" data-cy="flag-button">Something's wrong with this entry</button>
                 {% endif %}
-                <p class="card__title--cree" data-cy="transcription">{{ phrase.transcription }}</p>
+                <p class="card__title--cree" data-cy="transcription">
+                    {% if request.COOKIES['macron'] == 'on' %}
+                        {{ phrase.transcription }}
+                    {% else %}
+                        {{ phrase.transcription | replace("ê", "e") }}
+                    {% endif %}
+                </p>
                 <p class="card__title--english" data-cy="translation">Translation: {{ phrase.translation }}</p>
 
                 {% if is_expert and phrase.origin == "new" %}
@@ -76,12 +84,15 @@
                             {% if recording.quality == 'good' %}
                                 <button class="button button--success-solid audio-quality-good" data-cy="good-button" data-rec-id={{ recording.id }}>Good</button>
                                 <button class="button button--fail audio-quality-bad" data-cy="bad-button" data-rec-id={{ recording.id }}>Bad</button>
+                                <button class="button button--neutral" data-cy="wrong-button" data-toggle="modal" data-target="#{{ recording.id }}-modal" data-rec-id={{ recording.id }}>Wrong Speaker</button>
                             {% elif recording.quality == 'bad' %}
                                 <button class="button button--success audio-quality-good" data-cy="good-button" data-rec-id={{ recording.id }}>Good</button>
                                 <button class="button button--fail-solid audio-quality-bad" data-cy="bad-button" data-rec-id={{ recording.id }}>Bad</button>
+                                <button class="button button--neutral" data-cy="wrong-button" data-toggle="modal" data-target="#{{ recording.id }}-modal" data-rec-id={{ recording.id }}>Wrong Speaker</button>
                             {% else %}
                                 <button class="button button--success audio-quality-good" data-cy="good-button" data-rec-id={{ recording.id }}>Good</button>
                                 <button class="button button--fail audio-quality-bad" data-cy="bad-button" data-rec-id={{ recording.id }}>Bad</button>
+                                <button class="button button--neutral" data-cy="wrong-button" data-toggle="modal" data-target="#{{ recording.id }}-modal" data-rec-id={{ recording.id }}>Wrong Speaker</button>
                             {% endif %} {# recording quality #}
                         </td>
                         {% endif %}
@@ -89,6 +100,8 @@
                             <td>{{ recording.session.id }}</td>
                         {% endif %}
                     </tr>
+
+                    {{ speaker_code_modal.modal(recording.id, speakers, csrf_token, request) }}
 
                 {% endfor %}{# for recording in phrase.recordings #}
             </table>
@@ -98,28 +111,8 @@
         </div>
 
         <!-- Modal -->
-        <div id="{{ phrase.id }}-modal" class="modal fade" role="dialog">
-            <div class="modal-dialog">
+        {{  issue_modal.modal(forms, phrase.id, csrf_token) }}
 
-                <!-- Modal content-->
-                <div class="modal-content" data-cy="modal">
-                    <div class="modal-header">
-                        <h4 class="modal-title">What's wrong with this entry?</h4>
-                    </div>
-
-                    <form action="" method="post" id="{{ phrase.id }}-form">
-                        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-                        <div class="modal-body">
-                            {{ forms[phrase.id] }}
-                        </div>
-                        <div class="modal-footer">
-                            <button form="{{ phrase.id }}-form" data-cy="cancel-button" type="button" class="button button--fail" data-dismiss="modal" value="Cancel">Cancel</button>
-                            <button form="{{ phrase.id }}-form" data-cy="save-button" type="submit" class="button button--success" value="Save">Save</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
     </article>
 
 {% endmacro %}

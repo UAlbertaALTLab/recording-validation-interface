@@ -10,7 +10,7 @@ a:hover {
 }
 
 .header--dark {
-  background-color: var(--mauve);
+  background-color: var(--custom-purple);
 }
 
 .table__td--speaker {
@@ -140,13 +140,13 @@ a:hover {
 
 .button--success-solid {
   color: var(--custom-white);
-  background-color: var(--custom-pale-green);
+  background-color: var(--custom-green);
   border: 2px solid var(--custom-green);
 }
 
 .button--success:hover, .button--success-solid:hover {
   color: var(--custom-white);
-  background-color: var(--custom-green);
+  background-color: var(--custom-pale-green);
   border-color: var(--custom-green);
   cursor: pointer;
 }
@@ -158,26 +158,31 @@ a:hover {
 
 .button--fail-solid {
   color: var(--custom-white);
-  background-color: var(--custom-pale-orange);
+  background-color: var(--custom-orange);
   border: 2px solid var(--custom-orange);
 }
 
 .button--fail:hover, .button--fail-solid:hover {
   color: var(--custom-white);
-  background-color: var(--custom-orange);
+  background-color: var(--custom-pale-orange);
   border-color: var(--custom-orange);
   cursor: pointer;
 }
 
 .button--neutral {
-  color: var(--mauve);
-  border: 2px solid var(--mauve);
+  color: var(--custom-purple);
+  border: 2px solid var(--custom-purple);
+}
+
+.button--neutral-solid {
+  background-color: var(--custom-purple);
+  color: var(--custom-white)
 }
 
 .button--neutral:hover {
   color: var(--custom-white);
-  border: 2px solid var(--mauve);
-  background-color: var(--mauve);
+  border: 2px solid var(--custom-purple);
+  background-color: var(--custom-pale-purple);
   cursor: pointer;
 }
 
@@ -194,17 +199,32 @@ a:hover {
 
 .button--adv-search {
   background-color: transparent;
-  border: none;
+  color: var(--custom-beige);
+  border: 2px solid var(--custom-beige);
 }
 
 .button--adv-search:hover {
   text-decoration: none;
+  color: var(--custom-purple);
+  background-color: var(--custom-beige);
 }
 
 .button--small {
   font-size: 0.75rem;
   font-weight: 700;
   padding: 0.1rem 0.2rem;
+}
+
+.button--none {
+  border: none;
+  background-color: transparent;
+  display: inline-block;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  padding: .375rem .75rem;
+  line-height: 1.5;
+  transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
 
 .filter {
@@ -231,7 +251,7 @@ a:hover {
   text-decoration: none;
   display: block;
   padding: 0.5rem 1rem;
-  background-color: var(--light-green);
+  background-color: var(--custom-purple);
   color: var(--custom-white);
 }
 
@@ -240,13 +260,13 @@ a:hover {
   text-decoration: none;
   display: block;
   padding: 0.5rem 1rem;
-  background-color: var(--custom-green);
+  background-color: var(--custom-pale-purple);
   color: var(--custom-white);
   cursor: pointer;
 }
 
 .nav__link {
-  color: var(--light-green);
+  color: var(--custom-purple);
   text-decoration: none;
   display: block;
   padding: 0.5rem 1rem;
@@ -254,7 +274,7 @@ a:hover {
 }
 
 .nav__link:hover {
-  color: var(--custom-green);
+  color: var(--custom-pale-purple);
   cursor: pointer;
 }
 
@@ -324,11 +344,47 @@ a:hover {
   background-color: var(--custom-grey);
 }
 
-/*label {*/
-/*  padding-top: 0.75rem;*/
-/*  display: flex;*/
-/*  align-content: start;*/
-/*}*/
+.menu__caret {
+  color: var(--custom-beige);
+  margin: 1rem;
+
+}
+
+.menu__caret:hover {
+  cursor: pointer;
+}
+
+.menu__options {
+  background-color: var(--custom-beige);
+  z-index: 1;
+  padding: 1rem;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  max-width: 15rem;
+  margin: 1rem;
+  position: absolute;
+  right: 0;
+}
+
+.menu__options--list {
+  list-style: none;
+}
+
+
+.menu__options--right {
+  text-align: right;
+}
+
+.menu__options-link, .menu__options-link:hover {
+  color: var(--custom-purple);
+}
+
+.menu__none {
+  display: none;
+}
+
+.menu__block {
+  display: block;
+}
 
 #id_role {
   list-style: none;
@@ -348,15 +404,6 @@ a:hover {
   text-align: center;
 }
 
-.white-text {
-  color: var(--custom-white);
-}
-
-.white-text:hover {
-  text-decoration: none;
-  color: var(--custom-green);
-}
-
 .right {
   float: right;
 }
@@ -366,9 +413,14 @@ a:hover {
 }
 
 .modal-content .helptext {
-  width: 80%;
+  width: 100%;
   margin: 0 auto;
   margin-top: -2rem;
+  padding-bottom: 1rem;
+}
+
+.modal__speaker-select {
+  margin: 1rem;
 }
 
 .center {
@@ -378,4 +430,17 @@ a:hover {
 .description {
   font-weight: 600;
   font-size: 1.5rem;
+}
+
+.logout-link, .login-link {
+  color: var(--custom-purple);
+}
+
+.logout-link:hover, .login-link:hover {
+  color: var(--custom-purple);
+}
+
+.issue__textarea {
+  width: 80%;
+  height: 3rem;
 }

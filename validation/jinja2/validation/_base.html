@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="icon" type="image/png" href="/static/images/little-m.png">
-  <link rel="stylesheet" href="/static/styles.css" type="text/css">
+  <link rel="stylesheet" href="{{ static('styles.css') }}" type="text/css">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
@@ -13,12 +13,15 @@
 <script>
 const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 </script>
-      <script src="/static/index.js"></script>
+      <script src="{{ static('index.js') }}"></script>
+      <script src="{{ static('menu.js') }}"></script>
       <title>{% block title %} Maskwacîs Recordings Validation {% endblock title %}</title>
   {% endblock head %}
 
 </head>
 <body>
+
+{% import 'validation/_menu.html' as menu %}
 
   {# The header #}
   <nav class="navbar navbar-expand-md navbar-dark header--dark">
@@ -39,20 +42,17 @@ const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         <input class="form-control mr-sm-2" name="query" type="search" placeholder="Search" aria-label="Search" data-cy="search-bar">
         <button class="my-2 my-sm-0 button button--success" type="submit">Search</button>
         &nbsp;
-        <a data-cy="advanced-search-button" href="{{ url('validation:advanced_search') }}" class="button button--fail my-2 my-sm-0 button--adv-search">Advanced Search</a>
+        <a data-cy="advanced-search-button" href="{{ url('validation:advanced_search') }}" class="button button--adv-search">Advanced Search</a>
     
       </form>
     </div>
+      <details>
+        <summary data-cy="options-button-header" class="menu__caret">Options</summary>
+        {{ menu.menu_options(request, auth, showMacron) }}
+      </details>
 
-    {# Login button #}
-    <div>
-        {% if auth %}
-            <a href="/logout" id="logout-link" class="white-text">Logout</a>
-        {% else %}
-            <a href="/login" id="login-link" class="white-text">Login</a>
-        {% endif %}
-    </div>
   </nav>
+
 
   <main role="main" class="container">
     {% block content %}

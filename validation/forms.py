@@ -86,8 +86,8 @@ class EditSegment(forms.Form):
 
 class FlagSegment(forms.ModelForm):
     ISSUES = [
-        ("bad_cree", "There's a better Cree word for this translation"),
-        ("bad_english", "There's a better translation for this Cree word"),
+        ("bad_cree", "There's a better spelling for the transcription (Cree word)"),
+        ("bad_english", "There's a better spelling for the translation (English word)"),
         ("bad_rec", "One or more of these recordings are not of this word"),
         ("other", "Something else (please specify)"),
     ]
@@ -95,17 +95,25 @@ class FlagSegment(forms.ModelForm):
         choices=ISSUES, required=False, widget=forms.CheckboxSelectMultiple
     )
 
-    other_reason = forms.CharField(
-        label="Specify reason here",
+    cree_suggestion = forms.CharField(
+        help_text="Suggest a better Cree spelling",
         required=False,
-        widget=forms.TextInput(attrs={"class": "form-control bottom-margin"}),
+        widget=forms.Textarea(attrs={"class": "form-control issue__textarea"}),
+    )
+
+    english_suggestion = forms.CharField(
+        help_text="Suggest a better English word or phrase",
+        required=False,
+        widget=forms.Textarea(attrs={"class": "form-control issue__textarea"}),
     )
 
     comment = forms.CharField(
         help_text="Use the space above to suggest a new spelling or make a few notes about why you're reporting an issue "
         "with this entry",
-        required=True,
-        widget=forms.TextInput(attrs={"class": "form-control bottom-margin"}),
+        required=False,
+        widget=forms.Textarea(
+            attrs={"class": "form-control bottom-margin issue__textarea"}
+        ),
     )
 
     phrase_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
