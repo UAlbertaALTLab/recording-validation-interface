@@ -19,6 +19,7 @@
 import re
 import unicodedata
 from pathlib import Path
+import datetime
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -478,7 +479,7 @@ class Issue(models.Model):
     )
 
     created_on = models.DateField(
-        help_text="When was this issue filed?",
+        help_text="When was this issue filed?", default=datetime.datetime.now()
     )
 
     modified_on = models.DateField(

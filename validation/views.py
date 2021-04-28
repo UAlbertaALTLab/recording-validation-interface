@@ -628,7 +628,7 @@ def save_issue(data, user):
         comment=comment,
         cree_suggestion=cree_suggestion,
         english_suggestion=english_suggestion,
-        user=user,
+        user=str(user),
     )
 
 
@@ -655,13 +655,24 @@ def save_or_update_issue(
     """
 
     if phrase:
-        issue = Issue.objects.filter(phrase_id=phrase.id).first()
+        issue, created = Issue.objects.get_or_create(phrase_id=phrase.id)
     elif recording:
-        issue = Issue.objects.filter(recording_id=recording.id).first()
+        issue, created = Issue.objects.get_or_create(recording_id=recording.id)
     else:
         return
 
-    if issue:
+    if created:
+        issue.other = "other" in issues
+        issue.bad_cree = "bad_cree" in issues
+        issue.bad_english = "bad_english" in issues
+        issue.bad_recording = "bad_rec" in issues
+        issue.comment = comment
+        issue.suggested_cree = cree_suggestion
+        issue.suggested_english = english_suggestion
+        issue.created_by = user
+        issue.created_on = datetime.datetime.now()
+
+    else:
         issue.other = issue.other or "other" in issues
         issue.bad_cree = issue.bad_cree or "bad_cree" in issues
         issue.bad_english = issue.bad_english or "bad_english" in issues
@@ -687,7 +698,7 @@ def save_or_update_issue(
 
         if issue.comment and comment not in issue.comment and comment:
             issue.comment = f"{issue.comment}; {comment}"
-        elif comment and comment not in issue.comment:
+        elif comment and (not issue.comment or comment not in issue.comment):
             issue.comment = comment
 
         if issue.modified_by:
@@ -695,20 +706,5 @@ def save_or_update_issue(
         else:
             issue.modified_by = str(user)
         issue.modified_on = datetime.datetime.now()
-        issue.save()
-    else:
-        new_issue = Issue(
-            phrase=phrase if phrase else None,
-            recording=recording if recording else None,
-            other="other" in issues,
-            bad_cree="bad_cree" in issues,
-            bad_english="bad_english" in issues,
-            bad_recording="bad_rec" in issues,
-            comment=comment,
-            suggested_cree=cree_suggestion,
-            suggested_english=english_suggestion,
-            created_by=user,
-            created_on=datetime.datetime.now(),
-        )
 
-        new_issue.save()
+    issue.save()
