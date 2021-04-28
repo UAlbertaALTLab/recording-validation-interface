@@ -467,8 +467,19 @@ class Issue(models.Model):
         max_length=64,
     )
 
+    modified_by = models.CharField(
+        help_text="The person/people who modified this issue",
+        default="",
+        max_length=64,
+        null=True,
+    )
+
     created_on = models.DateField(
         help_text="When was this issue filed?",
+    )
+
+    modified_on = models.DateField(
+        help_text="The date this issue was last updated", null=True
     )
 
 
