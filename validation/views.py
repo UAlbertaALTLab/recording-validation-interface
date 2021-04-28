@@ -48,7 +48,7 @@ from django.db.models import Q
 from librecval.normalization import to_indexable_form
 
 from .crude_views import *
-from .models import Phrase, Recording, Speaker, RecordingSession, Issue
+from .models import Phrase, Recording, Speaker, RecordingSession, Issue, Status
 from .helpers import get_distance_with_translations, perfect_match, exactly_one_analysis
 from .forms import EditSegment, Login, Register, FlagSegment
 
@@ -529,7 +529,15 @@ def save_wrong_speaker_code(request, recording_id):
     )
     new_issue.save()
 
-    rec.quality = "wrong speaker"
+    if rec.status:
+        rec_status = Status.objects.filter(id=rec.status.id).first()
+        rec_status.wrong_speaker = True
+        rec_status.save()
+    else:
+        status = Status(wrong_word=False, wrong_speaker=True)
+
+        status.save()
+        rec.status = status
 
     rec.save()
     if referrer:
@@ -566,7 +574,15 @@ def save_wrong_word(request, recording_id):
     )
     new_issue.save()
 
-    rec.quality = "wrong word"
+    if rec.status:
+        rec_status = Status.objects.filter(id=rec.status.id).first()
+        rec_status.wrong_word = True
+        rec_status.save()
+    else:
+        status = Status(wrong_word=True, wrong_speaker=False)
+
+        status.save()
+        rec.status = status
 
     rec.save()
 
@@ -599,7 +615,7 @@ def prep_phrase_data(request, phrases):
     recordings = {}
     forms = {}
     for phrase in phrases:
-        recordings[phrase] = phrase.recordings
+        recordings[phrase] = phrase.recordings.prefetch_related("status")
         if request.method == "POST" and int(request.POST.get("phrase_id")) == phrase.id:
             forms[phrase.id] = FlagSegment(
                 request.POST, initial={"phrase_id": phrase.id}
