@@ -425,18 +425,21 @@ class Issue(models.Model):
         help_text="The comment left by the validator",
         blank=True,
         max_length=1024,
+        null=True,
     )
 
     suggested_cree = models.CharField(
         help_text="The Cree spelling suggested by the validator",
         blank=True,
         max_length=1024,
+        null=True,
     )
 
     suggested_english = models.CharField(
         help_text="The English spelling suggested by the validator",
         blank=True,
         max_length=1024,
+        null=True,
     )
 
     other = models.BooleanField(

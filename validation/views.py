@@ -517,31 +517,9 @@ def save_wrong_speaker_code(request, recording_id):
     if speaker != "idk":
         comment += " The speaker should be: " + speaker
 
-    rec_issue = Issue.objects.filter(recording_id=rec.id).first()
-    if rec_issue:
-        rec_issue.bad_recording = True
-        if rec_issue.comment and rec_issue.comment != comment:
-            rec_issue.comment = f"{rec_issue.comment}; {comment}"
-        else:
-            rec_issue.comment = comment
-        if rec_issue.modified_by:
-            rec_issue.modified_by = f"{rec_issue.modified_by}; {request.user}"
-        else:
-            rec_issue.modified_by = str(request.user)
-        rec_issue.modified_on = datetime.datetime.now()
-        rec_issue.save()
-    else:
-        new_issue = Issue(
-            recording=rec,
-            other=False,
-            bad_cree=False,
-            bad_english=False,
-            bad_recording=True,
-            comment=comment,
-            created_by=request.user,
-            created_on=datetime.datetime.now(),
-        )
-        new_issue.save()
+    save_or_update_issue(
+        recording=rec, issues=["bad_rec"], comment=comment, user=str(request.user)
+    )
 
     if rec.status:
         rec_status = Status.objects.filter(id=rec.status.id).first()
@@ -574,33 +552,11 @@ def save_wrong_word(request, recording_id):
     comment = "This is the wrong word."
 
     if suggestion:
-        comment += "The word is actually: " + suggestion
+        comment += " The word is actually: " + suggestion
 
-    rec_issue = Issue.objects.filter(recording_id=rec.id).first()
-    if rec_issue:
-        rec_issue.bad_recording = True
-        if rec_issue.comment and rec_issue.comment != comment:
-            rec_issue.comment = f"{rec_issue.comment}; {comment}"
-        else:
-            rec_issue.comment = comment
-        if rec_issue.modified_by:
-            rec_issue.modified_by = f"{rec_issue.modified_by}; {request.user}"
-        else:
-            rec_issue.modified_by = str(request.user)
-        rec_issue.modified_on = datetime.datetime.now()
-        rec_issue.save()
-    else:
-        new_issue = Issue(
-            recording=rec,
-            other=False,
-            bad_cree=False,
-            bad_english=False,
-            bad_recording=True,
-            comment=comment,
-            created_by=request.user,
-            created_on=datetime.datetime.now(),
-        )
-        new_issue.save()
+    save_or_update_issue(
+        recording=rec, issues=["bad_rec"], comment=comment, user=str(request.user)
+    )
 
     if rec.status:
         rec_status = Status.objects.filter(id=rec.status.id).first()
@@ -666,51 +622,84 @@ def save_issue(data, user):
     phrase.status = "needs review"
     phrase.save()
 
-    phrase_issue = Issue.objects.filter(phrase_id=phrase.id).first()
-    if phrase_issue:
-        phrase_issue.other = phrase_issue.other or "other" in issues
-        phrase_issue.bad_cree = phrase_issue.bad_cree or "bad_cree" in issues
-        phrase_issue.bad_english = phrase_issue.bad_english or "bad_english" in issues
-        phrase_issue.bad_recording = (
-            phrase_issue.bad_recording or "bad_recording" in issues
-        )
+    save_or_update_issue(
+        phrase=phrase,
+        issues=issues,
+        comment=comment,
+        cree_suggestion=cree_suggestion,
+        english_suggestion=english_suggestion,
+        user=user,
+    )
+
+
+def save_or_update_issue(
+    phrase=None,
+    recording=None,
+    issues=None,
+    comment=None,
+    cree_suggestion=None,
+    english_suggestion=None,
+    user=None,
+):
+    """
+    Decides whether an Issue needs to be created, or if one already exists and just
+    needs to be updated
+    :param phrase: Phrase object
+    :param recording: Recording object
+    :param issues: boolean list of issues from Issue form
+    :param comment: string
+    :param cree_suggestion: string
+    :param english_suggestion: string
+    :param user: User object or string
+    :return: None
+    """
+
+    if phrase:
+        issue = Issue.objects.filter(phrase_id=phrase.id).first()
+    elif recording:
+        issue = Issue.objects.filter(recording_id=recording.id).first()
+    else:
+        return
+
+    if issue:
+        issue.other = issue.other or "other" in issues
+        issue.bad_cree = issue.bad_cree or "bad_cree" in issues
+        issue.bad_english = issue.bad_english or "bad_english" in issues
+        issue.bad_recording = issue.bad_recording or "bad_rec" in issues
 
         if (
-            phrase_issue.suggested_cree
-            and phrase_issue.suggested_cree != cree_suggestion
+            issue.suggested_cree
+            and cree_suggestion not in issue.suggested_cree
             and cree_suggestion
         ):
-            phrase_issue.suggested_cree = (
-                f"{phrase_issue.suggested_cree}; {cree_suggestion}"
-            )
-        elif cree_suggestion:
-            phrase_issue.suggested_cree = cree_suggestion
+            issue.suggested_cree = f"{issue.suggested_cree}; {cree_suggestion}"
+        elif cree_suggestion and cree_suggestion not in issue.suggested_cree:
+            issue.suggested_cree = cree_suggestion
 
         if (
-            phrase_issue.suggested_english
-            and phrase_issue.suggested_english != english_suggestion
+            issue.suggested_english
+            and english_suggestion not in issue.suggested_english
             and english_suggestion
         ):
-            phrase_issue.suggested_english = (
-                f"{phrase_issue.suggested_english}; {english_suggestion}"
-            )
-        elif english_suggestion:
-            phrase_issue.suggested_english = english_suggestion
+            issue.suggested_english = f"{issue.suggested_english}; {english_suggestion}"
+        elif english_suggestion and english_suggestion not in issue.suggested_english:
+            issue.suggested_english = english_suggestion
 
-        if phrase_issue.comment and phrase_issue.comment != comment and comment:
-            phrase_issue.comment = f"{phrase_issue.comment}; {comment}"
-        elif comment:
-            phrase_issue.comment = comment
+        if issue.comment and comment not in issue.comment and comment:
+            issue.comment = f"{issue.comment}; {comment}"
+        elif comment and comment not in issue.comment:
+            issue.comment = comment
 
-        if phrase_issue.modified_by:
-            phrase_issue.modified_by = f"{phrase_issue.modified_by}; {user}"
+        if issue.modified_by:
+            issue.modified_by = f"{issue.modified_by}; {user}"
         else:
-            phrase_issue.modified_by = str(user)
-        phrase_issue.modified_on = datetime.datetime.now()
-        phrase_issue.save()
+            issue.modified_by = str(user)
+        issue.modified_on = datetime.datetime.now()
+        issue.save()
     else:
         new_issue = Issue(
-            phrase=phrase,
+            phrase=phrase if phrase else None,
+            recording=recording if recording else None,
             other="other" in issues,
             bad_cree="bad_cree" in issues,
             bad_english="bad_english" in issues,
