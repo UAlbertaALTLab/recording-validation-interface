@@ -19,7 +19,6 @@
 import re
 import unicodedata
 from pathlib import Path
-import datetime
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -356,6 +355,16 @@ def generate_primary_key(sender, instance, **kwargs):
 SHA256_HEX_LENGTH = 64
 
 
+class Status(models.Model):
+    wrong_word = models.BooleanField(
+        help_text="This recording has the wrong word", default=False
+    )
+
+    wrong_speaker = models.BooleanField(
+        help_text="This recording has the wrong speaker", default=False
+    )
+
+
 class Recording(models.Model):
     """
     A recording of a phrase.
@@ -364,16 +373,8 @@ class Recording(models.Model):
     GOOD = "good"
     BAD = "bad"
     UNKNOWN = "unknown"
-    WRONG_SPEAKER = "wrong speaker"
-    WRONG_WORD = "wrong word"
 
-    QUALITY_CHOICES = [
-        (GOOD, "Good"),
-        (BAD, "Bad"),
-        (UNKNOWN, "Unknown"),
-        (WRONG_SPEAKER, "Wrong Speaker"),
-        (WRONG_WORD, "Wrong Word"),
-    ]
+    QUALITY_CHOICES = [(GOOD, "Good"), (BAD, "Bad"), (UNKNOWN, "Unknown")]
 
     id = models.CharField(primary_key=True, max_length=SHA256_HEX_LENGTH)
 
@@ -403,6 +404,8 @@ class Recording(models.Model):
         blank=True,
     )
 
+    status = models.ForeignKey(Status, on_delete=models.SET_NULL, blank=True, null=True)
+
     # Keep track of the recording's history.
     history = HistoricalRecords(excluded_fields=["compressed_audio"])
 
@@ -422,21 +425,18 @@ class Issue(models.Model):
         help_text="The comment left by the validator",
         blank=True,
         max_length=1024,
-        null=True,
     )
 
     suggested_cree = models.CharField(
         help_text="The Cree spelling suggested by the validator",
         blank=True,
         max_length=1024,
-        null=True,
     )
 
     suggested_english = models.CharField(
         help_text="The English spelling suggested by the validator",
         blank=True,
         max_length=1024,
-        null=True,
     )
 
     other = models.BooleanField(
@@ -467,19 +467,8 @@ class Issue(models.Model):
         max_length=64,
     )
 
-    modified_by = models.CharField(
-        help_text="The person/people who modified this issue",
-        default="",
-        max_length=64,
-        null=True,
-    )
-
     created_on = models.DateField(
-        help_text="When was this issue filed?", default=datetime.datetime.now()
-    )
-
-    modified_on = models.DateField(
-        help_text="The date this issue was last updated", null=True
+        help_text="When was this issue filed?",
     )
 
 

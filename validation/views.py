@@ -48,7 +48,7 @@ from django.db.models import Q
 from librecval.normalization import to_indexable_form
 
 from .crude_views import *
-from .models import Phrase, Recording, Speaker, RecordingSession, Issue
+from .models import Phrase, Recording, Speaker, RecordingSession, Issue, Status
 from .helpers import get_distance_with_translations, perfect_match, exactly_one_analysis
 from .forms import EditSegment, Login, Register, FlagSegment
 
@@ -517,11 +517,27 @@ def save_wrong_speaker_code(request, recording_id):
     if speaker != "idk":
         comment += " The speaker should be: " + speaker
 
-    save_or_update_issue(
-        recording=rec, issues=["bad_rec"], comment=comment, user=str(request.user)
+    new_issue = Issue(
+        recording=rec,
+        other=False,
+        bad_cree=False,
+        bad_english=False,
+        bad_recording=True,
+        comment=comment,
+        created_by=request.user,
+        created_on=datetime.datetime.now(),
     )
+    new_issue.save()
 
-    rec.quality = "wrong speaker"
+    if rec.status:
+        rec_status = Status.objects.filter(id=rec.status.id).first()
+        rec_status.wrong_speaker = True
+        rec_status.save()
+    else:
+        status = Status(wrong_word=False, wrong_speaker=True)
+
+        status.save()
+        rec.status = status
 
     rec.save()
     if referrer:
@@ -544,13 +560,29 @@ def save_wrong_word(request, recording_id):
     comment = "This is the wrong word."
 
     if suggestion:
-        comment += " The word is actually: " + suggestion
+        comment += "The word is actually: " + suggestion
 
-    save_or_update_issue(
-        recording=rec, issues=["bad_rec"], comment=comment, user=str(request.user)
+    new_issue = Issue(
+        recording=rec,
+        other=False,
+        bad_cree=False,
+        bad_english=False,
+        bad_recording=True,
+        comment=comment,
+        created_by=request.user,
+        created_on=datetime.datetime.now(),
     )
+    new_issue.save()
 
-    rec.quality = "wrong word"
+    if rec.status:
+        rec_status = Status.objects.filter(id=rec.status.id).first()
+        rec_status.wrong_word = True
+        rec_status.save()
+    else:
+        status = Status(wrong_word=True, wrong_speaker=False)
+
+        status.save()
+        rec.status = status
 
     rec.save()
 
@@ -583,7 +615,7 @@ def prep_phrase_data(request, phrases):
     recordings = {}
     forms = {}
     for phrase in phrases:
-        recordings[phrase] = phrase.recordings
+        recordings[phrase] = phrase.recordings.prefetch_related("status")
         if request.method == "POST" and int(request.POST.get("phrase_id")) == phrase.id:
             forms[phrase.id] = FlagSegment(
                 request.POST, initial={"phrase_id": phrase.id}
@@ -606,89 +638,17 @@ def save_issue(data, user):
     phrase.status = "needs review"
     phrase.save()
 
-    save_or_update_issue(
+    new_issue = Issue(
         phrase=phrase,
-        issues=issues,
+        other="other" in issues,
+        bad_cree="bad_cree" in issues,
+        bad_english="bad_english" in issues,
+        bad_recording="bad_rec" in issues,
         comment=comment,
-        cree_suggestion=cree_suggestion,
-        english_suggestion=english_suggestion,
-        user=str(user),
+        suggested_cree=cree_suggestion,
+        suggested_english=english_suggestion,
+        created_by=user,
+        created_on=datetime.datetime.now(),
     )
 
-
-def save_or_update_issue(
-    phrase=None,
-    recording=None,
-    issues=None,
-    comment=None,
-    cree_suggestion=None,
-    english_suggestion=None,
-    user=None,
-):
-    """
-    Decides whether an Issue needs to be created, or if one already exists and just
-    needs to be updated
-    :param phrase: Phrase object
-    :param recording: Recording object
-    :param issues: boolean list of issues from Issue form
-    :param comment: string
-    :param cree_suggestion: string
-    :param english_suggestion: string
-    :param user: User object or string
-    :return: None
-    """
-
-    if phrase:
-        issue, created = Issue.objects.get_or_create(phrase_id=phrase.id)
-    elif recording:
-        issue, created = Issue.objects.get_or_create(recording_id=recording.id)
-    else:
-        return
-
-    if created:
-        issue.other = "other" in issues
-        issue.bad_cree = "bad_cree" in issues
-        issue.bad_english = "bad_english" in issues
-        issue.bad_recording = "bad_rec" in issues
-        issue.comment = comment
-        issue.suggested_cree = cree_suggestion
-        issue.suggested_english = english_suggestion
-        issue.created_by = user
-        issue.created_on = datetime.datetime.now()
-
-    else:
-        issue.other = issue.other or "other" in issues
-        issue.bad_cree = issue.bad_cree or "bad_cree" in issues
-        issue.bad_english = issue.bad_english or "bad_english" in issues
-        issue.bad_recording = issue.bad_recording or "bad_rec" in issues
-
-        if (
-            issue.suggested_cree
-            and cree_suggestion not in issue.suggested_cree
-            and cree_suggestion
-        ):
-            issue.suggested_cree = f"{issue.suggested_cree}; {cree_suggestion}"
-        elif cree_suggestion and cree_suggestion not in issue.suggested_cree:
-            issue.suggested_cree = cree_suggestion
-
-        if (
-            issue.suggested_english
-            and english_suggestion not in issue.suggested_english
-            and english_suggestion
-        ):
-            issue.suggested_english = f"{issue.suggested_english}; {english_suggestion}"
-        elif english_suggestion and english_suggestion not in issue.suggested_english:
-            issue.suggested_english = english_suggestion
-
-        if issue.comment and comment not in issue.comment and comment:
-            issue.comment = f"{issue.comment}; {comment}"
-        elif comment and (not issue.comment or comment not in issue.comment):
-            issue.comment = comment
-
-        if issue.modified_by:
-            issue.modified_by = f"{issue.modified_by}; {user}"
-        else:
-            issue.modified_by = str(user)
-        issue.modified_on = datetime.datetime.now()
-
-    issue.save()
+    new_issue.save()
