@@ -40,15 +40,15 @@
                 {% endif %}
                 <p class="card__title--cree" data-cy="transcription">
                     {% if request.COOKIES['macron'] == 'on' %}
-                        {{ phrase.transcription }}
+                        {{ phrase.transcription or '-' }}
                     {% else %}
-                        {{ phrase.transcription | replace("ê", "e") }}
+                        {{ (phrase.transcription | replace("ê", "e")) or '-' }}
                     {% endif %}
                 </p>
                 <p class="card__title--english" data-cy="translation">Translation: {{ phrase.translation }}</p>
 
                 {% if is_expert %}
-                    <p>Is this translation accurate?
+                    <p>Are the transcription and translation both correct?
                         {% if phrase.status == "linked" %}
                         <button class="button button--success-solid translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }} data-cy="yes-button">Yes</button>
                         <button class="button button--fail translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }} data-toggle="modal" data-target="#{{ phrase.id }}-modal" data-cy="no-button">No</button>
