@@ -23,7 +23,7 @@ describe("Edit segment", () => {
                     .click()
 
                 cy.location('pathname')
-                    .should('include', Cypress.env("segment_details_url"))
+                    .should('include', Cypress.env("awas_url"))
             })
 
 
