@@ -355,16 +355,6 @@ def generate_primary_key(sender, instance, **kwargs):
 SHA256_HEX_LENGTH = 64
 
 
-class Status(models.Model):
-    wrong_word = models.BooleanField(
-        help_text="This recording has the wrong word", default=False
-    )
-
-    wrong_speaker = models.BooleanField(
-        help_text="This recording has the wrong speaker", default=False
-    )
-
-
 class Recording(models.Model):
     """
     A recording of a phrase.
@@ -404,7 +394,13 @@ class Recording(models.Model):
         blank=True,
     )
 
-    status = models.ForeignKey(Status, on_delete=models.SET_NULL, blank=True, null=True)
+    wrong_word = models.BooleanField(
+        help_text="This recording has the wrong word", default=False
+    )
+
+    wrong_speaker = models.BooleanField(
+        help_text="This recording has the wrong speaker", default=False
+    )
 
     # Keep track of the recording's history.
     history = HistoricalRecords(excluded_fields=["compressed_audio"])
