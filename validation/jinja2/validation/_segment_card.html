@@ -40,9 +40,9 @@
                 {% endif %}
                 <p class="card__title--cree" data-cy="transcription">
                     {% if request.COOKIES['macron'] == 'on' %}
-                        {{ phrase.transcription or '-' }}
+                        {{ phrase.transcription }}
                     {% else %}
-                        {{ (phrase.transcription | replace("ê", "e")) or '-' }}
+                        {{ phrase.transcription | replace("ê", "e") }}
                     {% endif %}
                 </p>
                 <p class="card__title--english" data-cy="translation">Translation: {{ phrase.translation }}</p>
