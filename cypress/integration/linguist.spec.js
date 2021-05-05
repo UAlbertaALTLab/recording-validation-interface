@@ -1,6 +1,6 @@
 // Tests the functionality from the Linguist perspective
 
-describe("Community members", () => {
+describe("Linguists", () => {
     beforeEach(() => {
         cy.login("linguist", "1234567890");
     })
@@ -15,7 +15,7 @@ describe("Community members", () => {
                     .click()
 
                 cy.location('pathname')
-                    .should('include', Cypress.env("segment_details_url"))
+                    .should('include', Cypress.env("awas_url"))
             })
     })
 
