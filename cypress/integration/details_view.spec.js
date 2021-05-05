@@ -15,7 +15,7 @@ describe("Details View", () => {
                     .click()
 
                 cy.location('pathname')
-                    .should('include', Cypress.env("segment_details_url"))
+                    .should('include', Cypress.env("segment_url"))
             })
     })
 
@@ -36,7 +36,7 @@ describe("Details View", () => {
                     .click()
 
                 cy.location('pathname')
-                    .should('include', Cypress.env("segment_details_url"))
+                    .should('include', Cypress.env("segment_url"))
             })
 
 
@@ -56,7 +56,7 @@ describe("Details View", () => {
                     .click()
 
                 cy.location('pathname')
-                    .should('include', Cypress.env("segment_details_url"))
+                    .should('include', Cypress.env("segment_url"))
             })
 
         cy.get("#segment-table").within(() => {

@@ -5,6 +5,8 @@
         "login_url": "/login",
         "register_url": "/register",
         "logout_url": "/logout",
-        "segment_details_url": "/segment/6"
+        "segment_details_url": "/segment/146",
+        "segment_url": "/segment/",
+        "awas_url": "/segment/6"
       }
 }
