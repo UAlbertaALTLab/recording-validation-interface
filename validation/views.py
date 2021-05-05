@@ -480,7 +480,7 @@ def record_translation_judgement(request, phrase_id):
         phrase.date = datetime.datetime.now()
     elif judgement["judgement"] in ["no", "idk"]:
         phrase.validated = False
-        phrase.status = "new"
+        phrase.status = "needs review"
         phrase.modifier = str(request.user)
         phrase.date = datetime.datetime.now()
     else:
@@ -498,20 +498,6 @@ def record_audio_quality_judgement(request, recording_id):
 
     if judgement["judgement"] in ["good", "bad"]:
         rec.quality = judgement["judgement"]
-    elif judgement["judgement"] == "wrong":
-        new_issue = Issue(
-            recording=rec,
-            other=False,
-            bad_cree=False,
-            bad_english=False,
-            bad_recording=True,
-            comment="This recording has the wrong speaker code",
-            created_by=request.user,
-            created_on=datetime.datetime.now(),
-        )
-        new_issue.save()
-
-        rec.quality = "bad"
     else:
         return HttpResponseBadRequest()
 
@@ -543,12 +529,51 @@ def save_wrong_speaker_code(request, recording_id):
     )
     new_issue.save()
 
-    rec.quality = "bad"
+    rec.wrong_speaker = True
 
     rec.save()
     if referrer:
         response = HttpResponse(status=HTTPStatus.SEE_OTHER)
-        response["Location"] = referrer
+        response["Location"] = referrer + "#phrase-" + str(rec.phrase_id)
+    else:
+        response = HttpResponse(status=HTTPStatus.SEE_OTHER)
+        response["Location"] = "/"
+
+    return response
+
+
+@login_required()
+@require_http_methods(["POST"])
+def save_wrong_word(request, recording_id):
+    rec = get_object_or_404(Recording, id=recording_id)
+    suggestion = request.POST.get("wrong_word")
+    referrer = request.POST.get("referrer")
+
+    comment = "This is the wrong word."
+
+    if suggestion:
+        comment += "The word is actually: " + suggestion
+
+    new_issue = Issue(
+        recording=rec,
+        other=False,
+        bad_cree=False,
+        bad_english=False,
+        bad_recording=True,
+        suggested_cree=suggestion,
+        comment=comment,
+        created_by=request.user,
+        created_on=datetime.datetime.now(),
+    )
+    new_issue.save()
+
+    rec.wrong_word = True
+
+    rec.save()
+
+    if referrer:
+        response = HttpResponse(status=HTTPStatus.SEE_OTHER)
+        response["Location"] = referrer + "#phrase-" + str(rec.phrase_id)
     else:
         response = HttpResponse(status=HTTPStatus.SEE_OTHER)
         response["Location"] = "/"
@@ -594,6 +619,9 @@ def save_issue(data, user):
     english_suggestion = data["english_suggestion"]
 
     phrase = Phrase.objects.get(id=phrase_id)
+    phrase.validated = False
+    phrase.status = "needs review"
+    phrase.save()
 
     new_issue = Issue(
         phrase=phrase,
