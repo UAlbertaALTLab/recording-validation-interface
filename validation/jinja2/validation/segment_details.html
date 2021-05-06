@@ -31,6 +31,10 @@
         document.getElementById('id_analysis').value = analysis;
     }
 
+    function goBack() {
+        window.history.back()
+    }
+
     
 </script>
 
@@ -39,13 +43,17 @@
 
 {% block content %}
 <div class="table-responsive">
-  {% if auth %}
-    <button data-cy="edit-button" class="button button--fail"
-        onclick="showDiv('{{ segment_name }}')"
-        class="button button--fail button--right">
-            Edit
-    </button>
-    {% endif %}
+
+    <div>
+        <button class="button button--success button--back" onclick='goBack()'>Back</button>
+        {% if auth %}
+            <button data-cy="edit-button" class="button button--fail button--right button--edit"
+                onclick="showDiv('{{ segment_name }}')"
+                class="button button--fail button--right">
+                    Edit
+            </button>
+        {% endif %}
+    </div>
 
     <table id="segment-table" class="table table-striped">
       <thead>

@@ -5,6 +5,10 @@ main {
   margin: 1em auto;
 }
 
+.main_container {
+  width: 90%;
+}
+
 a:hover {
   cursor: pointer;
 }
@@ -186,14 +190,29 @@ a:hover {
   cursor: pointer;
 }
 
+.button--edit {
+  margin: 0.5rem 10.5rem 0.5rem 0.5rem;
+}
+
+.button--back {
+  margin: 0.5rem 0.5rem 0.5rem 0;
+}
+
 .button--flag {
   padding: 0.25rem;
   font-size: 12pt;
   margin: 0.5rem;
 }
 
+.button--more-options {
+  font-size: 12pt;
+  margin-top: 2rem;
+  margin-right: 0.5rem;
+}
+
 .button--right {
-  float: right;
+  position: absolute;
+  right: 0;
   margin-bottom: 0.5rem;
 }
 
@@ -402,10 +421,6 @@ a:hover {
 
 .center {
   text-align: center;
-}
-
-.right {
-  float: right;
 }
 
 .modal-body li {

@@ -73,4 +73,9 @@ urlpatterns = [
         views.save_wrong_speaker_code,
         name="save_wrong_speaker_code",
     ),
+    path(
+        "api/save_wrong_word/<str:recording_id>",
+        views.save_wrong_word,
+        name="save_wrong_word",
+    ),
 ]
