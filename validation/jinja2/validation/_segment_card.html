@@ -38,7 +38,10 @@
             {% endif %}
             <div class="card__body">
                 {% if auth %}
-                    <button type="button" class="button button--fail button--flag right" data-toggle="modal" data-target="#{{ phrase.id }}-modal" data-cy="flag-button">Flag this entry for review</button>
+                    <button type="button" class="button button--fail button--flag button--right" data-toggle="modal" data-target="#{{ phrase.id }}-modal" data-cy="flag-button">Flag this entry for review</button><br>
+                    {% if is_linguist %}
+                        <a href="{{ url('validation:segment_detail', phrase.id) }}" class="button button--success button--more-options button--right"  data-cy="options-button">More Options</a>
+                    {% endif %} {# is linguist #}
                 {% endif %}
                 <p class="card__title--cree" data-cy="transcription">
                     {% if request.COOKIES['macron'] == 'on' %}
@@ -50,10 +53,12 @@
                 <p class="card__title--english" data-cy="translation">Translation: {{ phrase.translation }}</p>
 
                 {% if is_expert and phrase.origin == "new" %}
-                    <p>Is this translation accurate?
+                    <p>Are the transcription and translation both correct?
                     <button class="button {{ 'button--success-solid' if phrase.status == 'linked' else 'button--success' }} translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }} data-cy="yes-button">Yes</button>
                     <button class="button {{ 'button--fail-solid' if phrase.status == 'needs review' else 'button--fail' }} translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }} data-toggle="modal" data-target="#{{ phrase.id }}-modal" data-cy="no-button">No</button>
                     <button class="button {{ 'button--neutral-solid' if phrase.status != 'linked' and phrase.status != 'needs review' else 'button--neutral' }} translation-judgement-accuracy-idk" data-phrase-id={{ phrase.id }} data-cy="idk-button">I don't know</button></p>
+                {% elif is_expert %}
+                    <p>This phrase is already in the Maskwacîs dictionary.</p>
                 {% endif %}
 
                 <table class="card__body--table">
@@ -98,9 +103,6 @@
 
                 {% endfor %}{# for recording in phrase.recordings #}
             </table>
-            {% if is_linguist %}
-                <a href={{ url('validation:segment_detail', phrase.id) }} class="button button--success right"  data-cy="options-button">More Options</a>
-            {% endif %} {# is linguist #}
         </div>
 
         <!-- Modal -->

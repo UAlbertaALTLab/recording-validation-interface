@@ -86,8 +86,8 @@ class EditSegment(forms.Form):
 
 class FlagSegment(forms.ModelForm):
     ISSUES = [
-        ("bad_cree", "There's a better spelling for the transcription (Cree word)"),
-        ("bad_english", "There's a better spelling for the translation (English word)"),
+        ("bad_cree", "There's a better transcription (Cree word/phrase)"),
+        ("bad_english", "There's a better translation (English word/phrase)"),
         ("bad_rec", "One or more of these recordings are not of this word"),
         ("other", "Something else (please specify)"),
     ]
