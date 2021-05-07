@@ -1,0 +1,9 @@
+{% extends 'validation/_base.html' %}
+
+{% import 'validation/_issue_card.html' as issue_card %}
+
+{% block content %}
+    {% for issue in issues %}
+        {{ issue_card.issue_card(issue) }}
+    {% endfor %}
+{% endblock content %}

@@ -464,7 +464,16 @@ def register(request):
     return render(request, "validation/register.html", context)
 
 
+def view_issues(request):
+    issues = Issue.objects.all()
+    context = dict(issues=issues)
+    return render(request, "validation/view_issues.html", context)
+
+
 # TODO: Speaker bio page like https://ojibwe.lib.umn.edu/about/voices
+
+
+# Internal API endpoints
 
 
 @login_required()
@@ -579,6 +588,9 @@ def save_wrong_word(request, recording_id):
         response["Location"] = "/"
 
     return response
+
+
+# Small Helper functions
 
 
 def encode_query_with_page(query, page):
