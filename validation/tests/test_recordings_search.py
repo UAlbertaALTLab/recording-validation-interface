@@ -260,12 +260,6 @@ def test_does_not_return_bad_recordings(client, bake_recording):
     unknown_recording = bake_recording(
         phrase=phrase, speaker=mystery_speaker, quality=""
     )
-    wrong_word_recording = bake_recording(
-        phrase=phrase, speaker=good_speaker, wrong_word=True
-    )
-    wrong_speaker_recording = bake_recording(
-        phrase=phrase, speaker=good_speaker, wrong_speaker=True
-    )
 
     response = client.get(
         reverse("validation:search_recordings", kwargs={"query": query})
@@ -277,9 +271,6 @@ def test_does_not_return_bad_recordings(client, bake_recording):
     for recording in recordings:
         assert recording.get("speaker") in (good_speaker.code, mystery_speaker.code)
         assert recording.get("speaker") != bad_speaker.code
-        assert recording.get("quality") != Recording.BAD
-        assert not recording.get("wrong_word")
-        assert not recording.get("wrong_speaker")
 
 
 @pytest.fixture
