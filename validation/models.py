@@ -74,6 +74,7 @@ class Phrase(models.Model):
     STANDARDIZED = "standardized"
     LINKED = "linked"
     VALIDATED = "validated"
+    REVIEW = "needs review"
 
     STATUS_CHOICES = (
         (NEW, "New"),
@@ -81,6 +82,7 @@ class Phrase(models.Model):
         (STANDARDIZED, "Standardized"),
         (LINKED, "Linked"),
         (VALIDATED, "Validated"),
+        (REVIEW, "Needs review"),
     )
 
     MASKWACÎS_DICTIONARY = "MD"
@@ -362,6 +364,8 @@ class Recording(models.Model):
     BAD = "bad"
     UNKNOWN = "unknown"
 
+    QUALITY_CHOICES = [(GOOD, "Good"), (BAD, "Bad"), (UNKNOWN, "Unknown")]
+
     id = models.CharField(primary_key=True, max_length=SHA256_HEX_LENGTH)
 
     compressed_audio = models.FileField(
@@ -381,12 +385,21 @@ class Recording(models.Model):
         help_text="Is the recording clean? Is it suitable to use publicly?",
         max_length=64,
         blank=True,
+        choices=QUALITY_CHOICES,
     )
 
     comment = models.CharField(
         help_text="The comment provided in the ELAN file",
         max_length=256,
         blank=True,
+    )
+
+    wrong_word = models.BooleanField(
+        help_text="This recording has the wrong word", default=False
+    )
+
+    wrong_speaker = models.BooleanField(
+        help_text="This recording has the wrong speaker", default=False
     )
 
     # Keep track of the recording's history.

@@ -23,7 +23,7 @@ describe("Edit segment", () => {
                     .click()
 
                 cy.location('pathname')
-                    .should('include', Cypress.env("segment_details_url"))
+                    .should('include', Cypress.env("awas_url"))
             })
 
 
@@ -34,7 +34,7 @@ describe("Edit segment", () => {
     })
     
     it("shows all tables", () => {
-        cy.visit(Cypress.env("segment_details_url"));
+        cy.visit(Cypress.env("awas_url"));
 
         cy.get("#segment-table").within(() => {
             cy.get('th').contains('Transcription')
@@ -65,7 +65,7 @@ describe("Edit segment", () => {
     })
 
     it("shows all buttons", () => {
-        cy.visit(Cypress.env("segment_details_url"));
+        cy.visit(Cypress.env("awas_url"));
 
         cy.get("#suggestions-table").within(() => {
             cy.get('input:first')
@@ -74,7 +74,7 @@ describe("Edit segment", () => {
     })
 
     it("should load content when clicking Accept", () => {
-        cy.visit(Cypress.env("segment_details_url"));
+        cy.visit(Cypress.env("awas_url"));
 
         cy.get("#suggestions-table").within(() => {
             cy.get('[data-cy="suggestion-transcription"]')
@@ -116,7 +116,7 @@ describe("Edit segment", () => {
     })
 
     it("should load content when clicking Edit", () => {
-        cy.visit(Cypress.env("segment_details_url"));
+        cy.visit(Cypress.env("awas_url"));
 
         cy.get('[data-cy="edit-button"]')
             .click()
@@ -147,7 +147,7 @@ describe("Edit segment", () => {
     })
 
     it("should update the entry when clicking Save", () => {
-        cy.visit(Cypress.env("segment_details_url"));
+        cy.visit(Cypress.env("awas_url"));
 
         cy.get("#suggestions-table").within(() => {
             cy.get('[data-cy="suggestion-transcription"]')
@@ -200,7 +200,7 @@ describe("Edit segment", () => {
     })
     
     it("should load content when clicking Revert", () => {
-        cy.visit(Cypress.env("segment_details_url"));
+        cy.visit(Cypress.env("awas_url"));
 
         cy.get("#revision-table").within(() => {
             cy.get('[data-cy="revision-transcription"]')
@@ -241,7 +241,7 @@ describe("Edit segment", () => {
     })
 
     it("should not update the entry when clicking Cancel", () => {
-        cy.visit(Cypress.env("segment_details_url"));
+        cy.visit(Cypress.env("awas_url"));
 
         cy.get("#suggestions-table").within(() => {
             cy.get('[data-cy="suggestion-transcription"]')
@@ -319,7 +319,7 @@ describe("Edit segment, no auth", () => {
     })
 
     it("does not show options or edit", () => {
-        cy.visit(Cypress.env("segment_details_url"));
+        cy.visit(Cypress.env("awas_url"));
 
         cy.get("#segment-table").within(() => {
             cy.get('th').contains('Transcription')
