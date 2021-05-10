@@ -352,6 +352,8 @@ def search_recordings(request, query):
         )
         # No bad recordings!
         result_set = result_set.exclude(quality=Recording.BAD)
+        result_set = result_set.exclude(wrong_word=True)
+        result_set = result_set.exclude(wrong_speaker=True)
 
         recordings.extend(
             {

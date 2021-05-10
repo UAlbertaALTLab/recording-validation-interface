@@ -260,6 +260,12 @@ def test_does_not_return_bad_recordings(client, bake_recording):
     unknown_recording = bake_recording(
         phrase=phrase, speaker=mystery_speaker, quality=""
     )
+    wrong_word_recording = bake_recording(
+        phrase=phrase, speaker=good_speaker, wrong_word=True
+    )
+    wrong_speaker_recording = bake_recording(
+        phrase=phrase, speaker=good_speaker, wrong_speaker=True
+    )
 
     response = client.get(
         reverse("validation:search_recordings", kwargs={"query": query})
