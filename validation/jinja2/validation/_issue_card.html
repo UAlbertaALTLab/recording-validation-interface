@@ -24,8 +24,12 @@
     <div class="card__header card__header--beige" data-cy="card-header">
                 &nbsp
     </div>
-        {{ issue.phrase }}<br>
-        {{ issue.recording }}<br>
+        {% if issue.phrase %}
+            {{ issue.phrase }}<br>
+        {% elif issue.recording %}
+            {{ issue.recording }}
+            {{ macros.player(issue.recording) }}<br>
+        {% endif %}
         {{ issue.comment }}<br>
         {{ issue.suggested_cree }}<br>
         {{ issue.suggested_english }}<br>
