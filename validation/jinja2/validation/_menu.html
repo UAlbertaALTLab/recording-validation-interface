@@ -16,18 +16,21 @@
 #}
 
 
-{% macro menu_options(request, auth, showMacron) %}
+{% macro menu_options(request, auth, is_linguist, showMacron) %}
     <ul id="options-menu" class="menu__options menu__options--list menu__options--right">
+        {% if is_linguist %}
+            <li><a href="{{ url('validation:issues') }}" class="menu__options-link">View open Issues</a></li>
+        {% endif %}
         {% if auth %}
             {% if request.COOKIES['macron'] == 'off' %}
                 <li onclick="showMacron('on')"><a href="#" class="menu__options-link">Show ê with circumflex</a></li>
             {% else %}
                 <li  onclick="showMacron('off')"><a href="#" class="menu__options-link">Show e without circumflex</a></li>
             {% endif %}
-            <li><a href="/logout" id="logout-link" class="logout-link">Logout</a></li>
+            <li><a href="{{ url('validation:logout') }}" id="logout-link" class="logout-link">Logout</a></li>
 
         {% else %}
-            <li><a href="/login" id="login-link" class="login-link">Login</a></li>
+            <li><a href="{{ url('validation:login') }}" id="login-link" class="login-link">Login</a></li>
         {% endif %}
     </ul>
 {% endmacro %}

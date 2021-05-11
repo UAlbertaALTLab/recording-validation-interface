@@ -467,6 +467,17 @@ class Issue(models.Model):
         help_text="When was this issue filed?",
     )
 
+    RESOLVED = "resolved"
+    OPEN = "open"
+    STATUS_CHOICES = [(RESOLVED, "Resolved"), (OPEN, "Open")]
+
+    status = models.CharField(
+        help_text="The status of the issue",
+        max_length=64,
+        choices=STATUS_CHOICES,
+        default=OPEN,
+    )
+
 
 # ############################### Utilities ############################### #
 

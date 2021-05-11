@@ -50,7 +50,7 @@ from librecval.normalization import to_indexable_form
 from .crude_views import *
 from .models import Phrase, Recording, Speaker, RecordingSession, Issue
 from .helpers import get_distance_with_translations, perfect_match, exactly_one_analysis
-from .forms import EditSegment, Login, Register, FlagSegment
+from .forms import EditSegment, Login, Register, FlagSegment, EditIssueWithRecording
 
 
 def index(request):
@@ -465,9 +465,44 @@ def register(request):
 
 
 def view_issues(request):
-    issues = Issue.objects.all()
-    context = dict(issues=issues)
+    issues = Issue.objects.filter(status=Issue.OPEN)
+    context = dict(
+        issues=issues,
+        auth=request.user.is_authenticated,
+        is_linguist=user_is_linguist(request.user),
+    )
     return render(request, "validation/view_issues.html", context)
+
+
+def view_issue_detail(request, issue_id):
+    issue = Issue.objects.filter(id=issue_id).first()
+    # need two forms: one for changing a recording, one for
+    # changing a phrase
+
+    # if the issue has a recording, send that form
+    form = None
+    if issue.recording:
+        form = EditIssueWithRecording()
+    # if the issue has a phrase, send that form
+
+    # when the recording form comes back, look for a phrase with
+    # the same transcription/translation if those fields have been filled
+    # if one exists, change the association to that one
+    # if one doesn't exist, make it and save the new relationship
+
+    # when the phrase form comes back, save the new information
+    # in the phrase
+
+    # when either form comes back, mark the issue as resolved
+    # and update the phrase/recording status
+
+    context = dict(
+        issue=issue,
+        form=form,
+        auth=request.user.is_authenticated,
+        is_linguist=user_is_linguist(request.user),
+    )
+    return render(request, "validation/view_issue_detail.html", context)
 
 
 # TODO: Speaker bio page like https://ojibwe.lib.umn.edu/about/voices

@@ -216,6 +216,11 @@ a:hover {
   margin-bottom: 0.5rem;
 }
 
+.button--right-issue {
+  display: inline-flex;
+  justify-content: end;
+}
+
 .button--adv-search {
   background-color: transparent;
   color: var(--custom-beige);

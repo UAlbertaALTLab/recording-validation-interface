@@ -15,27 +15,19 @@
       along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #}
 
+{% extends 'validation/_base.html' %}
 {% import 'validation/_macros.html' as macros %}
 
-
-{% macro issue_card(issue) %}
-
-    <div class="col-sm-6">
-        <article class="card shadow-sm" data-cy="issue-card">
-            <div class="card__header card__header--beige" data-cy="card-header">
-                <button class="button button--neutral button--right-issue">
-                    <a href="{{ url('validation:issue_detail', issue.id) }}">More Info</a>
-                </button>
-            </div>
-            <div class="card__body">
-                {% if issue.phrase %}
-                    <h2>Phrase: {{ issue.phrase }}</h2>
-                {% elif issue.recording %}
-                    <h2>Recording: {{ issue.recording }}</h2>
-                    {{ macros.player(issue.recording) }}<br>
-                {% endif %}
-                <h3>What's wrong with this entry?</h3>
-                {% if issue.bad_cree %}
+{% block content %}
+    <container style="display: flex">
+        <section style="flex: 1">
+        <h2>Current Information</h2>
+            {{ issue.phrase if issue.phrase }}<br>
+            {{ issue.recording if issue.recording }}<br>
+            {% if issue.recording %}
+                {{ macros.player(issue.recording) }}<br>
+            {% endif %}
+            {% if issue.bad_cree %}
                     The Cree word in this entry is wrong<br>
                 {% endif %}
                 {% if issue.bad_english %}
@@ -54,11 +46,19 @@
                 {% if issue.suggested_english %}
                     English spelling suggestion: {{ issue.suggested_english }}<br>
                 {% endif %}
-                <div class="card-footer">
-                    This issue was filed by {{ issue.created_by }} on {{ issue.created_on }}
-                </div>
-            </div>
-        </article>
-    </div>
+            This issue was filed by {{ issue.created_by }} on
+            {{ issue.created_on }}<br>
+        </section>
 
-{% endmacro %}
+        <section style="flex: 1">
+            <h2>Updates</h2>
+            {% if form %}
+                <form action="" method="post">
+                    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                    {{ form }}
+                    <input data-cy="save-button" type="submit" class="button button--success" value="Save">
+                </form>
+            {% endif %}
+        </section>
+    </container>
+{% endblock content %}
