@@ -468,6 +468,21 @@ class Issue(models.Model):
     )
 
 
+class Analysis(models.Model):
+    headword = models.CharField(help_text="The entry headword", max_length=1024)
+
+    phrase = models.ForeignKey(Phrase, on_delete=models.DO_NOTHING)
+
+    edited_by = models.CharField(
+        help_text="The last person to edit this analysis", max_length=64
+    )
+
+    edited_on = models.DateField(help_text="The date of the most recent change")
+
+    # Keep track of the history of each analysis so we can find any issues
+    history = HistoricalRecords()
+
+
 # ############################### Utilities ############################### #
 
 
