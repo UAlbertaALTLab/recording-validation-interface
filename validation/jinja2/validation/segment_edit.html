@@ -4,10 +4,7 @@
     <form action="" method="post" id="edit-segment-form">
         <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
         {{ base_form }}
-        {% for word in edit_word_forms %}
-            <h3>Add details for {{ word }}</h3>
-            {{ edit_word_forms[word] }}
-        {% endfor %}
+        {{ edit_word_form }}
         <input data-cy="save-button" type="submit" class="button button--success" value="Save">
         <input data-cy="cancel-button" type="button" class="button button--fail" onclick="hideDiv()" value="Cancel">
     </form>

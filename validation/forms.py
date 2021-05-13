@@ -75,20 +75,42 @@ class EditSegment(forms.Form):
     cree = forms.CharField(
         required=False, widget=forms.TextInput(attrs={"class": "form-control"})
     )
+    translation = forms.CharField(
+        required=False, widget=forms.TextInput(attrs={"class": "form-control"})
+    )
 
 
 class EditWordForm(forms.ModelForm):
     class Meta:
         model = Word
-        fields = [
-            "wordform",
-            "analysis",
-            "lemma",
-            "stem",
-            "inflectional_class",
-            "derivational_analysis",
-            "translation",
-        ]
+        # fields = ["wordform", "analysis", "lemma", "stem", "inflectional_class", "derivational_analysis", "translation"]
+        fields = []
+
+    def __init__(self, words):
+        super().__init__()
+        self.words = words
+        for word in self.words:
+            self.fields[f"{word} wordform"] = forms.CharField(
+                widget=forms.TextInput(attrs={"class": "form-control"})
+            )
+            self.fields[f"{word} analysis"] = forms.CharField(
+                widget=forms.TextInput(attrs={"class": "form-control"})
+            )
+            self.fields[f"{word} lemma"] = forms.CharField(
+                widget=forms.TextInput(attrs={"class": "form-control"})
+            )
+            self.fields[f"{word} stem"] = forms.CharField(
+                widget=forms.TextInput(attrs={"class": "form-control"})
+            )
+            self.fields[f"{word} inflectional class"] = forms.CharField(
+                widget=forms.TextInput(attrs={"class": "form-control"})
+            )
+            self.fields[f"{word} derivational analysis"] = forms.CharField(
+                widget=forms.TextInput(attrs={"class": "form-control"})
+            )
+            self.fields[f"{word} translation"] = forms.CharField(
+                widget=forms.TextInput(attrs={"class": "form-control"})
+            )
 
 
 class FlagSegment(forms.ModelForm):

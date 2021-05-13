@@ -398,11 +398,9 @@ def segment_content_view(request, segment_id):
         if base_form.is_valid():
             transcription = base_form.cleaned_data["cree"]
             translation = base_form.cleaned_data["translation"]
-            analysis = base_form.cleaned_data["analysis"]
             p = Phrase.objects.filter(id=phrase_id)[0]
             p.transcription = transcription
             p.translation = translation
-            p.analysis = analysis
             p.validated = True
             p.modifier = str(request.user)
             p.date = datetime.datetime.now()
@@ -418,14 +416,14 @@ def segment_content_view(request, segment_id):
     auth = request.user.is_authenticated
 
     base_form = EditSegment()
-    edit_word_forms = {word: EditWordForm() for word in segment_name.split()}
+    edit_word_form = EditWordForm(segment_name.split())
 
     context = dict(
         phrases=phrases,
         segment_name=segment_name,
         suggestions=suggestions,
         base_form=base_form,
-        edit_word_forms=edit_word_forms,
+        edit_word_form=edit_word_form,
         history=history,
         auth=auth,
     )
