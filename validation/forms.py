@@ -3,7 +3,7 @@ import re
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 
-from validation.models import Issue
+from validation.models import Issue, Word
 
 
 class Login(forms.Form):
@@ -75,13 +75,20 @@ class EditSegment(forms.Form):
     cree = forms.CharField(
         required=False, widget=forms.TextInput(attrs={"class": "form-control"})
     )
-    translation = forms.CharField(
-        required=False, widget=forms.TextInput(attrs={"class": "form-control"})
-    )
-    analysis = forms.CharField(
-        required=False,
-        widget=forms.TextInput(attrs={"class": "form-control bottom-margin"}),
-    )
+
+
+class EditWordForm(forms.ModelForm):
+    class Meta:
+        model = Word
+        fields = [
+            "wordform",
+            "analysis",
+            "lemma",
+            "stem",
+            "inflectional_class",
+            "derivational_analysis",
+            "translation",
+        ]
 
 
 class FlagSegment(forms.ModelForm):

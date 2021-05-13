@@ -50,7 +50,7 @@ from librecval.normalization import to_indexable_form
 from .crude_views import *
 from .models import Phrase, Recording, Speaker, RecordingSession, Issue
 from .helpers import get_distance_with_translations, perfect_match, exactly_one_analysis
-from .forms import EditSegment, Login, Register, FlagSegment
+from .forms import EditSegment, Login, Register, FlagSegment, EditWordForm
 
 
 def index(request):
@@ -392,13 +392,13 @@ def segment_content_view(request, segment_id):
     Returns the selected phrase and info provided by the helper functions
     """
     if request.method == "POST":
-        form = EditSegment(request.POST)
+        base_form = EditSegment(request.POST)
         og_phrase = Phrase.objects.filter(id=segment_id)[0]
         phrase_id = og_phrase.id
-        if form.is_valid():
-            transcription = form.cleaned_data["cree"]
-            translation = form.cleaned_data["translation"]
-            analysis = form.cleaned_data["analysis"]
+        if base_form.is_valid():
+            transcription = base_form.cleaned_data["cree"]
+            translation = base_form.cleaned_data["translation"]
+            analysis = base_form.cleaned_data["analysis"]
             p = Phrase.objects.filter(id=phrase_id)[0]
             p.transcription = transcription
             p.translation = translation
@@ -417,13 +417,15 @@ def segment_content_view(request, segment_id):
     history = phrases[0].history.all()
     auth = request.user.is_authenticated
 
-    form = EditSegment()
+    base_form = EditSegment()
+    edit_word_forms = {word: EditWordForm() for word in segment_name.split()}
 
     context = dict(
         phrases=phrases,
         segment_name=segment_name,
         suggestions=suggestions,
-        form=form,
+        base_form=base_form,
+        edit_word_forms=edit_word_forms,
         history=history,
         auth=auth,
     )

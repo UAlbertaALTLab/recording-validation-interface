@@ -468,13 +468,75 @@ class Issue(models.Model):
     )
 
 
-class Analysis(models.Model):
-    headword = models.CharField(help_text="The entry headword", max_length=1024)
+class Word(models.Model):
+    wordform = models.CharField(
+        help_text="The entry headword", max_length=256, blank=False
+    )
+
+    analysis = models.CharField(
+        help_text="The FST analysis", max_length=256, blank=False
+    )
+
+    lemma = models.CharField(
+        help_text="Is typically the 3S+Ind form of a verb", max_length=64, blank=True
+    )
+
+    stem = models.CharField(help_text="FST stem", max_length=64, blank=True)
+
+    INFLECTION_CHOICES = [
+        ("INM", "INM"),
+        ("IPC", "IPC"),
+        ("IPJ", "IPJ"),
+        ("NA1", "NA-1"),
+        ("NA2", "NA-2"),
+        ("NA3", "NA-3"),
+        ("NA4", "NA-4"),
+        ("NA4w", "NA-4w"),
+        ("NDA1", "NDA-1"),
+        ("NDA2", "NDA-2"),
+        ("NDA3", "NDA-3"),
+        ("NDA4", "NDA-4"),
+        ("NDA4w", "NDA-4w"),
+        ("NDI1", "NDI-1"),
+        ("NDI2", "NDI-2"),
+        ("NDI3", "NDI-3"),
+        ("NDI4", "NDI-4"),
+        ("NDI5", "NDI-5"),
+        ("PrA", "PrA"),
+        ("VAI", "VAI"),
+        ("VAI1", "VAI-1"),
+        ("VAI2", "VAI-2"),
+        ("VAI3", "VAI-3"),
+        ("VII1n", "VII-1n"),
+        ("VII1v", "VII-1v"),
+        ("VII2n", "VII-2n"),
+        ("VII2v", "VII-2v"),
+        ("VIIn", "VII-n"),
+        ("VIIv", "VII-v"),
+        ("VTA1", "VTA-1"),
+        ("VTA2", "VTA-2"),
+        ("VTA3", "VTA-3"),
+        ("VTA4", "VTA-4"),
+        ("VTA5", "VTA-5"),
+        ("VTI1", "VTI-1"),
+        ("VTI2", "VTI-2"),
+        ("VTI3", "VTI-3"),
+    ]
+    # auto-complete list would be ideal
+    inflectional_class = models.CharField(
+        max_length=8, choices=INFLECTION_CHOICES, blank=True
+    )
+
+    derivational_analysis = models.CharField(max_length=64, blank=True)
+
+    translation = models.CharField(
+        max_length=64, help_text="The literal translation of the word"
+    )
 
     phrase = models.ForeignKey(Phrase, on_delete=models.DO_NOTHING)
 
     edited_by = models.CharField(
-        help_text="The last person to edit this analysis", max_length=64
+        help_text="The last person to edit this word", max_length=64
     )
 
     edited_on = models.DateField(help_text="The date of the most recent change")
