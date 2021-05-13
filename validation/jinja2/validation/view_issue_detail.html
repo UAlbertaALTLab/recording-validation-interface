@@ -22,7 +22,10 @@
     <container style="display: flex">
         <section style="flex: 1">
         <h2>Current Information</h2>
-            {{ issue.phrase if issue.phrase }}<br>
+            {% if issue.phrase %}
+            Transcription: {{ issue.phrase.transcription }}<br>
+            Translation: {{ issue.phrase.translation }}<br>
+            {% endif %}
             {{ issue.recording if issue.recording }}<br>
             {% if issue.recording %}
                 {{ macros.player(issue.recording) }}<br>

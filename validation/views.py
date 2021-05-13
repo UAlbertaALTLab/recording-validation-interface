@@ -50,7 +50,14 @@ from librecval.normalization import to_indexable_form
 from .crude_views import *
 from .models import Phrase, Recording, Speaker, RecordingSession, Issue
 from .helpers import get_distance_with_translations, perfect_match, exactly_one_analysis
-from .forms import EditSegment, Login, Register, FlagSegment, EditIssueWithRecording
+from .forms import (
+    EditSegment,
+    Login,
+    Register,
+    FlagSegment,
+    EditIssueWithRecording,
+    EditIssueWithPhrase,
+)
 
 
 def index(request):
@@ -476,14 +483,12 @@ def view_issues(request):
 
 def view_issue_detail(request, issue_id):
     issue = Issue.objects.filter(id=issue_id).first()
-    # need two forms: one for changing a recording, one for
-    # changing a phrase
 
-    # if the issue has a recording, send that form
     form = None
     if issue.recording:
         form = EditIssueWithRecording()
-    # if the issue has a phrase, send that form
+    if issue.phrase:
+        form = EditIssueWithPhrase()
 
     # when the recording form comes back, look for a phrase with
     # the same transcription/translation if those fields have been filled

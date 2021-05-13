@@ -3,7 +3,7 @@ import re
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 
-from validation.models import Issue, Recording
+from validation.models import Issue, Recording, Phrase
 
 
 class Login(forms.Form):
@@ -129,10 +129,13 @@ class EditIssueWithRecording(forms.ModelForm):
     class Meta:
         model = Recording
         fields = ["speaker"]
+        help_texts = {
+            "speaker": "\n",
+        }
 
-    # drop down of speaker names
-    # ability to change the word being spoken
 
-
-class EditIssueWithPhrase(forms.Form):
-    pass
+class EditIssueWithPhrase(forms.ModelForm):
+    class Meta:
+        model = Phrase
+        fields = ["transcription", "translation"]
+        help_texts = {"transcription": "\n", "translation": "\n"}
