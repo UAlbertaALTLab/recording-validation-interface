@@ -5,6 +5,7 @@
         
         const translation = document.getElementById(name + '-translation').innerHTML;
 
+
         document.getElementById('id_cree').value = name;
         document.getElementById('id_translation').value = translation;
     }
@@ -48,7 +49,7 @@
         <button class="button button--success button--back" onclick='goBack()'>Back</button>
         {% if auth %}
             <button data-cy="edit-button" class="button button--fail button--right button--edit"
-                onclick="showDiv('{{ segment_name }}')"
+                onclick='showDiv("{{ segment_name }}")'
                 class="button button--fail button--right">
                     Edit
             </button>
@@ -123,7 +124,7 @@
               <td>
                   {% set transl = suggestions[suggestion]["matches"][0]["translations"] %}
                   {% set analysis = suggestions[suggestion]["matches"][0]["analysis"] %}
-                  <input type="button" class="button button--success" value="Accept" onclick="showDivAccept('{{ suggestion }}', '{{ transl }}', '{{ analysis }}')" />
+                  <input type="button" class="button button--success" value="Accept" onclick='showDivAccept("{{ suggestion }}", "{{ transl }}", "{{ analysis }}")' />
               </td>
               {% endif %}
             {% endif %}
@@ -137,7 +138,7 @@
             <td>
                 {% set transl = match["translations"] %}
                 {% set analysis = match["analysis"] %}
-                <input type="button" class="button button--success" value="Accept" onclick="showDivAccept('{{ suggestion }}', '{{ transl }}', '{{ analysis }}')" />
+                <input type="button" class="button button--success" value="Accept" onclick='showDivAccept("{{ suggestion }}", "{{ transl }}", "{{ analysis }}")' />
             </td>
           </tr>
             {% endif %}
@@ -168,7 +169,7 @@
           <td data-cy="revision-analysis">{{ revision.analysis }} </td>
           {% if auth %}
           <td>
-            <input type="button" class="button button--fail" value="Revert" onclick="revert('{{ revision.transcription }}', '{{ revision.translation }}', '{{ revision.analysis }}')" />
+            <input type="button" class="button button--fail" value="Revert" onclick='revert("{{ revision.transcription }}", "{{ revision.translation }}", "{{ revision.analysis }}")' />
         </td>
         {% endif %}
           
