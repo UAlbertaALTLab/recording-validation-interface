@@ -406,6 +406,10 @@ def segment_content_view(request, segment_id):
             p.date = datetime.datetime.now()
             p.save()
 
+        edit_word_form = EditWordForm(request.POST, og_phrase.transcription.split())
+        if edit_word_form.is_valid():
+            print("yay")
+
     phrases = Phrase.objects.filter(id=segment_id)
     field_transcription = phrases[0].field_transcription
     suggestions = get_distance_with_translations(field_transcription)
