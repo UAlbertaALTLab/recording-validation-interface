@@ -43,6 +43,7 @@ from django.contrib.auth.models import User, Group
 from django.contrib.auth import authenticate, login as django_login
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
+from django.template.loader import render_to_string
 from django.db.models import Q
 
 from librecval.normalization import to_indexable_form
@@ -445,7 +446,7 @@ def register(request):
             last_name = form.cleaned_data["last_name"]
             group = form.cleaned_data["role"]
             if not group:
-                group = "Community"
+                group = "Learner"
             else:
                 group = group.title()
             user = authenticate(request, username=username, password=password)
@@ -457,6 +458,22 @@ def register(request):
                     last_name=last_name,
                 )
                 new_user.save()
+                if group == "Linguist":
+                    # https://studygyaan.com/django/how-to-signup-user-and-send-confirmation-email-in-django
+                    # Linguists need permission to be a linguist
+                    admin_user = User.objects.get(username="jcpoulin")
+                    subject = "New Linguist User"
+                    message = render_to_string(
+                        "validation/account_activation_email.html", {"user": new_user}
+                    )
+                    admin_user.email_user(subject, message)
+                    message.success(
+                        request,
+                        (
+                            'You need approval to be granted Linguist access. Your request has been submitted and you have been granted "Expert" access in the meantime. Please contact jcpoulin@ualberta.ca with any further questions.'
+                        ),
+                    )
+                    group = "Expert"
                 group, _ = Group.objects.get_or_create(name=group)
                 group.user_set.add(new_user)
                 response = HttpResponseRedirect("/login")

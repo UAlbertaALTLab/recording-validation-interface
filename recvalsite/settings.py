@@ -249,3 +249,5 @@ LOGGING = {
         },
     },
 }
+
+EMAIL_HOST = "localhost"
