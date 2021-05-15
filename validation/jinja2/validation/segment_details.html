@@ -1,40 +1,46 @@
 <script>
-    function showDiv(name) {
-        document.getElementById('edit').style.display = "block";
-        document.getElementById('id_cree').focus()
-        
-        const translation = document.getElementById(name + '-translation').innerHTML;
-        
-        document.getElementById('id_cree').value = name;
-        document.getElementById('id_translation').value = translation;
-    }
+    document.addEventListener('DOMContentLoaded', () => {
+        for (let button of document.querySelectorAll('[data-segment-name]')) {
+            button.addEventListener("click", async (e) => {
+                const name = e.target.dataset.segmentName
 
-    function showDivAccept(name, translation, analysis) {
-        document.getElementById('edit').style.display = "block";
-        document.getElementById('id_cree').focus()
+                document.getElementById('edit').style.display = "block";
+                document.getElementById('id_cree').focus()
 
-        document.getElementById('id_cree').value = name;
-        document.getElementById('id_translation').value = translation;
-        document.getElementById('id_analysis').value = analysis;
-    }
+                const translation = document.getElementById(name + '-translation').innerHTML;
 
-    function hideDiv() {
-        document.getElementById('edit').style.display = "none";
-    }
+                document.getElementById('id_cree').value = name;
+                document.getElementById('id_translation').value = translation;
+            })
+        }
 
-    function revert(transcription, translation, analysis) {
-        document.getElementById('edit').style.display = "block";
-        document.getElementById('id_cree').focus()
+        for (let button of document.querySelectorAll('[data-cy="accept-button"], [data-cy="revert-button"]')) {
+            button.addEventListener("click", async(e) => {
+                document.getElementById('edit').style.display = "block";
+                document.getElementById('id_cree').focus()
 
-        document.getElementById('id_cree').value = transcription;
-        document.getElementById('id_translation').value = translation;
-        document.getElementById('id_analysis').value = analysis;
-    }
+                const name = e.target.dataset.transcription
+                const translation = e.target.dataset.translation
+                const analysis = e.target.dataset.analysis
 
-    function goBack() {
-        window.history.back()
-    }
+                document.getElementById('id_cree').value = name;
+                document.getElementById('id_translation').value = translation;
+                document.getElementById('id_analysis').value = analysis;
+            })
+        }
 
+        for (let button of document.querySelectorAll('[data-cy="cancel-button"]')) {
+            button.addEventListener("click", async(e) => {
+                document.getElementById('edit').style.display = "none";
+            })
+        }
+
+        for (let button of document.querySelectorAll('[data-cy="back-button"]')) {
+            button.addEventListener("click", async(e) => {
+                window.history.back()
+            })
+        }
+    })
     
 </script>
 
@@ -45,11 +51,13 @@
 <div class="table-responsive">
 
     <div>
-        <button class="button button--success button--back" onclick='goBack()'>Back</button>
+        <button data-cy="back-button" class="button button--success button--back">Back</button>
         {% if auth %}
-            <button data-cy="edit-button" class="button button--fail button--right button--edit"
-                onclick='showDiv("{{ segment_name }}")'
-                class="button button--fail button--right">
+            <button
+                    data-cy="edit-button"
+                    data-segment-name="{{ segment_name }}"
+                    class="button button--fail button--right button--edit"
+            >
                     Edit
             </button>
         {% endif %}
@@ -123,7 +131,14 @@
               <td>
                   {% set transl = suggestions[suggestion]["matches"][0]["translations"] %}
                   {% set analysis = suggestions[suggestion]["matches"][0]["analysis"] %}
-                  <input type="button" class="button button--success" value="Accept" onclick='showDivAccept("{{ suggestion }}", "{{ transl }}", "{{ analysis }}")' />
+                  <input
+                          type="button"
+                          data-cy="accept-button"
+                          class="button button--success"
+                          value="Accept"
+                          data-transcription="{{ suggestion }}"
+                          data-translation="{{ transl }}"
+                          data-analysis="{{ analysis }}" />
               </td>
               {% endif %}
             {% endif %}
@@ -137,7 +152,14 @@
             <td>
                 {% set transl = match["translations"] %}
                 {% set analysis = match["analysis"] %}
-                <input type="button" class="button button--success" value="Accept" onclick='showDivAccept("{{ suggestion }}", "{{ transl }}", "{{ analysis }}")' />
+                <input
+                        type="button"
+                        class="button button--success"
+                        value="Accept"
+                        data-cy="accept-button"
+                        data-transcription="{{ suggestion }}"
+                        data-translation="{{ transl }}"
+                        data-analysis="{{ analysis }}"/>
             </td>
           </tr>
             {% endif %}
@@ -168,7 +190,15 @@
           <td data-cy="revision-analysis">{{ revision.analysis }} </td>
           {% if auth %}
           <td>
-            <input type="button" class="button button--fail" value="Revert" onclick='revert("{{ revision.transcription }}", "{{ revision.translation }}", "{{ revision.analysis }}")' />
+            <input
+                    type="button"
+                    class="button button--fail"
+                    value="Revert"
+                    data-cy="revert-button"
+                    data-transcription="{{ revision.transcription }}"
+                    data-translation="{{ revision.translation }}"
+                    data-analysis="{{ revision.analysis }}"
+            />
         </td>
         {% endif %}
           
