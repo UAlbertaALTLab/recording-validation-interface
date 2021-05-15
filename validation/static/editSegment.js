@@ -3,11 +3,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     for (let button of document.querySelectorAll('[data-segment-name]')) {
         button.addEventListener("click", async (e) => {
+            showDiv()
             const name = e.target.dataset.segmentName
-
-            document.getElementById('edit').style.display = "block";
-            document.getElementById('id_cree').focus()
-
             const translation = document.getElementById(name + '-translation').innerHTML;
 
             document.getElementById('id_cree').value = name;
@@ -17,8 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     for (let button of document.querySelectorAll('[data-cy="accept-button"], [data-cy="revert-button"]')) {
         button.addEventListener("click", async(e) => {
-            document.getElementById('edit').style.display = "block";
-            document.getElementById('id_cree').focus()
+            showDiv()
 
             const name = e.target.dataset.transcription
             const translation = e.target.dataset.translation
@@ -42,3 +38,9 @@ document.addEventListener('DOMContentLoaded', () => {
         })
     }
 })
+
+
+function showDiv() {
+    document.getElementById('edit').style.display = "block";
+    document.getElementById('id_cree').focus()
+}
