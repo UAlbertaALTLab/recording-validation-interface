@@ -1,5 +1,8 @@
 "use strict";
 
+// Helper functions that are needed across multiple JS files
+
+
 function getElementByPhraseId(className, phraseId) {
     const elements =  document.getElementsByClassName(className);
     for (let e of elements) {
