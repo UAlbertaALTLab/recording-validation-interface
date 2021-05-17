@@ -102,31 +102,3 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 })
-
-function showWrongWordDiv(recordingId) {
-    const wrongWordDiv = getElementByRecordingId("rec-wrong-word", recordingId);
-    wrongWordDiv.classList.replace("menu__none", "menu__block");
-}
-
-function hideWrongWordDiv(recordingId) {
-    const wrongWordDiv = getElementByRecordingId("rec-wrong-word", recordingId);
-    wrongWordDiv.classList.replace("menu__block", "menu__none");
-}
-
-function getElementByPhraseId(className, phraseId) {
-    const elements =  document.getElementsByClassName(className);
-    for (let e of elements) {
-        if (e.dataset.phraseId === phraseId) {
-           return e
-        }
-    }
-}
-
-function getElementByRecordingId(className, recordingId) {
-    const elements =  document.getElementsByClassName(className);
-    for (let e of elements) {
-        if (e.dataset.recId === recordingId) {
-           return e
-        }
-    }
-}

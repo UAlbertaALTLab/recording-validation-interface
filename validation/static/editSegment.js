@@ -16,11 +16,11 @@ document.addEventListener('DOMContentLoaded', () => {
         button.addEventListener("click", async(e) => {
             showDiv()
 
-            const name = e.target.dataset.transcription
+            const transcription = e.target.dataset.transcription
             const translation = e.target.dataset.translation
             const analysis = e.target.dataset.analysis
 
-            document.getElementById('id_cree').value = name;
+            document.getElementById('id_cree').value = transcription;
             document.getElementById('id_translation').value = translation;
             document.getElementById('id_analysis').value = analysis;
         })
