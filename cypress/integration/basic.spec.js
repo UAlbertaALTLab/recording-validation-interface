@@ -26,4 +26,17 @@ describe("On load", () => {
         cy.get('[data-cy="nav-button-with-query"]')
             .should('be.visible')
     })
+
+    it("loads and can interact with the options menu", () => {
+        cy.visit(Cypress.env('home'));
+
+        cy.get('[data-cy="options-menu-options"]')
+            .should('not.be.visible')
+
+        cy.get('[data-cy="options-button-header"]')
+            .click()
+
+        cy.get('[data-cy="options-menu-options"]')
+            .should('be.visible')
+    })
 })

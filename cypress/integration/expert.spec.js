@@ -32,4 +32,30 @@ describe("Language experts", () => {
                     .click()
             })
     })
+
+    it("can mark a recording as having the wrong word", () => {
+        cy.visit(Cypress.env('home'));
+
+        cy.get('[data-cy="wrong-word-button"]')
+            .first()
+            .click()
+
+        cy.get('[id="wrong_word"]')
+            .first()
+            .click()
+            .type("test")
+            .type('{enter}')
+    })
+
+    it("can mark a recording as having the wrong speaker", () => {
+        cy.visit(Cypress.env('home'));
+
+        cy.get('[data-cy="wrong-speaker-button"]')
+            .first()
+            .click()
+
+        cy.get('[data-cy="rec-save-button"]')
+            .first()
+            .click()
+    })
 })
