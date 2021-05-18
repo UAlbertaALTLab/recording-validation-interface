@@ -43,7 +43,7 @@ from django.contrib.auth.models import User, Group
 from django.contrib.auth import authenticate, login as django_login
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
-from django.template.loader import render_to_string
+from django.core.mail import send_mail
 from django.db.models import Q
 
 from librecval.normalization import to_indexable_form
@@ -461,18 +461,17 @@ def register(request):
                 if group == "Linguist":
                     # https://studygyaan.com/django/how-to-signup-user-and-send-confirmation-email-in-django
                     # Linguists need permission to be a linguist
-                    admin_user = User.objects.get(username="jcpoulin")
+                    admin_user = User.objects.get(username="jolenepoulin")
                     subject = "New Linguist User"
-                    message = render_to_string(
-                        "validation/account_activation_email.html", {"user": new_user}
+                    message = f"New user {username} has request linguist access. Login to the admin interface to grant them access."
+                    res = send_mail(
+                        subject,
+                        message,
+                        admin_user.email,
+                        [admin_user.email],
+                        fail_silently=False,
                     )
-                    admin_user.email_user(subject, message)
-                    message.success(
-                        request,
-                        (
-                            'You need approval to be granted Linguist access. Your request has been submitted and you have been granted "Expert" access in the meantime. Please contact jcpoulin@ualberta.ca with any further questions.'
-                        ),
-                    )
+                    print(res)
                     group = "Expert"
                 group, _ = Group.objects.get_or_create(name=group)
                 group.user_set.add(new_user)

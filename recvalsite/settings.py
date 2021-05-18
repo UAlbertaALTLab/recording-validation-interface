@@ -250,4 +250,5 @@ LOGGING = {
     },
 }
 
-EMAIL_HOST = "localhost"
+# EMAIL_HOST = "localhost"
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
