@@ -48,7 +48,7 @@ from django.db.models import Q
 from librecval.normalization import to_indexable_form
 
 from .crude_views import *
-from .models import Phrase, Recording, Speaker, RecordingSession, Issue
+from .models import Phrase, Recording, Speaker, RecordingSession, Issue, Word
 from .helpers import get_distance_with_translations, perfect_match, exactly_one_analysis
 from .forms import EditSegment, Login, Register, FlagSegment, EditWordForm
 
@@ -406,10 +406,6 @@ def segment_content_view(request, segment_id):
             p.date = datetime.datetime.now()
             p.save()
 
-        edit_word_form = EditWordForm(request.POST, og_phrase.transcription.split())
-        if edit_word_form.is_valid():
-            print("yay")
-
     phrases = Phrase.objects.filter(id=segment_id)
     field_transcription = phrases[0].field_transcription
     suggestions = get_distance_with_translations(field_transcription)
@@ -422,12 +418,14 @@ def segment_content_view(request, segment_id):
     base_form = EditSegment()
     edit_word_form = EditWordForm(segment_name.split())
 
+    inflectional_classes = Word.INFLECTION_CHOICES
+
     context = dict(
         phrases=phrases,
         segment_name=segment_name,
         suggestions=suggestions,
         base_form=base_form,
-        edit_word_form=edit_word_form,
+        inflectional_classes=inflectional_classes,
         history=history,
         auth=auth,
     )

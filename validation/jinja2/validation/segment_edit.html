@@ -4,7 +4,35 @@
     <form action="" method="post" id="edit-segment-form">
         <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
         {{ base_form }}
-{#        {{ edit_word_form }}#}
+        {% for word in segment_name.split() %}
+            <h3>Information for {{ word }}:</h3>
+            <label for="{{ word }}-wordform">Wordform:</label>
+            <input type="text" id="{{ word }}-wordform" name="{{ word }}-wordform"><br>
+
+            <label for="{{ word }}-analysis">Analysis:</label>
+            <input type="text" id="{{ word }}-analysis" name="{{ word }}-analysis"><br>
+
+            <label for="{{ word }}-lemma">Lemma:</label>
+            <input type="text" id="{{ word }}-lemma" name="{{ word }}-lemma"><br>
+
+            <label for="{{ word }}-stem">Stem:</label>
+            <input type="text" id="{{ word }}-stem" name="{{ word }}-stem"><br>
+
+            <label for="{{ word }}-inflectional-class">Inflectional Class:</label>
+            <input list="{{ word }}-inflectional-class-options" id="{{ word }}-inflectional-class" name="{{ word }}-inflectional-class">
+            <datalist id="{{ word }}-inflectional-class-options">
+                {% for opt in inflectional_classes %}
+                    <option value="{{ opt[1] }}">
+                {% endfor %}
+            </datalist>
+            <br>
+
+            <label for="{{ word }}-derivational-analysis">Derivational Analysis:</label>
+            <input type="text" id="{{ word }}-derivational-analysis" name="{{ word }}-derivational-analysis"><br>
+
+            <label for="{{ word }}-translation">Translation:</label>
+            <input type="text" id="{{ word }}-translation" name="{{ word }}-translation"><br><br>
+        {% endfor %}
         <input data-cy="save-button" type="submit" class="button button--success" value="Save">
         <input data-cy="cancel-button" type="button" class="button button--fail" onclick="hideDiv()" value="Cancel">
     </form>
