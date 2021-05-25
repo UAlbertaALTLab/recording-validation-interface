@@ -1,8 +1,7 @@
 Maskwacîs recordings validation
 ===============================
 
-[![Build Status](https://travis-ci.org/UAlbertaALTLab/recording-validation-interface.svg?branch=master)](https://travis-ci.org/UAlbertaALTLab/recording-validation-interface)
-[![pyup.io Dependencies](https://pyup.io/repos/github/UAlbertaALTLab/recording-validation-interface/shield.svg)](https://pyup.io/repos/github/UAlbertaALTLab/recording-validation-interface/)
+[![Tests](https://github.com/UAlbertaALTLab/recording-validation-interface/actions/workflows/test.yml/badge.svg)](https://github.com/UAlbertaALTLab/recording-validation-interface/actions/workflows/test.yml)
 
 
 A Django web app for viewing and validating Cree recordings done in Maskwacîs.
