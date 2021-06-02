@@ -16,40 +16,6 @@
 #}
 
 {#
- # pagination() -- renders navigation links for a pagination object.
- #  e.g,. {1} [2] [3] ... [100]
- #
- # Adapted from: https://docs.djangoproject.com/en/2.1/topics/pagination/
- #}
-{% macro pagination(page, endpoint) %}
-<ul class="nav justify-content-center">
-  {% if page.has_previous() %}
-  <li class="nav-item"><a class="nav__link" href="?page=1">
-      First
-  </a></li>
-  <li class="nav-item"><a class="nav__link" href="?page={{ page.previous_page_number() }}">
-      Previous
-  </a></li>
-  {% endif %}
-
-  <li class="nav-item"><a class="nav__button active" data-cy="nav-button" href="#">
-      Page {{ page.number }}
-  </a></li>
-
-  {% if page.has_next() %}
-  <li class="nav-item"><a class="nav__link" href="?page={{ page.next_page_number() }}">
-      Next
-  </a></li>
-  <li class="nav-item"><a class="nav__link" href="?page={{ page.paginator.num_pages }}">
-      Last
-  </a></li>
-  {% endif %}
-
-</ul>
-{% endmacro %}
-
-
-{#
  # pagination_with_query() -- renders navigation links for a pagination object.
  #  e.g,. {1} [2] [3] ... [100]
  # links need query terms in the search pages
@@ -57,30 +23,33 @@
  # Adapted from: https://docs.djangoproject.com/en/2.1/topics/pagination/
  #}
 {% macro pagination_with_query(page, endpoint, query, encode_query_with_page) %}
-<ul class="nav justify-content-center">
-  {% if page.has_previous() %}
-  <li class="nav-item"><a class="nav__link" href={{ encode_query_with_page(query, page=1) }}>
-      First
-  </a></li>
-  <li class="nav-item"><a class="nav__link" href={{ encode_query_with_page(query, page=page.previous_page_number()) }}>
-      Previous
-  </a></li>
-  {% endif %}
+    <ul class="nav justify-content-center">
+        {% if page.has_previous() %}
+            <li class="nav-item"><a class="nav__link" href={{ encode_query_with_page(query, page=1) }}>
+                First
+            </a></li>
+            <li class="nav-item"><a class="nav__link" href={{ encode_query_with_page(query, page=page.previous_page_number()) }}>
+                Previous
+            </a></li>
+        {% endif %}
 
-  <li class="nav-item"><a class="nav__button active" data-cy="nav-button-with-query" href="#">
-      Page {{ page.number }} of {{ page.paginator.num_pages }}
-  </a></li>
+        <li class="nav-item"><a class="nav__button active" data-cy="nav-button-with-query" href="#">
+            Page {{ page.number }} of {{ page.paginator.num_pages }}
+        </a></li>
 
-  {% if page.has_next() %}
-  <li class="nav-item"><a class="nav__link" href={{ encode_query_with_page(query, page=page.next_page_number()) }}>
-      Next
-  </a></li>
-  <li class="nav-item"><a class="nav__link" href={{ encode_query_with_page(query, page=page.paginator.num_pages) }}>
-      Last
-  </a></li>
-  {% endif %}
+        {% if page.has_next() %}
+            <li class="nav-item"><a class="nav__link" href={{ encode_query_with_page(query, page=page.next_page_number()) }}>
+                Next
+            </a></li>
+            <li class="nav-item"><a class="nav__link" href={{ encode_query_with_page(query, page=page.paginator.num_pages) }}>
+                Last
+            </a></li>
+        {% endif %}
 
-</ul>
+    </ul>
+    <form name="jump-to-page" class="center">
+        Jump to Page: <input type="text" class="input--short"> <button type="button" data-cy="go-button-nav" class="button button--success button--small">Go</button>
+    </form>
 {% endmacro %}
 
 
