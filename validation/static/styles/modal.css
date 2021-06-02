@@ -1,0 +1,21 @@
+
+/* styles for the modals a.k.a pop-ups */
+.modal-body li {
+  list-style: none;
+}
+
+.modal-content .helptext {
+  width: 100%;
+  margin: 0 auto;
+  margin-top: -2rem;
+  padding-bottom: 1rem;
+}
+
+.modal__speaker-select {
+  margin: 1rem;
+}
+
+.issue__textarea {
+  width: 80%;
+  height: 3rem;
+}
