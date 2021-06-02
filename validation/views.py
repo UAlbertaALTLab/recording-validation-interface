@@ -136,7 +136,9 @@ def search_phrases(request):
 
     query = request.GET.get("query")
     all_matches = Phrase.objects.filter(
-        Q(transcription__contains=query) | Q(translation__contains=query)
+        Q(transcription__contains=query)
+        | Q(fuzzy_transcription__contains=query)
+        | Q(translation__contains=query)
     ).prefetch_related("recording_set__speaker")
     all_matches = list(all_matches)
     all_matches.sort(key=lambda phrase: phrase.transcription)
@@ -210,6 +212,7 @@ def advanced_search_results(request):
 
     filter_query = []
     if transcription:
+        filter_query.append(Q(fuzzy_transcription__contains=transcription))
         filter_query.append(Q(transcription__contains=transcription))
     if translation:
         filter_query.append(Q(translation__contains=translation))
