@@ -17,12 +17,12 @@
 
 
 {% macro menu_options(request, auth, showMacron) %}
-    <ul id="options-menu" class="menu__options menu__options--list menu__options--right">
+    <ul data-cy="options-menu-options" id="options-menu" class="menu__options menu__options--list menu__options--right">
         {% if auth %}
             {% if request.COOKIES['macron'] == 'off' %}
-                <li onclick="showMacron('on')"><a href="#" class="menu__options-link">Show ê with circumflex</a></li>
+                <li data-cy="show-flex-button"><a href="#" class="menu__options-link">Show ê with circumflex</a></li>
             {% else %}
-                <li  onclick="showMacron('off')"><a href="#" class="menu__options-link">Show e without circumflex</a></li>
+                <li data-cy="no-flex-button"><a href="#" class="menu__options-link">Show e without circumflex</a></li>
             {% endif %}
             <li><a href="/logout" id="logout-link" class="logout-link">Logout</a></li>
 

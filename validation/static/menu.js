@@ -1,17 +1,21 @@
 "use strict";
 
-function showMenu() {
-    let menu = document.getElementById("options-menu");
-    if (menu.classList.contains("menu__none")) {
-        menu.classList.remove("menu__none");
-        menu.classList.add("menu__block");
-    } else {
-        menu.classList.add("menu__none");
-        menu.classList.remove("menu__block");
+document.addEventListener("DOMContentLoaded", () => {
+    for (let link of document.querySelectorAll('[data-cy="show-flex-button"]')) {
+        link.addEventListener("click", () => {
+            showCircumflex("on");
+        })
     }
-}
 
-function showMacron(option) {
+    for (let link of document.querySelectorAll('[data-cy="no-flex-button"]')) {
+        link.addEventListener("click", () => {
+            showCircumflex("off");
+        })
+    }
+})
+
+
+function showCircumflex(option) {
     document.cookie = "macron=" + option + "; SameSite=Lax;"
     let menu = document.getElementById("options-menu");
     menu.classList.add("menu__none");
