@@ -43,7 +43,7 @@ from django.contrib.auth.models import User, Group
 from django.contrib.auth import authenticate, login as django_login
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
-from django.core.mail import send_mail, mail_admins
+from django.core.mail import mail_admins
 from django.db.models import Q
 
 from librecval.normalization import to_indexable_form
