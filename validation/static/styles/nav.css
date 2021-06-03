@@ -1,0 +1,33 @@
+
+/* nav styles */
+.nav__button {
+  border-radius: var(--button-radius);
+  text-decoration: none;
+  display: block;
+  padding: 0.5rem 1rem;
+  background-color: var(--custom-purple);
+  color: var(--custom-white);
+}
+
+.nav__button:hover {
+  border-radius: var(--button-radius);
+  text-decoration: none;
+  display: block;
+  padding: 0.5rem 1rem;
+  background-color: var(--custom-pale-purple);
+  color: var(--custom-white);
+  cursor: pointer;
+}
+
+.nav__link {
+  color: var(--custom-purple);
+  text-decoration: none;
+  display: block;
+  padding: 0.5rem 1rem;
+  background-color: transparent;
+}
+
+.nav__link:hover {
+  color: var(--custom-pale-purple);
+  cursor: pointer;
+}
