@@ -43,7 +43,7 @@ from django.contrib.auth.models import User, Group
 from django.contrib.auth import authenticate, login as django_login
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
-from django.core.mail import send_mail
+from django.core.mail import send_mail, mail_admins
 from django.db.models import Q
 
 from librecval.normalization import to_indexable_form
@@ -458,21 +458,17 @@ def register(request):
                     last_name=last_name,
                 )
                 new_user.save()
-                if group == "Linguist":
+                if group == "Linguist" or group == "Expert":
                     # https://studygyaan.com/django/how-to-signup-user-and-send-confirmation-email-in-django
                     # Linguists need permission to be a linguist
-                    admin_user = User.objects.get(username="jolenepoulin")
-                    subject = "New Linguist User"
-                    message = f"New user {username} has request linguist access. Login to the admin interface to grant them access."
-                    res = send_mail(
+                    subject = f"New {group} User"
+                    message = f"New user {username} has requested {group} access. Login to the admin interface to grant them access."
+                    mail_admins(
                         subject,
                         message,
-                        admin_user.email,
-                        [admin_user.email],
-                        fail_silently=False,
+                        fail_silently=True,
                     )
-                    print(res)
-                    group = "Expert"
+                    group = "Learner"
                 group, _ = Group.objects.get_or_create(name=group)
                 group.user_set.add(new_user)
                 response = HttpResponseRedirect("/login")
