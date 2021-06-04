@@ -26,3 +26,7 @@
   margin-left: -3rem;
   width: 150%;
 }
+
+.input--short {
+  width: 3rem;
+}
