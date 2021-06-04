@@ -84,6 +84,8 @@ RECVAL_SESSIONS_DIR=/absolute/path/to/recording/sessions/
 RECVAL_METADATA_PATH=/absolute/path/to/master-recordings-metadata.csv
 RECVAL_SQLITE_DB_PATH=/absolute/path/to/sqlite3/database.sqlite3
 STATIC_ROOT=/absolute/path/to/static/files/directory/  # (production-only)
+SMTP_USER=valid_username@emailprovider.com
+SMTP_PASS="password"
 ```
 
 Replace the paths as appropriate.
@@ -156,7 +158,7 @@ Make sure this path is configured before running
 `pipenv run python ./manage.py migrate`
 
 
-### `STATIC_ROOT`
+#### `STATIC_ROOT`
 
 > **Note**: this does not need to be configured in development mode.
 
@@ -172,6 +174,11 @@ This will copy all of the various static files to the configured directory.
 
 See more: <https://docs.djangoproject.com/en/2.1/ref/settings/#std:setting-STATIC_ROOT>
 
+#### `SMTP_USER`
+This email is used to contact admins in certain scenarios. You may have to ask someone for this.
+
+#### `SMTP_PASS`
+This is the plain text password for the SMTP_USER.
 
 ### Creating the database for the first time
 
