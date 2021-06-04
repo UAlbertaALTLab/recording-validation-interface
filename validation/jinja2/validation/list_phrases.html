@@ -62,9 +62,6 @@
 
 <nav>
 {{ macros.pagination_with_query(phrases, 'validation:list_phrases', query, encode_query_with_page) }}
-    <div class="center">
-        Jump to Page: <input type="text" data-cy="page-num-input" class="input--short"> <button type="button" data-cy="go-button-nav" class="button button--success button--small">Go</button>
-    </div>
 </nav>
 {% endblock content %}
 
