@@ -106,8 +106,9 @@ class Command(BaseCommand):
             else:
                 s4a_path = training_dir / speaker / "s4a" / s4a_filename
 
+            s4a_trans = create_s4a_transcription(transcription)
             with open(s4a_path, "w", encoding="UTF=8") as f:
-                f.write(transcription)
+                f.write(s4a_trans)
 
     def copy_audio_file(self, training_dir, audio_file, speaker):
         # Copy the audio file
@@ -156,3 +157,22 @@ def create_persephone_transcription(transcription):
     persephone_trans = persephone_trans.replace("%", "")
 
     return persephone_trans
+
+
+def create_s4a_transcription(transcription):
+    """
+    Prepares transcriptions for Simple4All
+    >>> create_s4a_transcription("wâpamêw")
+    'waapameew'
+    >>> create_s4a_transcription("kîkwây ôma")
+    'kiikwaay ooma'
+    >>> create_s4a_transcription("masinahikan")
+    'masinahikan'
+    """
+
+    transcription = transcription.replace("ê", "ee")
+    transcription = transcription.replace("â", "aa")
+    transcription = transcription.replace("î", "ii")
+    transcription = transcription.replace("ô", "oo")
+
+    return transcription
