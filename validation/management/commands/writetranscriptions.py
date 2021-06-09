@@ -41,7 +41,7 @@ class Command(BaseCommand):
 
         # Generate this folder by running:
         # python3 manage.py importrecordings --wav --skip-db
-        audio_dir = Path(_path)
+        audio_dir = Path("./transcriptions")
 
         print("Writing transcriptions for all phrases")
         self.write_transcriptions(audio_dir, mode="all")
