@@ -33,27 +33,27 @@ class Command(BaseCommand):
         md_words = get_md_words()
         phrases = Phrase.objects.all()
         for phrase in tqdm(phrases.iterator(), total=phrases.count()):
-            if not phrase.origin:
-                normalized = normalize_sro(phrase.transcription)
-                normalized = remove_diacritics(normalized)
-                if normalized in md_words:
-                    phrase.origin = "MD"
-                else:
-                    phrase.origin = "new"
-                phrase.save()
+            normalized = normalize_sro(phrase.transcription)
+            normalized = remove_diacritics(normalized)
+            if normalized in md_words:
+                phrase.origin = "MD"
+                phrase.translation = md_words[normalized]
+            else:
+                phrase.origin = "new"
+            phrase.save()
 
 
 def get_md_words():
     """
     Gets the words from the Maskwacîs dictionary file
-    :return: a list of Cree words
+    :return: a dict of Cree words and their translations
     """
-    words = []
+    words = {}
     with open("private/treatedMD.csv", "r") as f:
         reader = csv.DictReader(f)
 
         for row in reader:
-            words.append(row["SRO"])
+            words[row["SRO"]] = row["MeaningInEnglish"]
 
     return words
 
