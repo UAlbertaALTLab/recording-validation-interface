@@ -41,7 +41,7 @@ class Command(BaseCommand):
 
         # Generate this folder by running:
         # python3 manage.py importrecordings --wav --skip-db
-        audio_dir = Path("./transcriptions")
+        audio_dir = Path(_path)
 
         print("Writing transcriptions for all phrases")
         self.write_transcriptions(audio_dir, mode="all")
@@ -52,7 +52,7 @@ class Command(BaseCommand):
     def write_transcriptions(self, audio_dir, mode):
         # Change this to Path("/where/you/want/training/data")
         # if you want the data elsewhere
-        training_dir = audio_dir
+        training_dir = Path("./transcriptions")
         for audio_file in tqdm(audio_dir.iterdir()):
             audio_id = audio_file.stem
 
