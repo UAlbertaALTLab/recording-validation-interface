@@ -53,7 +53,10 @@ class Command(BaseCommand):
         # Change this to Path("/where/you/want/training/data")
         # if you want the data elsewhere
         training_dir = Path("./transcriptions")
-        for audio_file in tqdm(audio_dir.iterdir()):
+        for audio_file in tqdm(
+            audio_dir.iterdir(),
+            total=sum(1 for x in audio_dir.glob("*") if x.is_file()),
+        ):
             audio_id = audio_file.stem
 
             if mode == "auto-validated":
@@ -80,7 +83,7 @@ class Command(BaseCommand):
 
             # if there are things that aren't audio files in the directory
             # the speaker variable will be empty, this is normal/fine
-            if not speaker:
+            if not speaker or "/" in speaker:
                 continue
 
             self.make_directories(training_dir, speaker)
