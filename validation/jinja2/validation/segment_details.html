@@ -1,11 +1,4 @@
 <script>
-    function showDiv(name) {
-        document.getElementById('edit').style.display = "block";
-        document.getElementById('id_cree').focus()
-
-        document.getElementById('id_cree').value = name;
-    }
-
     function showDivAccept(name, analysis) {
         document.getElementById('edit').style.display = "block";
         document.getElementById('id_cree').focus()
@@ -41,13 +34,6 @@
 
     <div>
         <button class="button button--success button--back" onclick='goBack()'>Back</button>
-        {% if auth %}
-            <button data-cy="edit-button" class="button button--fail button--right button--edit"
-                onclick="showDiv('{{ segment_name }}')"
-                class="button button--fail button--right">
-                    Edit
-            </button>
-        {% endif %}
     </div>
 
     <table id="segment-table" class="table table-striped">
@@ -87,7 +73,7 @@
       {% endfor %}{# for phrase in phrases #}
     </table>
 
-    <div style="display: none;" id="edit" data-cy="edit-div">
+    <div id="edit" data-cy="edit-div">
         {% include 'validation/segment_edit.html' %}
     </div>
 
