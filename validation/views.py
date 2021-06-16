@@ -65,10 +65,7 @@ def index(request):
     mode = request.GET.get("mode")
 
     if mode == "all" or not mode:
-        if is_linguist:
-            all_phrases = Phrase.objects.all()
-        else:
-            all_phrases = Phrase.objects.exclude(status="auto-validated")
+        all_phrases = Phrase.objects.all()
     else:
         all_phrases = Phrase.objects.filter(status=mode)
 
