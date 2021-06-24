@@ -389,6 +389,7 @@ def add_cors_headers(response):
     return response
 
 
+@login_required()
 def segment_content_view(request, segment_id):
     """
     The view for a single segment
@@ -399,9 +400,9 @@ def segment_content_view(request, segment_id):
         og_phrase = Phrase.objects.filter(id=segment_id)[0]
         phrase_id = og_phrase.id
         if form.is_valid():
-            transcription = form.cleaned_data["cree"]
-            translation = form.cleaned_data["translation"]
-            analysis = form.cleaned_data["analysis"]
+            transcription = form.cleaned_data["cree"] or og_phrase.transcription
+            translation = form.cleaned_data["translation"] or og_phrase.translation
+            analysis = form.cleaned_data["analysis"] or og_phrase.analysis
             p = Phrase.objects.filter(id=phrase_id)[0]
             p.transcription = transcription
             p.translation = translation
