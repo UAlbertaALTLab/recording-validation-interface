@@ -33,8 +33,9 @@ if SECRET_KEY is None:
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", default=False, cast=bool)
+USE_DJANGO_DEBUG_TOOLBAR = config("USE_DJANGO_DEBUG_TOOLBAR", default=DEBUG, cast=bool)
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "sapir.artsrn.ualberta.ca"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "speech-db.altlab.app", "altlab-itw:8004"]
 
 
 # Application definition
@@ -57,9 +58,12 @@ INSTALLED_APPS = [
 # Apps used only during debug mode
 if DEBUG:
     INSTALLED_APPS.append("django_extensions")
+    if USE_DJANGO_DEBUG_TOOLBAR:
+        INSTALLED_APPS.append("debug_toolbar")
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -69,6 +73,9 @@ MIDDLEWARE = [
     # Automatically insert user that changed a model with history.
     "simple_history.middleware.HistoryRequestMiddleware",
 ]
+
+if DEBUG and USE_DJANGO_DEBUG_TOOLBAR:
+    MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
 
 ROOT_URLCONF = "recvalsite.urls"
 
@@ -170,17 +177,13 @@ X_FRAME_OPTIONS = "DENY"
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
-# Derive the static path from WSGI SCRIPT_NAME variable
-# e.g.,  if SCRIPT_NAME=/validation,
-#        then static file URLs will point to /validation/static/
-# TODO: this is the wrong way to construct this variable?
 STATIC_URL = "/static/"
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
-]
 
 # Remember to run manage.py collectstatic!
-STATIC_ROOT = config("STATIC_ROOT", default="/var/www/recvalsite/static")
+default_static_dir = "/var/www/recvalsite/static"
+if DEBUG:
+    default_static_dir = BASE_DIR / "static"
+STATIC_ROOT = config("STATIC_ROOT", default=default_static_dir)
 
 # This is concatenated with MEDIA_ROOT and MEDIA_URL to store and serve the audio files.
 RECVAL_AUDIO_PREFIX = config("RECVAL_AUDIO_PREFIX", default="audio/")
@@ -217,3 +220,41 @@ LOGIN_REDIRECT_URL = "/"
 ITWEWINA_URL = "https://itwewina.altlab.app/"
 
 FIXTURE_DIRS = ("validation/management/fixtures/",)
+
+INTERNAL_IPS = ["127.0.0.1"]
+
+log_level = "INFO"
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            # The handler should print anything that gets to it, so that
+            # debugging can be enabled for specific loggers without also turning
+            # on debug loggers for all of django/python
+            "level": "NOTSET",
+            "class": "logging.StreamHandler",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": log_level,
+    },
+    "loggers": {
+        # learn how different loggers are used in Django: https://docs.djangoproject.com/en/3.0/topics/logging/#id3
+        "django": {
+            "handlers": [],
+            "level": log_level,
+            "propagate": True,
+        },
+    },
+}
+
+ADMINS = [("Jolene", "jcpoulin@ualberta.ca")]
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_HOST_USER = config("SMTP_USER", default=None)
+EMAIL_HOST_PASSWORD = config("SMTP_PASS", default=None)
+EMAIL_USE_TLS = True

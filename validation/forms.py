@@ -3,6 +3,8 @@ import re
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 
+from validation.models import Issue
+
 
 class Login(forms.Form):
     username = forms.CharField(
@@ -80,3 +82,32 @@ class EditSegment(forms.Form):
         required=False,
         widget=forms.TextInput(attrs={"class": "form-control bottom-margin"}),
     )
+
+
+class FlagSegment(forms.ModelForm):
+    cree_suggestion = forms.CharField(
+        help_text="Use the space above to suggest a better Cree spelling",
+        required=False,
+        widget=forms.Textarea(attrs={"class": "form-control issue__textarea"}),
+    )
+
+    english_suggestion = forms.CharField(
+        help_text="Use the space above to suggest a better English word or phrase",
+        required=False,
+        widget=forms.Textarea(attrs={"class": "form-control issue__textarea"}),
+    )
+
+    comment = forms.CharField(
+        help_text="Use the space above to provide an example or make a few notes about why you're reporting an issue "
+        "with this entry",
+        required=False,
+        widget=forms.Textarea(
+            attrs={"class": "form-control bottom-margin issue__textarea"}
+        ),
+    )
+
+    phrase_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
+
+    class Meta:
+        model = Issue
+        fields = ["phrase_id"]

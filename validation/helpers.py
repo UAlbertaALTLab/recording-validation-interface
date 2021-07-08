@@ -193,7 +193,14 @@ def extract_translations(entry):
         translations = [str(j["text"]) for j in entry["definitions"]]
 
     translations = "; ".join(translations)
-    analysis = entry["analysis"]
+    if entry["raw_analysis"]:
+        analysis = (
+            "".join(entry["raw_analysis"][0])
+            + entry["raw_analysis"][1]
+            + "".join(entry["raw_analysis"][2])
+        )
+    else:
+        analysis = ""
 
     return translations, analysis
 

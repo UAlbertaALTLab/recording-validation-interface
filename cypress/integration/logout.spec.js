@@ -1,6 +1,7 @@
 // Tests for logout functionality
 
 describe("Logout", () => {
+
     it("logs out when logged in", () => {
         // TODO: don't make it log in through the UI
         cy.visit(Cypress.env('login_url'))
@@ -9,7 +10,7 @@ describe("Logout", () => {
             .should('be.visible');
 
         cy.get('input[name=username]')
-            .type('community')
+            .type('expert')
 
         cy.get('input[name=password]')
             .type('1234567890')
@@ -19,6 +20,9 @@ describe("Logout", () => {
 
         cy.location('pathname')
             .should('not.include', 'login')
+
+        cy.get('[data-cy="options-button-header"]')
+            .click()
 
         cy.get('#logout-link')
             .click()

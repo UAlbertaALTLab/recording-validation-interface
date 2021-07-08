@@ -23,18 +23,17 @@ describe("Edit segment", () => {
                     .click()
 
                 cy.location('pathname')
-                    .should('include', Cypress.env("segment_details_url"))
+                    .should('include', Cypress.env("awas_url"))
             })
 
 
         cy.get("#segment-table").within(() => {
             cy.get('@transcription')
-            cy.get('@translation')
         })
     })
     
     it("shows all tables", () => {
-        cy.visit(Cypress.env("segment_details_url"));
+        cy.visit(Cypress.env("awas_url"));
 
         cy.get("#segment-table").within(() => {
             cy.get('th').contains('Transcription')
@@ -61,36 +60,26 @@ describe("Edit segment", () => {
         })
 
         cy.get('#edit')
-            .should('not.be.visible')
+            .should('be.visible')
     })
 
     it("shows all buttons", () => {
-        cy.visit(Cypress.env("segment_details_url"));
+        cy.visit(Cypress.env("awas_url"));
 
         cy.get("#suggestions-table").within(() => {
             cy.get('input:first')
                 .should('have.value', 'Accept')
         })
-
-        cy.get("#revision-table").within(() => {
-            cy.get('input:first')
-                .should('have.value', 'Revert')
-        })
-
     })
 
     it("should load content when clicking Accept", () => {
-        cy.visit(Cypress.env("segment_details_url"));
+        cy.visit(Cypress.env("awas_url"));
 
         cy.get("#suggestions-table").within(() => {
             cy.get('[data-cy="suggestion-transcription"]')
                 .first()
                 .invoke('text')
                 .as('transcription')
-            cy.get('[data-cy="suggestion-translation"]')
-                .first()
-                .invoke('text')
-                .as('translation')
             cy.get('[data-cy="suggestion-analysis"]')
                 .first()
                 .invoke('text')
@@ -108,12 +97,6 @@ describe("Edit segment", () => {
                 cy.get('@transcription')
             })
 
-        cy.get('#id_translation')
-            .should('be.visible')
-            .within(() => {
-                cy.get('@translation')
-            })
-
         cy.get('#id_analysis')
             .should('be.visible')
             .within(() => {
@@ -121,18 +104,67 @@ describe("Edit segment", () => {
             })
     })
 
+    it("should load edit div", () => {
+        cy.visit(Cypress.env("awas_url"));
+
+        cy.get('[data-cy=edit-div]').should('be.visible')
+        cy.get('#id_cree')
+            .should('be.visible')
+
+        cy.get('#id_translation')
+            .should('be.visible')
+    })
+
+    it("should update the entry when clicking Save", () => {
+        cy.visit(Cypress.env("awas_url"));
+
+        cy.get("#suggestions-table").within(() => {
+            cy.get('[data-cy="suggestion-transcription"]')
+                .first()
+                .invoke('text')
+                .as('transcription')
+            cy.get('[data-cy="suggestion-analysis"]')
+                .first()
+                .invoke('text')
+                .as('analysis')
+            cy.get('input:first')
+                .should('have.value', 'Accept')
+                .click()
+        })
+        cy.get('[data-cy=edit-div]').should('be.visible')
+        cy.get('#id_cree')
+            .should('be.visible')
+            .within(() => {
+                cy.get('@transcription')
+            })
+
+        cy.get('#id_analysis')
+            .should('be.visible')
+            .within(() => {
+                cy.get('@analysis')
+            })
+
+        cy.get('[data-cy="save-button"]')
+            .click()
+
+        cy.get("#segment-table").within(() => {
+            cy.get('@transcription')
+            cy.get('@analysis')
+        })
+
+        // Make sure the username of the editor was stored
+        cy.get("#revision-table")
+            .contains('linguist')
+    })
+    
     it("should load content when clicking Revert", () => {
-        cy.visit(Cypress.env("segment_details_url"));
+        cy.visit(Cypress.env("awas_url"));
 
         cy.get("#revision-table").within(() => {
             cy.get('[data-cy="revision-transcription"]')
                 .first()
                 .invoke('text')
                 .as('transcription')
-            cy.get('[data-cy="revision-translation"]')
-                .first()
-                .invoke('text')
-                .as('translation')
             cy.get('[data-cy="revision-analysis"]')
                 .first()
                 .invoke('text')
@@ -149,115 +181,21 @@ describe("Edit segment", () => {
                 cy.get('@transcription')
             })
 
-        cy.get('#id_translation')
-            .should('be.visible')
-            .within(() => {
-                cy.get('@translation')
-            })
-
         cy.get('#id_analysis')
             .should('be.visible')
             .within(() => {
                 cy.get('@analysis')
             })
-    })
-
-    it("should load content when clicking Edit", () => {
-        cy.visit(Cypress.env("segment_details_url"));
-
-        cy.get('[data-cy="edit-button"]')
-            .click()
-
-        cy.get("#segment-table").within(() => {
-            cy.get('[data-cy="segment-transcription"]')
-                .first()
-                .invoke('text')
-                .as('transcription')
-            cy.get('[data-cy="segment-translation"]')
-                .first()
-                .invoke('text')
-                .as('translation')
-        })
-
-        cy.get('[data-cy=edit-div]').should('be.visible')
-        cy.get('#id_cree')
-            .should('be.visible')
-            .within(() => {
-                cy.get('@transcription')
-            })
-
-        cy.get('#id_translation')
-            .should('be.visible')
-            .within(() => {
-                cy.get('@translation')
-            })
-    })
-
-    it("should update the entry when clicking Save", () => {
-        cy.visit(Cypress.env("segment_details_url"));
-
-        cy.get("#suggestions-table").within(() => {
-            cy.get('[data-cy="suggestion-transcription"]')
-                .first()
-                .invoke('text')
-                .as('transcription')
-            cy.get('[data-cy="suggestion-translation"]')
-                .first()
-                .invoke('text')
-                .as('translation')
-            cy.get('[data-cy="suggestion-analysis"]')
-                .first()
-                .invoke('text')
-                .as('analysis')
-            cy.get('input:first')
-                .should('have.value', 'Accept')
-                .click()
-        })
-        cy.get('[data-cy=edit-div]').should('be.visible')
-        cy.get('#id_cree')
-            .should('be.visible')
-            .within(() => {
-                cy.get('@transcription')
-            })
-
-        cy.get('#id_translation')
-            .should('be.visible')
-            .within(() => {
-                cy.get('@translation')
-            })
-
-        cy.get('#id_analysis')
-            .should('be.visible')
-            .within(() => {
-                cy.get('@analysis')
-            })
-
-        cy.get('[data-cy="save-button"]')
-            .click()
-
-        cy.get("#segment-table").within(() => {
-            cy.get('@transcription')
-            cy.get('@translation')
-            cy.get('@analysis')
-        })
-
-        // Make sure the username of the editor was stored
-        cy.get("#revision-table")
-            .contains('linguist')
     })
 
     it("should not update the entry when clicking Cancel", () => {
-        cy.visit(Cypress.env("segment_details_url"));
+        cy.visit(Cypress.env("awas_url"));
 
         cy.get("#suggestions-table").within(() => {
             cy.get('[data-cy="suggestion-transcription"]')
                 .first()
                 .invoke('text')
                 .as('transcription')
-            cy.get('[data-cy="suggestion-translation"]')
-                .first()
-                .invoke('text')
-                .as('translation')
             cy.get('[data-cy="suggestion-analysis"]')
                 .first()
                 .invoke('text')
@@ -275,7 +213,7 @@ describe("Edit segment", () => {
             cy.get('[data-cy="segment-translation"]')
                 .first()
                 .invoke('text')
-                .as('og_translation')         
+                .as('og_translation')
         })
 
         cy.get('[data-cy=edit-div]').should('be.visible')
@@ -288,9 +226,6 @@ describe("Edit segment", () => {
 
         cy.get('#id_translation')
             .should('be.visible')
-            .within(() => {
-                cy.get('@translation')
-            })
             .type("DONT SAVE")
 
         cy.get('#id_analysis')
@@ -321,40 +256,5 @@ describe("Edit segment, no auth", () => {
                 cy.get('[data-cy="options-button"]')
                     .should('not.exist')
             })
-
     })
-
-    it("does not show options or edit", () => {
-        cy.visit(Cypress.env("segment_details_url"));
-
-        cy.get("#segment-table").within(() => {
-            cy.get('th').contains('Transcription')
-            cy.get('th').contains('Translation')
-            cy.get('th').contains('Recordings')
-            cy.get('th').contains('Speaker')
-        })
-
-        cy.get("#suggestions-table").within(() => {
-            cy.get('th').contains('Suggestion')
-            cy.get('th').contains('Translation')
-            cy.get('th').contains('Analysis')
-            cy.get('th').contains('MED')
-            cy.get('Options').should('not.exist')
-        })
-
-        cy.get("#revision-table").within(() => {
-            cy.get('th').contains('User')
-            cy.get('th').contains('Date')
-            cy.get('th').contains('Transcription')
-            cy.get('th').contains('Translation')
-            cy.get('th').contains('Analysis')
-            cy.get('Options').should('not.exist')
-        })
-
-        cy.get('[data-cy="edit-button"]')
-            .should('not.exist')
-        cy.get('#edit')
-            .should('not.be.visible')
-    })
-
 })

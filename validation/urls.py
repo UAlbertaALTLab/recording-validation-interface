@@ -19,6 +19,7 @@
 
 from django.urls import path
 from django.contrib.auth import views as auth_views
+from django.views.generic import TemplateView
 
 from . import views
 
@@ -69,5 +70,21 @@ urlpatterns = [
         "api/record_audio_quality_judgement/<str:recording_id>",
         views.record_audio_quality_judgement,
         name="record_audio_quality_judgement",
+    ),
+    path(
+        "api/save_wrong_speaker_code/<str:recording_id>",
+        views.save_wrong_speaker_code,
+        name="save_wrong_speaker_code",
+    ),
+    path(
+        "api/save_wrong_word/<str:recording_id>",
+        views.save_wrong_word,
+        name="save_wrong_word",
+    ),
+    path(
+        "robots.txt",
+        TemplateView.as_view(
+            template_name="validation/robots.txt", content_type="text/plain"
+        ),
     ),
 ]

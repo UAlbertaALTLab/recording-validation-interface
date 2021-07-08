@@ -1,0 +1,32 @@
+/* form styles */
+.form-restrict {
+  max-width: 15rem;
+}
+
+.errorlist {
+  /* this name is auto-generated, so I can't change it */
+  list-style: none;
+  font-size: 0.8rem;
+  color: var(--custom-orange);
+  font-style: italic;
+  margin-bottom: 0;
+  margin-left: -2rem;
+}
+
+#id_role {
+  list-style: none;
+  display: inline-block;
+}
+
+.helptext {
+  font-size: 0.9rem;
+  font-style: italic;
+  color: #797878;
+  display: inline-block;
+  margin-left: -3rem;
+  width: 150%;
+}
+
+.input--short {
+  width: 3rem;
+}

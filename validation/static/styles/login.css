@@ -1,0 +1,77 @@
+
+/* login, logout, and register styles */
+.login {
+  background-color: #F5F5F5;
+  padding: 2rem;
+  margin: 0 auto;
+  max-width: 50rem;
+  min-width: 22rem;
+  justify-content: center;
+}
+
+.login__title {
+  font-weight: 600;
+  font-size: 2.5rem;
+  text-align: center;
+}
+
+.login__link:hover {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.login__button {
+  color: var(--custom-purple);
+  background-color: transparent;
+  border: 2px solid var(--custom-purple);
+  border-radius: var(--button-radius);
+  padding: 0 0.5rem;
+  margin: 1rem;
+}
+
+.login__button:hover {
+  color: var(--custom-white);
+  background-color: var(--custom-purple);
+  cursor: pointer;
+}
+
+.login__h2 {
+  text-align: center;
+}
+
+.login__form {
+  margin: 0 auto;
+  width: 20rem;
+  padding: 1rem;
+}
+
+.register__button {
+  color: var(--custom-purple);
+  background-color: transparent;
+  border: 2px solid var(--custom-purple);
+  border-radius: var(--button-radius);
+  padding: 0 0.5rem;
+}
+
+.register__button:hover {
+  color: var(--custom-white);
+  background-color: var(--custom-purple);
+  cursor: pointer;
+}
+
+.logout-message {
+  background-color: #F5F5F5;
+  margin: 0 auto;
+  padding: 2rem;
+  max-width: 50rem;
+  min-width: 20rem;
+  text-align: center;
+}
+
+.logout-link, .login-link {
+  color: var(--custom-purple);
+}
+
+.logout-link:hover, .login-link:hover {
+  color: var(--custom-purple);
+}

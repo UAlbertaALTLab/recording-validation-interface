@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -eux
+
+# Change into directory containing THIS SCRIPT
+# (and presumably the docker-compose.yml file)
+cd "$(dirname "$0")"
+
+git pull
+docker-compose up -d --build --remove-orphans

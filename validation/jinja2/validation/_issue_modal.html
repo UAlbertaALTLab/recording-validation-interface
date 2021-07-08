@@ -1,0 +1,43 @@
+{#
+      Copyright (C) 2021 Jolene Poulin <jcpoulin@ualberta.ca>
+
+      This program is free software: you can redistribute it and/or modify
+      it under the terms of the GNU Affero General Public License as
+      published by the Free Software Foundation, either version 3 of the
+      License, or (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      GNU Affero General Public License for more details.
+
+      You should have received a copy of the GNU Affero General Public License
+      along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#}
+
+
+{% macro modal(forms, phrase_id, csrf_token) %}
+    <div id="{{ phrase_id }}-modal" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-lg">
+
+                <!-- Modal content-->
+                <div class="modal-content" data-cy="modal">
+                    <div class="modal-header">
+                        <h4 class="modal-title">What's wrong with this entry?</h4>
+                        <button form="{{ phrase_id }}-form" data-cy="save-button" type="submit" class="button button--success" value="Save">Save</button>
+                    </div>
+
+                    <form action="" method="post" id="{{ phrase_id }}-form">
+                        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                        <div class="modal-body">
+                            {{ forms[phrase_id] }}
+                        </div>
+                        <div class="modal-footer">
+                            <button form="{{ phrase_id }}-form" data-cy="cancel-button" type="button" class="button button--fail" data-dismiss="modal" value="Cancel">Cancel</button>
+                            <button form="{{ phrase_id }}-form" data-cy="save-button" type="submit" class="button button--success" value="Save">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+{% endmacro %}

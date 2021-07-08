@@ -112,6 +112,7 @@ ENV/
 metadata.csv
 /data/
 db.sqlite3
+test_db.sqlite
 node_modules
 .DS_Store
 validation/static/images/speakers/
@@ -119,3 +120,6 @@ crk.zhfst
 
 # Directory of broken dreams:
 failed-sessions/
+
+# collected static files:
+/static/

@@ -6,7 +6,7 @@
 # make init 		-- initializes the development environment
 # make reformat 	-- formats the Python code
 
-.PHONY: init install-test install-dev install-prod migrate test
+.PHONY: init install-test install-dev install-prod migrate test integration-test
 
 install-prod:
 	pipenv install --deploy
@@ -23,6 +23,9 @@ install-dev: init
 test:
 	pipenv run mypy librecval
 	pipenv run pytest
+
+integration-test:
+	pipenv run python ci_run_cypress.py
 
 init:
 	git config core.hooksPath .githooks
