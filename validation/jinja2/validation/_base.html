@@ -52,15 +52,6 @@ const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         {{ menu.menu_options(request, auth, showMacron) }}
       </details>
 
-    <div class="header-link">
-      <a href="/speakers/" data-cy="speakers-link" class="white-text">Speakers</a>
-      &nbsp;
-        {% if auth %}
-            <a href="/logout" id="logout-link" class="white-text">Logout</a>
-        {% else %}
-            <a href="/login" id="login-link" class="white-text">Login</a>
-        {% endif %}
-    </div>
   </nav>
 
 
