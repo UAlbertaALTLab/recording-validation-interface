@@ -691,7 +691,6 @@ def prep_phrase_data(request, phrases):
 
 def save_issue(data, user):
     phrase_id = data["phrase_id"]
-    issues = data["issues"]
     comment = data["comment"]
     cree_suggestion = data["cree_suggestion"]
     english_suggestion = data["english_suggestion"]
@@ -703,10 +702,6 @@ def save_issue(data, user):
 
     new_issue = Issue(
         phrase=phrase,
-        other="other" in issues,
-        bad_cree="bad_cree" in issues,
-        bad_english="bad_english" in issues,
-        bad_recording="bad_rec" in issues,
         comment=comment,
         suggested_cree=cree_suggestion,
         suggested_english=english_suggestion,
