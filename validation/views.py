@@ -381,6 +381,64 @@ def search_recordings(request, query):
     return add_cors_headers(response)
 
 
+def bulk_search_recordings(request):
+    """
+    API endpoint to retrieve EXACT wordforms and return the URLs and metadata for the recordings.
+    Example: /api/bulk_search?q=mistik&q=minahik&q=waskay&q=mîtos&q=mistikow&q=mêstan
+    """
+
+    def make_absolute_uri_for_recording(rec: Recording) -> str:
+        uri = rec.compressed_audio.url
+        if uri.startswith("/"):
+            # It's a relative URI: build an absolute URI:
+            return request.build_absolute_uri(uri)
+
+        # It's an absolute URI already:
+        assert uri.startswith("http")
+        return uri
+
+    def make_absolute_uri_for_speaker(code: str) -> str:
+        return f"https://www.altlab.dev/maskwacis/Speakers/{code}.html"
+
+    query_terms = request.GET.getlist("q")
+    matched_recordings = []
+    not_found = []
+
+    for term in query_terms:
+        # Assume the query is an SRO transcription; prepare it for a fuzzy match.
+        result_set = Recording.objects.filter(
+            phrase__transcription=term,
+            speaker__gender__isnull=False,
+        )
+        # No bad recordings!
+        result_set = result_set.exclude(quality=Recording.BAD)
+        result_set = result_set.exclude(wrong_word=True)
+        result_set = result_set.exclude(wrong_speaker=True)
+
+        if result_set:
+            matched_recordings.extend(
+                {
+                    "wordform": rec.phrase.transcription,
+                    "speaker": rec.speaker.code,
+                    "speaker_name": rec.speaker.full_name,
+                    "anonymous": rec.speaker.anonymous,
+                    "gender": rec.speaker.gender,
+                    "dialect": rec.speaker.dialect,
+                    "recording_url": make_absolute_uri_for_recording(rec),
+                    "speaker_bio_url": make_absolute_uri_for_speaker(rec.speaker.code),
+                }
+                for rec in result_set
+            )
+        else:
+            not_found.append(term)
+
+    response = {"matched_recordings": matched_recordings, "not_found": not_found}
+
+    json_response = JsonResponse(response)
+
+    return add_cors_headers(json_response)
+
+
 def add_cors_headers(response):
     """
     Adds appropriate Access-Control-* headers for cross-origin XHR responses.

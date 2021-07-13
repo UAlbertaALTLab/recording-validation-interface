@@ -106,10 +106,14 @@ RECVAL_SQLITE_DB_PATH = config(
     "RECVAL_SQLITE_DB_PATH", default=BASE_DIR / "db.sqlite3", cast=Path
 )
 
+USE_TEST_DB = config("USE_TEST_DB", default=False)
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": os.fspath(RECVAL_SQLITE_DB_PATH),
+        "NAME": os.fspath(BASE_DIR / "test_db.sqlite")
+        if USE_TEST_DB
+        else os.fspath(RECVAL_SQLITE_DB_PATH),
     }
 }
 
