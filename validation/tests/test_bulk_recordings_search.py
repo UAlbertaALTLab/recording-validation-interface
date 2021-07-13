@@ -11,13 +11,15 @@ from validation.models import Recording, Phrase, Speaker
 
 
 @pytest.mark.django_db
-def test_search_bulk_recordings(client):
+@pytest.mark.parametrize(
+    ("query", "speaker_code"),
+    [("nipiy", "MAR"), ("nîpiy", "ROS"), ("awas", "MAR")],
+)
+def test_search_bulk_recordings(client, query, speaker_code):
     """
     General test of the recordings search, in the happy case.
     """
 
-    query = "nipiy"
-    speaker_code = "MAR"
     phrase = Phrase.objects.filter(transcription=query).first()
     speaker = Speaker.objects.filter(code=speaker_code).first()
 
@@ -35,7 +37,6 @@ def test_search_bulk_recordings(client):
 
     recording = recordings["matched_recordings"][0]
     assert recording.get("wordform") == phrase.transcription
-    # TODO: Change field name to "speaker_code"?
     assert "speaker" in recording.keys()
     assert recording.get("gender") in ("M", "F")
     assert recording.get("recording_url").startswith(("http://", "https://"))
