@@ -48,6 +48,53 @@ def test_search_bulk_recordings(client, query, speaker_code, insert_test_data):
     assert recording.get("dialect") == speaker.dialect
 
 
+@pytest.mark.django_db
+def test_search_multiple_recordings(client, insert_test_data):
+    wordforms = ["nipiy", "nîpiy"]
+
+    url = reverse("validation:bulk_search_recordings")
+
+    query_params = [("q", form) for form in wordforms]
+    response = client.get(url + "?" + urllib.parse.urlencode(query_params))
+    recordings = response.json()
+
+    assert isinstance(recordings, dict)
+    assert len(recordings["matched_recordings"]) == 2
+    assert len(recordings["not_found"]) == 0
+
+    results = recordings["matched_recordings"]
+    water_results = [r for r in results if r["wordform"] == "nipiy"]
+    assert len(water_results) == 1
+
+    leaf_results = [r for r in results if r["wordform"] == "nîpiy"]
+    assert len(leaf_results) == 1
+
+    water_recording = water_results[0]["recording_url"]
+    leaf_recording = leaf_results[0]["recording_url"]
+    assert water_recording != leaf_recording
+
+
+@pytest.mark.django_db
+def test_search_recordings_not_found(client, insert_test_data):
+    real_word = "nîpiy"
+    non_word = "Fhqwhgads"
+    wordforms = [real_word, non_word]
+
+    url = reverse("validation:bulk_search_recordings")
+
+    query_params = [("q", form) for form in wordforms]
+    response = client.get(url + "?" + urllib.parse.urlencode(query_params))
+    recordings = response.json()
+
+    assert isinstance(recordings, dict)
+    assert len(recordings["matched_recordings"]) == 1
+    assert len(recordings["not_found"]) == 1
+
+    results = recordings["matched_recordings"]
+    assert non_word in recordings["not_found"]
+    assert all([r["wordform"] == real_word for r in results])
+
+
 @pytest.fixture
 def insert_test_data():
     call_command(
