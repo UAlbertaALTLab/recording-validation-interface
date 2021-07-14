@@ -536,10 +536,6 @@ def save_wrong_speaker_code(request, recording_id):
 
     new_issue = Issue(
         recording=rec,
-        other=False,
-        bad_cree=False,
-        bad_english=False,
-        bad_recording=True,
         comment=comment,
         created_by=request.user,
         created_on=datetime.datetime.now(),
@@ -573,10 +569,6 @@ def save_wrong_word(request, recording_id):
 
     new_issue = Issue(
         recording=rec,
-        other=False,
-        bad_cree=False,
-        bad_english=False,
-        bad_recording=True,
         suggested_cree=suggestion,
         comment=comment,
         created_by=request.user,
