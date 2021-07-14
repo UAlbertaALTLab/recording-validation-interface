@@ -4,7 +4,7 @@ Unit/Integration tests for the bulk recordings search API.
 import urllib
 
 import pytest  # type: ignore
-from django.conf import settings
+from django.core.management import call_command
 from django.shortcuts import reverse  # type: ignore
 
 from validation.models import Recording, Phrase, Speaker
@@ -15,7 +15,7 @@ from validation.models import Recording, Phrase, Speaker
     ("query", "speaker_code"),
     [("nipiy", "MAR"), ("nîpiy", "ROS"), ("awas", "MAR")],
 )
-def test_search_bulk_recordings(client, query, speaker_code):
+def test_search_bulk_recordings(client, query, speaker_code, insert_test_data):
     """
     General test of the recordings search, in the happy case.
     """
@@ -46,3 +46,14 @@ def test_search_bulk_recordings(client, query, speaker_code):
     assert recording.get("speaker_bio_url").startswith(("http://", "https://"))
     assert speaker.code in recording.get("speaker_bio_url")
     assert recording.get("dialect") == speaker.dialect
+
+
+@pytest.fixture
+def insert_test_data():
+    call_command(
+        "loaddata",
+        "speaker_info",
+        "test_recordingsession",
+        "test_phrases",
+        "test_recordings",
+    )

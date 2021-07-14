@@ -223,7 +223,7 @@ LOGIN_REDIRECT_URL = "/"
 
 ITWEWINA_URL = "https://itwewina.altlab.app/"
 
-FIXTURE_DIRS = ("validation/management/fixtures/",)
+FIXTURE_DIRS = (BASE_DIR / "validation" / "management" / "fixtures",)
 
 INTERNAL_IPS = ["127.0.0.1"]
 
