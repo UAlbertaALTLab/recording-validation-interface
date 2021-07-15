@@ -27,7 +27,7 @@ def test_search_bulk_recordings(client, query, speaker_code, insert_test_data):
 
     response = client.get(url + "?" + urllib.parse.urlencode([("q", query)]))
 
-    assert "Access-Control-Allow-Origin" in response, "Missing requried CORS headers"
+    assert "Access-Control-Allow-Origin" in response, "Missing required CORS headers"
 
     recordings = response.json()
 
