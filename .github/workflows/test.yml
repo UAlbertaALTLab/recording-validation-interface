@@ -37,6 +37,15 @@ jobs:
 
       - run: pip install pipenv
 
+      # Copy-paste from
+      # https://github.com/actions/cache/blob/main/examples.md#python---pipenv
+      - uses: actions/cache@v2
+        with:
+          path: ~/.local/share/virtualenvs
+          key: ${{ runner.os }}-pipenv-${{ hashFiles('Pipfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pipenv-
+
       - run: pipenv install --dev
 
       - run: make test
@@ -66,6 +75,15 @@ jobs:
             python-version: ${{ matrix.python }}
 
         - run: pip install pipenv
+
+        # Copy-paste from
+        # https://github.com/actions/cache/blob/main/examples.md#python---pipenv
+        - uses: actions/cache@v2
+          with:
+            path: ~/.local/share/virtualenvs
+            key: ${{ runner.os }}-pipenv-${{ hashFiles('Pipfile.lock') }}
+            restore-keys: |
+              ${{ runner.os }}-pipenv-
 
         - run: pipenv install --dev
 
