@@ -49,7 +49,6 @@ from django.db.models import Q, QuerySet
 
 from librecval.normalization import to_indexable_form
 
-from .crude_views import *
 from .models import Phrase, Recording, Speaker, RecordingSession, Issue
 from .helpers import get_distance_with_translations, perfect_match, exactly_one_analysis
 from .forms import EditSegment, Login, Register, FlagSegment
