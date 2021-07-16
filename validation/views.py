@@ -339,7 +339,6 @@ def search_recordings(request, query):
         fuzzy_transcription = to_indexable_form(form)
         result_set = Recording.objects.filter(
             phrase__fuzzy_transcription=fuzzy_transcription,
-            speaker__gender__isnull=False,
         )
         # No bad recordings!
         result_set = exclude_known_bad_recordings(result_set)
@@ -368,10 +367,8 @@ def bulk_search_recordings(request):
     not_found = []
 
     for term in query_terms:
-        # Assume the query is an SRO transcription; prepare it for a fuzzy match.
         result_set = Recording.objects.filter(
             phrase__transcription=term,
-            speaker__gender__isnull=False,
         )
         # No bad recordings!
         result_set = exclude_known_bad_recordings(result_set)
@@ -702,4 +699,9 @@ def exclude_known_bad_recordings(recordings: QuerySet):
         recordings.exclude(quality=Recording.BAD)
         .exclude(wrong_word=True)
         .exclude(wrong_speaker=True)
+        # We use the "gender" field as a proxy to see whether a speaker's data has
+        # been properly filled out: exclude speakers whose gender field has not been
+        # input. An admin must put *something* in the gender field before the
+        # speaker shows up in API results.
+        .exclude(speaker__gender__isnull=True)
     )
