@@ -394,7 +394,7 @@ def bulk_search_recordings(request):
             return request.build_absolute_uri(uri)
 
         # It's an absolute URI already:
-        assert uri.startswith("http")
+        assert uri.startswith(("http://", "https://"))
         return uri
 
     def make_absolute_uri_for_speaker(code: str) -> str:
