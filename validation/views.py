@@ -45,7 +45,7 @@ from django.contrib.auth import authenticate, login as django_login
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 from django.core.mail import mail_admins
-from django.db.models import Q
+from django.db.models import Q, QuerySet
 
 from librecval.normalization import to_indexable_form
 
@@ -342,9 +342,7 @@ def search_recordings(request, query):
             speaker__gender__isnull=False,
         )
         # No bad recordings!
-        result_set = result_set.exclude(quality=Recording.BAD)
-        result_set = result_set.exclude(wrong_word=True)
-        result_set = result_set.exclude(wrong_speaker=True)
+        result_set = exclude_known_bad_recordings(result_set)
 
         recordings.extend(
             {
@@ -386,9 +384,7 @@ def bulk_search_recordings(request):
             speaker__gender__isnull=False,
         )
         # No bad recordings!
-        result_set = result_set.exclude(quality=Recording.BAD)
-        result_set = result_set.exclude(wrong_word=True)
-        result_set = result_set.exclude(wrong_speaker=True)
+        result_set = exclude_known_bad_recordings(result_set)
 
         if result_set:
             matched_recordings.extend(
@@ -698,3 +694,15 @@ def make_absolute_uri_for_recording(request: HttpRequest, rec: Recording) -> str
     # It's an absolute URI already:
     assert uri.startswith(("http://", "https://"))
     return uri
+
+
+def exclude_known_bad_recordings(recordings: QuerySet):
+    """
+    Given a QuerySet of Recording objects, remove recordings that should NOT be
+    presented to users of e.g., the dictionary.
+    """
+    return (
+        recordings.exclude(quality=Recording.BAD)
+        .exclude(wrong_word=True)
+        .exclude(wrong_speaker=True)
+    )
