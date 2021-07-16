@@ -259,6 +259,14 @@ class Speaker(models.Model):
                 )
             )
 
+    def get_absolute_url(self) -> str:
+        """
+        Returns a URL for where to find the speaker bio.
+        """
+        # TODO: Change this when implementing:
+        # https://github.com/UAlbertaALTLab/recording-validation-interface/issues/72
+        return f"https://www.altlab.dev/maskwacis/Speakers/{self.code}.html"
+
     def __str__(self):
         return self.code
 

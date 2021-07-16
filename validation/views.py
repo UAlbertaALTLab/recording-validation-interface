@@ -656,17 +656,8 @@ def create_recording_result_json(request: HttpRequest, rec: Recording):
         "gender": rec.speaker.gender,
         "dialect": rec.speaker.dialect,
         "recording_url": make_absolute_uri_for_recording(request, rec),
-        "speaker_bio_url": make_absolute_uri_for_speaker_bio(rec.speaker),
+        "speaker_bio_url": rec.speaker.get_absolute_url(),
     }
-
-
-def make_absolute_uri_for_speaker_bio(speaker: Speaker) -> str:
-    """
-    Returns a URL for where to find the speaker bio.
-    """
-    # TODO: Change this when implementing:
-    # https://github.com/UAlbertaALTLab/recording-validation-interface/issues/72
-    return f"https://www.altlab.dev/maskwacis/Speakers/{speaker.code}.html"
 
 
 def make_absolute_uri_for_recording(request: HttpRequest, rec: Recording) -> str:
