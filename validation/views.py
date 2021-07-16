@@ -337,14 +337,13 @@ def search_recordings(request, query):
     for form in word_forms:
         # Assume the query is an SRO transcription; prepare it for a fuzzy match.
         fuzzy_transcription = to_indexable_form(form)
-        result_set = Recording.objects.filter(
+        all_matches = Recording.objects.filter(
             phrase__fuzzy_transcription=fuzzy_transcription,
         )
-        # No bad recordings!
-        result_set = exclude_known_bad_recordings(result_set)
+        results = exclude_known_bad_recordings(all_matches)
 
         recordings.extend(
-            create_recording_result_json(request, recording) for recording in result_set
+            create_recording_result_json(request, recording) for recording in results
         )
 
     response = JsonResponse(recordings, safe=False)
@@ -356,7 +355,7 @@ def search_recordings(request, query):
     return add_cors_headers(response)
 
 
-def bulk_search_recordings(request):
+def bulk_search_recordings(request: HttpRequest):
     """
     API endpoint to retrieve EXACT wordforms and return the URLs and metadata for the recordings.
     Example: /api/bulk_search?q=mistik&q=minahik&q=waskay&q=mîtos&q=mistikow&q=mêstan
@@ -367,16 +366,13 @@ def bulk_search_recordings(request):
     not_found = []
 
     for term in query_terms:
-        result_set = Recording.objects.filter(
-            phrase__transcription=term,
-        )
-        # No bad recordings!
-        result_set = exclude_known_bad_recordings(result_set)
+        all_matches = Recording.objects.filter(phrase__transcription=term)
+        results = exclude_known_bad_recordings(all_matches)
 
-        if result_set:
+        if results:
             matched_recordings.extend(
                 create_recording_result_json(request, recording)
-                for recording in result_set
+                for recording in results
             )
         else:
             not_found.append(term)
