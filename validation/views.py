@@ -23,6 +23,7 @@ import json
 import operator
 from functools import reduce
 from pathlib import Path
+from typing import List, Iterable
 
 from django.conf import settings
 from django.contrib.auth import authenticate
@@ -316,43 +317,106 @@ def serve_recording(request, recording_id):
     return response
 
 
+class BadRequest(Exception):
+    def __init__(self, response: HttpResponse):
+        self.response = response
+
+
+class BaseRecordingSearchAPI:
+    def __init__(self, request: HttpRequest):
+        self.request = request
+
+    def perform(self) -> HttpResponse:
+        try:
+            response = self._perform()
+        except BadRequest as error:
+            response = error.response
+        return add_cors_headers(response)
+
+    def _perform(self) -> HttpResponse:
+        terms = self.get_terms()
+        matches = []
+        not_found = []
+
+        for term in terms:
+            all_matches = self.initial_result_set(term)
+            results = exclude_known_bad_recordings(all_matches)
+
+            if results:
+                matches.extend(
+                    create_recording_result_json(self.request, recording)
+                    for recording in results
+                )
+            else:
+                not_found.append(term)
+
+        return self.create_json_response(matches, not_found)
+
+    def get_terms(self) -> Iterable[str]:
+        raise NotImplementedError
+
+    def initial_result_set(self, term: str) -> QuerySet:
+        raise NotImplementedError
+
+    def create_json_response(
+        self, matches: List[dict], not_found: List[str]
+    ) -> JsonResponse:
+        raise NotImplementedError
+
+
+# Maximum amount of comma-separated query terms.
+MAX_RECORDING_QUERY_TERMS = 3
+
+
+class FuzzyRecordingSearchAPI(BaseRecordingSearchAPI):
+    def __init__(self, request: HttpRequest, query):
+        super().__init__(request)
+        self.query = query
+
+    def initial_result_set(self, term: str) -> QuerySet:
+        fuzzy_transcription = to_indexable_form(term)
+        return Recording.objects.filter(
+            phrase__fuzzy_transcription=fuzzy_transcription,
+        )
+
+    def get_terms(self) -> Iterable[str]:
+        # Commas are fence posts: there will be one less comma than query terms.
+        if self.query.count(",") >= MAX_RECORDING_QUERY_TERMS:
+            response = JsonResponse((), safe=False)
+            response.status_code = 414
+            raise BadRequest(response)
+
+        return frozenset(self.query.split(","))
+
+    def create_json_response(
+        self, matches: List[dict], not_found: List[str]
+    ) -> JsonResponse:
+        response = JsonResponse(matches, safe=False)
+        if len(matches) == 0:
+            # No matches. Return an empty JSON response
+            response.status_code = 404
+        return response
+
+
+class BulkRecordingSearchAPI(BaseRecordingSearchAPI):
+    def initial_result_set(self, term: str) -> QuerySet:
+        return Recording.objects.filter(phrase__transcription=term)
+
+    def get_terms(self) -> Iterable[str]:
+        return self.request.GET.getlist("q")
+
+    def create_json_response(
+        self, matches: List[dict], not_found: List[str]
+    ) -> JsonResponse:
+        return JsonResponse({"matched_recordings": matches, "not_found": not_found})
+
+
 def search_recordings(request, query):
     """
     Searches for recordings whose phrase's transcription matches the query.
     The response is JSON that can be used by external apps (i.e., itwêwina).
     """
-
-    # Maximum amount of comma-separated query terms.
-    MAX_RECORDING_QUERY_TERMS = 3
-
-    # Commas are fence posts: there will be one less comma than query terms.
-    if query.count(",") >= MAX_RECORDING_QUERY_TERMS:
-        response = JsonResponse((), safe=False)
-        response.status_code = 414
-        return add_cors_headers(response)
-
-    word_forms = frozenset(query.split(","))
-
-    recordings = []
-    for form in word_forms:
-        # Assume the query is an SRO transcription; prepare it for a fuzzy match.
-        fuzzy_transcription = to_indexable_form(form)
-        all_matches = Recording.objects.filter(
-            phrase__fuzzy_transcription=fuzzy_transcription,
-        )
-        results = exclude_known_bad_recordings(all_matches)
-
-        recordings.extend(
-            create_recording_result_json(request, recording) for recording in results
-        )
-
-    response = JsonResponse(recordings, safe=False)
-
-    if len(recordings) == 0:
-        # No matches. Return an empty JSON response
-        response.status_code = 404
-
-    return add_cors_headers(response)
+    return FuzzyRecordingSearchAPI(request, query).perform()
 
 
 def bulk_search_recordings(request: HttpRequest):
@@ -360,28 +424,7 @@ def bulk_search_recordings(request: HttpRequest):
     API endpoint to retrieve EXACT wordforms and return the URLs and metadata for the recordings.
     Example: /api/bulk_search?q=mistik&q=minahik&q=waskay&q=mîtos&q=mistikow&q=mêstan
     """
-
-    query_terms = request.GET.getlist("q")
-    matched_recordings = []
-    not_found = []
-
-    for term in query_terms:
-        all_matches = Recording.objects.filter(phrase__transcription=term)
-        results = exclude_known_bad_recordings(all_matches)
-
-        if results:
-            matched_recordings.extend(
-                create_recording_result_json(request, recording)
-                for recording in results
-            )
-        else:
-            not_found.append(term)
-
-    response = {"matched_recordings": matched_recordings, "not_found": not_found}
-
-    json_response = JsonResponse(response)
-
-    return add_cors_headers(json_response)
+    return BulkRecordingSearchAPI(request).perform()
 
 
 def add_cors_headers(response):
