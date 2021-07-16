@@ -80,6 +80,9 @@ urlpatterns = [
         name="save_wrong_word",
     ),
     path(
+        "api/bulk_search", views.bulk_search_recordings, name="bulk_search_recordings"
+    ),
+    path(
         "robots.txt",
         TemplateView.as_view(
             template_name="validation/robots.txt", content_type="text/plain"

@@ -35,7 +35,7 @@ MAX_RECORDING_QUERY_TERMS = 3  # TODO: will this be a configuration option?
 @pytest.mark.django_db
 def test_search_recordings(client, bake_recording):
     """
-    General test of the recorings search, in the happy case.
+    General test of the recordings search, in the happy case.
     """
 
     # Store <enipat>, but search for the normatized form (as itwêwina would
