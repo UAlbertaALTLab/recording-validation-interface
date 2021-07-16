@@ -333,16 +333,6 @@ def search_recordings(request, query):
 
     word_forms = frozenset(query.split(","))
 
-    def make_absolute_uri_for_recording(rec: Recording) -> str:
-        uri = rec.compressed_audio.url
-        if uri.startswith("/"):
-            # It's a relative URI: build an absolute URI:
-            return request.build_absolute_uri(uri)
-
-        # It's an absolute URI already:
-        assert uri.startswith("http")
-        return uri
-
     recordings = []
     for form in word_forms:
         # Assume the query is an SRO transcription; prepare it for a fuzzy match.
@@ -364,7 +354,7 @@ def search_recordings(request, query):
                 "anonymous": rec.speaker.anonymous,
                 "gender": rec.speaker.gender,
                 "dialect": rec.speaker.dialect,
-                "recording_url": make_absolute_uri_for_recording(rec),
+                "recording_url": make_absolute_uri_for_recording(request, rec),
                 "speaker_bio_url": make_absolute_uri_for_speaker_bio(rec.speaker),
             }
             for rec in result_set
