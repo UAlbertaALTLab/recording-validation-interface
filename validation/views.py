@@ -345,17 +345,7 @@ def search_recordings(request, query):
         result_set = exclude_known_bad_recordings(result_set)
 
         recordings.extend(
-            {
-                "wordform": rec.phrase.transcription,
-                "speaker": rec.speaker.code,
-                "speaker_name": rec.speaker.full_name,
-                "anonymous": rec.speaker.anonymous,
-                "gender": rec.speaker.gender,
-                "dialect": rec.speaker.dialect,
-                "recording_url": make_absolute_uri_for_recording(request, rec),
-                "speaker_bio_url": make_absolute_uri_for_speaker_bio(rec.speaker),
-            }
-            for rec in result_set
+            create_recording_result_json(request, recording) for recording in result_set
         )
 
     response = JsonResponse(recordings, safe=False)
@@ -388,17 +378,8 @@ def bulk_search_recordings(request):
 
         if result_set:
             matched_recordings.extend(
-                {
-                    "wordform": rec.phrase.transcription,
-                    "speaker": rec.speaker.code,
-                    "speaker_name": rec.speaker.full_name,
-                    "anonymous": rec.speaker.anonymous,
-                    "gender": rec.speaker.gender,
-                    "dialect": rec.speaker.dialect,
-                    "recording_url": make_absolute_uri_for_recording(request, rec),
-                    "speaker_bio_url": make_absolute_uri_for_speaker_bio(rec.speaker),
-                }
-                for rec in result_set
+                create_recording_result_json(request, recording)
+                for recording in result_set
             )
         else:
             not_found.append(term)
@@ -670,6 +651,22 @@ def save_issue(data, user):
     )
 
     new_issue.save()
+
+
+def create_recording_result_json(request: HttpRequest, rec: Recording):
+    """
+    Returns JSON that API clients expect for a single recording.
+    """
+    return {
+        "wordform": rec.phrase.transcription,
+        "speaker": rec.speaker.code,
+        "speaker_name": rec.speaker.full_name,
+        "anonymous": rec.speaker.anonymous,
+        "gender": rec.speaker.gender,
+        "dialect": rec.speaker.dialect,
+        "recording_url": make_absolute_uri_for_recording(request, rec),
+        "speaker_bio_url": make_absolute_uri_for_speaker_bio(rec.speaker),
+    }
 
 
 def make_absolute_uri_for_speaker_bio(speaker: Speaker) -> str:
