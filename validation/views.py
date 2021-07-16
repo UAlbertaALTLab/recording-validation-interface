@@ -341,9 +341,7 @@ def search_recordings(request, query):
             phrase__fuzzy_transcription=fuzzy_transcription,
         )
 
-        recordings.extend(
-            create_recording_result_json(request, recording) for recording in results
-        )
+        recordings.extend(recording.as_json(request) for recording in results)
 
     response = JsonResponse(recordings, safe=False)
 
@@ -369,8 +367,7 @@ def bulk_search_recordings(request: HttpRequest):
 
         if results:
             matched_recordings.extend(
-                create_recording_result_json(request, recording)
-                for recording in results
+                recording.as_json(request) for recording in results
             )
         else:
             not_found.append(term)
@@ -642,19 +639,3 @@ def save_issue(data, user):
     )
 
     new_issue.save()
-
-
-def create_recording_result_json(request: HttpRequest, rec: Recording):
-    """
-    Returns JSON that API clients expect for a single recording.
-    """
-    return {
-        "wordform": rec.phrase.transcription,
-        "speaker": rec.speaker.code,
-        "speaker_name": rec.speaker.full_name,
-        "anonymous": rec.speaker.anonymous,
-        "gender": rec.speaker.gender,
-        "dialect": rec.speaker.dialect,
-        "recording_url": request.build_absolute_uri(rec.get_absolute_url()),
-        "speaker_bio_url": request.build_absolute_uri(rec.speaker.get_absolute_url()),
-    }

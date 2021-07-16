@@ -450,6 +450,23 @@ class Recording(models.Model):
         """
         return self.compressed_audio.url
 
+    def as_json(self, request):
+        """
+        Returns JSON that API clients expect for a single recording.
+        """
+        return {
+            "wordform": self.phrase.transcription,
+            "speaker": self.speaker.code,
+            "speaker_name": self.speaker.full_name,
+            "anonymous": self.speaker.anonymous,
+            "gender": self.speaker.gender,
+            "dialect": self.speaker.dialect,
+            "recording_url": request.build_absolute_uri(self.get_absolute_url()),
+            "speaker_bio_url": request.build_absolute_uri(
+                self.speaker.get_absolute_url()
+            ),
+        }
+
     @staticmethod
     def get_path_to_audio_directory() -> Path:
         """
