@@ -36,6 +36,7 @@ from django.http import (
     HttpResponseRedirect,
     JsonResponse,
     QueryDict,
+    HttpRequest,
 )
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -384,16 +385,6 @@ def bulk_search_recordings(request):
     Example: /api/bulk_search?q=mistik&q=minahik&q=waskay&q=mîtos&q=mistikow&q=mêstan
     """
 
-    def make_absolute_uri_for_recording(rec: Recording) -> str:
-        uri = rec.compressed_audio.url
-        if uri.startswith("/"):
-            # It's a relative URI: build an absolute URI:
-            return request.build_absolute_uri(uri)
-
-        # It's an absolute URI already:
-        assert uri.startswith(("http://", "https://"))
-        return uri
-
     query_terms = request.GET.getlist("q")
     matched_recordings = []
     not_found = []
@@ -418,7 +409,7 @@ def bulk_search_recordings(request):
                     "anonymous": rec.speaker.anonymous,
                     "gender": rec.speaker.gender,
                     "dialect": rec.speaker.dialect,
-                    "recording_url": make_absolute_uri_for_recording(rec),
+                    "recording_url": make_absolute_uri_for_recording(request, rec),
                     "speaker_bio_url": make_absolute_uri_for_speaker_bio(rec.speaker),
                 }
                 for rec in result_set
@@ -702,3 +693,18 @@ def make_absolute_uri_for_speaker_bio(speaker: Speaker) -> str:
     # TODO: Change this when implementing:
     # https://github.com/UAlbertaALTLab/recording-validation-interface/issues/72
     return f"https://www.altlab.dev/maskwacis/Speakers/{speaker.code}.html"
+
+
+def make_absolute_uri_for_recording(request: HttpRequest, rec: Recording) -> str:
+    """
+    Returns an absolute URL for the compressed audio recording.
+    This can be directly used in an <audio> tag to hear the recording on a webpage!
+    """
+    uri = rec.compressed_audio.url
+    if uri.startswith("/"):
+        # It's a relative URI: build an absolute URI:
+        return request.build_absolute_uri(uri)
+
+    # It's an absolute URI already:
+    assert uri.startswith(("http://", "https://"))
+    return uri
