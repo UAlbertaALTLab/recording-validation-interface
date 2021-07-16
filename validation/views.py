@@ -655,21 +655,6 @@ def create_recording_result_json(request: HttpRequest, rec: Recording):
         "anonymous": rec.speaker.anonymous,
         "gender": rec.speaker.gender,
         "dialect": rec.speaker.dialect,
-        "recording_url": make_absolute_uri_for_recording(request, rec),
-        "speaker_bio_url": rec.speaker.get_absolute_url(),
+        "recording_url": request.build_absolute_uri(rec.get_absolute_url()),
+        "speaker_bio_url": request.build_absolute_uri(rec.speaker.get_absolute_url()),
     }
-
-
-def make_absolute_uri_for_recording(request: HttpRequest, rec: Recording) -> str:
-    """
-    Returns an absolute URL for the compressed audio recording.
-    This can be directly used in an <audio> tag to hear the recording on a webpage!
-    """
-    uri = rec.compressed_audio.url
-    if uri.startswith("/"):
-        # It's a relative URI: build an absolute URI:
-        return request.build_absolute_uri(uri)
-
-    # It's an absolute URI already:
-    assert uri.startswith(("http://", "https://"))
-    return uri

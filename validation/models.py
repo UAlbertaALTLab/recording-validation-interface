@@ -442,6 +442,14 @@ class Recording(models.Model):
     def __str__(self):
         return f'"{self.phrase}" recorded by {self.speaker} during {self.session}'
 
+    def get_absolute_url(self) -> str:
+        """
+        Return a URL to the compressed audio file.
+        Note: you will still need to call HttpRequest.build_absolute_uri() to get an
+        absolute URI (i.e., with scheme and hostname).
+        """
+        return self.compressed_audio.url
+
     @staticmethod
     def get_path_to_audio_directory() -> Path:
         """
