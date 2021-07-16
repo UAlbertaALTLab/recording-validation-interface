@@ -106,6 +106,7 @@ RECVAL_SQLITE_DB_PATH = config(
     "RECVAL_SQLITE_DB_PATH", default=BASE_DIR / "db.sqlite3", cast=Path
 )
 
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
@@ -219,7 +220,7 @@ LOGIN_REDIRECT_URL = "/"
 
 ITWEWINA_URL = "https://itwewina.altlab.app/"
 
-FIXTURE_DIRS = ("validation/management/fixtures/",)
+FIXTURE_DIRS = (BASE_DIR / "validation" / "management" / "fixtures",)
 
 INTERNAL_IPS = ["127.0.0.1"]
 
