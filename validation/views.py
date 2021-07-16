@@ -342,9 +342,6 @@ def search_recordings(request, query):
         assert uri.startswith("http")
         return uri
 
-    def make_absolute_uri_for_speaker(code: str) -> str:
-        return f"https://www.altlab.dev/maskwacis/Speakers/{code}.html"
-
     recordings = []
     for form in word_forms:
         # Assume the query is an SRO transcription; prepare it for a fuzzy match.
@@ -367,7 +364,7 @@ def search_recordings(request, query):
                 "gender": rec.speaker.gender,
                 "dialect": rec.speaker.dialect,
                 "recording_url": make_absolute_uri_for_recording(rec),
-                "speaker_bio_url": make_absolute_uri_for_speaker(rec.speaker.code),
+                "speaker_bio_url": make_absolute_uri_for_speaker_bio(rec.speaker.code),
             }
             for rec in result_set
         )
@@ -397,9 +394,6 @@ def bulk_search_recordings(request):
         assert uri.startswith(("http://", "https://"))
         return uri
 
-    def make_absolute_uri_for_speaker(code: str) -> str:
-        return f"https://www.altlab.dev/maskwacis/Speakers/{code}.html"
-
     query_terms = request.GET.getlist("q")
     matched_recordings = []
     not_found = []
@@ -425,7 +419,9 @@ def bulk_search_recordings(request):
                     "gender": rec.speaker.gender,
                     "dialect": rec.speaker.dialect,
                     "recording_url": make_absolute_uri_for_recording(rec),
-                    "speaker_bio_url": make_absolute_uri_for_speaker(rec.speaker.code),
+                    "speaker_bio_url": make_absolute_uri_for_speaker_bio(
+                        rec.speaker.code
+                    ),
                 }
                 for rec in result_set
             )
@@ -699,3 +695,12 @@ def save_issue(data, user):
     )
 
     new_issue.save()
+
+
+def make_absolute_uri_for_speaker_bio(code: str) -> str:
+    """
+    Returns a URL for where to find the speaker bio.
+    """
+    # TODO: Change this when implementing:
+    # https://github.com/UAlbertaALTLab/recording-validation-interface/issues/72
+    return f"https://www.altlab.dev/maskwacis/Speakers/{code}.html"
