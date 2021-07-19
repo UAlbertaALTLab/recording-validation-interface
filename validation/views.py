@@ -45,7 +45,7 @@ from django.contrib.auth import authenticate, login as django_login
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 from django.core.mail import mail_admins
-from django.db.models import Q
+from django.db.models import Q, QuerySet
 
 from librecval.normalization import to_indexable_form
 
@@ -337,9 +337,10 @@ def search_recordings(request, query):
     for form in word_forms:
         # Assume the query is an SRO transcription; prepare it for a fuzzy match.
         fuzzy_transcription = to_indexable_form(form)
-        results = Recording.presentable_objects.filter(
+        all_matches = Recording.objects.filter(
             phrase__fuzzy_transcription=fuzzy_transcription,
         )
+        results = exclude_known_bad_recordings(all_matches)
 
         recordings.extend(recording.as_json(request) for recording in results)
 
@@ -363,7 +364,8 @@ def bulk_search_recordings(request: HttpRequest):
     not_found = []
 
     for term in query_terms:
-        results = Recording.presentable_objects.filter(phrase__transcription=term)
+        all_matches = Recording.objects.filter(phrase__transcription=term)
+        results = exclude_known_bad_recordings(all_matches)
 
         if results:
             matched_recordings.extend(
@@ -639,3 +641,20 @@ def save_issue(data, user):
     )
 
     new_issue.save()
+
+
+def exclude_known_bad_recordings(recordings: QuerySet):
+    """
+    Given a QuerySet of Recording objects, remove recordings that should NOT be
+    presented to users of e.g., the dictionary.
+    """
+    return (
+        recordings.exclude(quality=Recording.BAD)
+        .exclude(wrong_word=True)
+        .exclude(wrong_speaker=True)
+        # We use the "gender" field as a proxy to see whether a speaker's data has
+        # been properly filled out: exclude speakers whose gender field has not been
+        # input. An admin must put *something* in the gender field before the
+        # speaker shows up in API results.
+        .exclude(speaker__gender__isnull=True)
+    )

@@ -23,7 +23,6 @@ from pathlib import Path
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import QuerySet
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
@@ -364,26 +363,6 @@ def generate_primary_key(sender, instance, **kwargs):
 SHA256_HEX_LENGTH = 64
 
 
-class PresentableRecordingModelManager(models.Manager):
-    """
-    Returns Recording instances only for recordings we think are
-    clean/usable to be presented to users of e.g., the dictionary.
-    """
-
-    def get_queryset(self) -> "QuerySet[Recording]":
-        recordings = super().get_queryset()
-        return (
-            recordings.exclude(quality=Recording.BAD)
-            .exclude(wrong_word=True)
-            .exclude(wrong_speaker=True)
-            # We use the "gender" field as a proxy to see whether a speaker's data has
-            # been properly filled out: exclude speakers whose gender field has not been
-            # input. An admin must put *something* in the gender field before the
-            # speaker shows up in API results.
-            .exclude(speaker__gender__isnull=True)
-        )
-
-
 class Recording(models.Model):
     """
     A recording of a phrase.
@@ -433,11 +412,6 @@ class Recording(models.Model):
 
     # Keep track of the recording's history.
     history = HistoricalRecords(excluded_fields=["compressed_audio"])
-
-    # Default Django model manager:
-    objects = models.Manager()
-    # Custom model manager that returns only recordings that are okay to present:
-    presentable_objects = PresentableRecordingModelManager()
 
     def __str__(self):
         return f'"{self.phrase}" recorded by {self.speaker} during {self.session}'
