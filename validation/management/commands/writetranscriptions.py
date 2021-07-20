@@ -52,8 +52,11 @@ class Command(BaseCommand):
     def write_transcriptions(self, audio_dir, mode):
         # Change this to Path("/where/you/want/training/data")
         # if you want the data elsewhere
-        training_dir = audio_dir
-        for audio_file in tqdm(audio_dir.iterdir()):
+        training_dir = Path("./transcriptions")
+        for audio_file in tqdm(
+            audio_dir.iterdir(),
+            total=sum(1 for x in audio_dir.glob("*") if x.is_file()),
+        ):
             audio_id = audio_file.stem
 
             if mode == "auto-validated":
@@ -80,7 +83,7 @@ class Command(BaseCommand):
 
             # if there are things that aren't audio files in the directory
             # the speaker variable will be empty, this is normal/fine
-            if not speaker:
+            if not speaker or "/" in speaker:
                 continue
 
             self.make_directories(training_dir, speaker)
@@ -106,8 +109,9 @@ class Command(BaseCommand):
             else:
                 s4a_path = training_dir / speaker / "s4a" / s4a_filename
 
+            s4a_trans = create_s4a_transcription(transcription)
             with open(s4a_path, "w", encoding="UTF=8") as f:
-                f.write(transcription)
+                f.write(s4a_trans)
 
     def copy_audio_file(self, training_dir, audio_file, speaker):
         # Copy the audio file
@@ -156,3 +160,22 @@ def create_persephone_transcription(transcription):
     persephone_trans = persephone_trans.replace("%", "")
 
     return persephone_trans
+
+
+def create_s4a_transcription(transcription):
+    """
+    Prepares transcriptions for Simple4All
+    >>> create_s4a_transcription("wâpamêw")
+    'waapameew'
+    >>> create_s4a_transcription("kîkwây ôma")
+    'kiikwaay ooma'
+    >>> create_s4a_transcription("masinahikan")
+    'masinahikan'
+    """
+
+    transcription = transcription.replace("ê", "ee")
+    transcription = transcription.replace("â", "aa")
+    transcription = transcription.replace("î", "ii")
+    transcription = transcription.replace("ô", "oo")
+
+    return transcription

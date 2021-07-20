@@ -435,22 +435,6 @@ class Issue(models.Model):
         max_length=1024,
     )
 
-    other = models.BooleanField(
-        help_text="There's another reason this issue was filed", default=False
-    )
-
-    bad_cree = models.BooleanField(
-        help_text="There's a better Cree word for this translation", default=False
-    )
-
-    bad_english = models.BooleanField(
-        help_text="There's another English word for this transcription", default=False
-    )
-
-    bad_recording = models.BooleanField(
-        help_text="There's one or more bad recordings in this batch", default=False
-    )
-
     phrase = models.ForeignKey(Phrase, on_delete=models.CASCADE, blank=True, null=True)
 
     recording = models.ForeignKey(

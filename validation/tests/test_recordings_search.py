@@ -35,7 +35,7 @@ MAX_RECORDING_QUERY_TERMS = 3  # TODO: will this be a configuration option?
 @pytest.mark.django_db
 def test_search_recordings(client, bake_recording):
     """
-    General test of the recorings search, in the happy case.
+    General test of the recordings search, in the happy case.
     """
 
     # Store <enipat>, but search for the normatized form (as itwêwina would
@@ -259,6 +259,12 @@ def test_does_not_return_bad_recordings(client, bake_recording):
     )
     unknown_recording = bake_recording(
         phrase=phrase, speaker=mystery_speaker, quality=""
+    )
+    wrong_word_recording = bake_recording(
+        phrase=phrase, speaker=good_speaker, wrong_word=True
+    )
+    wrong_speaker_recording = bake_recording(
+        phrase=phrase, speaker=good_speaker, wrong_speaker=True
     )
 
     response = client.get(

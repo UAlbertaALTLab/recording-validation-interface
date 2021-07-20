@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="icon" type="image/png" href="/static/images/little-m.png">
-  <link rel="stylesheet" href="{{ static('styles.css') }}" type="text/css">
+  <link rel="stylesheet" href="{{ static('styles/main.css') }}" type="text/css">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
@@ -15,6 +15,7 @@ const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 </script>
       <script src="{{ static('index.js') }}"></script>
       <script src="{{ static('menu.js') }}"></script>
+      <script src="{{ static('nav.js') }}"></script>
       <title>{% block title %} Maskwacîs Recordings Validation {% endblock title %}</title>
   {% endblock head %}
 

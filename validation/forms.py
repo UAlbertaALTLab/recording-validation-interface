@@ -85,30 +85,20 @@ class EditSegment(forms.Form):
 
 
 class FlagSegment(forms.ModelForm):
-    ISSUES = [
-        ("bad_cree", "There's a better transcription (Cree word/phrase)"),
-        ("bad_english", "There's a better translation (English word/phrase)"),
-        ("bad_rec", "One or more of these recordings are not of this word"),
-        ("other", "Something else (please specify)"),
-    ]
-    issues = forms.MultipleChoiceField(
-        choices=ISSUES, required=False, widget=forms.CheckboxSelectMultiple
-    )
-
     cree_suggestion = forms.CharField(
-        help_text="Suggest a better Cree spelling",
+        help_text="Use the space above to suggest a better Cree spelling",
         required=False,
         widget=forms.Textarea(attrs={"class": "form-control issue__textarea"}),
     )
 
     english_suggestion = forms.CharField(
-        help_text="Suggest a better English word or phrase",
+        help_text="Use the space above to suggest a better English word or phrase",
         required=False,
         widget=forms.Textarea(attrs={"class": "form-control issue__textarea"}),
     )
 
     comment = forms.CharField(
-        help_text="Use the space above to suggest a new spelling or make a few notes about why you're reporting an issue "
+        help_text="Use the space above to provide an example or make a few notes about why you're reporting an issue "
         "with this entry",
         required=False,
         widget=forms.Textarea(

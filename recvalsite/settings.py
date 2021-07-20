@@ -106,6 +106,7 @@ RECVAL_SQLITE_DB_PATH = config(
     "RECVAL_SQLITE_DB_PATH", default=BASE_DIR / "db.sqlite3", cast=Path
 )
 
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
@@ -219,7 +220,7 @@ LOGIN_REDIRECT_URL = "/"
 
 ITWEWINA_URL = "https://itwewina.altlab.app/"
 
-FIXTURE_DIRS = ("validation/management/fixtures/",)
+FIXTURE_DIRS = (BASE_DIR / "validation" / "management" / "fixtures",)
 
 INTERNAL_IPS = ["127.0.0.1"]
 
@@ -249,3 +250,12 @@ LOGGING = {
         },
     },
 }
+
+ADMINS = [("Jolene", "jcpoulin@ualberta.ca")]
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_HOST_USER = config("SMTP_USER", default=None)
+EMAIL_HOST_PASSWORD = config("SMTP_PASS", default=None)
+EMAIL_USE_TLS = True

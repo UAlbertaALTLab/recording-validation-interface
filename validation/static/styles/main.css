@@ -1,0 +1,102 @@
+@import "variables.css";
+@import "button_styles.css";
+@import "menu.css";
+@import "modal.css";
+@import "nav.css";
+@import "forms.css";
+@import "cards.css";
+@import "login.css";
+
+/* main styles */
+/* these styles are used all over the site;
+  if a style is not specific to one element,
+  has a more general purpose,
+  or is the only one of its kind,
+  put it in here */
+
+main {
+  margin: 1em auto;
+}
+
+.main_container {
+  width: 90%;
+}
+
+a:hover {
+  cursor: pointer;
+}
+
+.header--dark {
+  background-color: var(--custom-purple);
+}
+
+.table__td--speaker {
+  padding: 0;
+}
+
+.list__speaker {
+  margin-top: 0.5rem;
+  padding-bottom: 10;
+  list-style: none;
+}
+
+.list__recording {
+  padding: auto 0;
+  list-style: none;
+}
+
+.list__item--speaker {
+  display: inline-block;
+  min-width: 4rem;
+  text-align: center;
+  margin: .5rem;
+}
+
+.list__item--speaker-code {
+  padding-bottom: 1.5rem;
+  display: block;
+}
+
+.recordings__audio {
+  max-width: 100%;
+}
+
+.bottom-margin {
+  margin-bottom: 2rem;
+}
+
+.filter {
+  margin: 0 auto;
+}
+
+.filter__button {
+  padding: 0.3rem;
+  margin-right: 0.2rem;
+  margin-bottom: 1rem;
+  border: none;
+}
+
+.filter__button--active {
+  color: var(--custom-white);
+  background-color: var(--custom-green);
+  border-color: var(--custom-green);
+}
+
+/* table styles */
+.restrict-content {
+  max-width: 15rem;
+}
+
+.rec-height {
+  height: 3rem;
+}
+
+.center {
+  text-align: center;
+}
+
+.description {
+  font-weight: 600;
+  font-size: 1.5rem;
+}
+

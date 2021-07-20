@@ -24,7 +24,7 @@
             "translation": "",
             "kind": "word",
             "validated": "1",
-            "status": "auto-validated",
+            "status": "new",
             "origin": "new",
             "fuzzy_transcription": "kwaskwepitamawew",
             "date": "2021-03-17",
@@ -58,7 +58,7 @@
             "translation": "sinking",
             "kind": "word",
             "validated": "1",
-            "status": "auto-validated",
+            "status": "new",
             "origin": "new",
             "fuzzy_transcription": "kosapewin",
             "date": "2021-03-17",
@@ -75,7 +75,7 @@
             "translation": "",
             "kind": "word",
             "validated": "1",
-            "status": "auto-validated",
+            "status": "new",
             "origin": "new",
             "fuzzy_transcription": "kosapew",
             "date": "2021-03-17",
@@ -116,6 +116,40 @@
             "analysis": "",
             "modifier": "AUTO",
             "field_transcription": "ocewipakamayikan"
+        }
+    },
+    {
+        "model": "validation.phrase",
+        "fields": {
+            "id": "8",
+            "transcription": "nipiy",
+            "translation": "water",
+            "kind": "word",
+            "validated":0,
+            "status": "new",
+            "origin": "new",
+            "fuzzy_transcription": "nipiy",
+            "date": "2021-03-17",
+            "analysis": "",
+            "modifier": "AUTO",
+            "field_transcription": "nipiy"
+        }
+    },
+    {
+        "model": "validation.phrase",
+        "fields": {
+            "id": "9",
+            "transcription": "nîpiy",
+            "translation": "leaf",
+            "kind": "word",
+            "validated":0,
+            "status": "new",
+            "origin": "new",
+            "fuzzy_transcription": "nipiy",
+            "date": "2021-03-17",
+            "analysis": "",
+            "modifier": "AUTO",
+            "field_transcription": "nîpiy"
         }
     }
 ]

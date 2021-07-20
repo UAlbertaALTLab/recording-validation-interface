@@ -1,20 +1,9 @@
 <script>
-    function showDiv(name) {
-        document.getElementById('edit').style.display = "block";
-        document.getElementById('id_cree').focus()
-        
-        const translation = document.getElementById(name + '-translation').innerHTML;
-
-        document.getElementById('id_cree').value = name;
-        document.getElementById('id_translation').value = translation;
-    }
-
-    function showDivAccept(name, translation, analysis) {
+    function showDivAccept(name, analysis) {
         document.getElementById('edit').style.display = "block";
         document.getElementById('id_cree').focus()
 
         document.getElementById('id_cree').value = name;
-        document.getElementById('id_translation').value = translation;
         document.getElementById('id_analysis').value = analysis;
     }
 
@@ -22,12 +11,11 @@
         document.getElementById('edit').style.display = "none";
     }
 
-    function revert(transcription, translation, analysis) {
+    function revert(transcription, analysis) {
         document.getElementById('edit').style.display = "block";
         document.getElementById('id_cree').focus()
 
         document.getElementById('id_cree').value = transcription;
-        document.getElementById('id_translation').value = translation;
         document.getElementById('id_analysis').value = analysis;
     }
 
@@ -46,13 +34,6 @@
 
     <div>
         <button class="button button--success button--back" onclick='goBack()'>Back</button>
-        {% if auth %}
-            <button data-cy="edit-button" class="button button--fail button--right button--edit"
-                onclick="showDiv('{{ segment_name }}')"
-                class="button button--fail button--right">
-                    Edit
-            </button>
-        {% endif %}
     </div>
 
     <table id="segment-table" class="table table-striped">
@@ -92,7 +73,7 @@
       {% endfor %}{# for phrase in phrases #}
     </table>
 
-    <div style="display: none;" id="edit" data-cy="edit-div">
+    <div id="edit" data-cy="edit-div">
         {% include 'validation/segment_edit.html' %}
     </div>
 
@@ -121,9 +102,8 @@
               {{ macros.td_suggestion_analysis(user, suggestion, suggestions) }}
               {% if auth %}
               <td>
-                  {% set transl = suggestions[suggestion]["matches"][0]["translations"] %}
                   {% set analysis = suggestions[suggestion]["matches"][0]["analysis"] %}
-                  <input type="button" class="button button--success" value="Accept" onclick="showDivAccept('{{ suggestion }}', '{{ transl }}', '{{ analysis }}')" />
+                  <input type="button" class="button button--success" value="Accept" onclick="showDivAccept('{{ suggestion }}', '{{ analysis }}')" />
               </td>
               {% endif %}
             {% endif %}
@@ -135,9 +115,8 @@
             <td>{{ match['analysis'] }}</td>
             {% if auth %}
             <td>
-                {% set transl = match["translations"] %}
                 {% set analysis = match["analysis"] %}
-                <input type="button" class="button button--success" value="Accept" onclick="showDivAccept('{{ suggestion }}', '{{ transl }}', '{{ analysis }}')" />
+                <input type="button" class="button button--success" value="Accept" onclick="showDivAccept('{{ suggestion }}', '{{ analysis }}')" />
             </td>
           </tr>
             {% endif %}
@@ -168,7 +147,7 @@
           <td data-cy="revision-analysis">{{ revision.analysis }} </td>
           {% if auth %}
           <td>
-            <input type="button" class="button button--fail" value="Revert" onclick="revert('{{ revision.transcription }}', '{{ revision.translation }}', '{{ revision.analysis }}')" />
+            <input type="button" class="button button--fail" value="Revert" onclick="revert('{{ revision.transcription }}', '{{ revision.analysis }}')" />
         </td>
         {% endif %}
           
