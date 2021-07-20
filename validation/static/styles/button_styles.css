@@ -67,6 +67,16 @@
   cursor: pointer;
 }
 
+.button--neutral > a {
+  text-decoration: none;
+  color: var(--custom-purple);
+}
+
+.button--neutral > a:hover {
+  text-decoration: none;
+  color: var(--custom-white);
+}
+
 .button--edit {
   margin: 0.5rem 10.5rem 0.5rem 0.5rem;
 }
@@ -121,4 +131,9 @@
   padding: .375rem .75rem;
   line-height: 1.5;
   transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+.button--right-issue {
+  display: inline-flex;
+  justify-content: end;
 }

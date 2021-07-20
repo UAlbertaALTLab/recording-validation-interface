@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("validation", "0007_wrong_word_fields"),
+        ("validation", "0008_remove_booleans_from_issue"),
     ]
 
     operations = [

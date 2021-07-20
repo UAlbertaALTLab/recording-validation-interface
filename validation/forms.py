@@ -106,15 +106,17 @@ class FlagSegment(forms.ModelForm):
         ),
     )
 
-    phrase_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
-
     class Meta:
         model = Issue
         fields = ["phrase_id"]
 
 
 class EditIssueWithRecording(forms.ModelForm):
-    phrase = forms.CharField(widget=forms.Textarea(), required=False)
+    phrase = forms.CharField(
+        widget=forms.Textarea(),
+        required=False,
+        help_text="The sentence or phrase is this recording is actually...",
+    )
 
     class Meta:
         model = Recording
@@ -125,6 +127,8 @@ class EditIssueWithRecording(forms.ModelForm):
 
 
 class EditIssueWithPhrase(forms.ModelForm):
+    phrase_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
+
     class Meta:
         model = Phrase
         fields = ["transcription", "translation"]

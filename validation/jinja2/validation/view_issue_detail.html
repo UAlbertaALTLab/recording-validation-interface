@@ -19,28 +19,29 @@
 {% import 'validation/_macros.html' as macros %}
 
 {% block content %}
+    <h2>
+        {% if issue.phrase %}
+            You are editing the Phrase object for this entry
+        {% else %}
+            You are editing this specific Recording for this entry
+        {% endif %}
+    </h2>
     <container style="display: flex">
         <section style="flex: 1">
-        <h2>Current Information</h2>
+        <h3>Current Information</h3>
             {% if issue.phrase %}
             Transcription: {{ issue.phrase.transcription }}<br>
             Translation: {{ issue.phrase.translation }}<br>
             {% endif %}
-            {{ issue.recording if issue.recording }}<br>
             {% if issue.recording %}
+                {{ issue.recording }}<br>
                 {{ macros.player(issue.recording) }}<br>
             {% endif %}
-            {% if issue.bad_cree %}
+            {% if issue.suggested_cree %}
                     The Cree word in this entry is wrong<br>
                 {% endif %}
-                {% if issue.bad_english %}
+                {% if issue.suggested_english %}
                     The English word in this entry is wrong<br>
-                {% endif %}
-                {% if issue.bad_recording %}
-                    This entry has one or more bad recordings<br>
-                {% endif %}
-                {% if issue.other %}
-                    Something else is wrong!<br>
                 {% endif %}
                 Comment: {{ issue.comment }}<br>
                 {% if issue.suggested_cree %}
@@ -54,11 +55,12 @@
         </section>
 
         <section style="flex: 1">
-            <h2>Updates</h2>
+            <h3>Updates</h3>
             {% if form %}
-                <form action="" method="post">
+                <form action="" method="POST">
                     <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
                     {{ form }}
+                    {{ form.rec_id }}
                     <input data-cy="save-button" type="submit" class="button button--success" value="Save">
                 </form>
             {% endif %}

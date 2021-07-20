@@ -35,17 +35,11 @@
                     {{ macros.player(issue.recording) }}<br>
                 {% endif %}
                 <h3>What's wrong with this entry?</h3>
-                {% if issue.bad_cree %}
+                {% if issue.suggested_cree %}
                     The Cree word in this entry is wrong<br>
                 {% endif %}
-                {% if issue.bad_english %}
+                {% if issue.suggested_english %}
                     The English word in this entry is wrong<br>
-                {% endif %}
-                {% if issue.bad_recording %}
-                    This entry has one or more bad recordings<br>
-                {% endif %}
-                {% if issue.other %}
-                    Something else is wrong!<br>
                 {% endif %}
                 Comment: {{ issue.comment }}<br>
                 {% if issue.suggested_cree %}

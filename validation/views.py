@@ -506,9 +506,38 @@ def view_issue_detail(request, issue_id):
 
     form = None
     if issue.recording:
-        form = EditIssueWithRecording()
+        form = EditIssueWithRecording(
+            request.POST, initial={"rec_id": str(issue.recording.id)}
+        )
     if issue.phrase:
-        form = EditIssueWithPhrase()
+        form = EditIssueWithPhrase(request.POST, initial={"phrase_id": issue.phrase.id})
+
+    if request.method == "POST":
+        if form.is_valid():
+            # if recording, get recording object
+            # set speaker to new speaker
+            # see if there's a matching phrase that already exists
+            # if there is, set the recording phrase to that phrase
+            # otherwise create a new phrase and associate it with the recording
+
+            # if phrase, get phrase object
+            # set new transcription and/or translation for the phrase
+            print("FORM:", form.cleaned_data)
+            speaker = None
+            phrase = None
+            transcription = None
+            translation = None
+            if "speaker" in form.cleaned_data:
+                speaker = form.cleaned_data["speaker"]
+
+            if "phrase" in form.cleaned_data:
+                phrase = form.cleaned_data["phrase"]
+            if "transcription" in form.cleaned_data:
+                transcription = form.cleaned_data["transcription"]
+            if "translation" in form.cleaned_data:
+                transcription = form.cleaned_data["translation"]
+
+            print(speaker, phrase, transcription, translation)
 
     # when the recording form comes back, look for a phrase with
     # the same transcription/translation if those fields have been filled
