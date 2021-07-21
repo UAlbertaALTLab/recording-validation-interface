@@ -60,7 +60,6 @@
                 <form action="" method="POST">
                     <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
                     {{ form }}
-                    {{ form.rec_id }}
                     <input data-cy="save-button" type="submit" class="button button--success" value="Save">
                 </form>
             {% endif %}

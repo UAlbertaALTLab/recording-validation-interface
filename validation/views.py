@@ -509,46 +509,58 @@ def view_issue_detail(request, issue_id):
         form = EditIssueWithRecording(
             request.POST, initial={"rec_id": str(issue.recording.id)}
         )
+        rec = Recording.objects.filter(id=issue.recording.id).first()
     if issue.phrase:
         form = EditIssueWithPhrase(request.POST, initial={"phrase_id": issue.phrase.id})
+        phrase = Phrase.objects.filter(id=issue.phrase.id).first()
 
     if request.method == "POST":
         if form.is_valid():
-            # if recording, get recording object
-            # set speaker to new speaker
-            # see if there's a matching phrase that already exists
-            # if there is, set the recording phrase to that phrase
-            # otherwise create a new phrase and associate it with the recording
+            if rec:
+                # if recording, get recording object
+                # set speaker to new speaker
+                # see if there's a matching phrase that already exists
+                # if there is, set the recording phrase to that phrase
+                # otherwise create a new phrase and associate it with the recording
+                speaker_code = form.cleaned_data["speaker"]
+                if speaker_code:
+                    speaker = Speaker.objects.filter(code=speaker_code).first()
+                    rec.speaker = speaker
+
+                new_word = form.cleaned_data["phrase"]
+                if new_word:
+                    new_phrase = Phrase.objects.filter(transcription=new_word).first()
+                    if not new_phrase:
+                        new_phrase = Phrase(
+                            field_transcription=new_word,
+                            transcription=new_word,
+                            translation="",
+                            kind="Sentence" if " " in new_word else "Word",
+                            date=datetime.datetime.now(),
+                            modifier=request.user.username,
+                        )
+                        new_phrase.save()
+                    rec.phrase_id = new_phrase.id
+
+                rec.wrong_word = False
+                rec.wrong_speaker = False
+                rec.save()
 
             # if phrase, get phrase object
             # set new transcription and/or translation for the phrase
-            print("FORM:", form.cleaned_data)
-            speaker = None
-            phrase = None
-            transcription = None
-            translation = None
-            if "speaker" in form.cleaned_data:
-                speaker = form.cleaned_data["speaker"]
-
-            if "phrase" in form.cleaned_data:
-                phrase = form.cleaned_data["phrase"]
-            if "transcription" in form.cleaned_data:
+            elif phrase:
                 transcription = form.cleaned_data["transcription"]
-            if "translation" in form.cleaned_data:
-                transcription = form.cleaned_data["translation"]
+                translation = form.cleaned_data["translation"]
 
-            print(speaker, phrase, transcription, translation)
+                if transcription:
+                    phrase.transcription = transcription
+                if translation:
+                    phrase.translation = translation
+                phrase.modifier = request.user.username
+                phrase.save()
 
-    # when the recording form comes back, look for a phrase with
-    # the same transcription/translation if those fields have been filled
-    # if one exists, change the association to that one
-    # if one doesn't exist, make it and save the new relationship
-
-    # when the phrase form comes back, save the new information
-    # in the phrase
-
-    # when either form comes back, mark the issue as resolved
-    # and update the phrase/recording status
+            issue.status = "Resolved"
+            issue.save()
 
     context = dict(
         issue=issue,
