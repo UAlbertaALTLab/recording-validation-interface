@@ -567,8 +567,7 @@ def view_issue_detail(request, issue_id):
 
             issue.status = "Resolved"
             issue.save()
-            response = HttpResponseRedirect("/issues")
-            return response
+            return HttpResponseRedirect("/issues")
 
     context = dict(
         issue=issue,
@@ -689,6 +688,14 @@ def save_wrong_word(request, recording_id):
         response["Location"] = "/"
 
     return response
+
+
+def close_issue(request, issue_id):
+    issue = Issue.objects.filter(id=issue_id).first()
+    issue.status = "Resolved"
+    issue.save()
+
+    return HttpResponseRedirect("/issues")
 
 
 # Small Helper functions

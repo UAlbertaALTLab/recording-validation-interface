@@ -81,6 +81,7 @@ urlpatterns = [
         views.save_wrong_word,
         name="save_wrong_word",
     ),
+    path("api/close_issue/<str:issue_id>", views.close_issue, name="close_issue"),
     path(
         "api/bulk_search", views.bulk_search_recordings, name="bulk_search_recordings"
     ),

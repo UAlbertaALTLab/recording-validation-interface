@@ -23,9 +23,14 @@
     <div class="col-sm-6">
         <article class="card shadow-sm" data-cy="issue-card">
             <div class="card__header card__header--beige" data-cy="card-header">
-                <button class="button button--neutral button--right-issue">
-                    <a href="{{ url('validation:issue_detail', issue.id) }}">More Info</a>
-                </button>
+                <div class="right">
+                    <button class="button button--neutral" data-cy="more-info-issue-button">
+                        <a href="{{ url('validation:issue_detail', issue.id) }}">More Info</a>
+                    </button>
+                    <button class="button button--fail" data-cy="close-issue-button">
+                        <a href="/api/close_issue/{{ issue.id }}">Close Issue</a>
+                    </button>
+                </div>
             </div>
             <div class="card__body">
                 {% if issue.phrase %}

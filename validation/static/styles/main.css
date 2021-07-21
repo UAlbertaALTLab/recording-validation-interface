@@ -95,6 +95,10 @@ a:hover {
   text-align: center;
 }
 
+.right {
+  text-align: right;
+}
+
 .description {
   font-weight: 600;
   font-size: 1.5rem;

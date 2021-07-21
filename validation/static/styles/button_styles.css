@@ -37,6 +37,15 @@
   border: 2px solid var(--custom-orange);
 }
 
+.button--fail > a {
+  color: var(--custom-orange);
+}
+
+.button--fail:hover > a, .button--fail > a:hover {
+  color: var(--custom-white);
+  text-decoration: none;
+}
+
 .button--fail-solid {
   color: var(--custom-white);
   background-color: var(--custom-orange);
@@ -65,6 +74,10 @@
   border: 2px solid var(--custom-purple);
   background-color: var(--custom-pale-purple);
   cursor: pointer;
+}
+
+.button--neutral:hover > a {
+  color: var(--custom-white);
 }
 
 .button--neutral > a {
