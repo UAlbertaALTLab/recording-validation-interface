@@ -440,6 +440,7 @@ def segment_content_view(request, segment_id):
         form=form,
         history=history,
         auth=auth,
+        is_linguist=user_is_linguist(request.user),
     )
 
     return render(request, "validation/segment_details.html", context)
@@ -510,9 +511,11 @@ def view_issue_detail(request, issue_id):
             request.POST, initial={"rec_id": str(issue.recording.id)}
         )
         rec = Recording.objects.filter(id=issue.recording.id).first()
+        phrase = None
     if issue.phrase:
         form = EditIssueWithPhrase(request.POST, initial={"phrase_id": issue.phrase.id})
         phrase = Phrase.objects.filter(id=issue.phrase.id).first()
+        rec = None
 
     if request.method == "POST":
         if form.is_valid():
@@ -537,7 +540,7 @@ def view_issue_detail(request, issue_id):
                             translation="",
                             kind="Sentence" if " " in new_word else "Word",
                             date=datetime.datetime.now(),
-                            modifier=request.user.username,
+                            modifier=str(request.user),
                         )
                         new_phrase.save()
                     rec.phrase_id = new_phrase.id
@@ -556,11 +559,16 @@ def view_issue_detail(request, issue_id):
                     phrase.transcription = transcription
                 if translation:
                     phrase.translation = translation
-                phrase.modifier = request.user.username
+
+                phrase.status = "linked"
+                phrase.modifier = str(request.user)
+                phrase.date = datetime.datetime.now()
                 phrase.save()
 
             issue.status = "Resolved"
             issue.save()
+            response = HttpResponseRedirect("/issues")
+            return response
 
     context = dict(
         issue=issue,
@@ -658,7 +666,7 @@ def save_wrong_word(request, recording_id):
     comment = "This is the wrong word."
 
     if suggestion:
-        comment += "The word is actually: " + suggestion
+        comment += " The word is actually: " + suggestion
 
     new_issue = Issue(
         recording=rec,

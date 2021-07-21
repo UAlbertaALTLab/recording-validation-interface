@@ -21,8 +21,14 @@
 
 {% block content %}
     <div class="row">
-        {% for issue in issues %}
-            {{ issue_card.issue_card(issue) }}
-        {% endfor %}
+        {% if issues %}
+            {% for issue in issues %}
+                {{ issue_card.issue_card(issue) }}
+            {% endfor %}
+        {% else %}
+            <div class="logout-message">
+                <h2>There are no open issues</h2>
+            </div>
+        {% endif %}
     </div>
 {% endblock content %}
