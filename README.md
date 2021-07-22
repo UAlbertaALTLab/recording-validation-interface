@@ -246,7 +246,7 @@ Each directory should have `*.eaf` files paired with a `*.wav` file:
 
 ### Auto-validating entries
 
-Some entries have very close spellings that can be auto-validated. This only needs to be done once after the initial 
+Some entries have very close spellings that can be auto-validated. This only needs to be done once after the initial
 data import. Auto-validate entries by running:
 
 ```shell
@@ -323,7 +323,7 @@ There are also Cypress integrations tests that can be run by doing:
 ```shell
 npx cypress open
 ```
-This opens the interactive Cypress testing window. Select `Run integration specs` to run 
+This opens the interactive Cypress testing window. Select `Run integration specs` to run
 all tests.
 
 To run Cypress tests against a test database, use:
@@ -339,18 +339,7 @@ some entries due to the nature of the tests.
 Web API
 -------
 
-There is one API call:
-
-    /recording/_search/{query}
-
-Where `{query}` is replaced by one ore more Cree word forms, written in
-SRO. If more than one word form is supplied, each word form must be
-separated by a single comma (`,`).
-
-This will return a JSON array of recordings of those word forms.
-
-Each entry in the returned array is a JSON object with the following
-properties:
+There are two API calls. Both return recordings with these properties:
 
  - `wordform`: the word form that was matched by the query
  - `speaker`: the speaker's short code (e.g., something like `"ROS"` or `"JER"`)
@@ -360,7 +349,196 @@ properties:
    container (a `*.m4a` file). This can be used in an `<audio>` tag.
  - `speaker_bio_url`: Absolute URI to the speaker's biography.
 
-### Errors
+
+### Bulk recording search
+
+URL:
+
+   /api/bulk_search?q={wordform-1}&q={wordform-2}&...&q={wordform-n}
+
+Where `{wordform-i}` is a wordform that you want to get recordings for
+the. The spelling must be **exact** to what is in the database. You can
+search for an arbitrary amount of wordforms, however note that services
+may not process requests that have large URIs.
+
+#### Response
+
+The response is an object with two name/value pairs:
+
+```json
+{
+  "matched_recordings": [...],
+  "not_found": [...]
+}
+```
+
+ - `matched_recordings` will be an array of recording results (see above).
+ - `not_found` is an array of strings; each string is a wordform that
+   has no recordings.
+
+
+#### Errors
+
+speech-db will not explicitly issue errors, however application servers
+and proxies may drop large requests. If speech-db is running in front of
+these application servers (e.g., `uwsgi`), you may get **502 Bad
+Gateway** errors. The fix is to request fewer wordforms!
+
+#### Example
+
+Searching for _kiskisiw_, _nikiskisin_, _fhqwhgads_ (non-word).
+
+```http
+GET /api/bulk_search?q=kiskisiw&q=nikiskisin&q=fhqwhgads HTTP/1.1
+```
+
+Result:
+
+```json
+{
+    "matched_recordings": [
+        {
+            "anonymous": false,
+            "dialect": "Maskwacîs",
+            "gender": "F",
+            "recording_url": "http://speech-db.altlab.app/media/audio/a7714df80b4e3d404a0ff9e6d743221285f228721c922262f9036f67e26d5edc_dkoSdSS.m4a",
+            "speaker": "ANN",
+            "speaker_bio_url": "https://www.altlab.dev/maskwacis/Speakers/ANN.html",
+            "speaker_name": "Annette Lee",
+            "wordform": "kiskisiw"
+        },
+        {
+            "anonymous": false,
+            "dialect": "Maskwacîs",
+            "gender": "F",
+            "recording_url": "http://speech-db.altlab.app/media/audio/8dc6c2b21a597130366e57a6a2b4b35806493e77e91b7a19563dad786752c58d_Udjqiuq.m4a",
+            "speaker": "ANN",
+            "speaker_bio_url": "https://www.altlab.dev/maskwacis/Speakers/ANN.html",
+            "speaker_name": "Annette Lee",
+            "wordform": "kiskisiw"
+        },
+        {
+            "anonymous": false,
+            "dialect": "Maskwacîs",
+            "gender": "M",
+            "recording_url": "http://speech-db.altlab.app/media/audio/d6291252925f447789e55ccc3f19c46c66ec2cbefacb2090224dec4ff01766bb_ojSf0sB.m4a",
+            "speaker": "JER",
+            "speaker_bio_url": "https://www.altlab.dev/maskwacis/Speakers/JER.html",
+            "speaker_name": "Jerry Roasting",
+            "wordform": "kiskisiw"
+        },
+        {
+            "anonymous": false,
+            "dialect": "Maskwacîs",
+            "gender": "M",
+            "recording_url": "http://speech-db.altlab.app/media/audio/627382176984bbe1dc97ce241327ac28919bf9ffa0be7dc7502fd1fb2f7b25f5_GOlSlBM.m4a",
+            "speaker": "JER",
+            "speaker_bio_url": "https://www.altlab.dev/maskwacis/Speakers/JER.html",
+            "speaker_name": "Jerry Roasting",
+            "wordform": "kiskisiw"
+        },
+        {
+            "anonymous": false,
+            "dialect": "Maskwacîs",
+            "gender": "F",
+            "recording_url": "http://speech-db.altlab.app/media/audio/2580def01f7b6808d88bb23dadf169a2f9f474cbdb7f46bb267b5653a013b459_rwd7jQ0.m4a",
+            "speaker": "MAR",
+            "speaker_bio_url": "https://www.altlab.dev/maskwacis/Speakers/MAR.html",
+            "speaker_name": "Mary-Jean Littlechild",
+            "wordform": "kiskisiw"
+        },
+        {
+            "anonymous": false,
+            "dialect": "Maskwacîs",
+            "gender": "F",
+            "recording_url": "http://speech-db.altlab.app/media/audio/acf9b0d65a7a3e72f67ca6cecc5c2f4e6160f558d8724bc53d18618b096b533f_hZ02vZp.m4a",
+            "speaker": "MAR",
+            "speaker_bio_url": "https://www.altlab.dev/maskwacis/Speakers/MAR.html",
+            "speaker_name": "Mary-Jean Littlechild",
+            "wordform": "kiskisiw"
+        },
+        {
+            "anonymous": false,
+            "dialect": "Maskwacîs",
+            "gender": "F",
+            "recording_url": "http://speech-db.altlab.app/media/audio/2198ff134107ff474115cdb48ee36f88c17168e215fe424da4cc414bab0f4582_MGuwvND.m4a",
+            "speaker": "LOU",
+            "speaker_bio_url": "https://www.altlab.dev/maskwacis/Speakers/LOU.html",
+            "speaker_name": "Louise Wildcat",
+            "wordform": "nikiskisin"
+        },
+        {
+            "anonymous": false,
+            "dialect": "Maskwacîs",
+            "gender": "F",
+            "recording_url": "http://speech-db.altlab.app/media/audio/e8dd10846601861c1e9c4edf944b1e4da7670ed669fe027bd0b27e0af954e031_jIrtglj.m4a",
+            "speaker": "LOU",
+            "speaker_bio_url": "https://www.altlab.dev/maskwacis/Speakers/LOU.html",
+            "speaker_name": "Louise Wildcat",
+            "wordform": "nikiskisin"
+        },
+        {
+            "anonymous": false,
+            "dialect": "Maskwacîs",
+            "gender": "M",
+            "recording_url": "http://speech-db.altlab.app/media/audio/1576034645a6b765ab40275a67390fa197ee3c7ed8cc949907d132df3c0f1c9e_ybXLQLW.m4a",
+            "speaker": "GOR",
+            "speaker_bio_url": "https://www.altlab.dev/maskwacis/Speakers/GOR.html",
+            "speaker_name": "kîsikâw",
+            "wordform": "nikiskisin"
+        },
+        {
+            "anonymous": false,
+            "dialect": "Maskwacîs",
+            "gender": "M",
+            "recording_url": "http://speech-db.altlab.app/media/audio/a86939d888ff908d091538b2c1a3dc4fb383167b781b5dddddd4253342b0dace_SIlbUPl.m4a",
+            "speaker": "GOR",
+            "speaker_bio_url": "https://www.altlab.dev/maskwacis/Speakers/GOR.html",
+            "speaker_name": "kîsikâw",
+            "wordform": "nikiskisin"
+        },
+        {
+            "anonymous": false,
+            "dialect": "Maskwacîs",
+            "gender": "F",
+            "recording_url": "http://speech-db.altlab.app/media/audio/7353dda3d48799325ee62de0eceb4b50839382cfcf0ebf96c70d84fd37881201_PYYtyur.m4a",
+            "speaker": "ROS",
+            "speaker_bio_url": "https://www.altlab.dev/maskwacis/Speakers/ROS.html",
+            "speaker_name": "Rose Makinaw",
+            "wordform": "nikiskisin"
+        },
+        {
+            "anonymous": false,
+            "dialect": "Maskwacîs",
+            "gender": "F",
+            "recording_url": "http://speech-db.altlab.app/media/audio/dac08c374354594b7a77195daa4fd2e12a88acc5acf4e4894dd612354c1e7a92_XnZV0UY.m4a",
+            "speaker": "ROS",
+            "speaker_bio_url": "https://www.altlab.dev/maskwacis/Speakers/ROS.html",
+            "speaker_name": "Rose Makinaw",
+            "wordform": "nikiskisin"
+        }
+    ],
+    "not_found": [
+        "fhqwhgads"
+    ]
+}
+```
+
+
+### Legacy recording search
+
+URL:
+
+    /recording/_search/{query}
+
+Where `{query}` is replaced by one ore more Cree word forms, written in
+SRO. If more than one word form is supplied, each word form must be
+separated by a single comma (`,`).
+
+This will return a JSON array of recordings of those word forms in the
+way documented above.
+
+#### Errors
 
 Will respond with HTTP **404** if no recordings match the query. Note
 that the recordings' speaker's _must_ have a non-null gender before they
@@ -368,7 +546,7 @@ appear in search results. So make sure all `Speaker` instances have
 a non-null value for `gender`!
 
 
-### Example
+#### Example
 
 
 Finding recordings of 'nikiskisin' and 'kiskisiw':
@@ -446,7 +624,7 @@ Assume there are six recordings for `nikiskisin`, and none for
 ```
 
 ### Generating Transcription Files
-These are necessary in order to run Persephone and Simple4All against the current 
+These are necessary in order to run Persephone and Simple4All against the current
 set of recordings.
 
 The following steps should be performed from within the `pipenv shell`
@@ -464,10 +642,10 @@ Then generate the .wav files:
 python manage.py importrecordings --wav --skip-db
 ```
 
-This saves all the recording snippets to the `./audio` directory, unless otherwise specified 
+This saves all the recording snippets to the `./audio` directory, unless otherwise specified
 (not recommended for this task).
 
-Now auto-validate the recordings (you can skip this step if you just want the transcriptions files 
+Now auto-validate the recordings (you can skip this step if you just want the transcriptions files
 for the raw data):
 
 ```shell
@@ -485,7 +663,7 @@ This should create:
 * A copy of each .wav file in the speaker folder, eg: `./audio/LOU/wav/audio_id.wav`
 * Transcription files to be used by **Persephone**, eg: `./audio/LOU/label/audio_id.txt`
 * Transcription files to be used by **Simple4All**, eg: `./audio/LOU/s4a/audio_id.txt`
-  
+
 If there are auto-validated entries in the database, it will also create:
 * Transcription files for the *auto-validated* data to be used by **Persephone**, eg: `./audio/LOU/auto-val/label/audio_id.txt`
 * Transcription files for the *auto-validated* data to be used by **Simple4All**, eg: `./audio/LOU/auto-val/audio_id.txt`
