@@ -26,7 +26,7 @@
                 {{ issue_card.issue_card(issue) }}
             {% endfor %}
         {% else %}
-            <div class="logout-message">
+            <div class="logout-message" data-cy="no-issues-header">
                 <h2>There are no open issues</h2>
             </div>
         {% endif %}
