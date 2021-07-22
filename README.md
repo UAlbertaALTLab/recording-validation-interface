@@ -339,10 +339,17 @@ some entries due to the nature of the tests.
 Web API
 -------
 
-There are two API calls. Both return recordings with these properties:
+There are two API calls.
 
- - `wordform`: the word form that was matched by the query
+### Recording results
+
+Both API calls return a list of matched recordings, with each recording
+having the following name/value pairs:
+
+ - `wordform`: the wordform that the recording corresponds to.
+   Internally, this corresponds to the `Phrase.transcription`.
  - `speaker`: the speaker's short code (e.g., something like `"ROS"` or `"JER"`)
+ - `speaker_name`: the speaker's full name
  - `gender`: the speaker's gender: either `"M"` or `"F"` (all our speakers identify as male or female).
  - `dialect`: the region of Cree that this person speaks
  - `recording_url`: Absolute URI to the audio, encoded as AAC in an MP4
@@ -354,12 +361,12 @@ There are two API calls. Both return recordings with these properties:
 
 URL:
 
-   /api/bulk_search?q={wordform-1}&q={wordform-2}&...&q={wordform-n}
+    /api/bulk_search?q={wordform-1}&q={wordform-2}&...&q={wordform-n}
 
-Where `{wordform-i}` is a wordform that you want to get recordings for
-the. The spelling must be **exact** to what is in the database. You can
+Where `{wordform-i}` is a wordform that you want to get recordings for.
+The spelling must be **exact** to the `Phrase.transcription`. You can
 search for an arbitrary amount of wordforms, however note that services
-may not process requests that have large URIs.
+may not process large requests (see: “Errors” below).
 
 #### Response
 
@@ -380,9 +387,10 @@ The response is an object with two name/value pairs:
 #### Errors
 
 speech-db will not explicitly issue errors, however application servers
-and proxies may drop large requests. If speech-db is running in front of
-these application servers (e.g., `uwsgi`), you may get **502 Bad
-Gateway** errors. The fix is to request fewer wordforms!
+and proxies may drop or reject large requests. If speech-db is running
+in front of an application server (e.g., `uwsgi`), you may get **502 Bad
+Gateway** errors when too many wordforms are request. The fix is to
+request fewer wordforms (possibly by batching requests).
 
 #### Example
 
@@ -552,7 +560,7 @@ a non-null value for `gender`!
 Finding recordings of 'nikiskisin' and 'kiskisiw':
 
 ```http
-GET /recording/_search/nikiskisin,kiskisiw
+GET /recording/_search/nikiskisin,kiskisiw  HTTP/1.1
 ```
 
 Assume there are six recordings for `nikiskisin`, and none for
