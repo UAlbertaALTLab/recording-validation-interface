@@ -520,11 +520,6 @@ def view_issue_detail(request, issue_id):
     if request.method == "POST":
         if form.is_valid():
             if rec:
-                # if recording, get recording object
-                # set speaker to new speaker
-                # see if there's a matching phrase that already exists
-                # if there is, set the recording phrase to that phrase
-                # otherwise create a new phrase and associate it with the recording
                 speaker_code = form.cleaned_data["speaker"]
                 if speaker_code:
                     speaker = Speaker.objects.filter(code=speaker_code).first()
@@ -549,8 +544,6 @@ def view_issue_detail(request, issue_id):
                 rec.wrong_speaker = False
                 rec.save()
 
-            # if phrase, get phrase object
-            # set new transcription and/or translation for the phrase
             elif phrase:
                 transcription = form.cleaned_data["transcription"].strip()
                 translation = form.cleaned_data["translation"].strip()
