@@ -493,7 +493,7 @@ def register(request):
 
 
 def view_issues(request):
-    issues = Issue.objects.filter(status=Issue.OPEN)
+    issues = Issue.objects.filter(status=Issue.OPEN).order_by("id")
     context = dict(
         issues=issues,
         auth=request.user.is_authenticated,
@@ -530,7 +530,7 @@ def view_issue_detail(request, issue_id):
                     speaker = Speaker.objects.filter(code=speaker_code).first()
                     rec.speaker = speaker
 
-                new_word = form.cleaned_data["phrase"]
+                new_word = form.cleaned_data["phrase"].strip()
                 if new_word:
                     new_phrase = Phrase.objects.filter(transcription=new_word).first()
                     if not new_phrase:
@@ -552,8 +552,8 @@ def view_issue_detail(request, issue_id):
             # if phrase, get phrase object
             # set new transcription and/or translation for the phrase
             elif phrase:
-                transcription = form.cleaned_data["transcription"]
-                translation = form.cleaned_data["translation"]
+                transcription = form.cleaned_data["transcription"].strip()
+                translation = form.cleaned_data["translation"].strip()
 
                 if transcription:
                     phrase.transcription = transcription
@@ -576,6 +576,14 @@ def view_issue_detail(request, issue_id):
         is_linguist=user_is_linguist(request.user),
     )
     return render(request, "validation/view_issue_detail.html", context)
+
+
+def close_issue(request, issue_id):
+    issue = Issue.objects.filter(id=issue_id).first()
+    issue.status = "Resolved"
+    issue.save()
+
+    return HttpResponseRedirect("/issues")
 
 
 # TODO: Speaker bio page like https://ojibwe.lib.umn.edu/about/voices
@@ -688,14 +696,6 @@ def save_wrong_word(request, recording_id):
         response["Location"] = "/"
 
     return response
-
-
-def close_issue(request, issue_id):
-    issue = Issue.objects.filter(id=issue_id).first()
-    issue.status = "Resolved"
-    issue.save()
-
-    return HttpResponseRedirect("/issues")
 
 
 # Small Helper functions

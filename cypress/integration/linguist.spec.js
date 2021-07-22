@@ -63,9 +63,6 @@ describe("Linguists", () => {
                 cy.get('[data-cy=close-issue-button]')
                     .click()
             })
-
-        cy.get('[data-cy="no-issues-header"]')
-            .should('be.visible')
     })
 
 })

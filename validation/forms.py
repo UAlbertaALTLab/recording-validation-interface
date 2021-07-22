@@ -129,6 +129,16 @@ class EditIssueWithRecording(forms.ModelForm):
 
 
 class EditIssueWithPhrase(forms.ModelForm):
+    transcription = forms.CharField(
+        max_length=200,
+        required=False,
+    )
+
+    translation = forms.CharField(
+        max_length=200,
+        required=False,
+    )
+
     class Meta:
         model = Phrase
         fields = ["transcription", "translation"]
