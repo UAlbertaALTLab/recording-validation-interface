@@ -179,20 +179,29 @@ def get_translations(results):
     matches = []
 
     for i in results["results"]:
-        translations, analysis = extract_translations(i["lemma_wordform"])
-        if {"translations": translations, "analysis": analysis} not in matches:
-            matches.append({"translations": translations, "analysis": analysis})
+        translations, analysis, sources = extract_translations(i["lemma_wordform"])
+        for (j, translation) in enumerate(translations):
+            source = sources[j]
+            if {
+                "translation": translation,
+                "analysis": analysis,
+                "source": source,
+            } not in matches:
+                matches.append(
+                    {"translation": translation, "analysis": analysis, "source": source}
+                )
 
     return matches
 
 
 def extract_translations(entry):
     translations = []
+    sources = []
 
     if type(entry["definitions"]) == list and len(entry["definitions"]) > 0:
         translations = [str(j["text"]) for j in entry["definitions"]]
+        sources = [", ".join(j["source_ids"]) for j in entry["definitions"]]
 
-    translations = "; ".join(translations)
     if entry["raw_analysis"]:
         analysis = (
             "".join(entry["raw_analysis"][0])
@@ -202,7 +211,7 @@ def extract_translations(entry):
     else:
         analysis = ""
 
-    return translations, analysis
+    return translations, analysis, sources
 
 
 def get_distance_with_translations(word):
