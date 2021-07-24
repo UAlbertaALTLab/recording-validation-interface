@@ -503,60 +503,14 @@ def view_issue_detail(request, issue_id):
 
     form = None
     if issue.recording:
-        form = EditIssueWithRecording(
-            request.POST, initial={"rec_id": str(issue.recording.id)}
-        )
-        rec = Recording.objects.filter(id=issue.recording.id).first()
-        phrase = None
+        form = EditIssueWithRecording(request.POST)
+        if request.method == "POST" and form.is_valid():
+            handle_save_issue_with_recording(form, issue)
+
     if issue.phrase:
-        form = EditIssueWithPhrase(request.POST, initial={"phrase_id": issue.phrase.id})
-        phrase = Phrase.objects.filter(id=issue.phrase.id).first()
-        rec = None
-
-    if request.method == "POST":
-        if form.is_valid():
-            if rec:
-                speaker_code = form.cleaned_data["speaker"]
-                if speaker_code:
-                    speaker = Speaker.objects.filter(code=speaker_code).first()
-                    rec.speaker = speaker
-
-                new_word = form.cleaned_data["phrase"].strip()
-                if new_word:
-                    new_phrase = Phrase.objects.filter(transcription=new_word).first()
-                    if not new_phrase:
-                        new_phrase = Phrase(
-                            field_transcription=new_word,
-                            transcription=new_word,
-                            translation="",
-                            kind="Sentence" if " " in new_word else "Word",
-                            date=datetime.datetime.now(),
-                            modifier=str(request.user),
-                        )
-                        new_phrase.save()
-                    rec.phrase_id = new_phrase.id
-
-                rec.wrong_word = False
-                rec.wrong_speaker = False
-                rec.save()
-
-            elif phrase:
-                transcription = form.cleaned_data["transcription"].strip()
-                translation = form.cleaned_data["translation"].strip()
-
-                if transcription:
-                    phrase.transcription = transcription
-                if translation:
-                    phrase.translation = translation
-
-                phrase.status = "linked"
-                phrase.modifier = str(request.user)
-                phrase.date = datetime.datetime.now()
-                phrase.save()
-
-            issue.status = "Resolved"
-            issue.save()
-            return HttpResponseRedirect("/issues")
+        form = EditIssueWithPhrase(request.POST)
+        if request.method == "POST" and form.is_valid():
+            handle_save_issue_with_phrase(form, issue)
 
     context = dict(
         issue=issue,
@@ -688,6 +642,59 @@ def save_wrong_word(request, recording_id):
 
 
 # Small Helper functions
+
+
+def handle_save_issue_with_recording(form, issue, request):
+    rec = Recording.objects.get(id=issue.recording.id)
+
+    speaker_code = form.cleaned_data["speaker"]
+    if speaker_code:
+        speaker = Speaker.objects.get(code=speaker_code)
+        rec.speaker = speaker
+
+    new_word = form.cleaned_data["phrase"].strip()
+    if new_word:
+        new_phrase = Phrase.objects.get(transcription=new_word)
+        if not new_phrase:
+            new_phrase = Phrase(
+                field_transcription=new_word,
+                transcription=new_word,
+                translation="",
+                kind="Sentence" if " " in new_word else "Word",
+                date=datetime.datetime.now(),
+                modifier=str(request.user),
+            )
+            new_phrase.save()
+        rec.phrase_id = new_phrase.id
+
+    rec.wrong_word = False
+    rec.wrong_speaker = False
+    rec.save()
+
+    issue.status = Issue.RESOLVED
+    issue.save()
+    return HttpResponseRedirect("/issues")
+
+
+def handle_save_issue_with_phrase(form, issue, request):
+    phrase = Phrase.objects.get(id=issue.phrase.id)
+
+    transcription = form.cleaned_data["transcription"].strip()
+    translation = form.cleaned_data["translation"].strip()
+
+    if transcription:
+        phrase.transcription = transcription
+    if translation:
+        phrase.translation = translation
+
+    phrase.status = "linked"
+    phrase.modifier = str(request.user)
+    phrase.date = datetime.datetime.now()
+    phrase.save()
+
+    issue.status = Issue.RESOLVED
+    issue.save()
+    return HttpResponseRedirect("/issues")
 
 
 def encode_query_with_page(query, page):

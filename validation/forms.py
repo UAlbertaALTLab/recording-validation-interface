@@ -117,7 +117,7 @@ class EditIssueWithRecording(forms.ModelForm):
     phrase = forms.CharField(
         widget=forms.Textarea(),
         required=False,
-        help_text="The sentence or phrase is this recording is actually...",
+        help_text="What word or phrase this recording is actually for",
     )
 
     class Meta:
@@ -142,4 +142,3 @@ class EditIssueWithPhrase(forms.ModelForm):
     class Meta:
         model = Phrase
         fields = ["transcription", "translation"]
-        help_texts = {"transcription": "\n", "translation": "\n"}
