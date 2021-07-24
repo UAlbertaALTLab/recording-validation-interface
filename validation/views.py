@@ -49,7 +49,6 @@ from django.db.models import Q, QuerySet
 
 from librecval.normalization import to_indexable_form
 
-from .crude_views import *
 from .models import Phrase, Recording, Speaker, RecordingSession, Issue
 from .helpers import get_distance_with_translations, perfect_match, exactly_one_analysis
 from .forms import (
@@ -349,9 +348,7 @@ def search_recordings(request, query):
         )
         results = exclude_known_bad_recordings(all_matches)
 
-        recordings.extend(
-            create_recording_result_json(request, recording) for recording in results
-        )
+        recordings.extend(recording.as_json(request) for recording in results)
 
     response = JsonResponse(recordings, safe=False)
 
@@ -378,8 +375,7 @@ def bulk_search_recordings(request: HttpRequest):
 
         if results:
             matched_recordings.extend(
-                create_recording_result_json(request, recording)
-                for recording in results
+                recording.as_json(request) for recording in results
             )
         else:
             not_found.append(term)
@@ -745,46 +741,6 @@ def save_issue(data, user):
     )
 
     new_issue.save()
-
-
-def create_recording_result_json(request: HttpRequest, rec: Recording):
-    """
-    Returns JSON that API clients expect for a single recording.
-    """
-    return {
-        "wordform": rec.phrase.transcription,
-        "speaker": rec.speaker.code,
-        "speaker_name": rec.speaker.full_name,
-        "anonymous": rec.speaker.anonymous,
-        "gender": rec.speaker.gender,
-        "dialect": rec.speaker.dialect,
-        "recording_url": make_absolute_uri_for_recording(request, rec),
-        "speaker_bio_url": make_absolute_uri_for_speaker_bio(rec.speaker),
-    }
-
-
-def make_absolute_uri_for_speaker_bio(speaker: Speaker) -> str:
-    """
-    Returns a URL for where to find the speaker bio.
-    """
-    # TODO: Change this when implementing:
-    # https://github.com/UAlbertaALTLab/recording-validation-interface/issues/72
-    return f"https://www.altlab.dev/maskwacis/Speakers/{speaker.code}.html"
-
-
-def make_absolute_uri_for_recording(request: HttpRequest, rec: Recording) -> str:
-    """
-    Returns an absolute URL for the compressed audio recording.
-    This can be directly used in an <audio> tag to hear the recording on a webpage!
-    """
-    uri = rec.compressed_audio.url
-    if uri.startswith("/"):
-        # It's a relative URI: build an absolute URI:
-        return request.build_absolute_uri(uri)
-
-    # It's an absolute URI already:
-    assert uri.startswith(("http://", "https://"))
-    return uri
 
 
 def exclude_known_bad_recordings(recordings: QuerySet):
