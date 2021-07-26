@@ -180,8 +180,7 @@ def get_translations(results):
 
     for i in results["results"]:
         translations, analysis, sources = extract_translations(i["lemma_wordform"])
-        for (j, translation) in enumerate(translations):
-            source = sources[j]
+        for (source, translation) in zip(sources, translations):
             if {
                 "translation": translation,
                 "analysis": analysis,
