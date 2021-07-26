@@ -396,13 +396,15 @@ def segment_content_view(request, segment_id):
     """
     if request.method == "POST":
         form = EditSegment(request.POST)
-        og_phrase = Phrase.objects.filter(id=segment_id)[0]
+        og_phrase = Phrase.objects.get(id=segment_id)
         phrase_id = og_phrase.id
         if form.is_valid():
-            transcription = form.cleaned_data["cree"] or og_phrase.transcription
-            translation = form.cleaned_data["translation"] or og_phrase.translation
-            analysis = form.cleaned_data["analysis"] or og_phrase.analysis
-            p = Phrase.objects.filter(id=phrase_id)[0]
+            transcription = form.cleaned_data["cree"].strip() or og_phrase.transcription
+            translation = (
+                form.cleaned_data["translation"].strip() or og_phrase.translation
+            )
+            analysis = form.cleaned_data["analysis"].strip() or og_phrase.analysis
+            p = Phrase.objects.get(id=phrase_id)
             p.transcription = transcription
             p.translation = translation
             p.analysis = analysis
