@@ -204,6 +204,7 @@ def advanced_search_results(request):
     transcription = request.GET.get("transcription")
     translation = request.GET.get("translation")
     analysis = request.GET.get("analysis")
+    kind = request.GET.get("kind")
     status = request.GET.get("status")
     speakers = request.GET.getlist("speaker-options")
     quality = request.GET.get("quality")
@@ -220,6 +221,10 @@ def advanced_search_results(request):
         filter_query.append(Q(analysis__contains=analysis))
     if status and status != "all":
         filter_query.append(Q(status=status))
+
+    if kind and kind != "all":
+        filter_kind = Phrase.WORD if kind == "word" else Phrase.SENTENCE
+        filter_query.append(Q(kind=filter_kind))
 
     if filter_query:
         phrase_matches = Phrase.objects.filter(
@@ -260,6 +265,7 @@ def advanced_search_results(request):
             "translation": translation,
             "analysis": analysis,
             "status": status,
+            "kind": kind,
         }
     )
     for speaker in speakers:
