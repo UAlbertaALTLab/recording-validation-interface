@@ -36,6 +36,7 @@ from django.http import (
     HttpResponseRedirect,
     JsonResponse,
     QueryDict,
+    HttpRequest,
 )
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -44,11 +45,10 @@ from django.contrib.auth import authenticate, login as django_login
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 from django.core.mail import mail_admins
-from django.db.models import Q
+from django.db.models import Q, QuerySet
 
 from librecval.normalization import to_indexable_form
 
-from .crude_views import *
 from .models import Phrase, Recording, Speaker, RecordingSession, Issue
 from .forms import EditSegment, Login, Register, FlagSegment
 from .helpers import (
@@ -209,6 +209,7 @@ def advanced_search_results(request):
     transcription = request.GET.get("transcription")
     translation = request.GET.get("translation")
     analysis = request.GET.get("analysis")
+    kind = request.GET.get("kind")
     status = request.GET.get("status")
     speakers = request.GET.getlist("speaker-options")
     quality = request.GET.get("quality")
@@ -225,6 +226,10 @@ def advanced_search_results(request):
         filter_query.append(Q(analysis__contains=analysis))
     if status and status != "all":
         filter_query.append(Q(status=status))
+
+    if kind and kind != "all":
+        filter_kind = Phrase.WORD if kind == "word" else Phrase.SENTENCE
+        filter_query.append(Q(kind=filter_kind))
 
     if filter_query:
         phrase_matches = Phrase.objects.filter(
@@ -265,6 +270,7 @@ def advanced_search_results(request):
             "translation": translation,
             "analysis": analysis,
             "status": status,
+            "kind": kind,
         }
     )
     for speaker in speakers:
@@ -337,45 +343,16 @@ def search_recordings(request, query):
 
     word_forms = frozenset(query.split(","))
 
-    def make_absolute_uri_for_recording(rec: Recording) -> str:
-        uri = rec.compressed_audio.url
-        if uri.startswith("/"):
-            # It's a relative URI: build an absolute URI:
-            return request.build_absolute_uri(uri)
-
-        # It's an absolute URI already:
-        assert uri.startswith("http")
-        return uri
-
-    def make_absolute_uri_for_speaker(code: str) -> str:
-        return f"https://www.altlab.dev/maskwacis/Speakers/{code}.html"
-
     recordings = []
     for form in word_forms:
         # Assume the query is an SRO transcription; prepare it for a fuzzy match.
         fuzzy_transcription = to_indexable_form(form)
-        result_set = Recording.objects.filter(
+        all_matches = Recording.objects.filter(
             phrase__fuzzy_transcription=fuzzy_transcription,
-            speaker__gender__isnull=False,
         )
-        # No bad recordings!
-        result_set = result_set.exclude(quality=Recording.BAD)
-        result_set = result_set.exclude(wrong_word=True)
-        result_set = result_set.exclude(wrong_speaker=True)
+        results = exclude_known_bad_recordings(all_matches)
 
-        recordings.extend(
-            {
-                "wordform": rec.phrase.transcription,
-                "speaker": rec.speaker.code,
-                "speaker_name": rec.speaker.full_name,
-                "anonymous": rec.speaker.anonymous,
-                "gender": rec.speaker.gender,
-                "dialect": rec.speaker.dialect,
-                "recording_url": make_absolute_uri_for_recording(rec),
-                "speaker_bio_url": make_absolute_uri_for_speaker(rec.speaker.code),
-            }
-            for rec in result_set
-        )
+        recordings.extend(recording.as_json(request) for recording in results)
 
     response = JsonResponse(recordings, safe=False)
 
@@ -384,6 +361,34 @@ def search_recordings(request, query):
         response.status_code = 404
 
     return add_cors_headers(response)
+
+
+def bulk_search_recordings(request: HttpRequest):
+    """
+    API endpoint to retrieve EXACT wordforms and return the URLs and metadata for the recordings.
+    Example: /api/bulk_search?q=mistik&q=minahik&q=waskay&q=mîtos&q=mistikow&q=mêstan
+    """
+
+    query_terms = request.GET.getlist("q")
+    matched_recordings = []
+    not_found = []
+
+    for term in query_terms:
+        all_matches = Recording.objects.filter(phrase__transcription=term)
+        results = exclude_known_bad_recordings(all_matches)
+
+        if results:
+            matched_recordings.extend(
+                recording.as_json(request) for recording in results
+            )
+        else:
+            not_found.append(term)
+
+    response = {"matched_recordings": matched_recordings, "not_found": not_found}
+
+    json_response = JsonResponse(response)
+
+    return add_cors_headers(json_response)
 
 
 def add_cors_headers(response):
@@ -402,13 +407,15 @@ def segment_content_view(request, segment_id):
     """
     if request.method == "POST":
         form = EditSegment(request.POST)
-        og_phrase = Phrase.objects.filter(id=segment_id)[0]
+        og_phrase = Phrase.objects.get(id=segment_id)
         phrase_id = og_phrase.id
         if form.is_valid():
-            transcription = form.cleaned_data["cree"] or og_phrase.transcription
-            translation = form.cleaned_data["translation"] or og_phrase.translation
-            analysis = form.cleaned_data["analysis"] or og_phrase.analysis
-            p = Phrase.objects.filter(id=phrase_id)[0]
+            transcription = form.cleaned_data["cree"].strip() or og_phrase.transcription
+            translation = (
+                form.cleaned_data["translation"].strip() or og_phrase.translation
+            )
+            analysis = form.cleaned_data["analysis"].strip() or og_phrase.analysis
+            p = Phrase.objects.get(id=phrase_id)
             p.transcription = transcription
             p.translation = translation
             p.analysis = analysis
@@ -597,10 +604,6 @@ def save_wrong_speaker_code(request, recording_id):
 
     new_issue = Issue(
         recording=rec,
-        other=False,
-        bad_cree=False,
-        bad_english=False,
-        bad_recording=True,
         comment=comment,
         created_by=request.user,
         created_on=datetime.datetime.now(),
@@ -634,10 +637,6 @@ def save_wrong_word(request, recording_id):
 
     new_issue = Issue(
         recording=rec,
-        other=False,
-        bad_cree=False,
-        bad_english=False,
-        bad_recording=True,
         suggested_cree=suggestion,
         comment=comment,
         created_by=request.user,
@@ -710,3 +709,20 @@ def save_issue(data, user):
     )
 
     new_issue.save()
+
+
+def exclude_known_bad_recordings(recordings: QuerySet):
+    """
+    Given a QuerySet of Recording objects, remove recordings that should NOT be
+    presented to users of e.g., the dictionary.
+    """
+    return (
+        recordings.exclude(quality=Recording.BAD)
+        .exclude(wrong_word=True)
+        .exclude(wrong_speaker=True)
+        # We use the "gender" field as a proxy to see whether a speaker's data has
+        # been properly filled out: exclude speakers whose gender field has not been
+        # input. An admin must put *something* in the gender field before the
+        # speaker shows up in API results.
+        .exclude(speaker__gender__isnull=True)
+    )
