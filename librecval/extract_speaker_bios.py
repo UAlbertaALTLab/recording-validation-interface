@@ -14,19 +14,27 @@ def compute_sha256hash(speaker, start, text):
     return sha256(signature.encode("UTF-8")).hexdigest()
 
 
+def get_wav_file(bio_num, bio_wav_files):
+    for f in bio_wav_files:
+        if bio_num in str(f):
+            return f
+    raise Exception(
+        f"cannot find bio num {bio_num} in all of these files: {bio_wav_files}"
+    )
+
+
 def extract_speaker_bios():
     path_to_eaf_files = Path("../data/speakers/biographies")
     assert path_to_eaf_files.is_dir()
     bio_files = list(path_to_eaf_files.glob("*.eaf"))
+
     bio_wav_files = list(path_to_eaf_files.glob("*.wav"))
     for file in bio_files:
         # extract recordings
         # extract annotations
         speaker, bio_num = get_speaker_and_bio_num(file)
-        wav_file = ""
-        for f in bio_wav_files:
-            if bio_num in str(f):
-                wav_file = f
+        wav_file = get_wav_file(bio_num, bio_wav_files)
+
         print(speaker)
         print(file)
         # open the EAF
@@ -77,8 +85,7 @@ def parse_eaf(eaf_file, tier_name):
 
 
 def save_audio(wav_file, start, stop, text, language, speaker):
-    with open(wav_file, "rb") as recording_file:
-        audio = AudioSegment.from_wav(recording_file)
+    audio = AudioSegment.from_wav(wav_file)
 
     sound_bite = audio[start:stop].normalize(headroom=0.1)
     print(sound_bite)
@@ -86,7 +93,7 @@ def save_audio(wav_file, start, stop, text, language, speaker):
     rec_id = compute_sha256hash(speaker, start, text)
     with TemporaryDirectory() as audio_dir:
         # recording_path = Path(f"/Users/jolenepoulin/Documents/recording-validation-interface/data/speakers/biographies/{rec_id}.m4a")
-        recording_path = audio_dir + rec_id + ".m4a"
+        recording_path = Path(audio_dir + rec_id + ".m4a")
         sound_bite.export(recording_path)
 
         transcode_to_aac(
