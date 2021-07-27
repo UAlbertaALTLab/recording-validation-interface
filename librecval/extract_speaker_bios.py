@@ -118,7 +118,3 @@ def get_speaker_and_bio_num(file):
 
     bio_number = file_name[3:5]
     return name, bio_number
-
-
-if __name__ == "__main__":
-    extract_speaker_bios()

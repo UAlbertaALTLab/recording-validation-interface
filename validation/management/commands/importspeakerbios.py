@@ -43,7 +43,7 @@ from validation.models import Phrase, Recording, RecordingSession, Speaker
 
 
 class Command(BaseCommand):
-    help = "imports recordings into the database"
+    help = "imports speaker bios into the database"
 
     def handle(self, *args, **kwargs) -> None:
         extract_speaker_bios()
