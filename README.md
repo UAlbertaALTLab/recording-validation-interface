@@ -389,7 +389,7 @@ The response is an object with two name/value pairs:
 speech-db will not explicitly issue errors, however application servers
 and proxies may drop or reject large requests. If speech-db is running
 in front of an application server (e.g., `uwsgi`), you may get **502 Bad
-Gateway** errors when too many wordforms are request. The fix is to
+Gateway** errors when too many wordforms are requested. The fix is to
 request fewer wordforms (possibly by batching requests).
 
 #### Example
@@ -539,8 +539,8 @@ URL:
 
     /recording/_search/{query}
 
-Where `{query}` is replaced by one ore more Cree word forms, written in
-SRO. If more than one word form is supplied, each word form must be
+Where `{query}` is replaced by one ore more Cree wordforms, written in
+SRO. If more than one wordform is supplied, each wordform must be
 separated by a single comma (`,`).
 
 This will return a JSON array of recordings of those word forms in the
