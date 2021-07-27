@@ -17,11 +17,12 @@ def compute_sha256hash(speaker, start, text):
 
 
 def get_wav_file(bio_num, bio_wav_files):
+    wav_file_name = f"recordingbios-{bio_num}"
     for f in bio_wav_files:
-        if bio_num in str(f):
+        if wav_file_name in str(f):
             return f
     raise Exception(
-        f"cannot find bio num {bio_num} in all of these files: {bio_wav_files}"
+        f"Cannot find wav file for {bio_num} in all of these files: {bio_wav_files}"
     )
 
 
@@ -34,18 +35,15 @@ def extract_speaker_bios():
 
     bio_wav_files = list(path_to_eaf_files.glob("*.wav"))
     for file in bio_files:
-        # extract recordings
-        # extract annotations
+
         speaker, bio_num = get_speaker_and_bio_num(file)
         wav_file = get_wav_file(bio_num, bio_wav_files)
 
-        print(speaker)
-        print(file)
-        # open the EAF
         eaf_file = Eaf(file)
 
         start, stop, text = get_bio_cree(eaf_file)
         save_audio(wav_file, start, stop, text, "crk", speaker)
+
         start, stop, text = get_bio_english(eaf_file)
         save_audio(wav_file, start, stop, text, "eng", speaker)
 
@@ -78,9 +76,6 @@ def parse_eaf(eaf_file, tier_name):
 
         start = start_times[0]
         stop = stop_times[-1]
-        print("Start: ", start)
-        print("Stop: ", stop)
-        print("Text: ", text)
 
         if start and stop and text:
             return start, stop, text
@@ -92,12 +87,10 @@ def save_audio(wav_file, start, stop, text, language, speaker):
     audio = AudioSegment.from_wav(wav_file)
 
     sound_bite = audio[start:stop].normalize(headroom=0.1)
-    print(sound_bite)
 
-    rec_id = compute_sha256hash(speaker, start, text)
+    rec_name = speaker.replace(" ", "-") + "_bio_" + language
     with TemporaryDirectory() as audio_dir:
-        # recording_path = Path(f"/Users/jolenepoulin/Documents/recording-validation-interface/data/speakers/biographies/{rec_id}.m4a")
-        recording_path = Path(audio_dir) / (rec_id + ".m4a")
+        recording_path = Path(audio_dir) / (rec_name + ".m4a")
 
         transcode_to_aac(
             sound_bite,
@@ -112,8 +105,6 @@ def save_audio(wav_file, start, stop, text, language, speaker):
         audio_data = recording_path.read_bytes()
         django_file = ContentFile(audio_data, name=recording_path.name)
 
-        # get speaker using speaker name/code
-        # add bio to speaker
         speaker = Speaker.objects.get(full_name=speaker)
         if language == "crk":
             speaker.crk_bio_audio = django_file
@@ -123,18 +114,16 @@ def save_audio(wav_file, start, stop, text, language, speaker):
             speaker.eng_bio_text = text
 
         speaker.save()
+        print(f"Imported {language} bio for {speaker}")
 
 
 def get_speaker_and_bio_num(file):
-    print(file)
     sections = str(file).split("/")
     file_name = sections[-1]
     file_name = file_name.split(".")[0]
-    print("FILE NAME: ", file_name)
     name = file_name[file_name.index("(") + 1 : file_name.index(")")]
 
     bio_number = file_name[3:5]
-    print("NUMBER: ", bio_number)
     return name, bio_number
 
 
