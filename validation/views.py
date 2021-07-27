@@ -494,9 +494,8 @@ def register(request):
 
 
 def speaker_view(request, speaker_code):
-    speaker = Speaker.objects.filter(code=speaker_code)
+    speaker = Speaker.objects.get(code=speaker_code)
     if speaker:
-        speaker = speaker[0]
         full_name = speaker.full_name
         gender = speaker.gender or ""
 
@@ -514,7 +513,7 @@ def speaker_view(request, speaker_code):
 
     if gender.upper() == "M":
         pronouns = "(He/Him)"
-    if gender.upper() == "F":
+    elif gender.upper() == "F":
         pronouns = "(She/Her)"
     else:
         pronouns = ""
@@ -524,6 +523,7 @@ def speaker_view(request, speaker_code):
         pronouns=pronouns,
         img_src=image_url,
         auth=request.user.is_authenticated,
+        speaker=speaker,
     )
     return render(request, "validation/speaker_view.html", context)
 

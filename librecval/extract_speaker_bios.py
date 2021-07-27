@@ -8,12 +8,8 @@ from pympi.Elan import Eaf
 from pathlib import Path
 
 from librecval.transcode_recording import transcode_to_aac
+from recvalsite import settings
 from validation.models import Speaker
-
-
-def compute_sha256hash(speaker, start, text):
-    signature = f"speaker: {speaker}\n" f"timestamp: {start}\n" f"{text}"
-    return sha256(signature.encode("UTF-8")).hexdigest()
 
 
 def get_wav_file(bio_num, bio_wav_files):
@@ -27,9 +23,7 @@ def get_wav_file(bio_num, bio_wav_files):
 
 
 def extract_speaker_bios():
-    path_to_eaf_files = Path(
-        "/Users/jolenepoulin/Documents/recording-validation-interface/data/speakers/biographies"
-    )
+    path_to_eaf_files = Path(settings.BIO_INFO_PREFIX)
     assert path_to_eaf_files.is_dir()
     bio_files = list(path_to_eaf_files.glob("*.eaf"))
 
@@ -64,7 +58,6 @@ def parse_eaf(eaf_file, tier_name):
     stop_times = []
     text = ""
     if tier_name in tiers:
-        # Extract data for Cree phrases
         phrases = eaf_file.get_annotation_data_for_tier(tier_name)
         for phrase in phrases:
             start_times.append(phrase[0])
