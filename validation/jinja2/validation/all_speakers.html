@@ -6,7 +6,7 @@
     <h2>Maskwacîs Speakers</h2>
     <div class="row">
         {% for speaker in speakers %}
-        <div class="col-sm-4">
+        <div class="col-sm-4 d-flex align-items-stretch">
             <div class="card">
                 <img class="card-img-top" src="{{ speaker.img_src }}" alt="Image of {{ speaker.full_name }}">
                 <div class="card-body">
@@ -15,8 +15,9 @@
                     {% else %}
                         <h5 class="card-title">{{ speaker.code }}</h5>
                     {% endif %}
-                    {# TODO: add this back in once we have the speaker bios #}
-{#                  <p class="card-text">This is where the first line/few words of the speaker bio will go</p>#}
+                {% if speaker.bio %}
+                  <p class="card-text speaker-bio-preview">{{ speaker.bio }}</p>
+                {% endif %}
                 <a href="{{ url('validation:speaker_view', speaker.code) }}" class="button button--success">Learn More</a>
                 </div>
             </div>

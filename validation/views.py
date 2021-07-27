@@ -543,9 +543,14 @@ def all_speakers(request):
         if not Path(
             f"validation/{settings.STATIC_URL}images/speakers/{image_name}"
         ).exists():
-            image_url = Path("/static/images/missing.png")
+            image_url = Path("/static/images/missing.jpg")
 
-        speaker_dict = dict(full_name=full_name, code=speaker.code, img_src=image_url)
+        speaker_dict = dict(
+            full_name=full_name,
+            code=speaker.code,
+            img_src=image_url,
+            bio=speaker.eng_bio_text or "",
+        )
         speakers.append(speaker_dict)
 
     context = dict(speakers=speakers, auth=request.user.is_authenticated)
