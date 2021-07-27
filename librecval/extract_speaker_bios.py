@@ -2,11 +2,13 @@ import os
 from hashlib import sha256
 from tempfile import TemporaryDirectory
 
+from django.core.files.base import ContentFile
 from pydub import AudioSegment
 from pympi.Elan import Eaf
 from pathlib import Path
 
 from librecval.transcode_recording import transcode_to_aac
+from validation.models import Speaker
 
 
 def compute_sha256hash(speaker, start, text):
@@ -24,7 +26,9 @@ def get_wav_file(bio_num, bio_wav_files):
 
 
 def extract_speaker_bios():
-    path_to_eaf_files = Path("../data/speakers/biographies")
+    path_to_eaf_files = Path(
+        "/Users/jolenepoulin/Documents/recording-validation-interface/data/speakers/biographies"
+    )
     assert path_to_eaf_files.is_dir()
     bio_files = list(path_to_eaf_files.glob("*.eaf"))
 
@@ -93,8 +97,7 @@ def save_audio(wav_file, start, stop, text, language, speaker):
     rec_id = compute_sha256hash(speaker, start, text)
     with TemporaryDirectory() as audio_dir:
         # recording_path = Path(f"/Users/jolenepoulin/Documents/recording-validation-interface/data/speakers/biographies/{rec_id}.m4a")
-        recording_path = Path(audio_dir + rec_id + ".m4a")
-        sound_bite.export(recording_path)
+        recording_path = Path(audio_dir) / (rec_id + ".m4a")
 
         transcode_to_aac(
             sound_bite,
@@ -105,6 +108,21 @@ def save_audio(wav_file, start, stop, text, language, speaker):
                 language=language,
             ),
         )
+
+        audio_data = recording_path.read_bytes()
+        django_file = ContentFile(audio_data, name=recording_path.name)
+
+        # get speaker using speaker name/code
+        # add bio to speaker
+        speaker = Speaker.objects.get(full_name=speaker)
+        if language == "crk":
+            speaker.crk_bio_audio = django_file
+            speaker.crk_bio_text = text
+        if language == "eng":
+            speaker.eng_bio_audio = django_file
+            speaker.eng_bio_text = text
+
+        speaker.save()
 
 
 def get_speaker_and_bio_num(file):
@@ -119,36 +137,6 @@ def get_speaker_and_bio_num(file):
     print("NUMBER: ", bio_number)
     return name, bio_number
 
-
-# save audio as a m4a file
-# add recording to the DB under the Recording model
-# associate the recording(s) with the speaker bio
-
-#
-# def save_recording(
-#     dest: Path,
-#     info: Segment,
-#     audio: AudioSegment,
-#     recording_format: Format = "m4a",
-#     logger=None,
-# ) -> Path:
-#     rec_id = info.compute_sha256hash()
-#     recording_path = dest / f"{rec_id}.{recording_format}"
-#     if recording_path.exists():
-#         logger.warn("Already exists, not transcoding: %s", recording_path)
-#         return recording_path
-#
-#     if len(audio) == 0:
-#         raise RecordingError(f"Recording empty for {info!r}")
-#
-#     # https://www.ffmpeg.org/doxygen/3.2/group__metadata__api.html
-#     logger.debug("Writing audio to %s", recording_path)
-#     if recording_format == "m4a":
-#
-#     else:
-#         audio.export(os.fspath(recording_path), format="wav")
-#     assert recording_path.exists()
-#     return recording_path
 
 if __name__ == "__main__":
     extract_speaker_bios()
