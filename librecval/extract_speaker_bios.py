@@ -1,10 +1,8 @@
-import os
-from hashlib import sha256
 from tempfile import TemporaryDirectory
 
 from django.core.files.base import ContentFile
-from pydub import AudioSegment
-from pympi.Elan import Eaf
+from pydub import AudioSegment  # type: ignore
+from pympi.Elan import Eaf  # type: ignore
 from pathlib import Path
 
 from librecval.transcode_recording import transcode_to_aac
