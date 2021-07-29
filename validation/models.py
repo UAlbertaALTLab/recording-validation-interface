@@ -28,7 +28,7 @@ from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
 
-from librecval.normalization import normalize_sro, to_indexable_form
+from librecval.normalization import normalize_sro, to_indexable_form, normalize_phrase
 from librecval.recording_session import Location, SessionID, TimeOfDay
 
 
@@ -183,12 +183,15 @@ class Phrase(models.Model):
         """
         Cleans the text fields.
         """
-        self.field_transcription = unicodedata.normalize(
-            "NFC", self.field_transcription
-        )
+        self.field_transcription = normalize_phrase(self.field_transcription)
+        self.transcription = normalize_phrase(self.transcription)
 
-        self.transcription = normalize_sro(self.transcription)
-        assert self.ALLOWED_TRANSCRIPTION_CHARACTERS.issuperset(self.transcription)
+        if self.kind == self.WORD:
+            self.transcription = normalize_sro(self.transcription)
+            if not self.ALLOWED_TRANSCRIPTION_CHARACTERS.issuperset(self.transcription):
+                raise ValidationError(
+                    f"Cree word had non-SRO characters: {self.transcription}"
+                )
 
     def save(self, *args, **kwargs):
         # Make sure the fuzzy match is always up to date

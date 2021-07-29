@@ -186,6 +186,7 @@ def test_phrase_transcription_normalization(dirty_transcription):
         Phrase,
         transcription=dirty_transcription,
         field_transcription=dirty_transcription,
+        kind=Phrase.WORD,
     ).prepare()
     phrase.clean()
     assert phrase.transcription == nfc(phrase.transcription)
@@ -223,6 +224,7 @@ def test_phrase_transcription_normalization_hyphenation(dirty_transcription, exp
         Phrase,
         transcription=dirty_transcription,
         field_transcription=dirty_transcription,
+        kind=Phrase.WORD,
     ).prepare()
     phrase.clean()
     assert phrase.transcription == expected
@@ -233,7 +235,10 @@ def test_phrase_transcription_normalize_ê():
     Tests that e gets converted to ê.
     """
     phrase = Recipe(
-        Phrase, transcription="e-cacâstapiwet", field_transcription="e-cacâstapiwet"
+        Phrase,
+        transcription="e-cacâstapiwet",
+        field_transcription="e-cacâstapiwet",
+        kind=Phrase.WORD,
     ).prepare()
     phrase.clean()
     assert phrase.transcription == "ê-cacâstapiwêt"
