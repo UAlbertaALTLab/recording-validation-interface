@@ -239,6 +239,21 @@ def test_phrase_transcription_normalize_ê():
     assert phrase.transcription == "ê-cacâstapiwêt"
 
 
+def test_phrase_transcription_validation():
+    """
+    A ValidationError should be raised ONLY for words that have non-SRO characters.
+    """
+    constants = dict(transcription="Brian", field_transcription="Brian")
+    word = Recipe(Phrase, **constants, kind=Phrase.WORD).prepare()
+    sentence = Recipe(Phrase, **constants, kind=Phrase.SENTENCE).prepare()
+
+    sentence.clean()
+    assert sentence.transcription == constants["transcription"]
+
+    with pytest.raises(ValidationError):
+        word.clean()
+
+
 @pytest.mark.django_db
 def test_phrase_has_history():
     """
