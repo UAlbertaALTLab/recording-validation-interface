@@ -78,8 +78,7 @@ def normalize_sro(utterance: str) -> str:
     """
 
     utterance = (
-        nfc(utterance)
-        .strip()
+        normalize_phrase(utterance)
         .lower()
         .replace("e", "ê")
         .translate(MACRON_TO_CIRCUMFLEX)
@@ -90,6 +89,16 @@ def normalize_sro(utterance: str) -> str:
 
     # Ensure there are exactly single spaces between words
     return re.sub(r"\s+", " ", utterance)
+
+
+def normalize_phrase(utterance: str) -> str:
+    """
+    Basic normalization for all phrases in any language:
+
+    >>> normalize_phrase("  Brian n't'siyihka\N{COMBINING MACRON}son  ")
+    "Brian n't'siyihkāson"
+    """
+    return nfc(utterance).strip()
 
 
 def to_indexable_form(text: str) -> str:
