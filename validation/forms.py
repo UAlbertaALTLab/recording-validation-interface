@@ -128,9 +128,6 @@ class EditIssueWithRecording(forms.ModelForm):
         }
 
 
-ALLOWED_TRANSCRIPTION_CHARACTERS = set("ptkcshmn yw rl eêiîoôaâ -")
-
-
 class EditIssueWithPhrase(forms.ModelForm):
     transcription = forms.CharField(
         max_length=200,
@@ -147,12 +144,3 @@ class EditIssueWithPhrase(forms.ModelForm):
     class Meta:
         model = Phrase
         fields = ["transcription", "translation"]
-
-    def clean_transcription(self):
-        transcription = self.cleaned_data.get("transcription")
-
-        if not ALLOWED_TRANSCRIPTION_CHARACTERS.issuperset(transcription):
-            print("doot")
-            raise forms.ValidationError(
-                f"Transcriptions can only contain these characters: {ALLOWED_TRANSCRIPTION_CHARACTERS}"
-            )

@@ -510,7 +510,6 @@ def view_issue_detail(request, issue_id):
     if issue.phrase:
         form = EditIssueWithPhrase(request.POST)
         if request.method == "POST" and form.is_valid():
-            form.clean_transcription()
             return handle_save_issue_with_phrase(form, issue, request)
 
     context = dict(
@@ -685,6 +684,10 @@ def handle_save_issue_with_phrase(form, issue, request):
 
     if transcription:
         phrase.transcription = transcription
+        if " " in transcription:
+            phrase.kind = Phrase.SENTENCE
+        else:
+            phrase.kind = Phrase.WORD
     if translation:
         phrase.translation = translation
 
