@@ -511,16 +511,8 @@ def speaker_view(request, speaker_code):
         gender = ""
         image_url = "#"
 
-    if gender.upper() == "M":
-        pronouns = "(He/Him)"
-    elif gender.upper() == "F":
-        pronouns = "(She/Her)"
-    else:
-        pronouns = ""
-
     context = dict(
         full_name=full_name,
-        pronouns=pronouns,
         img_src=image_url,
         auth=request.user.is_authenticated,
         speaker=speaker,
