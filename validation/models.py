@@ -188,7 +188,7 @@ class Phrase(models.Model):
 
         if self.kind == self.WORD:
             self.transcription = normalize_sro(self.transcription)
-            if not self.ALLOWED_TRANSCRIPTION_CHARACTERS.issuperset(self.transcription):
+            if not self.transcription_is_in_strict_sro():
                 raise ValidationError(
                     f"Cree word had non-SRO characters: {self.transcription}"
                 )
@@ -197,6 +197,12 @@ class Phrase(models.Model):
         # Make sure the fuzzy match is always up to date
         self.fuzzy_transcription = to_indexable_form(self.transcription)
         super().save(*args, **kwargs)
+
+    def transcription_is_in_strict_sro(self) -> bool:
+        """
+        Returns True when the transcription is written in perfect SRO.
+        """
+        return self.ALLOWED_TRANSCRIPTION_CHARACTERS.issuperset(self.transcription)
 
     def __str__(self) -> str:
         return self.transcription
