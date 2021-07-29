@@ -499,18 +499,19 @@ def view_issues(request):
 
 
 def view_issue_detail(request, issue_id):
-    issue = Issue.objects.filter(id=issue_id).first()
+    issue = Issue.objects.get(id=issue_id)
 
     form = None
     if issue.recording:
         form = EditIssueWithRecording(request.POST)
         if request.method == "POST" and form.is_valid():
-            handle_save_issue_with_recording(form, issue)
+            return handle_save_issue_with_recording(form, issue, request)
 
     if issue.phrase:
         form = EditIssueWithPhrase(request.POST)
         if request.method == "POST" and form.is_valid():
-            handle_save_issue_with_phrase(form, issue)
+            form.clean_transcription()
+            return handle_save_issue_with_phrase(form, issue, request)
 
     context = dict(
         issue=issue,
