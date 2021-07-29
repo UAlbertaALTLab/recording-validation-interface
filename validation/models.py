@@ -186,6 +186,9 @@ class Phrase(models.Model):
         self.field_transcription = normalize_phrase(self.field_transcription)
         self.transcription = normalize_phrase(self.transcription)
 
+        if not self.kind:
+            self.kind = self.SENTENCE if " " in self.transcription else self.WORD
+
         if self.kind == self.WORD:
             self.transcription = normalize_sro(self.transcription)
             if not self.transcription_is_in_strict_sro():
