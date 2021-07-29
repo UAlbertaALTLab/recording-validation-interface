@@ -211,6 +211,7 @@ def advanced_search_results(request):
     transcription = request.GET.get("transcription")
     translation = request.GET.get("translation")
     analysis = request.GET.get("analysis")
+    kind = request.GET.get("kind")
     status = request.GET.get("status")
     speakers = request.GET.getlist("speaker-options")
     quality = request.GET.get("quality")
@@ -227,6 +228,10 @@ def advanced_search_results(request):
         filter_query.append(Q(analysis__contains=analysis))
     if status and status != "all":
         filter_query.append(Q(status=status))
+
+    if kind and kind != "all":
+        filter_kind = Phrase.WORD if kind == "word" else Phrase.SENTENCE
+        filter_query.append(Q(kind=filter_kind))
 
     if filter_query:
         phrase_matches = Phrase.objects.filter(
@@ -267,6 +272,7 @@ def advanced_search_results(request):
             "translation": translation,
             "analysis": analysis,
             "status": status,
+            "kind": kind,
         }
     )
     for speaker in speakers:
@@ -403,13 +409,15 @@ def segment_content_view(request, segment_id):
     """
     if request.method == "POST":
         form = EditSegment(request.POST)
-        og_phrase = Phrase.objects.filter(id=segment_id)[0]
+        og_phrase = Phrase.objects.get(id=segment_id)
         phrase_id = og_phrase.id
         if form.is_valid():
-            transcription = form.cleaned_data["cree"] or og_phrase.transcription
-            translation = form.cleaned_data["translation"] or og_phrase.translation
-            analysis = form.cleaned_data["analysis"] or og_phrase.analysis
-            p = Phrase.objects.filter(id=phrase_id)[0]
+            transcription = form.cleaned_data["cree"].strip() or og_phrase.transcription
+            translation = (
+                form.cleaned_data["translation"].strip() or og_phrase.translation
+            )
+            analysis = form.cleaned_data["analysis"].strip() or og_phrase.analysis
+            p = Phrase.objects.get(id=phrase_id)
             p.transcription = transcription
             p.translation = translation
             p.analysis = analysis

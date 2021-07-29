@@ -107,7 +107,7 @@
   #}
  {% macro td_suggestion_translation(user, suggestion, suggestions) %}
  <td data-cy="suggestion-translation" lang="en">
-   {{ suggestions[suggestion]['matches'][0]['translations'] or 'No translation available' }}
+   {{ suggestions[suggestion]['matches'][0]['translation'] or 'No translation available' }}
  </td>
  {% endmacro %}
 
@@ -128,6 +128,16 @@
  {% macro td_suggestion_med(user, suggestion, suggestions) %}
  <td lang="en" rowspan="{{ suggestions[suggestion]['len'] }}">
    {{ suggestions[suggestion]['med'] }}
+ </td>
+ {% endmacro %}
+
+ {#
+  # Expands to a <td> that displays the source
+    # of the Cree suggestion from itwêwina.
+  #}
+ {% macro td_suggestion_source(user, suggestion, suggestions) %}
+ <td lang="en">
+   {{ suggestions[suggestion]['matches'][0]['source'] }}
  </td>
  {% endmacro %}
 
