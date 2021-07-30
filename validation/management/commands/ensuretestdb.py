@@ -33,6 +33,7 @@ def import_test_phrases():
             "test_recordingsession",
             "test_phrases",
             "test_recordings",
+            "test_issues",
         )
 
 

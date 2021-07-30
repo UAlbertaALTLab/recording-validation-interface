@@ -1,0 +1,34 @@
+{#
+      Copyright (C) 2021 Jolene Poulin <jcpoulin@ualberta.ca>
+
+      This program is free software: you can redistribute it and/or modify
+      it under the terms of the GNU Affero General Public License as
+      published by the Free Software Foundation, either version 3 of the
+      License, or (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      GNU Affero General Public License for more details.
+
+      You should have received a copy of the GNU Affero General Public License
+      along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#}
+
+{% extends 'validation/_base.html' %}
+
+{% import 'validation/_issue_card.html' as issue_card %}
+
+{% block content %}
+    <div class="row">
+        {% if issues %}
+            {% for issue in issues %}
+                {{ issue_card.issue_card(issue) }}
+            {% endfor %}
+        {% else %}
+            <div class="header-large-center" data-cy="no-issues-header">
+                <h2>There are no open issues</h2>
+            </div>
+        {% endif %}
+    </div>
+{% endblock content %}

@@ -50,7 +50,14 @@ from django.db.models import Q, QuerySet
 from librecval.normalization import to_indexable_form
 
 from .models import Phrase, Recording, Speaker, RecordingSession, Issue
-from .forms import EditSegment, Login, Register, FlagSegment
+from .forms import (
+    EditSegment,
+    Login,
+    Register,
+    FlagSegment,
+    EditIssueWithRecording,
+    EditIssueWithPhrase,
+)
 from .helpers import (
     get_distance_with_translations,
     perfect_match,
@@ -442,6 +449,7 @@ def segment_content_view(request, segment_id):
         form=form,
         history=history,
         auth=auth,
+        is_linguist=user_is_linguist(request.user),
     )
 
     return render(request, "validation/segment_details.html", context)
@@ -491,6 +499,47 @@ def register(request):
 
     context = dict(form=form)
     return render(request, "validation/register.html", context)
+
+
+def view_issues(request):
+    issues = Issue.objects.filter(status=Issue.OPEN).order_by("id")
+    context = dict(
+        issues=issues,
+        auth=request.user.is_authenticated,
+        is_linguist=user_is_linguist(request.user),
+    )
+    return render(request, "validation/view_issues.html", context)
+
+
+def view_issue_detail(request, issue_id):
+    issue = Issue.objects.get(id=issue_id)
+
+    form = None
+    if issue.recording:
+        form = EditIssueWithRecording(request.POST)
+        if request.method == "POST" and form.is_valid():
+            return handle_save_issue_with_recording(form, issue, request)
+
+    if issue.phrase:
+        form = EditIssueWithPhrase(request.POST)
+        if request.method == "POST" and form.is_valid():
+            return handle_save_issue_with_phrase(form, issue, request)
+
+    context = dict(
+        issue=issue,
+        form=form,
+        auth=request.user.is_authenticated,
+        is_linguist=user_is_linguist(request.user),
+    )
+    return render(request, "validation/view_issue_detail.html", context)
+
+
+def close_issue(request, issue_id):
+    issue = Issue.objects.filter(id=issue_id).first()
+    issue.status = Issue.RESOLVED
+    issue.save()
+
+    return HttpResponseRedirect("/issues")
 
 
 def speaker_view(request, speaker_code):
@@ -547,6 +596,9 @@ def all_speakers(request):
 
     context = dict(speakers=speakers, auth=request.user.is_authenticated)
     return render(request, "validation/all_speakers.html", context)
+
+
+# Internal API endpoints
 
 
 @login_required()
@@ -630,7 +682,7 @@ def save_wrong_word(request, recording_id):
     comment = "This is the wrong word."
 
     if suggestion:
-        comment += "The word is actually: " + suggestion
+        comment += " The word is actually: " + suggestion
 
     new_issue = Issue(
         recording=rec,
@@ -653,6 +705,66 @@ def save_wrong_word(request, recording_id):
         response["Location"] = "/"
 
     return response
+
+
+# Small Helper functions
+
+
+def handle_save_issue_with_recording(form, issue, request):
+    rec = Recording.objects.get(id=issue.recording.id)
+
+    speaker_code = form.cleaned_data["speaker"]
+    if speaker_code:
+        speaker = Speaker.objects.get(code=speaker_code)
+        rec.speaker = speaker
+
+    new_word = form.cleaned_data["phrase"].strip()
+    if new_word:
+        new_phrase = Phrase.objects.filter(transcription=new_word).first()
+        if not new_phrase:
+            new_phrase = Phrase(
+                field_transcription=new_word,
+                transcription=new_word,
+                translation="",
+                kind="Sentence" if " " in new_word else "Word",
+                date=datetime.datetime.now(),
+                modifier=str(request.user),
+            )
+            new_phrase.save()
+        rec.phrase_id = new_phrase.id
+
+    rec.wrong_word = False
+    rec.wrong_speaker = False
+    rec.save()
+
+    issue.status = Issue.RESOLVED
+    issue.save()
+    return HttpResponseRedirect("/issues")
+
+
+def handle_save_issue_with_phrase(form, issue, request):
+    phrase = Phrase.objects.get(id=issue.phrase.id)
+
+    transcription = form.cleaned_data["transcription"].strip()
+    translation = form.cleaned_data["translation"].strip()
+
+    if transcription:
+        phrase.transcription = transcription
+        if " " in transcription:
+            phrase.kind = Phrase.SENTENCE
+        else:
+            phrase.kind = Phrase.WORD
+    if translation:
+        phrase.translation = translation
+
+    phrase.status = "linked"
+    phrase.modifier = str(request.user)
+    phrase.date = datetime.datetime.now()
+    phrase.save()
+
+    issue.status = Issue.RESOLVED
+    issue.save()
+    return HttpResponseRedirect("/issues")
 
 
 def encode_query_with_page(query, page):

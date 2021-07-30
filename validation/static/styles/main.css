@@ -95,9 +95,22 @@ a:hover {
   text-align: center;
 }
 
+.right {
+  text-align: right;
+}
+
 .description {
   font-weight: 600;
   font-size: 1.5rem;
+}
+
+.header-large-center {
+  background-color: #F5F5F5;
+  margin: 0 auto;
+  padding: 2rem;
+  max-width: 50rem;
+  min-width: 20rem;
+  text-align: center;
 }
 
 .speaker-bio {

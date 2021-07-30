@@ -41,3 +41,7 @@
 .card__header--grey {
   background-color: var(--custom-grey);
 }
+
+.card__header--beige {
+  background-color: var(--custom-beige);
+}

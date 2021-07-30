@@ -53,6 +53,8 @@ urlpatterns = [
         name="search_recordings",
     ),
     path("segment/<str:segment_id>", views.segment_content_view, name="segment_detail"),
+    path("issues", views.view_issues, name="issues"),
+    path("issues/<int:issue_id>", views.view_issue_detail, name="issue_detail"),
     path("speakers/<str:speaker_code>", views.speaker_view, name="speaker_view"),
     path("speakers/", views.all_speakers, name="all_speakers"),
     path(
@@ -75,6 +77,7 @@ urlpatterns = [
         views.save_wrong_word,
         name="save_wrong_word",
     ),
+    path("api/close_issue/<str:issue_id>", views.close_issue, name="close_issue"),
     path(
         "api/bulk_search", views.bulk_search_recordings, name="bulk_search_recordings"
     ),

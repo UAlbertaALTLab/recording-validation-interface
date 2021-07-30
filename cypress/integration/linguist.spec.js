@@ -19,4 +19,50 @@ describe("Linguists", () => {
             })
     })
 
+    it("can view all open issues", () => {
+        cy.visit(Cypress.env('issues'));
+
+        cy.get('[data-cy="issue-card"]')
+            .first()
+            .should('be.visible')
+    })
+
+    it("can resolve an open issue", () => {
+        cy.visit(Cypress.env('issues'));
+
+        cy.get('[data-cy="issue-card"]')
+            .first()
+            .within(() => {
+                cy.get('[data-cy="more-info-issue-button"]')
+                    .click()
+            })
+
+        cy.location('pathname')
+            .should('include', '/issues/1')
+
+        cy.get('#id_speaker')
+            .select('JER')
+
+        cy.get('#id_phrase')
+            .click()
+            .type("hello")
+
+        cy.get('[data-cy=save-button]')
+            .click()
+
+        cy.location('pathname')
+            .should('include', '/issues')
+    })
+
+    it("can close an open issue", () => {
+        cy.visit(Cypress.env('issues'));
+
+        cy.get('[data-cy="issue-card"]')
+            .first()
+            .within(() => {
+                cy.get('[data-cy=close-issue-button]')
+                    .click()
+            })
+    })
+
 })
