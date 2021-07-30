@@ -573,7 +573,12 @@ def all_speakers(request):
     speakers = []
     speaker_objects = Speaker.objects.all()
     for speaker in speaker_objects:
-        if "E-" in speaker.code or "ELICIT" in speaker.code:
+        if (
+            "E-" in speaker.code
+            or "ELICIT" in speaker.code
+            or "/" in speaker.code
+            or not speaker.code
+        ):
             continue
 
         full_name = speaker.full_name
