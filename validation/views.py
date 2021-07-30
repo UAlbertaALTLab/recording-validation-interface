@@ -546,18 +546,9 @@ def speaker_view(request, speaker_code):
     speaker = Speaker.objects.get(code=speaker_code)
     if speaker:
         full_name = speaker.full_name
-        gender = speaker.gender or ""
-
-        image_name = full_name.replace(" ", "") + ".jpg"
-        image_name = normalize_img_name(image_name)
-        image_url = Path(f"/static/images/speakers/{image_name}")
-        if not Path(
-            f"validation/{settings.STATIC_URL}images/speakers/{image_name}"
-        ).exists():
-            image_url = Path("/static/images/missing.png")
+        image_url = get_image_url(full_name)
     else:
         full_name = f"No speaker found for speaker code {speaker_code}"
-        gender = ""
         image_url = "#"
 
     context = dict(
@@ -582,14 +573,7 @@ def all_speakers(request):
             continue
 
         full_name = speaker.full_name
-
-        image_name = full_name.replace(" ", "") + ".jpg"
-        image_name = normalize_img_name(image_name)
-        image_url = f"/static/images/speakers/{image_name}"
-        if not Path(
-            f"validation/{settings.STATIC_URL}images/speakers/{image_name}"
-        ).exists():
-            image_url = Path("/static/images/missing.jpg")
+        image_url = get_image_url(full_name)
 
         speaker_dict = dict(
             full_name=full_name,
@@ -713,6 +697,18 @@ def save_wrong_word(request, recording_id):
 
 
 # Small Helper functions
+
+
+def get_image_url(full_name):
+    image_name = full_name.replace(" ", "") + ".jpg"
+    image_name = normalize_img_name(image_name)
+    image_url = Path(f"{settings.STATIC_URL}/images/speakers/{image_name}")
+    if not Path(
+        f"validation/{settings.STATIC_URL}/images/speakers/{image_name}"
+    ).exists():
+        image_url = Path(f"{settings.STATIC_URL}/images/missing.jpg")
+
+    return image_url
 
 
 def handle_save_issue_with_recording(form, issue, request):
