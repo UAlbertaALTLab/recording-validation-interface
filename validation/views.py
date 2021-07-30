@@ -531,7 +531,7 @@ def view_issue_detail(request, issue_id):
 
 def close_issue(request, issue_id):
     issue = Issue.objects.filter(id=issue_id).first()
-    issue.status = "Resolved"
+    issue.status = Issue.RESOLVED
     issue.save()
 
     return HttpResponseRedirect("/issues")
