@@ -53,6 +53,8 @@ urlpatterns = [
         name="search_recordings",
     ),
     path("segment/<str:segment_id>", views.segment_content_view, name="segment_detail"),
+    path("speakers/<str:speaker_code>", views.speaker_view, name="speaker_view"),
+    path("speakers/", views.all_speakers, name="all_speakers"),
     path(
         "api/record_translation_judgement/<int:phrase_id>",
         views.record_translation_judgement,

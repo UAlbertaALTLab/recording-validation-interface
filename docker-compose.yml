@@ -10,6 +10,8 @@ services:
         - "./.env:/app/.env"
         - "./db.sqlite3:/app/db.sqlite3"
         - "/data/application-data/speech-db/audio:/app/data/audio"
+        - "/data/application-data/speech-db/speakers:/app/validation/static/images/speakers"
         - "/data/maskwacis-recordings/sessions:/app/data/sessions"
+        - "/data/maskwacis-recordings/speakers:/app/data/speakers"
         - "/data/maskwacis-recordings:/data/maskwacis-recordings"
         - "/data/application-data/speech-db/metadata.csv:/app/private/metadata.csv"

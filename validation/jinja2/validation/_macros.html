@@ -62,6 +62,17 @@
 </audio>
 {% endmacro %}
 
+
+{#
+ # An audio player for a bio recording.
+ #}
+{% macro bio_player(recording) %}
+<audio controls preload=none>
+  <source src="{{ recording.url }}" type="audio/mp4"/>
+</audio>
+{% endmacro %}
+
+
 {#
  # Expands to a <td> that displays the Cree transcription.
   # Creates link from phrase to view more details 
