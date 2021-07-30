@@ -3,7 +3,7 @@ import re
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 
-from validation.models import Issue
+from validation.models import Issue, Recording, Phrase
 
 
 class Login(forms.Form):
@@ -111,3 +111,36 @@ class FlagSegment(forms.ModelForm):
     class Meta:
         model = Issue
         fields = ["phrase_id"]
+
+
+class EditIssueWithRecording(forms.ModelForm):
+    phrase = forms.CharField(
+        widget=forms.Textarea(),
+        required=False,
+        help_text="What word or phrase this recording is actually for",
+    )
+
+    class Meta:
+        model = Recording
+        fields = ["speaker"]
+        help_texts = {
+            "speaker": "\n",
+        }
+
+
+class EditIssueWithPhrase(forms.ModelForm):
+    transcription = forms.CharField(
+        max_length=200,
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control form-restrict"}),
+    )
+
+    translation = forms.CharField(
+        max_length=200,
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control form-restrict"}),
+    )
+
+    class Meta:
+        model = Phrase
+        fields = ["transcription", "translation"]

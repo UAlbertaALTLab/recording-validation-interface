@@ -106,6 +106,7 @@ RECVAL_SQLITE_DB_PATH = config(
     "RECVAL_SQLITE_DB_PATH", default=BASE_DIR / "db.sqlite3", cast=Path
 )
 
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
@@ -187,6 +188,7 @@ STATIC_ROOT = config("STATIC_ROOT", default=default_static_dir)
 
 # This is concatenated with MEDIA_ROOT and MEDIA_URL to store and serve the audio files.
 RECVAL_AUDIO_PREFIX = config("RECVAL_AUDIO_PREFIX", default="audio/")
+BIO_INFO_PREFIX = config("BIO_INFO_PREFIX", default="data/speakers/biographies")
 
 # Where to find the metadata CSV file.
 RECVAL_METADATA_PATH = config(
@@ -219,7 +221,7 @@ LOGIN_REDIRECT_URL = "/"
 
 ITWEWINA_URL = "https://itwewina.altlab.app/"
 
-FIXTURE_DIRS = ("validation/management/fixtures/",)
+FIXTURE_DIRS = (BASE_DIR / "validation" / "management" / "fixtures",)
 
 INTERNAL_IPS = ["127.0.0.1"]
 

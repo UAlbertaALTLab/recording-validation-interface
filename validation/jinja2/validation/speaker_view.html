@@ -1,0 +1,29 @@
+{% extends 'validation/_base.html' %}
+{% import 'validation/_macros.html' as macros %}
+
+{% block content %}
+    <div class="header-large-center">
+        <h2>{{ full_name }}</h2>
+        <img src="{{ img_src }}" alt="Image of {{ full_name }}" width=320>
+    </div>
+
+    <div class="speaker-bio">
+        {% if speaker.eng_bio_text %}
+            <h3>Listen in English:</h3>
+            <p>{{ macros.bio_player(speaker.eng_bio_audio) }}</p>
+            {% if request.COOKIES['macron'] == 'on' %}
+                <p>{{ speaker.eng_bio_text }}</p>
+            {% else %}
+                <p>{{ speaker.eng_bio_text | replace("ê", "e") }}</p>
+            {% endif %}
+
+            {% if request.COOKIES['macron'] == 'on' %}
+                <h3>Listen in nêhiyawêwin:</h3>
+            {% else %}
+                <h3>Listen in nehiyawewin:</h3>
+            {% endif %}
+            <p>{{ macros.bio_player(speaker.crk_bio_audio) }}</p>
+            <p>(Cree translation coming soon)</p>
+        {% endif %}
+    </div>
+{% endblock content %}

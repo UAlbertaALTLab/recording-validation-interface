@@ -1,0 +1,63 @@
+{#
+      Copyright (C) 2021 Jolene Poulin <jcpoulin@ualberta.ca>
+
+      This program is free software: you can redistribute it and/or modify
+      it under the terms of the GNU Affero General Public License as
+      published by the Free Software Foundation, either version 3 of the
+      License, or (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      GNU Affero General Public License for more details.
+
+      You should have received a copy of the GNU Affero General Public License
+      along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#}
+
+{% import 'validation/_macros.html' as macros %}
+
+
+{% macro issue_card(issue) %}
+
+    <div class="col-sm-6">
+        <article class="card shadow-sm" data-cy="issue-card">
+            <div class="card__header card__header--beige" data-cy="card-header">
+                <div class="right">
+                    <button class="button button--neutral" data-cy="more-info-issue-button">
+                        <a href="{{ url('validation:issue_detail', issue.id) }}">More Info</a>
+                    </button>
+                    <button class="button button--fail" data-cy="close-issue-button">
+                        <a href="/api/close_issue/{{ issue.id }}">Close Issue</a>
+                    </button>
+                </div>
+            </div>
+            <div class="card__body">
+                {% if issue.phrase %}
+                    <h2>Phrase: {{ issue.phrase }}</h2>
+                {% elif issue.recording %}
+                    <h2>Recording: {{ issue.recording }}</h2>
+                    {{ macros.player(issue.recording) }}<br>
+                {% endif %}
+                <h3>What's wrong with this entry?</h3>
+                {% if issue.suggested_cree %}
+                    The Cree word in this entry is wrong<br>
+                {% endif %}
+                {% if issue.suggested_english %}
+                    The English word in this entry is wrong<br>
+                {% endif %}
+                Comment: {{ issue.comment }}<br>
+                {% if issue.suggested_cree %}
+                    Cree spelling suggestion: {{ issue.suggested_cree }}<br>
+                {% endif %}
+                {% if issue.suggested_english %}
+                    English spelling suggestion: {{ issue.suggested_english }}<br>
+                {% endif %}
+                <div class="card-footer">
+                    This issue was filed by {{ issue.created_by }} on {{ issue.created_on }}
+                </div>
+            </div>
+        </article>
+    </div>
+
+{% endmacro %}

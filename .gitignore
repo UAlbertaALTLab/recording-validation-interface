@@ -115,6 +115,16 @@ db.sqlite3
 test_db.sqlite
 node_modules
 .DS_Store
+validation/static/images/speakers/
+crk.zhfst
+.vscode
+private/treatedMD.csv
+audio/
+crk-descriptive-analyzer.hfstol
+cypress/videos/
+private/MaskwacisDictionary.csv
+private/skip-no-speaker.py
+transcriptions/
 
 # Directory of broken dreams:
 failed-sessions/

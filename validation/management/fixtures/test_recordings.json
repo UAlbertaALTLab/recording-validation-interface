@@ -89,5 +89,31 @@
       "session_id": "2015-05-29-AM-___-_",
       "speaker_id": "MAR"
     }
+  },
+  {
+    "model": "validation.recording",
+    "fields": {
+      "id": "c4d8a787fd109e50a23398fa8f2e3fb4cafba46e74ff433be737b618809a85b8_d1XbS7n",
+      "compressed_audio": "audio/c4d8a787fd109e50a23398fa8f2e3fb4cafba46e74ff433be737b618809a85b8_d1XbS7n.m4a",
+      "timestamp": 2403521,
+      "quality": "good",
+      "comment": "Good",
+      "phrase_id": 8,
+      "session_id": "2015-05-29-AM-___-_",
+      "speaker_id": "MAR"
+    }
+  },
+  {
+    "model": "validation.recording",
+    "fields": {
+      "id": "1a7ad5039f86d2e9770d29358d2d6937ae625a021540cf45f054d0f5f7d76320_ZiIOu4i",
+      "compressed_audio": "audio/1a7ad5039f86d2e9770d29358d2d6937ae625a021540cf45f054d0f5f7d76320_ZiIOu4i.m4a",
+      "timestamp": 2403521,
+      "quality": "good",
+      "comment": "Good",
+      "phrase_id": 9,
+      "session_id": "2015-05-29-AM-___-_",
+      "speaker_id": "ROS"
+    }
   }
 ]

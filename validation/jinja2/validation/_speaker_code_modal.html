@@ -31,7 +31,7 @@
                         <form id="{{ recording_id }}-form" method="POST" action="/api/save_wrong_speaker_code/{{ recording_id }}">
                             <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
                             <input type="hidden" name="referrer" value="{{ request.build_absolute_uri() }}">
-                            <select name="speaker-code-select" id="speaker-code-select">
+                            <select name="speaker-code-select" id="speaker-code-select" data-cy="select-speaker">
                                 <option value="idk">I'm not sure</option>
                                 {% for speaker in speakers %}
                                     <option value="{{ speaker.code }}">{{ speaker.code }}
