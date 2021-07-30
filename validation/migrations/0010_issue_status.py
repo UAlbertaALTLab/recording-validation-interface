@@ -7,6 +7,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("validation", "0008_remove_booleans_from_issue"),
+        ("validation", "0009_add_speaker_bio"),
     ]
 
     operations = [

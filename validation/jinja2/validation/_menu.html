@@ -16,7 +16,7 @@
 #}
 
 
-{% macro menu_options(request, auth, showMacron) %}
+{% macro menu_options(request, auth, is_linguist, showMacron) %}
     <ul id="options-menu" class="menu__options menu__options--list menu__options--right">
         <li><a href="/speakers" class="menu__options-link">Speakers</a></li>
         {% if is_linguist %}

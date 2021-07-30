@@ -720,7 +720,7 @@ def handle_save_issue_with_recording(form, issue, request):
 
     new_word = form.cleaned_data["phrase"].strip()
     if new_word:
-        new_phrase = Phrase.objects.get(transcription=new_word)
+        new_phrase = Phrase.objects.filter(transcription=new_word).first()
         if not new_phrase:
             new_phrase = Phrase(
                 field_transcription=new_word,
