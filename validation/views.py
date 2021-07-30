@@ -50,7 +50,6 @@ from django.db.models import Q, QuerySet
 from librecval.normalization import to_indexable_form
 
 from .models import Phrase, Recording, Speaker, RecordingSession, Issue
-from .helpers import get_distance_with_translations, perfect_match, exactly_one_analysis
 from .forms import (
     EditSegment,
     Login,
@@ -58,6 +57,12 @@ from .forms import (
     FlagSegment,
     EditIssueWithRecording,
     EditIssueWithPhrase,
+)
+from .helpers import (
+    get_distance_with_translations,
+    perfect_match,
+    exactly_one_analysis,
+    normalize_img_name,
 )
 
 
@@ -537,7 +542,60 @@ def close_issue(request, issue_id):
     return HttpResponseRedirect("/issues")
 
 
-# TODO: Speaker bio page like https://ojibwe.lib.umn.edu/about/voices
+def speaker_view(request, speaker_code):
+    speaker = Speaker.objects.get(code=speaker_code)
+    if speaker:
+        full_name = speaker.full_name
+        gender = speaker.gender or ""
+
+        image_name = full_name.replace(" ", "") + ".jpg"
+        image_name = normalize_img_name(image_name)
+        image_url = Path(f"/static/images/speakers/{image_name}")
+        if not Path(
+            f"validation/{settings.STATIC_URL}images/speakers/{image_name}"
+        ).exists():
+            image_url = Path("/static/images/missing.png")
+    else:
+        full_name = f"No speaker found for speaker code {speaker_code}"
+        gender = ""
+        image_url = "#"
+
+    context = dict(
+        full_name=full_name,
+        img_src=image_url,
+        auth=request.user.is_authenticated,
+        speaker=speaker,
+    )
+    return render(request, "validation/speaker_view.html", context)
+
+
+def all_speakers(request):
+    speakers = []
+    speaker_objects = Speaker.objects.all()
+    for speaker in speaker_objects:
+        if "E-" in speaker.code or "ELICIT" in speaker.code:
+            continue
+
+        full_name = speaker.full_name
+
+        image_name = full_name.replace(" ", "") + ".jpg"
+        image_name = normalize_img_name(image_name)
+        image_url = f"/static/images/speakers/{image_name}"
+        if not Path(
+            f"validation/{settings.STATIC_URL}images/speakers/{image_name}"
+        ).exists():
+            image_url = Path("/static/images/missing.jpg")
+
+        speaker_dict = dict(
+            full_name=full_name,
+            code=speaker.code,
+            img_src=image_url,
+            bio=speaker.eng_bio_text or "",
+        )
+        speakers.append(speaker_dict)
+
+    context = dict(speakers=speakers, auth=request.user.is_authenticated)
+    return render(request, "validation/all_speakers.html", context)
 
 
 # Internal API endpoints

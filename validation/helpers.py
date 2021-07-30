@@ -230,6 +230,19 @@ def get_distance_with_translations(word):
     return suggestions
 
 
+def normalize_img_name(img_name):
+    ret_name = img_name.replace("î", "i")
+    ret_name = ret_name.replace("â", "a")
+    ret_name = ret_name.replace("ô", "o")
+    ret_name = ret_name.replace("ê", "e")
+
+    # Capitalize first character if it isn't already
+    if ret_name[0] in "abcdefghifjklmnopqrstuvwxyz":
+        ret_name = ret_name.capitalize()
+
+    return ret_name
+
+
 def perfect_match(word, suggestions):
     """
     Checks for exactly one entry with either

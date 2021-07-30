@@ -112,3 +112,18 @@ a:hover {
   min-width: 20rem;
   text-align: center;
 }
+
+.speaker-bio {
+  width: 80%;
+  margin: 3rem auto;
+}
+
+/* https://stackoverflow.com/questions/3922739/limit-text-length-to-n-lines-using-css */
+.speaker-bio-preview {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  display: -webkit-box;
+   -webkit-line-clamp: 4; /* number of lines to show */
+   -webkit-box-orient: vertical;
+}

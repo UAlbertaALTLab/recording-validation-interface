@@ -241,6 +241,30 @@ class Speaker(models.Model):
         null=True,
     )
 
+    eng_bio_text = models.CharField(
+        help_text="The English transcription of the speaker bio",
+        null=True,
+        blank=True,
+        max_length=2048,
+    )
+    crk_bio_text = models.CharField(
+        help_text="The Cree transcription of the speaker bio",
+        null=True,
+        blank=True,
+        max_length=2048,
+    )
+
+    eng_bio_audio = models.FileField(
+        # relative to settings.MEDIA_ROOT
+        upload_to=settings.RECVAL_AUDIO_PREFIX,
+        blank=True,
+    )
+    crk_bio_audio = models.FileField(
+        # relative to settings.MEDIA_ROOT
+        upload_to=settings.RECVAL_AUDIO_PREFIX,
+        blank=True,
+    )
+
     @property
     def dialect(self):
         """

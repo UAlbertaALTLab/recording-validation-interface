@@ -16,8 +16,9 @@
 #}
 
 
-{% macro menu_options(request, auth, is_linguist, showMacron) %}
+{% macro menu_options(request, auth, showMacron) %}
     <ul id="options-menu" class="menu__options menu__options--list menu__options--right">
+        <li><a href="/speakers" class="menu__options-link">Speakers</a></li>
         {% if is_linguist %}
             <li><a href="{{ url('validation:issues') }}" class="menu__options-link">View open Issues</a></li>
         {% endif %}
@@ -27,10 +28,10 @@
             {% else %}
                 <li  onclick="showMacron('off')"><a href="#" class="menu__options-link">Show e without circumflex</a></li>
             {% endif %}
-            <li><a href="{{ url('validation:logout') }}" id="logout-link" class="logout-link">Logout</a></li>
+            <li><a href="/logout" id="logout-link" class="logout-link">Logout</a></li>
 
         {% else %}
-            <li><a href="{{ url('validation:login') }}" id="login-link" class="login-link">Login</a></li>
+            <li><a href="/login" id="login-link" class="login-link">Login</a></li>
         {% endif %}
     </ul>
 {% endmacro %}
