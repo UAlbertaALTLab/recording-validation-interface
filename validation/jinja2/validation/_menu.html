@@ -16,8 +16,12 @@
 #}
 
 
-{% macro menu_options(request, auth, showMacron) %}
+{% macro menu_options(request, auth, is_linguist, showMacron) %}
     <ul id="options-menu" class="menu__options menu__options--list menu__options--right">
+        <li><a href="/speakers" class="menu__options-link">Speakers</a></li>
+        {% if is_linguist %}
+            <li><a href="{{ url('validation:issues') }}" class="menu__options-link">View open Issues</a></li>
+        {% endif %}
         {% if auth %}
             {% if request.COOKIES['macron'] == 'off' %}
                 <li onclick="showMacron('on')"><a href="#" class="menu__options-link">Show ê with circumflex</a></li>

@@ -179,20 +179,28 @@ def get_translations(results):
     matches = []
 
     for i in results["results"]:
-        translations, analysis = extract_translations(i["lemma_wordform"])
-        if {"translations": translations, "analysis": analysis} not in matches:
-            matches.append({"translations": translations, "analysis": analysis})
+        translations, analysis, sources = extract_translations(i["lemma_wordform"])
+        for (source, translation) in zip(sources, translations):
+            if {
+                "translation": translation,
+                "analysis": analysis,
+                "source": source,
+            } not in matches:
+                matches.append(
+                    {"translation": translation, "analysis": analysis, "source": source}
+                )
 
     return matches
 
 
 def extract_translations(entry):
     translations = []
+    sources = []
 
     if type(entry["definitions"]) == list and len(entry["definitions"]) > 0:
         translations = [str(j["text"]) for j in entry["definitions"]]
+        sources = [", ".join(j["source_ids"]) for j in entry["definitions"]]
 
-    translations = "; ".join(translations)
     if entry["raw_analysis"]:
         analysis = (
             "".join(entry["raw_analysis"][0])
@@ -202,7 +210,7 @@ def extract_translations(entry):
     else:
         analysis = ""
 
-    return translations, analysis
+    return translations, analysis, sources
 
 
 def get_distance_with_translations(word):
@@ -220,6 +228,19 @@ def get_distance_with_translations(word):
         }
 
     return suggestions
+
+
+def normalize_img_name(img_name):
+    ret_name = img_name.replace("î", "i")
+    ret_name = ret_name.replace("â", "a")
+    ret_name = ret_name.replace("ô", "o")
+    ret_name = ret_name.replace("ê", "e")
+
+    # Capitalize first character if it isn't already
+    if ret_name[0] in "abcdefghifjklmnopqrstuvwxyz":
+        ret_name = ret_name.capitalize()
+
+    return ret_name
 
 
 def perfect_match(word, suggestions):

@@ -28,7 +28,7 @@ from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
 
-from librecval.normalization import normalize_sro, to_indexable_form
+from librecval.normalization import normalize_sro, to_indexable_form, normalize_phrase
 from librecval.recording_session import Location, SessionID, TimeOfDay
 
 
@@ -183,17 +183,29 @@ class Phrase(models.Model):
         """
         Cleans the text fields.
         """
-        self.field_transcription = unicodedata.normalize(
-            "NFC", self.field_transcription
-        )
+        self.field_transcription = normalize_phrase(self.field_transcription)
+        self.transcription = normalize_phrase(self.transcription)
 
-        self.transcription = normalize_sro(self.transcription)
-        assert self.ALLOWED_TRANSCRIPTION_CHARACTERS.issuperset(self.transcription)
+        if not self.kind:
+            self.kind = self.SENTENCE if " " in self.transcription else self.WORD
+
+        if self.kind == self.WORD:
+            self.transcription = normalize_sro(self.transcription)
+            if not self.transcription_is_in_strict_sro():
+                raise ValidationError(
+                    f"Cree word had non-SRO characters: {self.transcription}"
+                )
 
     def save(self, *args, **kwargs):
         # Make sure the fuzzy match is always up to date
         self.fuzzy_transcription = to_indexable_form(self.transcription)
         super().save(*args, **kwargs)
+
+    def transcription_is_in_strict_sro(self) -> bool:
+        """
+        Returns True when the transcription is written in perfect SRO.
+        """
+        return self.ALLOWED_TRANSCRIPTION_CHARACTERS.issuperset(self.transcription)
 
     def __str__(self) -> str:
         return self.transcription
@@ -229,6 +241,30 @@ class Speaker(models.Model):
         null=True,
     )
 
+    eng_bio_text = models.CharField(
+        help_text="The English transcription of the speaker bio",
+        null=True,
+        blank=True,
+        max_length=2048,
+    )
+    crk_bio_text = models.CharField(
+        help_text="The Cree transcription of the speaker bio",
+        null=True,
+        blank=True,
+        max_length=2048,
+    )
+
+    eng_bio_audio = models.FileField(
+        # relative to settings.MEDIA_ROOT
+        upload_to=settings.RECVAL_AUDIO_PREFIX,
+        blank=True,
+    )
+    crk_bio_audio = models.FileField(
+        # relative to settings.MEDIA_ROOT
+        upload_to=settings.RECVAL_AUDIO_PREFIX,
+        blank=True,
+    )
+
     @property
     def dialect(self):
         """
@@ -257,6 +293,14 @@ class Speaker(models.Model):
                     "optionally followed by a digit"
                 )
             )
+
+    def get_absolute_url(self) -> str:
+        """
+        Returns a URL for where to find the speaker bio.
+        """
+        # TODO: Change this when implementing:
+        # https://github.com/UAlbertaALTLab/recording-validation-interface/issues/72
+        return f"https://www.altlab.dev/maskwacis/Speakers/{self.code}.html"
 
     def __str__(self):
         return self.code
@@ -408,6 +452,31 @@ class Recording(models.Model):
     def __str__(self):
         return f'"{self.phrase}" recorded by {self.speaker} during {self.session}'
 
+    def get_absolute_url(self) -> str:
+        """
+        Return a URL to the compressed audio file.
+        Note: you will still need to call HttpRequest.build_absolute_uri() to get an
+        absolute URI (i.e., with scheme and hostname).
+        """
+        return self.compressed_audio.url
+
+    def as_json(self, request):
+        """
+        Returns JSON that API clients expect for a single recording.
+        """
+        return {
+            "wordform": self.phrase.transcription,
+            "speaker": self.speaker.code,
+            "speaker_name": self.speaker.full_name,
+            "anonymous": self.speaker.anonymous,
+            "gender": self.speaker.gender,
+            "dialect": self.speaker.dialect,
+            "recording_url": request.build_absolute_uri(self.get_absolute_url()),
+            "speaker_bio_url": request.build_absolute_uri(
+                self.speaker.get_absolute_url()
+            ),
+        }
+
     @staticmethod
     def get_path_to_audio_directory() -> Path:
         """
@@ -449,6 +518,17 @@ class Issue(models.Model):
 
     created_on = models.DateField(
         help_text="When was this issue filed?",
+    )
+
+    RESOLVED = "resolved"
+    OPEN = "open"
+    STATUS_CHOICES = [(RESOLVED, "Resolved"), (OPEN, "Open")]
+
+    status = models.CharField(
+        help_text="The status of the issue",
+        max_length=64,
+        choices=STATUS_CHOICES,
+        default=OPEN,
     )
 
 

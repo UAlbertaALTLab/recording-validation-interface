@@ -84,6 +84,7 @@
             <th scope="col"> MED </th>
             <th scope="col"> Translation </th>
             <th scope="col"> Analysis </th>
+            <th scope="col"> Source </th>
             {% if auth %}
             <th scope="col"> Options </th>
             {% endif %}
@@ -97,9 +98,11 @@
               <td>Multiple Translations</td>
               <td>Multiple Analyses</td>
               <td></td>
+              <td></td>
             {% else %}
               {{ macros.td_suggestion_translation(user, suggestion, suggestions) }}
               {{ macros.td_suggestion_analysis(user, suggestion, suggestions) }}
+              {{ macros.td_suggestion_source(user, suggestion, suggestions) }}
               {% if auth %}
               <td>
                   {% set analysis = suggestions[suggestion]["matches"][0]["analysis"] %}
@@ -111,8 +114,9 @@
         {% if suggestions[suggestion]['len'] > 1 %}
           {% for match in suggestions[suggestion]['matches'] %}
             <tr>
-            <td>{{ match['translations'] }}</td>
+            <td>{{ match['translation'] }}</td>
             <td>{{ match['analysis'] }}</td>
+            <td>{{ match['source'] }}</td>
             {% if auth %}
             <td>
                 {% set analysis = match["analysis"] %}

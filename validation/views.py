@@ -49,10 +49,21 @@ from django.db.models import Q, QuerySet
 
 from librecval.normalization import to_indexable_form
 
-from .crude_views import *
 from .models import Phrase, Recording, Speaker, RecordingSession, Issue
-from .helpers import get_distance_with_translations, perfect_match, exactly_one_analysis
-from .forms import EditSegment, Login, Register, FlagSegment
+from .forms import (
+    EditSegment,
+    Login,
+    Register,
+    FlagSegment,
+    EditIssueWithRecording,
+    EditIssueWithPhrase,
+)
+from .helpers import (
+    get_distance_with_translations,
+    perfect_match,
+    exactly_one_analysis,
+    normalize_img_name,
+)
 
 
 def index(request):
@@ -205,6 +216,7 @@ def advanced_search_results(request):
     transcription = request.GET.get("transcription")
     translation = request.GET.get("translation")
     analysis = request.GET.get("analysis")
+    kind = request.GET.get("kind")
     status = request.GET.get("status")
     speakers = request.GET.getlist("speaker-options")
     quality = request.GET.get("quality")
@@ -221,6 +233,10 @@ def advanced_search_results(request):
         filter_query.append(Q(analysis__contains=analysis))
     if status and status != "all":
         filter_query.append(Q(status=status))
+
+    if kind and kind != "all":
+        filter_kind = Phrase.WORD if kind == "word" else Phrase.SENTENCE
+        filter_query.append(Q(kind=filter_kind))
 
     if filter_query:
         phrase_matches = Phrase.objects.filter(
@@ -261,6 +277,7 @@ def advanced_search_results(request):
             "translation": translation,
             "analysis": analysis,
             "status": status,
+            "kind": kind,
         }
     )
     for speaker in speakers:
@@ -342,9 +359,7 @@ def search_recordings(request, query):
         )
         results = exclude_known_bad_recordings(all_matches)
 
-        recordings.extend(
-            create_recording_result_json(request, recording) for recording in results
-        )
+        recordings.extend(recording.as_json(request) for recording in results)
 
     response = JsonResponse(recordings, safe=False)
 
@@ -371,8 +386,7 @@ def bulk_search_recordings(request: HttpRequest):
 
         if results:
             matched_recordings.extend(
-                create_recording_result_json(request, recording)
-                for recording in results
+                recording.as_json(request) for recording in results
             )
         else:
             not_found.append(term)
@@ -400,13 +414,15 @@ def segment_content_view(request, segment_id):
     """
     if request.method == "POST":
         form = EditSegment(request.POST)
-        og_phrase = Phrase.objects.filter(id=segment_id)[0]
+        og_phrase = Phrase.objects.get(id=segment_id)
         phrase_id = og_phrase.id
         if form.is_valid():
-            transcription = form.cleaned_data["cree"] or og_phrase.transcription
-            translation = form.cleaned_data["translation"] or og_phrase.translation
-            analysis = form.cleaned_data["analysis"] or og_phrase.analysis
-            p = Phrase.objects.filter(id=phrase_id)[0]
+            transcription = form.cleaned_data["cree"].strip() or og_phrase.transcription
+            translation = (
+                form.cleaned_data["translation"].strip() or og_phrase.translation
+            )
+            analysis = form.cleaned_data["analysis"].strip() or og_phrase.analysis
+            p = Phrase.objects.get(id=phrase_id)
             p.transcription = transcription
             p.translation = translation
             p.analysis = analysis
@@ -433,6 +449,7 @@ def segment_content_view(request, segment_id):
         form=form,
         history=history,
         auth=auth,
+        is_linguist=user_is_linguist(request.user),
     )
 
     return render(request, "validation/segment_details.html", context)
@@ -484,7 +501,104 @@ def register(request):
     return render(request, "validation/register.html", context)
 
 
-# TODO: Speaker bio page like https://ojibwe.lib.umn.edu/about/voices
+def view_issues(request):
+    issues = Issue.objects.filter(status=Issue.OPEN).order_by("id")
+    context = dict(
+        issues=issues,
+        auth=request.user.is_authenticated,
+        is_linguist=user_is_linguist(request.user),
+    )
+    return render(request, "validation/view_issues.html", context)
+
+
+def view_issue_detail(request, issue_id):
+    issue = Issue.objects.get(id=issue_id)
+
+    form = None
+    if issue.recording:
+        form = EditIssueWithRecording(request.POST)
+        if request.method == "POST" and form.is_valid():
+            return handle_save_issue_with_recording(form, issue, request)
+
+    if issue.phrase:
+        form = EditIssueWithPhrase(request.POST)
+        if request.method == "POST" and form.is_valid():
+            return handle_save_issue_with_phrase(form, issue, request)
+
+    context = dict(
+        issue=issue,
+        form=form,
+        auth=request.user.is_authenticated,
+        is_linguist=user_is_linguist(request.user),
+    )
+    return render(request, "validation/view_issue_detail.html", context)
+
+
+def close_issue(request, issue_id):
+    issue = Issue.objects.filter(id=issue_id).first()
+    issue.status = Issue.RESOLVED
+    issue.save()
+
+    return HttpResponseRedirect("/issues")
+
+
+def speaker_view(request, speaker_code):
+    speaker = Speaker.objects.get(code=speaker_code)
+    if speaker:
+        full_name = speaker.full_name
+        gender = speaker.gender or ""
+
+        image_name = full_name.replace(" ", "") + ".jpg"
+        image_name = normalize_img_name(image_name)
+        image_url = Path(f"/static/images/speakers/{image_name}")
+        if not Path(
+            f"validation/{settings.STATIC_URL}images/speakers/{image_name}"
+        ).exists():
+            image_url = Path("/static/images/missing.png")
+    else:
+        full_name = f"No speaker found for speaker code {speaker_code}"
+        gender = ""
+        image_url = "#"
+
+    context = dict(
+        full_name=full_name,
+        img_src=image_url,
+        auth=request.user.is_authenticated,
+        speaker=speaker,
+    )
+    return render(request, "validation/speaker_view.html", context)
+
+
+def all_speakers(request):
+    speakers = []
+    speaker_objects = Speaker.objects.all()
+    for speaker in speaker_objects:
+        if "E-" in speaker.code or "ELICIT" in speaker.code:
+            continue
+
+        full_name = speaker.full_name
+
+        image_name = full_name.replace(" ", "") + ".jpg"
+        image_name = normalize_img_name(image_name)
+        image_url = f"/static/images/speakers/{image_name}"
+        if not Path(
+            f"validation/{settings.STATIC_URL}images/speakers/{image_name}"
+        ).exists():
+            image_url = Path("/static/images/missing.jpg")
+
+        speaker_dict = dict(
+            full_name=full_name,
+            code=speaker.code,
+            img_src=image_url,
+            bio=speaker.eng_bio_text or "",
+        )
+        speakers.append(speaker_dict)
+
+    context = dict(speakers=speakers, auth=request.user.is_authenticated)
+    return render(request, "validation/all_speakers.html", context)
+
+
+# Internal API endpoints
 
 
 @login_required()
@@ -568,7 +682,7 @@ def save_wrong_word(request, recording_id):
     comment = "This is the wrong word."
 
     if suggestion:
-        comment += "The word is actually: " + suggestion
+        comment += " The word is actually: " + suggestion
 
     new_issue = Issue(
         recording=rec,
@@ -591,6 +705,66 @@ def save_wrong_word(request, recording_id):
         response["Location"] = "/"
 
     return response
+
+
+# Small Helper functions
+
+
+def handle_save_issue_with_recording(form, issue, request):
+    rec = Recording.objects.get(id=issue.recording.id)
+
+    speaker_code = form.cleaned_data["speaker"]
+    if speaker_code:
+        speaker = Speaker.objects.get(code=speaker_code)
+        rec.speaker = speaker
+
+    new_word = form.cleaned_data["phrase"].strip()
+    if new_word:
+        new_phrase = Phrase.objects.filter(transcription=new_word).first()
+        if not new_phrase:
+            new_phrase = Phrase(
+                field_transcription=new_word,
+                transcription=new_word,
+                translation="",
+                kind="Sentence" if " " in new_word else "Word",
+                date=datetime.datetime.now(),
+                modifier=str(request.user),
+            )
+            new_phrase.save()
+        rec.phrase_id = new_phrase.id
+
+    rec.wrong_word = False
+    rec.wrong_speaker = False
+    rec.save()
+
+    issue.status = Issue.RESOLVED
+    issue.save()
+    return HttpResponseRedirect("/issues")
+
+
+def handle_save_issue_with_phrase(form, issue, request):
+    phrase = Phrase.objects.get(id=issue.phrase.id)
+
+    transcription = form.cleaned_data["transcription"].strip()
+    translation = form.cleaned_data["translation"].strip()
+
+    if transcription:
+        phrase.transcription = transcription
+        if " " in transcription:
+            phrase.kind = Phrase.SENTENCE
+        else:
+            phrase.kind = Phrase.WORD
+    if translation:
+        phrase.translation = translation
+
+    phrase.status = "linked"
+    phrase.modifier = str(request.user)
+    phrase.date = datetime.datetime.now()
+    phrase.save()
+
+    issue.status = Issue.RESOLVED
+    issue.save()
+    return HttpResponseRedirect("/issues")
 
 
 def encode_query_with_page(query, page):
@@ -644,46 +818,6 @@ def save_issue(data, user):
     )
 
     new_issue.save()
-
-
-def create_recording_result_json(request: HttpRequest, rec: Recording):
-    """
-    Returns JSON that API clients expect for a single recording.
-    """
-    return {
-        "wordform": rec.phrase.transcription,
-        "speaker": rec.speaker.code,
-        "speaker_name": rec.speaker.full_name,
-        "anonymous": rec.speaker.anonymous,
-        "gender": rec.speaker.gender,
-        "dialect": rec.speaker.dialect,
-        "recording_url": make_absolute_uri_for_recording(request, rec),
-        "speaker_bio_url": make_absolute_uri_for_speaker_bio(rec.speaker),
-    }
-
-
-def make_absolute_uri_for_speaker_bio(speaker: Speaker) -> str:
-    """
-    Returns a URL for where to find the speaker bio.
-    """
-    # TODO: Change this when implementing:
-    # https://github.com/UAlbertaALTLab/recording-validation-interface/issues/72
-    return f"https://www.altlab.dev/maskwacis/Speakers/{speaker.code}.html"
-
-
-def make_absolute_uri_for_recording(request: HttpRequest, rec: Recording) -> str:
-    """
-    Returns an absolute URL for the compressed audio recording.
-    This can be directly used in an <audio> tag to hear the recording on a webpage!
-    """
-    uri = rec.compressed_audio.url
-    if uri.startswith("/"):
-        # It's a relative URI: build an absolute URI:
-        return request.build_absolute_uri(uri)
-
-    # It's an absolute URI already:
-    assert uri.startswith(("http://", "https://"))
-    return uri
 
 
 def exclude_known_bad_recordings(recordings: QuerySet):
