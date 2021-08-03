@@ -20,8 +20,8 @@ class Command(BaseCommand):
 
         call_command("migrate", verbosity=0)
 
-        import_test_phrases()
         create_test_users()
+        import_test_phrases()
 
 
 def import_test_phrases():
