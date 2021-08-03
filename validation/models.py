@@ -21,6 +21,7 @@ import unicodedata
 from pathlib import Path
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.signals import pre_save
@@ -30,6 +31,9 @@ from simple_history.models import HistoricalRecords
 
 from librecval.normalization import normalize_sro, to_indexable_form, normalize_phrase
 from librecval.recording_session import Location, SessionID, TimeOfDay
+
+
+User = get_user_model()
 
 
 def choices_from_enum(enum_class):
@@ -281,9 +285,6 @@ class Speaker(models.Model):
         # XXX: For now, all speakers are NOT anonymous.
         return False
 
-    # TODO: add field for speaker bio (en)
-    # TODO: add field for speaker bio (crk)
-
     def clean(self):
         self.code = self.code.strip().upper()
         if not re.match(r"\A[A-Z]+[0-9]?\Z", self.code):
@@ -516,8 +517,27 @@ class Issue(models.Model):
         max_length=64,
     )
 
+    created_by_reference = models.ForeignKey(
+        User,
+        help_text="Reference to user who filed the Issue",
+        on_delete=models.PROTECT,
+        related_name="user_created_by",
+    )
+
     created_on = models.DateField(
         help_text="When was this issue filed?",
+    )
+
+    modified_by = models.ForeignKey(
+        User,
+        help_text="The user who last modified the issue",
+        on_delete=models.DO_NOTHING,
+        related_name="user_modified_by",
+        null=True,
+    )
+
+    modified_on = models.DateField(
+        help_text="When was this issue last modified?", null=True
     )
 
     RESOLVED = "resolved"
@@ -530,6 +550,8 @@ class Issue(models.Model):
         choices=STATUS_CHOICES,
         default=OPEN,
     )
+
+    history = HistoricalRecords()
 
 
 # ############################### Utilities ############################### #

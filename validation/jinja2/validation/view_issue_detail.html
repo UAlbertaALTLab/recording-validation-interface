@@ -50,8 +50,9 @@
                 {% if issue.suggested_english %}
                     English spelling suggestion: {{ issue.suggested_english }}<br>
                 {% endif %}
-            This issue was filed by {{ issue.created_by }} on
+            This issue was filed by {{ issue.created_by_reference }} on
             {{ issue.created_on }}<br>
+
         </section>
 
         <section style="flex: 1">

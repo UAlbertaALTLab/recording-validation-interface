@@ -655,6 +655,7 @@ def save_wrong_speaker_code(request, recording_id):
         recording=rec,
         comment=comment,
         created_by=request.user,
+        created_by_reference=request.user,
         created_on=datetime.datetime.now(),
     )
     new_issue.save()
@@ -689,6 +690,7 @@ def save_wrong_word(request, recording_id):
         suggested_cree=suggestion,
         comment=comment,
         created_by=request.user,
+        created_by_reference=request.user,
         created_on=datetime.datetime.now(),
     )
     new_issue.save()
@@ -738,6 +740,8 @@ def handle_save_issue_with_recording(form, issue, request):
     rec.save()
 
     issue.status = Issue.RESOLVED
+    issue.modified_by = request.user
+    issue.modified_on = datetime.datetime.now()
     issue.save()
     return HttpResponseRedirect("/issues")
 
@@ -763,6 +767,8 @@ def handle_save_issue_with_phrase(form, issue, request):
     phrase.save()
 
     issue.status = Issue.RESOLVED
+    issue.modified_by = request.user
+    issue.modified_on = datetime.datetime.now()
     issue.save()
     return HttpResponseRedirect("/issues")
 
@@ -814,6 +820,7 @@ def save_issue(data, user):
         suggested_cree=cree_suggestion,
         suggested_english=english_suggestion,
         created_by=user,
+        created_by_reference=user,
         created_on=datetime.datetime.now(),
     )
 
