@@ -728,7 +728,7 @@ def handle_save_issue_with_recording(form, issue, request):
                 field_transcription=new_word,
                 transcription=new_word,
                 translation="",
-                kind="Sentence" if " " in new_word else "Word",
+                kind=Phrase.SENTENCE if " " in new_word else Phrase.WORD,
                 date=datetime.datetime.now(),
                 modifier=str(request.user),
             )
