@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "cypress": "^6.3.0",
+    "recorderjs": "^1.0.1",
     "tailwindcss": "^2.0.3"
   }
 }

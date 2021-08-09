@@ -707,6 +707,10 @@ def save_wrong_word(request, recording_id):
     return response
 
 
+def record_audio(request):
+    return render(request, "validation/record_audio.html")
+
+
 # Small Helper functions
 
 
