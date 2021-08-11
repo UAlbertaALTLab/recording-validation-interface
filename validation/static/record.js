@@ -67,7 +67,7 @@ function stopRecording() {
     // pauseButton.innerHTML = "Pause";
     rec.stop();
     gumStream.getAudioTracks()[0].stop();
-    rec.exportWAV(createDownloadLink);
+    rec.exportWAV(createDownloadLink, "audio/mp4");
 }
 
 function createDownloadLink(blob) {
@@ -77,6 +77,7 @@ function createDownloadLink(blob) {
     // let dlButton = document.createElement('button');     // Button to download audio--not sure if we want this feature
     au.controls = true;
     au.src = url;
+
 
     // dlButton.classList.add("button");
     // dlButton.classList.add("button--success");
