@@ -1,5 +1,7 @@
 "use strict";
 
+// referencing: https://blog.addpipe.com/using-recorder-js-to-capture-wav-audio-in-your-html5-web-site/
+
 let gumStream;      // stream from getUserMedia()
 let rec;            // Recorder.js object
 let input;          // MediaStreamAudioSourceNode
