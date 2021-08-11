@@ -23,8 +23,6 @@ import json
 import operator
 from functools import reduce
 from pathlib import Path
-import random
-from tempfile import TemporaryDirectory
 
 from django.conf import settings
 from django.contrib.auth import authenticate
@@ -48,10 +46,8 @@ from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 from django.core.mail import mail_admins
 from django.db.models import Q, QuerySet
-from pydub import AudioSegment
 
 from librecval.normalization import to_indexable_form
-from librecval.transcode_recording import transcode_to_aac
 
 from .models import Phrase, Recording, Speaker, RecordingSession, Issue
 from .forms import (
@@ -911,12 +907,16 @@ def exclude_known_bad_recordings(recordings: QuerySet):
 
 
 def create_new_rec_id(phrase, speaker):
+    # Generate a unique ID for all user-submitted recordings
+    # Since these don't have a timestamp or a session,
+    # we use datetime.datetime.now().microsecond to add a truly unique element
+    # to each signature
     signature = (
         f"speaker: {speaker}\n"
         f"timestamp: 0\n"
         f"{phrase.kind}: {phrase.transcription}\n"
         "\n"
         f"{phrase.translation}\n"
-        f"{random.randint(0,256)}\n"
+        f"{datetime.datetime.now().microsecond}\n"
     )
     return sha256(signature.encode("UTF-8")).hexdigest()
