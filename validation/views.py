@@ -24,6 +24,7 @@ import operator
 from functools import reduce
 from pathlib import Path
 import random
+from tempfile import TemporaryDirectory
 
 from django.conf import settings
 from django.contrib.auth import authenticate
@@ -47,8 +48,10 @@ from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 from django.core.mail import mail_admins
 from django.db.models import Q, QuerySet
+from pydub import AudioSegment
 
 from librecval.normalization import to_indexable_form
+from librecval.transcode_recording import transcode_to_aac
 
 from .models import Phrase, Recording, Speaker, RecordingSession, Issue
 from .forms import (
@@ -77,9 +80,17 @@ def index(request):
     is_expert = user_is_expert(request.user)
 
     mode = request.GET.get("mode")
+    mode_options = {
+        "auto-standardized": Phrase.AUTO,
+        "new": Phrase.NEW,
+        "linked": Phrase.LINKED,
+        "user-submitted": Phrase.USER,
+    }
+    if mode and mode != "all":
+        mode = mode_options[mode]
 
     if mode == "all" or not mode:
-        all_phrases = Phrase.objects.all()
+        all_phrases = Phrase.objects.exclude(status=Phrase.USER)
     else:
         all_phrases = Phrase.objects.filter(status=mode)
 
@@ -147,11 +158,15 @@ def search_phrases(request):
     is_expert = user_is_expert(request.user)
 
     query = request.GET.get("query")
-    all_matches = Phrase.objects.filter(
-        Q(transcription__contains=query)
-        | Q(fuzzy_transcription__contains=to_indexable_form(query))
-        | Q(translation__contains=query)
-    ).prefetch_related("recording_set__speaker")
+    all_matches = (
+        Phrase.objects.filter(
+            Q(transcription__contains=query)
+            | Q(fuzzy_transcription__contains=to_indexable_form(query))
+            | Q(translation__contains=query)
+        )
+        .exclude(status=Phrase.USER)
+        .prefetch_related("recording_set__speaker")
+    )
     all_matches = list(all_matches)
     all_matches.sort(key=lambda phrase: phrase.transcription)
 
@@ -222,6 +237,15 @@ def advanced_search_results(request):
     status = request.GET.get("status")
     speakers = request.GET.getlist("speaker-options")
     quality = request.GET.get("quality")
+
+    if status and status != "all":
+        status_choices = {
+            "new": Phrase.NEW,
+            "linked": Phrase.LINKED,
+            "auto-validated": Phrase.AUTO,
+            "user-submitted": Phrase.USER,
+        }
+        status = status_choices[status]
 
     filter_query = []
     if transcription:
@@ -738,10 +762,10 @@ def record_audio(request):
             )
             speaker.save()
 
-        id = create_new_rec_id(phrase, speaker)
-
+        _id = create_new_rec_id(phrase, speaker)
+        audio_data.name = _id + ".m4a"
         rec = Recording(
-            id=id,
+            id=_id,
             compressed_audio=audio_data,
             speaker=speaker,
             phrase=phrase,
@@ -750,11 +774,6 @@ def record_audio(request):
             is_user_submitted=True,
         )
         rec.save()
-        print("Saved new recording")
-        # TODO: convert audio to .m4a
-        # TODO: save audio to disk as .m4a
-        # TODO: don't show user-created recordings in the main interface
-        # TODO: make the front-end prettier pls
         return HttpResponseRedirect("/secrets/record_audio")
     else:
         form = RecordNewPhrase()

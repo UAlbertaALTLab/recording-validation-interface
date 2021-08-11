@@ -25,7 +25,9 @@
     <label for="linked">Linked</label>
     {% if is_linguist %}
         <input type="radio" id="auto-val" name="status" value="auto-validated">
-        <label for="auto-val">Auto-validated</label> <br>
+        <label for="auto-val">Auto-validated</label>
+        <input type="radio" id="user-sub" name="status" value="user-submitted">
+        <label for="user-sub">User-submitted</label> <br>
     {% else %}
         <br>
     {% endif %}

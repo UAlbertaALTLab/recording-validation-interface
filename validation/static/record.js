@@ -1,23 +1,29 @@
 "use strict";
 
-var gumStream;      // stream from getUserMedia()
-var rec;            // Recorder.js object
-var input;          // MediaStreamAudioSourceNode
-var AudioContext = window.AudioContext;
-var audioContext = new AudioContext;
-var recordButton = document.getElementById("recordButton");
-var stopButton = document.getElementById("stopButton");
-var pauseButton = document.getElementById("pauseButton");
-var recordingsList = document.getElementById("recordingsList");
+let gumStream;      // stream from getUserMedia()
+let rec;            // Recorder.js object
+let input;          // MediaStreamAudioSourceNode
+const AudioContext = window.AudioContext;
+let audioContext = new AudioContext;
+let recordButton = document.getElementById("recordButton");
+let stopButton = document.getElementById("stopButton");
+// TODO: do we want a pause button??
+// let pauseButton = document.getElementById("pauseButton");
+let recordingsList = document.getElementById("recordingsList");
+let recNewEntryButton = document.getElementById("recNewEntryButton");
 
 recordButton.addEventListener("click", startRecording)
 stopButton.addEventListener("click", stopRecording)
-pauseButton.addEventListener("click", pauseRecording)
+// pauseButton.addEventListener("click", pauseRecording)
+recNewEntryButton.addEventListener("click", reloadPage)
+
+
+function reloadPage() {
+    window.location.reload(true);
+}
 
 
 function startRecording() {
-    console.log("recordButton pressed")
-
     const constraints = {
         audio: true,
         video: false,
@@ -25,63 +31,67 @@ function startRecording() {
 
     recordButton.disabled = true;
     stopButton.disabled = false;
-    pauseButton.disabled = false;
+    // pauseButton.disabled = false;
 
     navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
-        console.log("getUserMedia() success, stream created, initializing Recorder.js");
         gumStream = stream;
         input = audioContext.createMediaStreamSource(stream);
         rec = new Recorder(input);
         rec.record()
-        console.log("Recording started");
+        recordButton.innerHTML = "Recording...";
     }).catch(function (err) {
         recordButton.disabled = false;
         stopButton.disabled = true;
-        pauseButton.disabled = true;
+        // pauseButton.disabled = true;
     });
 }
 
 function pauseRecording() {
-    console.log("pauseButton clicked rec.recording=", rec.recording);
     if (rec.recording) {
         rec.stop();
-        pauseButton.innerHTML = "Resume";
+        // pauseButton.innerHTML = "Resume";
     } else {
         rec.record()
-        pauseButton.innerHTML = "Pause";
+        // pauseButton.innerHTML = "Pause";
     }
 }
 
 function stopRecording() {
-    console.log("stopButton clicked");
+    recordButton.innerHTML = "Record";
     stopButton.disabled = true;
     recordButton.disabled = false;
-    pauseButton.disabled = true;
+    // pauseButton.disabled = true;
 
-    pauseButton.innerHTML = "Pause";
+    // pauseButton.innerHTML = "Pause";
     rec.stop();
     gumStream.getAudioTracks()[0].stop();
     rec.exportWAV(createDownloadLink);
 }
 
 function createDownloadLink(blob) {
-    var url = URL.createObjectURL(blob);
-    var au = document.createElement('audio');
-    var li = document.createElement('li');
-    var link = document.createElement('a');
+    let url = URL.createObjectURL(blob);
+    let au = document.createElement('audio');
+    let li = document.createElement('li');
+    // let dlButton = document.createElement('button');     // Button to download audio--not sure if we want this feature
     au.controls = true;
     au.src = url;
 
-    link.href = url;
-    link.download = new Date().toISOString() + '.wav'
-    link.innerHTML = link.download;
+    // dlButton.classList.add("button");
+    // dlButton.classList.add("button--success");
+    // dlButton.classList.add("button--small");
+    // dlButton.href = url;
+    // dlButton.download = new Date().toISOString() + '.wav'
+    // dlButton.innerHTML = "Download";
 
     li.appendChild(au);
-    li.appendChild(link);
+    // li.appendChild(dlButton);
 
-    var filename = new Date().toISOString();
-    var upload = document.createElement('a');
+    let filename = new Date().toISOString();
+    let upload = document.createElement('button');
     upload.href = '#';
+    upload.classList.add("button");
+    upload.classList.add("button--success");
+    upload.classList.add("button--small");
     upload.innerHTML = "Save";
     upload.addEventListener("click", async function(event) {
         let fd = new FormData();
@@ -99,11 +109,14 @@ function createDownloadLink(blob) {
             body: fd
         })
 
-        console.log(response)
+        if (response.status == 200) {
+            upload.innerHTML = "Saved &#x2713;";
+        }
+
     })
 
     li.appendChild(document.createTextNode(" "));
     li.appendChild(upload);
 
-    recordingsList.appendChild(li)
+    recordingsList.appendChild(li);
 }

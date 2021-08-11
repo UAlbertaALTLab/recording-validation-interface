@@ -78,7 +78,7 @@ class Phrase(models.Model):
     LINKED = "linked"
     VALIDATED = "validated"
     REVIEW = "needs review"
-    USER = "user submitted"
+    USER = "user-submitted"
 
     STATUS_CHOICES = (
         (NEW, "New"),
