@@ -87,7 +87,7 @@ class Phrase(models.Model):
         (LINKED, "Linked"),
         (VALIDATED, "Validated"),
         (REVIEW, "Needs review"),
-        (USER, "User submitted"),
+        (USER, "User-submitted"),
     )
 
     MASKWACÎS_DICTIONARY = "MD"
