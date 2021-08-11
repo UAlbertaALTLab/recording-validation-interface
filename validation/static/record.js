@@ -1,6 +1,5 @@
 "use strict";
 
-URL = window.URL;
 var gumStream;      // stream from getUserMedia()
 var rec;            // Recorder.js object
 var input;          // MediaStreamAudioSourceNode
@@ -19,7 +18,7 @@ pauseButton.addEventListener("click", pauseRecording)
 function startRecording() {
     console.log("recordButton pressed")
 
-    var constraints = {
+    const constraints = {
         audio: true,
         video: false,
     }
@@ -56,7 +55,7 @@ function pauseRecording() {
 function stopRecording() {
     console.log("stopButton clicked");
     stopButton.disabled = true;
-    recordButton.disables = false;
+    recordButton.disabled = false;
     pauseButton.disabled = true;
 
     pauseButton.innerHTML = "Pause";
@@ -83,18 +82,24 @@ function createDownloadLink(blob) {
     var filename = new Date().toISOString();
     var upload = document.createElement('a');
     upload.href = '#';
-    upload.innerHTML = "Upload";
-    upload.addEventListener("click", function(event) {
-        var xhr = new XMLHttpRequest();
-        xhr.onload = function(e) {
-            if (this.readyState === 4) {
-                console.log("Server returned: ", e.target.responseText);
-            }
-        };
-        var fd = new FormData();
+    upload.innerHTML = "Save";
+    upload.addEventListener("click", async function(event) {
+        let fd = new FormData();
         fd.append("audio_data", blob, filename);
-        xhr.open("POST", "/static/upload.php", true);
-        xhr.send(fd);
+        let translation = document.getElementById("id_translation").value
+        let transcription = document.getElementById("id_transcription").value
+        fd.append("translation", translation)
+        fd.append("transcription", transcription)
+        const response = await fetch(`/secrets/record_audio`, {
+            method: 'POST',
+            mode: 'same-origin',    // Do not send CSRF token to another domain.
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            body: fd
+        })
+
+        console.log(response)
     })
 
     li.appendChild(document.createTextNode(" "));

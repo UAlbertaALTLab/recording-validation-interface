@@ -144,3 +144,23 @@ class EditIssueWithPhrase(forms.ModelForm):
     class Meta:
         model = Phrase
         fields = ["transcription", "translation"]
+
+
+class RecordNewPhrase(forms.ModelForm):
+    transcription = forms.CharField(
+        max_length=256,
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control form-restrict"}),
+    )
+
+    translation = forms.CharField(
+        max_length=256,
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control form-restrict"}),
+    )
+
+    file = forms.FileField(widget=forms.HiddenInput())
+
+    class Meta:
+        model = Recording
+        fields = []

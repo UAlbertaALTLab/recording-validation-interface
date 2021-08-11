@@ -15,7 +15,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+from hashlib import sha256
 from http import HTTPStatus
 import datetime
 import io
@@ -23,6 +23,7 @@ import json
 import operator
 from functools import reduce
 from pathlib import Path
+import random
 
 from django.conf import settings
 from django.contrib.auth import authenticate
@@ -57,6 +58,7 @@ from .forms import (
     FlagSegment,
     EditIssueWithRecording,
     EditIssueWithPhrase,
+    RecordNewPhrase,
 )
 from .helpers import (
     get_distance_with_translations,
@@ -707,8 +709,56 @@ def save_wrong_word(request, recording_id):
     return response
 
 
+@login_required()
 def record_audio(request):
-    return render(request, "validation/record_audio.html")
+    if request.method == "POST":
+        form = RecordNewPhrase(request.POST, request.FILES)
+        translation = request.POST.get("translation")
+        transcription = request.POST.get("transcription")
+        audio_data = request.FILES["audio_data"]
+
+        phrase = Phrase.objects.filter(transcription=transcription).first()
+        if not phrase:
+            phrase = Phrase(
+                translation=translation,
+                field_transcription=transcription,
+                transcription=transcription,
+                kind=Phrase.SENTENCE if " " in transcription else Phrase.WORD,
+                status=Phrase.USER,
+                date=datetime.datetime.now(),
+                modifier=request.user,
+            )
+            phrase.save()
+
+        speaker = Speaker.objects.filter(user=request.user).first()
+        if not speaker:
+            speaker = Speaker(
+                full_name=request.user.first_name + " " + request.user.last_name,
+                code=request.user.first_name[:3].upper(),
+            )
+            speaker.save()
+
+        id = create_new_rec_id(phrase, speaker)
+
+        rec = Recording(
+            id=id,
+            compressed_audio=audio_data,
+            speaker=speaker,
+            phrase=phrase,
+            timestamp=0,
+            comment=f"Uploaded by user: {request.user}",
+            is_user_submitted=True,
+        )
+        rec.save()
+        print("Saved new recording")
+        # TODO: convert audio to .m4a
+        # TODO: save audio to disk as .m4a
+        # TODO: don't show user-created recordings in the main interface
+        # TODO: make the front-end prettier pls
+        return HttpResponseRedirect("/secrets/record_audio")
+    else:
+        form = RecordNewPhrase()
+    return render(request, "validation/record_audio.html", {"form": form})
 
 
 # Small Helper functions
@@ -839,3 +889,15 @@ def exclude_known_bad_recordings(recordings: QuerySet):
         # speaker shows up in API results.
         .exclude(speaker__gender__isnull=True)
     )
+
+
+def create_new_rec_id(phrase, speaker):
+    signature = (
+        f"speaker: {speaker}\n"
+        f"timestamp: 0\n"
+        f"{phrase.kind}: {phrase.transcription}\n"
+        "\n"
+        f"{phrase.translation}\n"
+        f"{random.randint(0,256)}\n"
+    )
+    return sha256(signature.encode("UTF-8")).hexdigest()
