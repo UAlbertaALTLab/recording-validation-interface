@@ -218,6 +218,7 @@ MEDIA_URL = config("MEDIA_URL", default="/media/")
 MEDIA_ROOT = config("MEDIA_ROOT", default=BASE_DIR / "data", cast=str)
 
 LOGIN_REDIRECT_URL = "/"
+LOGIN_URL = '/login'
 
 ITWEWINA_URL = "https://itwewina.altlab.app/"
 
