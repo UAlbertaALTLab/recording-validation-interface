@@ -779,6 +779,8 @@ def record_audio(request):
         rec.compressed_audio = dest
         rec.save()
 
+        save_metadata_to_file(rec_id, request.user, transcription, translation)
+
         context = dict(
             form=form,
             auth=request.user.is_authenticated,
@@ -940,3 +942,26 @@ def create_new_rec_id(phrase, speaker):
         f"{time.time()}\n"
     )
     return sha256(signature.encode("UTF-8")).hexdigest()
+
+
+def save_metadata_to_file(rec_id, user, transcription, translation):
+    dest = (
+        settings.MEDIA_ROOT
+        + "/"
+        + settings.RECVAL_AUDIO_PREFIX
+        + "metadata/"
+        + rec_id
+        + ".json"
+    )
+    data = {
+        "audio_file_name": rec_id + ".wav",
+        "user_id": user.id,
+        "username": user.username,
+        "full_name": user.first_name + " " + user.last_name,
+        "recorded_on": str(datetime.datetime.now()),
+        "transcription": transcription,
+        "translation": translation,
+        "dialect": "Plains Cree",
+    }
+    with open(dest, "w+") as f:
+        json.dump(data, f)
