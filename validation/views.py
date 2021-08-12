@@ -958,7 +958,7 @@ def save_metadata_to_file(rec_id, user, transcription, translation):
         "user_id": user.id,
         "username": user.username,
         "full_name": user.first_name + " " + user.last_name,
-        "recorded_on": str(datetime.datetime.now()),
+        "recorded_on": str(datetime.datetime.now().astimezone()),
         "transcription": transcription,
         "translation": translation,
         "dialect": "Plains Cree",
