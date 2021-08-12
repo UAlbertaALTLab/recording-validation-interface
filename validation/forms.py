@@ -164,3 +164,8 @@ class RecordNewPhrase(forms.ModelForm):
     class Meta:
         model = Recording
         fields = []
+
+    def __init__(self, *args, **kwargs):
+        super(RecordNewPhrase, self).__init__(*args, **kwargs)
+        self.fields["transcription"].label = "Cree"
+        self.fields["translation"].label = "English"
