@@ -34,8 +34,10 @@
         <input type="radio" id="filter-linked" name="mode" value="linked">
         <label for="filter-linked"> Linked</label>
         {% if is_linguist %}
-            <input type="radio" id="filter-auto" name="mode" value="auto-validated">
+            <input type="radio" id="filter-auto" name="mode" value="auto-standardized">
             <label for="filter-auto"> Auto-Validated</label>
+            <input type="radio" id="filter-user" name="mode" value="user-submitted">
+            <label for="filter-user"> User-Submitted</label>
         {% endif %}
     </div>
   <div class="filter">

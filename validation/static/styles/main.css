@@ -127,3 +127,7 @@ a:hover {
    -webkit-line-clamp: 4; /* number of lines to show */
    -webkit-box-orient: vertical;
 }
+
+.space {
+  margin: 0.5rem;
+}
