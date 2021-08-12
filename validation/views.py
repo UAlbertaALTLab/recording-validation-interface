@@ -15,7 +15,9 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+import subprocess
+import time
+from hashlib import sha256
 from http import HTTPStatus
 import datetime
 import io
@@ -28,6 +30,7 @@ from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as django_login
 from django.contrib.auth.models import User
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.paginator import Paginator
 from django.http import (
     FileResponse,
@@ -57,6 +60,7 @@ from .forms import (
     FlagSegment,
     EditIssueWithRecording,
     EditIssueWithPhrase,
+    RecordNewPhrase,
 )
 from .helpers import (
     get_distance_with_translations,
@@ -75,9 +79,17 @@ def index(request):
     is_expert = user_is_expert(request.user)
 
     mode = request.GET.get("mode")
+    mode_options = {
+        "auto-standardized": Phrase.AUTO,
+        "new": Phrase.NEW,
+        "linked": Phrase.LINKED,
+        "user-submitted": Phrase.USER,
+    }
+    if mode and mode != "all":
+        mode = mode_options[mode]
 
     if mode == "all" or not mode:
-        all_phrases = Phrase.objects.all()
+        all_phrases = Phrase.objects.exclude(status=Phrase.USER)
     else:
         all_phrases = Phrase.objects.filter(status=mode)
 
@@ -145,11 +157,15 @@ def search_phrases(request):
     is_expert = user_is_expert(request.user)
 
     query = request.GET.get("query")
-    all_matches = Phrase.objects.filter(
-        Q(transcription__contains=query)
-        | Q(fuzzy_transcription__contains=to_indexable_form(query))
-        | Q(translation__contains=query)
-    ).prefetch_related("recording_set__speaker")
+    all_matches = (
+        Phrase.objects.filter(
+            Q(transcription__contains=query)
+            | Q(fuzzy_transcription__contains=to_indexable_form(query))
+            | Q(translation__contains=query)
+        )
+        .exclude(status=Phrase.USER)
+        .prefetch_related("recording_set__speaker")
+    )
     all_matches = list(all_matches)
     all_matches.sort(key=lambda phrase: phrase.transcription)
 
@@ -220,6 +236,15 @@ def advanced_search_results(request):
     status = request.GET.get("status")
     speakers = request.GET.getlist("speaker-options")
     quality = request.GET.get("quality")
+
+    if status and status != "all":
+        status_choices = {
+            "new": Phrase.NEW,
+            "linked": Phrase.LINKED,
+            "auto-validated": Phrase.AUTO,
+            "user-submitted": Phrase.USER,
+        }
+        status = status_choices[status]
 
     filter_query = []
     if transcription:
@@ -696,6 +721,58 @@ def save_wrong_word(request, recording_id):
     return response
 
 
+@login_required()
+def record_audio(request):
+    if request.method == "POST":
+        form = RecordNewPhrase(request.POST, request.FILES)
+        translation = request.POST.get("translation")
+        transcription = request.POST.get("transcription")
+        audio_data = request.FILES["audio_data"]
+
+        phrase = Phrase.objects.filter(transcription=transcription).first()
+        if not phrase:
+            phrase = Phrase(
+                translation=translation,
+                field_transcription=transcription,
+                transcription=transcription,
+                kind=Phrase.SENTENCE if " " in transcription else Phrase.WORD,
+                status=Phrase.USER,
+                date=datetime.datetime.now(),
+                modifier=request.user,
+            )
+            phrase.save()
+
+        speaker = Speaker.objects.filter(user=request.user).first()
+        if not speaker:
+            speaker = Speaker(
+                full_name=request.user.first_name + " " + request.user.last_name,
+                code=request.user.username,
+            )
+            speaker.save()
+
+        rec_id = create_new_rec_id(phrase, speaker)
+        audio_data.name = rec_id + ".wav"
+        rec = Recording(
+            id=rec_id,
+            compressed_audio=audio_data,
+            speaker=speaker,
+            phrase=phrase,
+            timestamp=0,
+            comment=f"Uploaded by user: {request.user}",
+            is_user_submitted=True,
+        )
+        rec.save()
+        source = settings.RECVAL_AUDIO_PREFIX + rec_id + ".wav"
+        dest = settings.RECVAL_AUDIO_PREFIX + rec_id + ".m4a"
+        subprocess.check_call(["ffmpeg", "-i", source, dest], cwd=settings.MEDIA_ROOT)
+        rec.compressed_audio = dest
+        rec.save()
+        return HttpResponseRedirect("/secrets/record_audio")
+    else:
+        form = RecordNewPhrase()
+    return render(request, "validation/record_audio.html", {"form": form})
+
+
 # Small Helper functions
 
 
@@ -836,3 +913,19 @@ def exclude_known_bad_recordings(recordings: QuerySet):
         # speaker shows up in API results.
         .exclude(speaker__gender__isnull=True)
     )
+
+
+def create_new_rec_id(phrase, speaker):
+    # Generate a unique ID for all user-submitted recordings
+    # Since these don't have a timestamp or a session,
+    # we use time.time() to add a truly unique element
+    # to each signature
+    signature = (
+        f"speaker: {speaker}\n"
+        f"timestamp: 0\n"
+        f"{phrase.kind}: {phrase.transcription}\n"
+        "\n"
+        f"{phrase.translation}\n"
+        f"{time.time()}\n"
+    )
+    return sha256(signature.encode("UTF-8")).hexdigest()

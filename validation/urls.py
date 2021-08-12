@@ -81,6 +81,7 @@ urlpatterns = [
     path(
         "api/bulk_search", views.bulk_search_recordings, name="bulk_search_recordings"
     ),
+    path("secrets/record_audio", views.record_audio, name="record_audio"),
     path(
         "robots.txt",
         TemplateView.as_view(

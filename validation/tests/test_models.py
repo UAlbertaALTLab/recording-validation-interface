@@ -310,7 +310,8 @@ def test_recording():
     assert isinstance(recording.timestamp, int)
     assert 0 <= recording.timestamp < MAX_RECORDING_LENGTH
     assert isinstance(recording.phrase, Phrase)
-    assert isinstance(recording.session, RecordingSession)
+    if recording.session:
+        assert isinstance(recording.session, RecordingSession)
     assert isinstance(recording.speaker, Speaker)
 
     assert hasattr(recording, "history")

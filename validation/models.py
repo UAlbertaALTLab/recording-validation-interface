@@ -21,6 +21,7 @@ import unicodedata
 from pathlib import Path
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.signals import pre_save
@@ -30,6 +31,8 @@ from simple_history.models import HistoricalRecords
 
 from librecval.normalization import normalize_sro, to_indexable_form, normalize_phrase
 from librecval.recording_session import Location, SessionID, TimeOfDay
+
+User = get_user_model()
 
 
 def choices_from_enum(enum_class):
@@ -75,6 +78,7 @@ class Phrase(models.Model):
     LINKED = "linked"
     VALIDATED = "validated"
     REVIEW = "needs review"
+    USER = "user-submitted"
 
     STATUS_CHOICES = (
         (NEW, "New"),
@@ -83,6 +87,7 @@ class Phrase(models.Model):
         (LINKED, "Linked"),
         (VALIDATED, "Validated"),
         (REVIEW, "Needs review"),
+        (USER, "User-submitted"),
     )
 
     MASKWACÎS_DICTIONARY = "MD"
@@ -238,6 +243,13 @@ class Speaker(models.Model):
         help_text="Gender of the voice.",
         max_length=1,
         choices=GENDER_CHOICES,
+        null=True,
+    )
+
+    user = models.ForeignKey(
+        User,
+        help_text="The User object associated with this Speaker, if any",
+        on_delete=models.PROTECT,
         null=True,
     )
 
@@ -422,7 +434,7 @@ class Recording(models.Model):
         help_text="The offset (in milliseconds) when the phrase starts in the master file"
     )
     phrase = models.ForeignKey(Phrase, on_delete=models.CASCADE)
-    session = models.ForeignKey(RecordingSession, on_delete=models.CASCADE)
+    session = models.ForeignKey(RecordingSession, on_delete=models.CASCADE, null=True)
 
     # TODO: determine this automatically during import process
     quality = models.CharField(
@@ -444,6 +456,10 @@ class Recording(models.Model):
 
     wrong_speaker = models.BooleanField(
         help_text="This recording has the wrong speaker", default=False
+    )
+
+    is_user_submitted = models.BooleanField(
+        help_text="This recording was submitted online by a user", default=False
     )
 
     # Keep track of the recording's history.

@@ -1,0 +1,28 @@
+{% extends 'validation/_base.html' %}
+
+{% block content %}
+    <title>Simple Recorder.js demo with record, stop and pause</title>
+    <button id="recNewEntryButton" class="button button--neutral button--right">Record a new Entry</button>
+    <h2>Instructions</h2>
+    <p>Use this page to record or re-record entries in Plains Cree. Start by entering the transcription (in Cree)
+    and the translation (in English) for the word or sentence you are going to record. Try to spell the Cree word(s)
+        as correctly as possible, as these recordings will be added to an existing entry if one exists.</p>
+    <p>Next, click the "Record" button. It will likely ask you permission to use your microphone, please click "Allow". You are now recording, as indicated
+    by the word "Recording..." on the button. When you are finished, press "Stop". Listen to your recording. If you're happy
+    with how it sounds, click "Save" next to that recording. Please record yourself saying this word or phrase up to 3 times,
+    clicking save next to each good recording and ignoring any that you are unhappy with. To record a new word or phrase,
+    click the "Record a new Entry" button.</p>
+    <p>Please note that pressing the "Record a new Entry" button or reloading the page will cause all your current unsaved
+        recordings to disappear, so make sure you're done with them and have saved all the good ones before doing either of those actions.</p>
+    {{ form }}
+    <div id="controls" class="space">
+        <button id="recordButton" class="button button--success">Record</button>
+{#        <button id="pauseButton" class="button button--neutral" disabled>Pause</button>#}
+        <button id="stopButton" class="button button--fail" disabled>Stop</button>
+    </div>
+    <h3>Recordings</h3>
+    <ol id="recordingsList"></ol>
+    <!-- inserting these scripts at the end to be able to use all the elements in the DOM -->
+    <script type="module" src="https://cdn.jsdelivr.net/gh/mattdiamond/Recorderjs@08e7abd99739be6946f19f6806ccb368138f2dd3/dist/recorder.js"></script>
+    <script src="{{ static('record.js') }}"></script>
+{% endblock content %}
