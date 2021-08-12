@@ -778,10 +778,22 @@ def record_audio(request):
         subprocess.check_call(["ffmpeg", "-i", source, dest], cwd=settings.MEDIA_ROOT)
         rec.compressed_audio = dest
         rec.save()
-        return HttpResponseRedirect("/secrets/record_audio")
+
+        context = dict(
+            form=form,
+            auth=request.user.is_authenticated,
+            is_linguist=user_is_linguist(request.user),
+        )
+        return HttpResponseRedirect("/secrets/record_audio", context)
     else:
         form = RecordNewPhrase()
-    return render(request, "validation/record_audio.html", {"form": form})
+
+    context = dict(
+        form=form,
+        auth=request.user.is_authenticated,
+        is_linguist=user_is_linguist(request.user),
+    )
+    return render(request, "validation/record_audio.html", context)
 
 
 # Small Helper functions
