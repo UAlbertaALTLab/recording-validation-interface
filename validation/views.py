@@ -15,7 +15,6 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import os
 import subprocess
 import time
 from hashlib import sha256
@@ -50,7 +49,6 @@ from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 from django.core.mail import mail_admins
 from django.db.models import Q, QuerySet
-from pydub import AudioSegment
 
 from librecval.normalization import to_indexable_form
 
@@ -759,14 +757,14 @@ def record_audio(request):
         if not speaker:
             speaker = Speaker(
                 full_name=request.user.first_name + " " + request.user.last_name,
-                code=request.user.first_name[:3].upper(),
+                code=request.user.username,
             )
             speaker.save()
 
-        _id = create_new_rec_id(phrase, speaker)
-        audio_data.name = _id + ".wav"
+        rec_id = create_new_rec_id(phrase, speaker)
+        audio_data.name = rec_id + ".wav"
         rec = Recording(
-            id=_id,
+            id=rec_id,
             compressed_audio=audio_data,
             speaker=speaker,
             phrase=phrase,
@@ -775,12 +773,11 @@ def record_audio(request):
             is_user_submitted=True,
         )
         rec.save()
-        source = settings.RECVAL_AUDIO_PREFIX + _id + ".wav"
-        dest = settings.RECVAL_AUDIO_PREFIX + _id + ".m4a"
+        source = settings.RECVAL_AUDIO_PREFIX + rec_id + ".wav"
+        dest = settings.RECVAL_AUDIO_PREFIX + rec_id + ".m4a"
         subprocess.check_call(["ffmpeg", "-i", source, dest], cwd=settings.MEDIA_ROOT)
         rec.compressed_audio = dest
         rec.save()
-        os.remove(settings.MEDIA_ROOT + "/" + source)
         return HttpResponseRedirect("/secrets/record_audio")
     else:
         form = RecordNewPhrase()
@@ -920,7 +917,7 @@ def exclude_known_bad_recordings(recordings: QuerySet):
 def create_new_rec_id(phrase, speaker):
     # Generate a unique ID for all user-submitted recordings
     # Since these don't have a timestamp or a session,
-    # we use datetime.datetime.now().microsecond to add a truly unique element
+    # we use time.time() to add a truly unique element
     # to each signature
     signature = (
         f"speaker: {speaker}\n"
