@@ -964,4 +964,4 @@ def save_metadata_to_file(rec_id, user, transcription, translation):
         "dialect": "Plains Cree",
     }
     with open(dest, "w+") as f:
-        json.dump(data, f)
+        json.dump(data, f, indent=2, ensure_ascii=False)
