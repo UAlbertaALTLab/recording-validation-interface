@@ -150,13 +150,13 @@ class RecordNewPhrase(forms.ModelForm):
     transcription = forms.CharField(
         max_length=256,
         required=False,
-        widget=forms.TextInput(attrs={"class": "form-control form-restrict"}),
+        widget=forms.Textarea(attrs={"class": "form-control issue__textarea"}),
     )
 
     translation = forms.CharField(
         max_length=256,
         required=False,
-        widget=forms.TextInput(attrs={"class": "form-control form-restrict"}),
+        widget=forms.Textarea(attrs={"class": "form-control issue__textarea"}),
     )
 
     file = forms.FileField(widget=forms.HiddenInput())
@@ -164,3 +164,8 @@ class RecordNewPhrase(forms.ModelForm):
     class Meta:
         model = Recording
         fields = []
+
+    def __init__(self, *args, **kwargs):
+        super(RecordNewPhrase, self).__init__(*args, **kwargs)
+        self.fields["transcription"].label = "Cree"
+        self.fields["translation"].label = "English"
