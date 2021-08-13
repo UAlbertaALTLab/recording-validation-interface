@@ -736,8 +736,8 @@ def save_wrong_word(request, recording_id):
 def record_audio(request):
     if request.method == "POST":
         form = RecordNewPhrase(request.POST, request.FILES)
-        translation = request.POST.get("translation")
-        transcription = request.POST.get("transcription")
+        translation = request.POST.get("translation").strip()
+        transcription = request.POST.get("transcription").strip()
         audio_data = request.FILES["audio_data"]
 
         phrase = Phrase.objects.filter(transcription=transcription).first()
@@ -758,6 +758,7 @@ def record_audio(request):
             speaker = Speaker(
                 full_name=request.user.first_name + " " + request.user.last_name,
                 code=request.user.username,
+                user=request.user,
             )
             speaker.save()
 
