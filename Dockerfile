@@ -34,6 +34,8 @@ RUN groupadd --system --gid ${UID_GID} ${WSGI_USER} \
  && mkdir -p /var/www/recvalsite \
  && chown ${WSGI_USER}:${WSGI_USER} /app /var/www/recvalsite
 
+RUN apt-get update -qq && apt-get -y install ffmpeg
+
 USER ${WSGI_USER}:${WSGI_USER}
 WORKDIR /app/
 

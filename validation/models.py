@@ -257,13 +257,13 @@ class Speaker(models.Model):
         help_text="The English transcription of the speaker bio",
         null=True,
         blank=True,
-        max_length=2048,
+        max_length=4096,
     )
     crk_bio_text = models.CharField(
         help_text="The Cree transcription of the speaker bio",
         null=True,
         blank=True,
-        max_length=2048,
+        max_length=4096,
     )
 
     eng_bio_audio = models.FileField(

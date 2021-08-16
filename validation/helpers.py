@@ -231,6 +231,8 @@ def get_distance_with_translations(word):
 
 
 def normalize_img_name(img_name):
+    if not img_name:
+        return ""
     ret_name = img_name.replace("î", "i")
     ret_name = ret_name.replace("â", "a")
     ret_name = ret_name.replace("ô", "o")
