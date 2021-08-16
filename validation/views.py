@@ -26,6 +26,7 @@ import operator
 from functools import reduce
 from pathlib import Path
 
+import mutagen as mutagen
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as django_login
@@ -776,9 +777,20 @@ def record_audio(request):
             is_user_submitted=True,
         )
         rec.save()
-        source = settings.RECVAL_AUDIO_PREFIX + rec_id + ".wav"
-        dest = settings.RECVAL_AUDIO_PREFIX + rec_id + ".m4a"
-        subprocess.check_call(["ffmpeg", "-i", source, dest], cwd=settings.MEDIA_ROOT)
+        source = (
+            settings.MEDIA_ROOT + "/" + settings.RECVAL_AUDIO_PREFIX + rec_id + ".wav"
+        )
+        dest = (
+            settings.MEDIA_ROOT + "/" + settings.RECVAL_AUDIO_PREFIX + rec_id + ".m4a"
+        )
+        audio_info = mutagen.File(source).info
+        new_length = (
+            audio_info.length - 0.1
+        )  # It takes the average human 0.1 seconds to click down on a button
+        subprocess.check_call(
+            ["ffmpeg", "-i", source, "-ss", "0", "-to", str(new_length), dest],
+            cwd=settings.MEDIA_ROOT,
+        )
         rec.compressed_audio = dest
         rec.save()
 
