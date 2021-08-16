@@ -736,8 +736,10 @@ def save_wrong_word(request, recording_id):
 def record_audio(request):
     if request.method == "POST":
         form = RecordNewPhrase(request.POST, request.FILES)
-        translation = request.POST.get("translation").strip()
-        transcription = request.POST.get("transcription").strip()
+        translation = request.POST.get("translation")
+        translation = clean_text(translation)
+        transcription = request.POST.get("transcription")
+        transcription = clean_text(transcription)
         audio_data = request.FILES["audio_data"]
 
         phrase = Phrase.objects.filter(transcription=transcription).first()
@@ -966,3 +968,10 @@ def save_metadata_to_file(rec_id, user, transcription, translation):
     }
     with open(dest, "w+") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
+
+
+def clean_text(text):
+    ret = text.strip()
+    ret = ret.replace("\n", "")
+    ret = ret.replace("\t", "")
+    return ret
