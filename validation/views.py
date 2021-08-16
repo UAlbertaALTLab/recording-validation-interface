@@ -777,13 +777,9 @@ def record_audio(request):
             is_user_submitted=True,
         )
         rec.save()
-        source = (
-            settings.MEDIA_ROOT + "/" + settings.RECVAL_AUDIO_PREFIX + rec_id + ".wav"
-        )
-        dest = (
-            settings.MEDIA_ROOT + "/" + settings.RECVAL_AUDIO_PREFIX + rec_id + ".m4a"
-        )
-        audio_info = mutagen.File(source).info
+        source = settings.RECVAL_AUDIO_PREFIX + rec_id + ".wav"
+        dest = settings.RECVAL_AUDIO_PREFIX + rec_id + ".m4a"
+        audio_info = mutagen.File(settings.MEDIA_ROOT + "/" + source).info
         new_length = (
             audio_info.length - 0.1
         )  # It takes the average human 0.1 seconds to click down on a button
