@@ -26,6 +26,7 @@ import operator
 from functools import reduce
 from pathlib import Path
 
+import mutagen as mutagen
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as django_login
@@ -726,7 +727,9 @@ def record_audio(request):
     if request.method == "POST":
         form = RecordNewPhrase(request.POST, request.FILES)
         translation = request.POST.get("translation")
+        translation = clean_text(translation)
         transcription = request.POST.get("transcription")
+        transcription = clean_text(transcription)
         audio_data = request.FILES["audio_data"]
 
         phrase = Phrase.objects.filter(transcription=transcription).first()
@@ -747,6 +750,7 @@ def record_audio(request):
             speaker = Speaker(
                 full_name=request.user.first_name + " " + request.user.last_name,
                 code=request.user.username,
+                user=request.user,
             )
             speaker.save()
 
@@ -764,7 +768,14 @@ def record_audio(request):
         rec.save()
         source = settings.RECVAL_AUDIO_PREFIX + rec_id + ".wav"
         dest = settings.RECVAL_AUDIO_PREFIX + rec_id + ".m4a"
-        subprocess.check_call(["ffmpeg", "-i", source, dest], cwd=settings.MEDIA_ROOT)
+        audio_info = mutagen.File(settings.MEDIA_ROOT + "/" + source).info
+        new_length = (
+            audio_info.length - 0.1
+        )  # It takes the average human 0.1 seconds to click down on a button
+        subprocess.check_call(
+            ["ffmpeg", "-i", source, "-ss", "0", "-to", str(new_length), dest],
+            cwd=settings.MEDIA_ROOT,
+        )
         rec.compressed_audio = dest
         rec.save()
 
@@ -966,3 +977,10 @@ def save_metadata_to_file(rec_id, user, transcription, translation):
     }
     with open(dest, "w+") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
+
+
+def clean_text(text):
+    ret = text.strip()
+    ret = ret.replace("\n", "")
+    ret = ret.replace("\t", "")
+    return ret

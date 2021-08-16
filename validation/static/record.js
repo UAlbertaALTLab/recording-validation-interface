@@ -57,7 +57,7 @@ function stopRecording() {
 
     rec.stop();
     gumStream.getAudioTracks()[0].stop();
-    rec.exportWAV(createDownloadLink, "audio/mp4");
+    rec.exportWAV(createDownloadLink);
 }
 
 function createDownloadLink(blob) {
