@@ -53,7 +53,7 @@ from django.db.models import Q, QuerySet
 
 from librecval.normalization import to_indexable_form
 
-from .models import Phrase, Recording, Speaker, RecordingSession, Issue
+from .models import Phrase, Recording, Speaker, RecordingSession, Issue, Dialect
 from .forms import (
     EditSegment,
     Login,
@@ -69,6 +69,16 @@ from .helpers import (
     exactly_one_analysis,
     normalize_img_name,
 )
+
+
+def home(request):
+    """
+    The home page that lets you select a language/dialect
+    """
+    dialects = Dialect.objects.all()
+
+    context = dict(dialects=dialects)
+    return render(request, "validation/home.html", context)
 
 
 def index(request):
@@ -796,6 +806,17 @@ def record_audio(request):
         is_linguist=user_is_linguist(request.user),
     )
     return render(request, "validation/record_audio.html", context)
+
+
+@require_http_methods(["POST"])
+def set_dialect(request, dialect_code):
+    assert get_object_or_404(Dialect, code=dialect_code)
+
+    response = HttpResponse(status=HTTPStatus.SEE_OTHER)
+    response["Location"] = "/"
+    response.set_cookie("dialect", dialect_code)
+
+    return response
 
 
 # Small Helper functions

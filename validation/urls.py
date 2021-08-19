@@ -27,6 +27,11 @@ app_name = "validation"
 urlpatterns = [
     path("", views.index, name="index"),
     path(
+        "home",
+        views.home,
+        name="home",
+    ),
+    path(
         "login",
         auth_views.LoginView.as_view(template_name="validation/login.html"),
         name="login",
@@ -81,6 +86,7 @@ urlpatterns = [
     path(
         "api/bulk_search", views.bulk_search_recordings, name="bulk_search_recordings"
     ),
+    path("api/set_dialect/<str:dialect_code>", views.set_dialect, name="set_dialect"),
     path("secrets/record_audio", views.record_audio, name="record_audio"),
     path(
         "robots.txt",

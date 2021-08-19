@@ -54,6 +54,24 @@ def arguments_for_choices(choices):
     return dict(choices=choices, max_length=max(len(choice[0]) for choice in choices))
 
 
+class Dialect(models.Model):
+    name = models.CharField(
+        help_text="The full name of the dialect", blank=False, max_length=256
+    )
+
+    code = models.CharField(
+        help_text="The three character code for this language",
+        blank=False,
+        max_length=3,
+    )
+
+    description = models.CharField(
+        help_text="A short description of this language/where it is spoken",
+        null=True,
+        max_length=1024,
+    )
+
+
 class Phrase(models.Model):
     """
     A recorded phrase. A phrase may either be a word or a sentence with at
@@ -119,6 +137,13 @@ class Phrase(models.Model):
     )
     validated = models.BooleanField(
         help_text="Has this phrase be validated?", default=False
+    )
+
+    dialect = models.ForeignKey(
+        Dialect,
+        help_text="The dialect this phrase belongs to",
+        on_delete=models.PROTECT,
+        null=True,
     )
 
     status = models.CharField(

@@ -1,0 +1,9 @@
+{% extends 'validation/_base.html' %}
+{% import 'validation/_dialect_card.html' as card %}
+
+{% block content %}
+    <h2>Please select a dialect from the following choices:</h2>
+    {% for dialect in dialects %}
+        {{ card.dialect_card(dialect) }}
+    {% endfor %}
+{% endblock content %}

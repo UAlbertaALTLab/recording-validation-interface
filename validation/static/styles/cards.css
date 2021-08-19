@@ -45,3 +45,7 @@
 .card__header--beige {
   background-color: var(--custom-beige);
 }
+
+.card--dialect:hover {
+  cursor: pointer;
+}
