@@ -99,10 +99,7 @@ def index(request):
     sessions = RecordingSession.objects.order_by("id").values("id", "date").distinct()
     session = request.GET.get("session")
     if session != "all" and session:
-        session_date = datetime.datetime.strptime(session, "%Y-%m-%d").date()
-        all_phrases = all_phrases.filter(
-            recording__session__date=session_date
-        ).distinct()
+        all_phrases = all_phrases.filter(recording__session__id=session).distinct()
 
     all_phrases = all_phrases.order_by("transcription")
 
