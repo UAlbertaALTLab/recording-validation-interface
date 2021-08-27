@@ -251,6 +251,7 @@ class Speaker(models.Model):
         help_text="The User object associated with this Speaker, if any",
         on_delete=models.PROTECT,
         null=True,
+        blank=True,
     )
 
     eng_bio_text = models.CharField(

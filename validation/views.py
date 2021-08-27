@@ -457,19 +457,25 @@ def segment_content_view(request, segment_id):
             p.date = datetime.datetime.now()
             p.save()
 
-    phrases = Phrase.objects.filter(id=segment_id)
-    field_transcription = phrases[0].field_transcription
+    phrase = Phrase.objects.get(id=segment_id)
+    field_transcription = phrase.field_transcription
     suggestions = get_distance_with_translations(field_transcription)
 
-    segment_name = phrases[0].transcription
+    segment_name = phrase.transcription
 
-    history = phrases[0].history.all()
+    history = phrase.history.all()
     auth = request.user.is_authenticated
 
-    form = EditSegment()
+    form = EditSegment(
+        initial={
+            "cree": phrase.transcription,
+            "translation": phrase.translation,
+            "analysis": phrase.analysis,
+        }
+    )
 
     context = dict(
-        phrases=phrases,
+        phrase=phrase,
         segment_name=segment_name,
         suggestions=suggestions,
         form=form,
