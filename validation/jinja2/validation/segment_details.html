@@ -45,7 +45,6 @@
           <th scope="col">Speaker </th>
         </tr>
       </thead>
-      {% for phrase in phrases %}
       <tr>
         {{ macros.td_transcription(user, phrase) }}
         {{ macros.td_translation(user, phrase) }}
@@ -70,7 +69,6 @@
           </ul>
         </td>
       </tr>
-      {% endfor %}{# for phrase in phrases #}
     </table>
 
     <div id="edit" data-cy="edit-div">
