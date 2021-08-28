@@ -130,15 +130,17 @@ class EditIssueWithRecording(forms.ModelForm):
 
 class EditIssueWithPhrase(forms.ModelForm):
     transcription = forms.CharField(
-        max_length=200,
+        max_length=412,
         required=False,
-        widget=forms.TextInput(attrs={"class": "form-control form-restrict"}),
+        widget=forms.Textarea(attrs={"class": "form-control"}),
+        initial="{{ issue.suggested_cree }}",
     )
 
     translation = forms.CharField(
-        max_length=200,
+        max_length=412,
         required=False,
-        widget=forms.TextInput(attrs={"class": "form-control form-restrict"}),
+        widget=forms.Textarea(attrs={"class": "form-control"}),
+        initial="{{ issue.suggested_english }}",
     )
 
     class Meta:
