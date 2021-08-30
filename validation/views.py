@@ -545,20 +545,12 @@ def view_issue_detail(request, issue_id):
 
     form = None
     if issue.recording:
-        form = EditIssueWithRecording(
-            request.POST, initial={"phrase": issue.suggested_cree}
-        )
+        form = EditIssueWithRecording(request.POST)
         if request.method == "POST" and form.is_valid():
             return handle_save_issue_with_recording(form, issue, request)
 
     if issue.phrase:
-        form = EditIssueWithPhrase(
-            request.POST,
-            initial={
-                "transcription": issue.suggested_cree,
-                "translation": issue.suggested_english,
-            },
-        )
+        form = EditIssueWithPhrase(request.POST)
         if request.method == "POST" and form.is_valid():
             return handle_save_issue_with_phrase(form, issue, request)
 
