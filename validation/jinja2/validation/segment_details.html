@@ -33,10 +33,12 @@
 <div class="table-responsive">
 
     <div>
-        <button class="button button--success button--back" onclick='goBack()'>Back</button>
+        <button class="button button--success button--back">Back</button>
     </div>
 
-    <p>This entry was last edited by {{ history[0].modifier }} on {{ history[0].history_date.strftime('%Y-%m-%d') }}</p>
+    {% if history|length > 1 %}
+        <p>This entry was last edited by {{ history[0].modifier }} on {{ history[0].history_date.strftime('%Y-%m-%d') }}</p>
+    {% endif %}
 
     <table id="segment-table" class="table table-striped">
       <thead>

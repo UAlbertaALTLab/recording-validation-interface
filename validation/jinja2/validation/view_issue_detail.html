@@ -19,24 +19,6 @@
 {% import 'validation/_macros.html' as macros %}
 
 {% block content %}
-    {% if issue.phrase %}
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                let transcription = document.getElementById("id_transcription");
-                let translation = document.getElementById("id_translation");
-                transcription.value = "{{ issue.suggested_cree }}"
-                translation.value = "{{ issue.suggested_english }}"
-            })
-        </script>
-    {% elif issue.recording %}
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                let phrase = document.getElementById("id_phrase");
-                phrase.value = "{{ issue.suggested_cree }}"
-            })
-        </script>
-    {% endif %}
-
     <h2>
         {% if issue.phrase %}
             You are editing the Phrase object for this entry

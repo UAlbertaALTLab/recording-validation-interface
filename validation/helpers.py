@@ -185,7 +185,7 @@ def get_translations(results):
 
     for i in results["results"]:
         translations, sources = extract_translations(i["lemma_wordform"])
-        analysis = fst.lookup(i["wordform_text"])[0]
+        analysis = get_analysis_from_fst(i["wordform_text"])
         for (source, translation) in zip(sources, translations):
             if {
                 "translation": translation,
@@ -208,6 +208,14 @@ def extract_translations(entry):
         sources = [", ".join(j["source_ids"]) for j in entry["definitions"]]
 
     return translations, sources
+
+
+def get_analysis_from_fst(entry):
+    res = fst.lookup(entry)
+    if len(res) > 0:
+        return res[0]
+    else:
+        return ""
 
 
 def get_distance_with_translations(word):

@@ -110,7 +110,9 @@ class Phrase(models.Model):
     )
 
     translation = models.CharField(
-        help_text="The English translation of the phrase.", blank=False, max_length=256
+        help_text="The English translation of the phrase.",
+        blank=False,
+        max_length=MAX_TRANSCRIPTION_LENGTH,
     )
     kind = models.CharField(
         help_text="Is this phrase a word or a sentence?",

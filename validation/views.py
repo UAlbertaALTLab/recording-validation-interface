@@ -545,14 +545,25 @@ def view_issue_detail(request, issue_id):
 
     form = None
     if issue.recording:
-        form = EditIssueWithRecording(request.POST)
-        if request.method == "POST" and form.is_valid():
-            return handle_save_issue_with_recording(form, issue, request)
+        if request.method == "POST":
+            form = EditIssueWithRecording(request.POST)
+            if request.method == "POST" and form.is_valid():
+                return handle_save_issue_with_recording(form, issue, request)
+        else:
+            form = EditIssueWithRecording(initial={"phrase": issue.suggested_cree})
 
     if issue.phrase:
-        form = EditIssueWithPhrase(request.POST)
-        if request.method == "POST" and form.is_valid():
-            return handle_save_issue_with_phrase(form, issue, request)
+        if request.method == "POST":
+            form = EditIssueWithPhrase(request.POST)
+            if request.method == "POST" and form.is_valid():
+                return handle_save_issue_with_phrase(form, issue, request)
+        else:
+            form = EditIssueWithPhrase(
+                initial={
+                    "transcription": issue.suggested_cree,
+                    "translation": issue.suggested_english,
+                }
+            )
 
     context = dict(
         issue=issue,

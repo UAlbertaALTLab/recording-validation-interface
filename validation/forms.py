@@ -5,6 +5,8 @@ from django.contrib.auth.models import User
 
 from validation.models import Issue, Recording, Phrase
 
+DEFAULT_MAX_LENGTH = 256
+
 
 class Login(forms.Form):
     username = forms.CharField(
@@ -133,14 +135,12 @@ class EditIssueWithPhrase(forms.ModelForm):
         max_length=412,
         required=False,
         widget=forms.Textarea(attrs={"class": "form-control"}),
-        initial="{{ issue.suggested_cree }}",
     )
 
     translation = forms.CharField(
         max_length=412,
         required=False,
         widget=forms.Textarea(attrs={"class": "form-control"}),
-        initial="{{ issue.suggested_english }}",
     )
 
     class Meta:
@@ -150,13 +150,13 @@ class EditIssueWithPhrase(forms.ModelForm):
 
 class RecordNewPhrase(forms.ModelForm):
     transcription = forms.CharField(
-        max_length=256,
+        max_length=DEFAULT_MAX_LENGTH,
         required=False,
         widget=forms.Textarea(attrs={"class": "form-control issue__textarea"}),
     )
 
     translation = forms.CharField(
-        max_length=256,
+        max_length=DEFAULT_MAX_LENGTH,
         required=False,
         widget=forms.Textarea(attrs={"class": "form-control issue__textarea"}),
     )
