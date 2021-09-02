@@ -38,6 +38,7 @@ describe("Edit segment", () => {
         cy.get("#segment-table").within(() => {
             cy.get('th').contains('Transcription')
             cy.get('th').contains('Translation')
+            cy.get('th').contains('Analysis')
             cy.get('th').contains('Recordings')
             cy.get('th').contains('Speaker')
         })
@@ -46,6 +47,7 @@ describe("Edit segment", () => {
             cy.get('th').contains('Suggestion')
             cy.get('th').contains('Translation')
             cy.get('th').contains('Analysis')
+            cy.get('th').contains('Source')
             cy.get('th').contains('MED')
             cy.get('th').contains('Options')
         })
@@ -186,62 +188,6 @@ describe("Edit segment", () => {
             .within(() => {
                 cy.get('@analysis')
             })
-    })
-
-    it("should not update the entry when clicking Cancel", () => {
-        cy.visit(Cypress.env("awas_url"));
-
-        cy.get("#suggestions-table").within(() => {
-            cy.get('[data-cy="suggestion-transcription"]')
-                .first()
-                .invoke('text')
-                .as('transcription')
-            cy.get('[data-cy="suggestion-analysis"]')
-                .first()
-                .invoke('text')
-                .as('analysis')
-            cy.get('input:first')
-                .should('have.value', 'Accept')
-                .click()            
-        })
-
-        cy.get("#segment-table").within(() => {
-            cy.get('[data-cy="segment-transcription"]')
-                .first()
-                .invoke('text')
-                .as('og_transcription')
-            cy.get('[data-cy="segment-translation"]')
-                .first()
-                .invoke('text')
-                .as('og_translation')
-        })
-
-        cy.get('[data-cy=edit-div]').should('be.visible')
-        cy.get('#id_cree')
-            .should('be.visible')
-            .within(() => {
-                cy.get('@transcription')
-            })
-            .type("DONT SAVE")
-
-        cy.get('#id_translation')
-            .should('be.visible')
-            .type("DONT SAVE")
-
-        cy.get('#id_analysis')
-            .should('be.visible')
-            .within(() => {
-                cy.get('@analysis')
-            })
-            .type("DONT SAVE")
-
-        cy.get('[data-cy="cancel-button"]')
-            .click()
-
-        cy.get("#segment-table").within(() => {
-            cy.get('@og_transcription')
-            cy.get('@og_translation')
-        })
     })
 });
 
