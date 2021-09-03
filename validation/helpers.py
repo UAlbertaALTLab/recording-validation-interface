@@ -1,7 +1,8 @@
 from os import fspath
 
 import divvunspell
-from difflib import Differ, SequenceMatcher, get_close_matches
+from difflib import Differ
+import hfst_optimized_lookup
 from urllib.parse import urljoin
 import operator
 
@@ -12,7 +13,7 @@ from django.conf import settings
 from django.utils.http import urlencode
 
 """
-RULES
+RULES FOR MED
 
     adding/removing diacritics or hyphens, swapping glides w/y, or 
     adding/removing aspirations -h- between vowel and consonant would have a weight of zero.
@@ -24,6 +25,10 @@ RULES
 
 archive = divvunspell.SpellerArchive(fspath(settings.BASE_DIR / "crk.zhfst"))
 speller = archive.speller()
+
+fst = hfst_optimized_lookup.TransducerFile(
+    fspath(settings.BASE_DIR / "crk-descriptive-analyzer.hfstol")
+)
 
 vowels = ["a", "i", "o", "â", "î", "ô", "e", "ê"]
 consonants = [f"  {char}" for char in "chkmnpstwy"]
@@ -179,7 +184,8 @@ def get_translations(results):
     matches = []
 
     for i in results["results"]:
-        translations, analysis, sources = extract_translations(i["lemma_wordform"])
+        translations, sources = extract_translations(i["lemma_wordform"])
+        analysis = get_analysis_from_fst(i["wordform_text"])
         for (source, translation) in zip(sources, translations):
             if {
                 "translation": translation,
@@ -201,16 +207,15 @@ def extract_translations(entry):
         translations = [str(j["text"]) for j in entry["definitions"]]
         sources = [", ".join(j["source_ids"]) for j in entry["definitions"]]
 
-    if entry["raw_analysis"]:
-        analysis = (
-            "".join(entry["raw_analysis"][0])
-            + entry["raw_analysis"][1]
-            + "".join(entry["raw_analysis"][2])
-        )
-    else:
-        analysis = ""
+    return translations, sources
 
-    return translations, analysis, sources
+
+def get_analysis_from_fst(entry):
+    res = fst.lookup(entry)
+    if len(res) > 0:
+        return res[0]
+    else:
+        return ""
 
 
 def get_distance_with_translations(word):

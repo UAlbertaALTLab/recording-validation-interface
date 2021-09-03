@@ -27,19 +27,9 @@ Its defaults are configured using the following settings:
 See recvalsite/settings.py for more information.
 """
 
-from pathlib import Path
-from tempfile import TemporaryDirectory
-
-import logme  # type: ignore
-from django.conf import settings  # type: ignore
-from django.core.files.base import ContentFile  # type: ignore
 from django.core.management.base import BaseCommand, CommandError  # type: ignore
 
-from librecval import REPOSITORY_ROOT
-from librecval.extract_phrases import Segment
 from librecval.extract_speaker_bios import extract_speaker_bios
-from librecval.import_recordings import initialize as import_recordings
-from validation.models import Phrase, Recording, RecordingSession, Speaker
 
 
 class Command(BaseCommand):

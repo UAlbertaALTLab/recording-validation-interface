@@ -26,6 +26,7 @@ import operator
 from functools import reduce
 from pathlib import Path
 
+import mutagen as mutagen
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as django_login
@@ -98,10 +99,7 @@ def index(request):
     sessions = RecordingSession.objects.order_by("id").values("id", "date").distinct()
     session = request.GET.get("session")
     if session != "all" and session:
-        session_date = datetime.datetime.strptime(session, "%Y-%m-%d").date()
-        all_phrases = all_phrases.filter(
-            recording__session__date=session_date
-        ).distinct()
+        all_phrases = all_phrases.filter(recording__session__id=session).distinct()
 
     all_phrases = all_phrases.order_by("transcription")
 
@@ -456,19 +454,25 @@ def segment_content_view(request, segment_id):
             p.date = datetime.datetime.now()
             p.save()
 
-    phrases = Phrase.objects.filter(id=segment_id)
-    field_transcription = phrases[0].field_transcription
+    phrase = Phrase.objects.get(id=segment_id)
+    field_transcription = phrase.field_transcription
     suggestions = get_distance_with_translations(field_transcription)
 
-    segment_name = phrases[0].transcription
+    segment_name = phrase.transcription
 
-    history = phrases[0].history.all()
+    history = phrase.history.all()
     auth = request.user.is_authenticated
 
-    form = EditSegment()
+    form = EditSegment(
+        initial={
+            "cree": phrase.transcription,
+            "translation": phrase.translation,
+            "analysis": phrase.analysis,
+        }
+    )
 
     context = dict(
-        phrases=phrases,
+        phrase=phrase,
         segment_name=segment_name,
         suggestions=suggestions,
         form=form,
@@ -541,14 +545,25 @@ def view_issue_detail(request, issue_id):
 
     form = None
     if issue.recording:
-        form = EditIssueWithRecording(request.POST)
-        if request.method == "POST" and form.is_valid():
-            return handle_save_issue_with_recording(form, issue, request)
+        if request.method == "POST":
+            form = EditIssueWithRecording(request.POST)
+            if request.method == "POST" and form.is_valid():
+                return handle_save_issue_with_recording(form, issue, request)
+        else:
+            form = EditIssueWithRecording(initial={"phrase": issue.suggested_cree})
 
     if issue.phrase:
-        form = EditIssueWithPhrase(request.POST)
-        if request.method == "POST" and form.is_valid():
-            return handle_save_issue_with_phrase(form, issue, request)
+        if request.method == "POST":
+            form = EditIssueWithPhrase(request.POST)
+            if request.method == "POST" and form.is_valid():
+                return handle_save_issue_with_phrase(form, issue, request)
+        else:
+            form = EditIssueWithPhrase(
+                initial={
+                    "transcription": issue.suggested_cree,
+                    "translation": issue.suggested_english,
+                }
+            )
 
     context = dict(
         issue=issue,
@@ -726,7 +741,9 @@ def record_audio(request):
     if request.method == "POST":
         form = RecordNewPhrase(request.POST, request.FILES)
         translation = request.POST.get("translation")
+        translation = clean_text(translation)
         transcription = request.POST.get("transcription")
+        transcription = clean_text(transcription)
         audio_data = request.FILES["audio_data"]
 
         phrase = Phrase.objects.filter(transcription=transcription).first()
@@ -747,6 +764,7 @@ def record_audio(request):
             speaker = Speaker(
                 full_name=request.user.first_name + " " + request.user.last_name,
                 code=request.user.username,
+                user=request.user,
             )
             speaker.save()
 
@@ -764,7 +782,14 @@ def record_audio(request):
         rec.save()
         source = settings.RECVAL_AUDIO_PREFIX + rec_id + ".wav"
         dest = settings.RECVAL_AUDIO_PREFIX + rec_id + ".m4a"
-        subprocess.check_call(["ffmpeg", "-i", source, dest], cwd=settings.MEDIA_ROOT)
+        audio_info = mutagen.File(settings.MEDIA_ROOT + "/" + source).info
+        new_length = (
+            audio_info.length - 0.1
+        )  # It takes the average human 0.1 seconds to click down on a button
+        subprocess.check_call(
+            ["ffmpeg", "-i", source, "-ss", "0", "-to", str(new_length), dest],
+            cwd=settings.MEDIA_ROOT,
+        )
         rec.compressed_audio = dest
         rec.save()
 
@@ -966,3 +991,10 @@ def save_metadata_to_file(rec_id, user, transcription, translation):
     }
     with open(dest, "w+") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
+
+
+def clean_text(text):
+    ret = text.strip()
+    ret = ret.replace("\n", "")
+    ret = ret.replace("\t", "")
+    return ret

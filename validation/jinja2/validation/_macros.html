@@ -113,6 +113,15 @@
  {% endmacro %}
 
 {#
+  # Expands to a <td> that displays the current phrase analysis.
+  #}
+ {% macro td_analysis(user, phrase) %}
+ <td data-cy="phrase-analysis" lang="end">
+   {{ phrase.analysis }}
+ </td>
+ {% endmacro %}
+
+{#
   # Expands to a <td> that displays the English translation
     # of the Cree suggestion from itwêwina.
   #}
