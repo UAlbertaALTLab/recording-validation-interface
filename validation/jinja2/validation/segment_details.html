@@ -33,22 +33,27 @@
 <div class="table-responsive">
 
     <div>
-        <button class="button button--success button--back" onclick='goBack()'>Back</button>
+        <button class="button button--success button--back">Back</button>
     </div>
+
+    {% if history|length > 1 %}
+        <p>This entry was last edited by {{ history[0].modifier }} on {{ history[0].history_date.strftime('%Y-%m-%d') }}</p>
+    {% endif %}
 
     <table id="segment-table" class="table table-striped">
       <thead>
         <tr>
           <th scope="col"> Transcription </th>
           <th scope="col"> Translation </th>
+          <th scope="col"> Analysis </th>
           <th scope="col"> Recordings </th>
           <th scope="col">Speaker </th>
         </tr>
       </thead>
-      {% for phrase in phrases %}
       <tr>
         {{ macros.td_transcription(user, phrase) }}
         {{ macros.td_translation(user, phrase) }}
+        {{ macros.td_analysis(user, phrase) }}
         <td>
           <ul class="list__recording">
           {% for recording in phrase.recordings %}
@@ -70,7 +75,6 @@
           </ul>
         </td>
       </tr>
-      {% endfor %}{# for phrase in phrases #}
     </table>
 
     <div id="edit" data-cy="edit-div">

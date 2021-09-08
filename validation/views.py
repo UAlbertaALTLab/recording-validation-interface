@@ -109,10 +109,7 @@ def index(request):
     sessions = RecordingSession.objects.order_by("id").values("id", "date").distinct()
     session = request.GET.get("session")
     if session != "all" and session:
-        session_date = datetime.datetime.strptime(session, "%Y-%m-%d").date()
-        all_phrases = all_phrases.filter(
-            recording__session__date=session_date
-        ).distinct()
+        all_phrases = all_phrases.filter(recording__session__id=session).distinct()
 
     all_phrases = all_phrases.order_by("transcription")
 
@@ -467,19 +464,25 @@ def segment_content_view(request, segment_id):
             p.date = datetime.datetime.now()
             p.save()
 
-    phrases = Phrase.objects.filter(id=segment_id)
-    field_transcription = phrases[0].field_transcription
+    phrase = Phrase.objects.get(id=segment_id)
+    field_transcription = phrase.field_transcription
     suggestions = get_distance_with_translations(field_transcription)
 
-    segment_name = phrases[0].transcription
+    segment_name = phrase.transcription
 
-    history = phrases[0].history.all()
+    history = phrase.history.all()
     auth = request.user.is_authenticated
 
-    form = EditSegment()
+    form = EditSegment(
+        initial={
+            "cree": phrase.transcription,
+            "translation": phrase.translation,
+            "analysis": phrase.analysis,
+        }
+    )
 
     context = dict(
-        phrases=phrases,
+        phrase=phrase,
         segment_name=segment_name,
         suggestions=suggestions,
         form=form,
@@ -552,14 +555,25 @@ def view_issue_detail(request, issue_id):
 
     form = None
     if issue.recording:
-        form = EditIssueWithRecording(request.POST)
-        if request.method == "POST" and form.is_valid():
-            return handle_save_issue_with_recording(form, issue, request)
+        if request.method == "POST":
+            form = EditIssueWithRecording(request.POST)
+            if request.method == "POST" and form.is_valid():
+                return handle_save_issue_with_recording(form, issue, request)
+        else:
+            form = EditIssueWithRecording(initial={"phrase": issue.suggested_cree})
 
     if issue.phrase:
-        form = EditIssueWithPhrase(request.POST)
-        if request.method == "POST" and form.is_valid():
-            return handle_save_issue_with_phrase(form, issue, request)
+        if request.method == "POST":
+            form = EditIssueWithPhrase(request.POST)
+            if request.method == "POST" and form.is_valid():
+                return handle_save_issue_with_phrase(form, issue, request)
+        else:
+            form = EditIssueWithPhrase(
+                initial={
+                    "transcription": issue.suggested_cree,
+                    "translation": issue.suggested_english,
+                }
+            )
 
     context = dict(
         issue=issue,

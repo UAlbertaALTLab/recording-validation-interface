@@ -128,7 +128,9 @@ class Phrase(models.Model):
     )
 
     translation = models.CharField(
-        help_text="The English translation of the phrase.", blank=False, max_length=256
+        help_text="The English translation of the phrase.",
+        blank=False,
+        max_length=MAX_TRANSCRIPTION_LENGTH,
     )
     kind = models.CharField(
         help_text="Is this phrase a word or a sentence?",
@@ -276,6 +278,7 @@ class Speaker(models.Model):
         help_text="The User object associated with this Speaker, if any",
         on_delete=models.PROTECT,
         null=True,
+        blank=True,
     )
 
     eng_bio_text = models.CharField(

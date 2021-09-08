@@ -21,6 +21,7 @@ divvunspell = "*"
 tqdm = "*"
 whitenoise = "*"
 mutagen = "*"
+hfst-optimized-lookup = "*"
 
 [dev-packages]
 gunicorn = "*"
