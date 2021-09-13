@@ -101,31 +101,6 @@ document.addEventListener('DOMContentLoaded', () => {
             })
         }
     }
-
-    for (let button of document.querySelectorAll(`.card--dialect`)) {
-        button.addEventListener("click", async (e) => {
-            const dialectCode = e.target.dataset.code
-            console.log(e.target.dataset);
-            console.log(dialectCode);
-
-            const response = await fetch(`/api/set_dialect/${dialectCode}`, {
-                method: 'POST',
-                mode: 'same-origin',    // Do not send CSRF token to another domain.
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrftoken
-                },
-                body: JSON.stringify({dialectCode})
-            })
-
-            let r = await response.json()
-
-            if (r.status != 'ok') {
-                return
-            }
-
-        })
-    }
 })
 
 function showWrongWordDiv(recordingId) {

@@ -62,6 +62,7 @@ urlpatterns = [
     path("issues/<int:issue_id>", views.view_issue_detail, name="issue_detail"),
     path("speakers/<str:speaker_code>", views.speaker_view, name="speaker_view"),
     path("speakers/", views.all_speakers, name="all_speakers"),
+    path("record_audio", views.record_audio, name="record_audio"),
     path(
         "api/record_translation_judgement/<int:phrase_id>",
         views.record_translation_judgement,
@@ -87,7 +88,6 @@ urlpatterns = [
         "api/bulk_search", views.bulk_search_recordings, name="bulk_search_recordings"
     ),
     path("api/set_dialect/<str:dialect_code>", views.set_dialect, name="set_dialect"),
-    path("secrets/record_audio", views.record_audio, name="record_audio"),
     path(
         "robots.txt",
         TemplateView.as_view(

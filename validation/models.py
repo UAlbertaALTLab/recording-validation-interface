@@ -60,9 +60,9 @@ class Dialect(models.Model):
     )
 
     code = models.CharField(
-        help_text="The three character code for this language",
+        help_text="The three character code for this language + an additional identifier",
         blank=False,
-        max_length=3,
+        max_length=16,
     )
 
     description = models.CharField(
@@ -70,6 +70,9 @@ class Dialect(models.Model):
         null=True,
         max_length=1024,
     )
+
+    def __str__(self) -> str:
+        return self.name
 
 
 class Phrase(models.Model):
@@ -280,6 +283,8 @@ class Speaker(models.Model):
         null=True,
         blank=True,
     )
+
+    dialects = models.ManyToManyField(Dialect, blank=True)
 
     eng_bio_text = models.CharField(
         help_text="The English transcription of the speaker bio",
@@ -552,6 +557,13 @@ class Issue(models.Model):
 
     recording = models.ForeignKey(
         Recording, on_delete=models.CASCADE, blank=True, null=True
+    )
+
+    dialect = models.ForeignKey(
+        Dialect,
+        help_text="The dialect this phrase belongs to",
+        on_delete=models.PROTECT,
+        null=True,
     )
 
     created_by = models.CharField(
