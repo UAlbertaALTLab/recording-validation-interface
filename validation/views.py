@@ -83,7 +83,7 @@ def home(request):
 
 def index(request):
     """
-    The home page.
+    The main page.
     """
 
     is_linguist = user_is_linguist(request.user)
@@ -807,6 +807,7 @@ def record_audio(request):
             )
             speaker.save()
 
+        if dialect_object not in speaker.dialects:
             # Can only add dialect after the object exists i.e. is saved
             speaker.dialects.add(dialect_object)
             speaker.save()

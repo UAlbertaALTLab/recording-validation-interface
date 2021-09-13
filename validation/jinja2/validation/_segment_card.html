@@ -95,7 +95,7 @@
                         </td>
                         {% endif %}
                         {% if is_linguist %}
-                            <td>{{ recording.session.id }}</td>
+                            <td>{{ recording.session.id or "" }}</td>
                         {% endif %}
                     </tr>
 

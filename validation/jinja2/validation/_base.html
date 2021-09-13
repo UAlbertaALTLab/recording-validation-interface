@@ -16,7 +16,7 @@ const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
       <script src="{{ static('index.js') }}"></script>
       <script src="{{ static('menu.js') }}"></script>
       <script src="{{ static('nav.js') }}"></script>
-      <title>{% block title %} {{ dialect.name if dialect != None else "" }} Recordings Validation {% endblock title %}</title>
+      <title>{% block title %} {{ dialect.name if dialect != None else "" }} Speech DB {% endblock title %}</title>
   {% endblock head %}
 
 </head>
@@ -30,7 +30,7 @@ const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         {% if dialect != None %}
             <span lang="en" class="d-none d-sm-inline"> {{ dialect.name }} </span>
         {% endif %}
-      Recordings Validation
+      Speech DB
     </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
