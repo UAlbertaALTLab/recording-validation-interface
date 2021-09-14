@@ -25,7 +25,7 @@ from . import views
 
 app_name = "validation"
 urlpatterns = [
-    path("", views.index, name="index"),
+    path("<str:language>/entries", views.entries, name="index"),
     path(
         "home",
         views.home,

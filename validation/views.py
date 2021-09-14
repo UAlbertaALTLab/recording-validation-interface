@@ -81,7 +81,7 @@ def home(request):
     return render(request, "validation/home.html", context)
 
 
-def index(request):
+def entries(request, language):
     """
     The main page.
     """
@@ -90,7 +90,7 @@ def index(request):
     is_expert = user_is_expert(request.user)
 
     # Only show selected dialect
-    dialect_object = get_dialect_object(request.COOKIES.get("dialect"))
+    dialect_object = get_dialect_object(language)
     all_phrases = Phrase.objects.filter(dialect=dialect_object)
 
     mode = request.GET.get("mode")
@@ -863,8 +863,9 @@ def set_dialect(request, dialect_code):
     assert get_object_or_404(Dialect, code=dialect_code)
 
     response = HttpResponse(status=HTTPStatus.SEE_OTHER)
-    response["Location"] = "/"
-    response.set_cookie("dialect", dialect_code)
+    response["Location"] = reverse(
+        "validation:index", kwargs={"language": dialect_code}
+    )
 
     return response
 
@@ -1058,4 +1059,4 @@ def clean_text(text):
 
 
 def get_dialect_object(dialect):
-    return Dialect.objects.get(code=dialect)
+    return get_object_or_404(Dialect, code=dialect)
