@@ -47,7 +47,7 @@ assert (project_root / "LICENSE").exists()
 
 class MissingMetadataError(RuntimeError):
     """
-    Raised when the cooresponding metadata cannot be found.
+    Raised when the corresponding metadata cannot be found.
     """
 
 
