@@ -195,6 +195,10 @@ RECVAL_METADATA_PATH = config(
     "RECVAL_METADATA_PATH", BASE_DIR / "private" / "metadata.csv", cast=Path
 )
 
+TSUUTINA_METADATA_PATH = config(
+    "TSUUTINA_METADATA_PATH", BASE_DIR / "private" / "tsuutina-metadata.csv", cast=Path
+)
+
 # Where the sessions should be extracted from.
 # Expecting a structure like this:
 #
@@ -204,6 +208,10 @@ RECVAL_METADATA_PATH = config(
 # └── 2016-01-18-PM-___-_/
 RECVAL_SESSIONS_DIR = config(
     "RECVAL_SESSIONS_DIR", BASE_DIR / "data" / "sessions", cast=Path
+)
+
+TSUUTINA_SESSIONS_DIR = config(
+    "TSUUTINA_SESSIONS_DIR", BASE_DIR / "data" / "tsuutina", cast=Path
 )
 
 ################################### MEDIA (Uploads) ####################################

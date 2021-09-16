@@ -1,7 +1,10 @@
 import csv
+from datetime import datetime
 from hashlib import sha256
+from os import fspath
 from typing import NamedTuple
 from typing_extensions import Literal
+import re
 
 from pydub import AudioSegment
 from pympi.Elan import Eaf
@@ -13,8 +16,10 @@ GoodBadUnknown = Literal["good", "bad", "unknown"]
 
 
 class Segment(NamedTuple):
+    id: str
     translation: str
     transcription: str
+    fixed_transcription: str
     type: WordOrSentence
     start: int
     stop: int
@@ -57,34 +62,89 @@ The session has to come from the filename
 """
 
 
-def run():
-    eaf_file = Eaf(
-        "/Users/jolenepoulin/Documents/Onespot-Sapir/OS-srs-BRS-018-2015-07-15_0841.eaf"
+class TsuutinaRecordingExtractor:
+    """
+    Extracts recordings from a directory of Tsuut'ina files
+    """
+
+    def scan(self):
+        elan_file_path = "/Users/jolenepoulin/Documents/Onespot-Sapir/OS-srs-BRS-018-2015-07-15_0841.eaf"
+        audio_path = "/Users/jolenepoulin/Documents/CRIM-Tsuutina_recordings/Onespot-Sapir/OS-srs-BRS-018-2015-07-15_0841-ELAN.wav"
+        eaf_file = Eaf(elan_file_path)
+        keys = eaf_file.get_tier_names()
+        metadata_file = open(
+            "/Users/jolenepoulin/Documents/recording-validation-interface/private/tsuutina-metadata.csv"
+        )
+        metadata = csv.DictReader(metadata_file)
+        md_dict = {}
+        for row in metadata:
+            md_dict[row["ID"]] = {
+                "form": row["Form"],
+                "corrected-form": row["Corrected form"],
+                "senses": row["Senses"],
+                "fst-gloss-template": row["FST gloss template"],
+                "morphemic-parsing": row["Morphemic parsing"],
+                "aspect": row["Aspect"],
+                "argument-structure": row["Argument structure"],
+                "inflectional-paradigm": row["Inflectional paradigm"],
+                "fst-lemma": row["FST lemma"],
+                "fst-morphology": row["FST morphology"],
+                "source": row["Source"],
+                "fst-status": row["FST status"],
+                "notes": row["Notes"],
+                "wordnet": row["WordNet"],
+                "rapidword-items": row["RapidWords items"],
+                "rapidwords-labels": row["RapidWords labels"],
+            }
+
+        for elem in eaf_file.get_annotation_data_for_tier("BRS-Identifier"):
+            if elem[2] in md_dict.keys():
+                entry = md_dict[elem[2]]
+                start = elem[0]
+                stop = elem[1]
+                rec_date = get_session_from_filename(
+                    "OS-srs-BRS-018-2015-07-15_0841.eaf"
+                )
+                session_id = SessionID(
+                    date=datetime.date(rec_date),
+                    time_of_day=None,
+                    subsession=None,
+                    location=None,
+                )
+                audio = AudioSegment.from_file(fspath(audio_path))[start:stop]
+                s = Segment(
+                    id=elem[2],
+                    translation=entry["senses"],
+                    transcription=entry["form"],
+                    fixed_transcription=entry["corrected-form"],
+                    start=start,
+                    stop=stop,
+                    comment=entry["notes"],
+                    quality=get_quality_from_eaf(eaf_file, start),
+                    session=session_id,
+                    audio=audio,
+                    type="word",
+                    speaker="BRS",
+                )
+
+                yield s
+
+        metadata_file.close()
+
+
+def get_session_from_filename(filename):
+    date = re.search(r"\d{4}-\d{2}-\d{2}", filename)
+    _datetime = date.group().split("-")
+    return datetime(
+        year=int(_datetime[0]), month=int(_datetime[1]), day=int(_datetime[2])
     )
-    keys = eaf_file.get_tier_names()
-    print(keys)
-    metadata_file = open(
-        "/Users/jolenepoulin/Documents/recording-validation-interface/private/tsuutina-metadata.csv"
-    )
-    metadata = csv.DictReader(metadata_file)
-    print(metadata.fieldnames)
-    md_dict = {}
-    for row in metadata:
-        print(row)
-        md_dict[row["ID"]] = {
-            "form": row["Form"],
-            "corrected-form": row["Corrected form"],
-            "senses": row["Senses"],
-            "fst-gloss-template": row["FST gloss template"],
-            "morphemic-parsing": row["Morphemic parsing"],
-        }
-    # for elem in eaf_file.get_annotation_data_for_tier('BRS-Identifier'):
-    #     print(elem[2])
-    #     if elem[2] in metadata['ID']:
-    #         print(metadata['ID'][elem[2]])
-
-    metadata_file.close()
 
 
-if __name__ == "__main__":
-    run()
+def get_quality_from_eaf(eaf_file, start):
+    comment = eaf_file.get_annotation_data_at_time("BRS-Questions", start + 1) or ""
+    if comment:
+        if "good" in comment.lower():
+            return "good"
+        else:
+            return "bad"
+    return "bad"

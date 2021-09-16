@@ -91,9 +91,11 @@ class Phrase(models.Model):
     )
 
     MASKWACÎS_DICTIONARY = "MD"
+    TSUUTINA_DICTIONARY = "SRS"
     NEW_WORD = "new"
     ORIGIN_CHOICES = (
         (MASKWACÎS_DICTIONARY, "Maskwacîs Dictionary"),
+        (TSUUTINA_DICTIONARY, "Tsuut'ina Dictionary"),
         (NEW_WORD, "New word"),
     )
 
@@ -136,6 +138,12 @@ class Phrase(models.Model):
         null=True,
         default=NEW_WORD,
         **arguments_for_choices(ORIGIN_CHOICES),
+    )
+
+    osid = models.CharField(
+        help_text="Typically, this is the os##### for Tsuut'ina recordings",
+        null=True,
+        max_length=16,
     )
 
     # A hidden field that will be indexed to make fuzzy matching easier.
