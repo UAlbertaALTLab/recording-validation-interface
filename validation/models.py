@@ -54,6 +54,27 @@ def arguments_for_choices(choices):
     return dict(choices=choices, max_length=max(len(choice[0]) for choice in choices))
 
 
+class Dialect(models.Model):
+    name = models.CharField(
+        help_text="The full name of the dialect", blank=False, max_length=256
+    )
+
+    code = models.CharField(
+        help_text="The three character code for this language + an additional identifier",
+        blank=False,
+        max_length=16,
+    )
+
+    description = models.CharField(
+        help_text="A short description of this language/where it is spoken",
+        null=True,
+        max_length=1024,
+    )
+
+    def __str__(self) -> str:
+        return self.name
+
+
 class Phrase(models.Model):
     """
     A recorded phrase. A phrase may either be a word or a sentence with at
@@ -123,6 +144,13 @@ class Phrase(models.Model):
     )
     validated = models.BooleanField(
         help_text="Has this phrase be validated?", default=False
+    )
+
+    dialect = models.ForeignKey(
+        Dialect,
+        help_text="The dialect this phrase belongs to",
+        on_delete=models.PROTECT,
+        null=True,
     )
 
     status = models.CharField(
@@ -263,6 +291,8 @@ class Speaker(models.Model):
         null=True,
         blank=True,
     )
+
+    dialects = models.ManyToManyField(Dialect, blank=True)
 
     eng_bio_text = models.CharField(
         help_text="The English transcription of the speaker bio",
@@ -535,6 +565,13 @@ class Issue(models.Model):
 
     recording = models.ForeignKey(
         Recording, on_delete=models.CASCADE, blank=True, null=True
+    )
+
+    dialect = models.ForeignKey(
+        Dialect,
+        help_text="The dialect this phrase belongs to",
+        on_delete=models.PROTECT,
+        null=True,
     )
 
     created_by = models.CharField(

@@ -169,5 +169,5 @@ class RecordNewPhrase(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(RecordNewPhrase, self).__init__(*args, **kwargs)
-        self.fields["transcription"].label = "Cree"
+        self.fields["transcription"].label = "Source language"
         self.fields["translation"].label = "English"

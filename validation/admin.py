@@ -16,12 +16,13 @@
 from django.contrib import admin
 from simple_history.admin import SimpleHistoryAdmin
 
-from .models import Phrase, Recording, RecordingSession, Speaker, Issue
+from .models import Phrase, Recording, RecordingSession, Speaker, Issue, Dialect
 
 admin.site.register(Phrase, SimpleHistoryAdmin)
 admin.site.register(RecordingSession)
 admin.site.register(Speaker)  # TODO: use simplehistory
 admin.site.register(Recording, SimpleHistoryAdmin)
+admin.site.register(Dialect)
 
 
 class IssueAdmin(admin.ModelAdmin):

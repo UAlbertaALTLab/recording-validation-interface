@@ -53,7 +53,7 @@ from django.db.models import Q, QuerySet
 
 from librecval.normalization import to_indexable_form
 
-from .models import Phrase, Recording, Speaker, RecordingSession, Issue
+from .models import Phrase, Recording, Speaker, RecordingSession, Issue, Dialect
 from .forms import (
     EditSegment,
     Login,
@@ -71,13 +71,27 @@ from .helpers import (
 )
 
 
+def home(request):
+    """
+    The home page that lets you select a language/dialect
+    """
+    dialects = Dialect.objects.all()
+
+    context = dict(dialects=dialects, dialect=None)
+    return render(request, "validation/home.html", context)
+
+
 def index(request):
     """
-    The home page.
+    The main page.
     """
 
     is_linguist = user_is_linguist(request.user)
     is_expert = user_is_expert(request.user)
+
+    # Only show selected dialect
+    dialect_object = get_dialect_object(request.COOKIES.get("dialect"))
+    all_phrases = Phrase.objects.filter(dialect=dialect_object)
 
     mode = request.GET.get("mode")
     mode_options = {
@@ -90,9 +104,9 @@ def index(request):
         mode = mode_options[mode]
 
     if mode == "all" or not mode:
-        all_phrases = Phrase.objects.exclude(status=Phrase.USER)
+        all_phrases = all_phrases.exclude(status=Phrase.USER)
     else:
-        all_phrases = Phrase.objects.filter(status=mode)
+        all_phrases = all_phrases.filter(status=mode)
 
     all_phrases = all_phrases.prefetch_related("recording_set__speaker")
 
@@ -143,6 +157,7 @@ def index(request):
         session=session,
         mode=mode,
         encode_query_with_page=encode_query_with_page,
+        dialect=get_dialect_object(request.COOKIES.get("dialect")),
     )
     return render(request, "validation/list_phrases.html", context)
 
@@ -195,6 +210,7 @@ def search_phrases(request):
         is_expert=is_expert,
         forms=forms,
         auth=request.user.is_authenticated,
+        dialect=get_dialect_object(request.COOKIES.get("dialect")),
     )
     return render(request, "validation/search.html", context)
 
@@ -210,6 +226,7 @@ def advanced_search(request):
         speakers=speakers,
         auth=request.user.is_authenticated,
         is_linguist=user_is_linguist(request.user),
+        dialect=get_dialect_object(request.COOKIES.get("dialect")),
     )
     return render(request, "validation/advanced_search.html", context)
 
@@ -319,6 +336,7 @@ def advanced_search_results(request):
         is_expert=is_expert,
         forms=forms,
         auth=request.user.is_authenticated,
+        dialect=get_dialect_object(request.COOKIES.get("dialect")),
     )
     return render(request, "validation/search.html", context)
 
@@ -479,6 +497,7 @@ def segment_content_view(request, segment_id):
         history=history,
         auth=auth,
         is_linguist=user_is_linguist(request.user),
+        dialect=get_dialect_object(request.COOKIES.get("dialect")),
     )
 
     return render(request, "validation/segment_details.html", context)
@@ -526,16 +545,22 @@ def register(request):
                 response = HttpResponseRedirect("/login")
                 return response
 
-    context = dict(form=form)
+    context = dict(
+        form=form, dialect=get_dialect_object(request.COOKIES.get("dialect"))
+    )
     return render(request, "validation/register.html", context)
 
 
 def view_issues(request):
-    issues = Issue.objects.filter(status=Issue.OPEN).order_by("id")
+    dialect = get_dialect_object(request.COOKIES.get("dialect"))
+    issues = (
+        Issue.objects.filter(status=Issue.OPEN).filter(dialect=dialect).order_by("id")
+    )
     context = dict(
         issues=issues,
         auth=request.user.is_authenticated,
         is_linguist=user_is_linguist(request.user),
+        dialect=get_dialect_object(request.COOKIES.get("dialect")),
     )
     return render(request, "validation/view_issues.html", context)
 
@@ -570,6 +595,7 @@ def view_issue_detail(request, issue_id):
         form=form,
         auth=request.user.is_authenticated,
         is_linguist=user_is_linguist(request.user),
+        dialect=get_dialect_object(request.COOKIES.get("dialect")),
     )
     return render(request, "validation/view_issue_detail.html", context)
 
@@ -596,13 +622,15 @@ def speaker_view(request, speaker_code):
         img_src=image_url,
         auth=request.user.is_authenticated,
         speaker=speaker,
+        dialect=get_dialect_object(request.COOKIES.get("dialect")),
     )
     return render(request, "validation/speaker_view.html", context)
 
 
 def all_speakers(request):
     speakers = []
-    speaker_objects = Speaker.objects.all()
+    dialect = get_dialect_object(request.COOKIES.get("dialect"))
+    speaker_objects = Speaker.objects.filter(dialects__name=dialect)
     for speaker in speaker_objects:
         if (
             "E-" in speaker.code
@@ -623,7 +651,11 @@ def all_speakers(request):
         )
         speakers.append(speaker_dict)
 
-    context = dict(speakers=speakers, auth=request.user.is_authenticated)
+    context = dict(
+        speakers=speakers,
+        auth=request.user.is_authenticated,
+        dialect=get_dialect_object(request.COOKIES.get("dialect")),
+    )
     return render(request, "validation/all_speakers.html", context)
 
 
@@ -738,6 +770,8 @@ def save_wrong_word(request, recording_id):
 
 @login_required()
 def record_audio(request):
+    dialect_object = get_dialect_object(request.COOKIES.get("dialect"))
+
     if request.method == "POST":
         form = RecordNewPhrase(request.POST, request.FILES)
         translation = request.POST.get("translation")
@@ -746,7 +780,11 @@ def record_audio(request):
         transcription = clean_text(transcription)
         audio_data = request.FILES["audio_data"]
 
-        phrase = Phrase.objects.filter(transcription=transcription).first()
+        # To allow for homonym differentiation, we check that the translation is *exactly* the same
+        # There's likely a better way of doing this, but this should suffice for now
+        phrase = Phrase.objects.filter(
+            transcription=transcription, translation=translation, dialect=dialect_object
+        ).first()
         if not phrase:
             phrase = Phrase(
                 translation=translation,
@@ -756,6 +794,7 @@ def record_audio(request):
                 status=Phrase.USER,
                 date=datetime.datetime.now(),
                 modifier=request.user,
+                dialect=dialect_object,
             )
             phrase.save()
 
@@ -766,6 +805,11 @@ def record_audio(request):
                 code=request.user.username,
                 user=request.user,
             )
+            speaker.save()
+
+        if dialect_object not in speaker.dialects:
+            # Can only add dialect after the object exists i.e. is saved
+            speaker.dialects.add(dialect_object)
             speaker.save()
 
         rec_id = create_new_rec_id(phrase, speaker)
@@ -799,17 +843,30 @@ def record_audio(request):
             form=form,
             auth=request.user.is_authenticated,
             is_linguist=user_is_linguist(request.user),
+            dialect=get_dialect_object(request.COOKIES.get("dialect")),
         )
-        return HttpResponseRedirect("/secrets/record_audio", context)
+        return HttpResponseRedirect("/record_audio", context)
     else:
         form = RecordNewPhrase()
+        form.fields["transcription"].label = dialect_object.name
 
     context = dict(
         form=form,
         auth=request.user.is_authenticated,
         is_linguist=user_is_linguist(request.user),
+        dialect=get_dialect_object(request.COOKIES.get("dialect")),
     )
     return render(request, "validation/record_audio.html", context)
+
+
+def set_dialect(request, dialect_code):
+    assert get_object_or_404(Dialect, code=dialect_code)
+
+    response = HttpResponse(status=HTTPStatus.SEE_OTHER)
+    response["Location"] = "/"
+    response.set_cookie("dialect", dialect_code)
+
+    return response
 
 
 # Small Helper functions
@@ -998,3 +1055,7 @@ def clean_text(text):
     ret = ret.replace("\n", "")
     ret = ret.replace("\t", "")
     return ret
+
+
+def get_dialect_object(dialect):
+    return Dialect.objects.get(code=dialect)

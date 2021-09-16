@@ -1,0 +1,13 @@
+{% macro dialect_card(dialect) %}
+
+    <a href="/api/set_dialect/{{ dialect.code }}">
+    <article id='dialect-{{ dialect.id }}' class="card shadow-lg card--dialect" data-cy="segment-card">
+        <div class="card__body">
+            <h3>{{ dialect.name }}</h3>
+            <p>{{ dialect.description }}</p>
+        </div>
+
+    </article>
+    </a>
+
+{% endmacro %}
