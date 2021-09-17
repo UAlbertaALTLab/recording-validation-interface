@@ -2,7 +2,10 @@ import csv
 from datetime import datetime
 from hashlib import sha256
 from os import fspath
+from pathlib import Path
 from typing import NamedTuple
+
+from django.conf import settings
 from typing_extensions import Literal
 import re
 
@@ -67,69 +70,80 @@ class TsuutinaRecordingExtractor:
     Extracts recordings from a directory of Tsuut'ina files
     """
 
-    def scan(self):
-        elan_file_path = "/Users/jolenepoulin/Documents/Onespot-Sapir/OS-srs-BRS-018-2015-07-15_0841.eaf"
-        audio_path = "/Users/jolenepoulin/Documents/CRIM-Tsuutina_recordings/Onespot-Sapir/OS-srs-BRS-018-2015-07-15_0841-ELAN.wav"
-        eaf_file = Eaf(elan_file_path)
-        keys = eaf_file.get_tier_names()
-        metadata_file = open(
-            "/Users/jolenepoulin/Documents/recording-validation-interface/private/tsuutina-metadata.csv"
-        )
-        metadata = csv.DictReader(metadata_file)
-        md_dict = {}
-        for row in metadata:
-            md_dict[row["ID"]] = {
-                "form": row["Form"],
-                "corrected-form": row["Corrected form"],
-                "senses": row["Senses"],
-                "fst-gloss-template": row["FST gloss template"],
-                "morphemic-parsing": row["Morphemic parsing"],
-                "aspect": row["Aspect"],
-                "argument-structure": row["Argument structure"],
-                "inflectional-paradigm": row["Inflectional paradigm"],
-                "fst-lemma": row["FST lemma"],
-                "fst-morphology": row["FST morphology"],
-                "source": row["Source"],
-                "fst-status": row["FST status"],
-                "notes": row["Notes"],
-                "wordnet": row["WordNet"],
-                "rapidword-items": row["RapidWords items"],
-                "rapidwords-labels": row["RapidWords labels"],
-            }
+    def scan(self, sessions_dir):
+        md_dict = get_metadata_from_file()
 
-        for elem in eaf_file.get_annotation_data_for_tier("BRS-Identifier"):
-            if elem[2] in md_dict.keys():
-                entry = md_dict[elem[2]]
-                start = elem[0]
-                stop = elem[1]
-                rec_date = get_session_from_filename(
-                    "OS-srs-BRS-018-2015-07-15_0841.eaf"
-                )
-                session_id = SessionID(
-                    date=datetime.date(rec_date),
-                    time_of_day=None,
-                    subsession=None,
-                    location=None,
-                )
-                audio = AudioSegment.from_file(fspath(audio_path))[start:stop]
-                s = Segment(
-                    id=elem[2],
-                    translation=entry["senses"],
-                    transcription=entry["form"],
-                    fixed_transcription=entry["corrected-form"],
-                    start=start,
-                    stop=stop,
-                    comment=entry["notes"],
-                    quality=get_quality_from_eaf(eaf_file, start),
-                    session=session_id,
-                    audio=audio,
-                    type="word",
-                    speaker="BRS",
-                )
+        sessions_dir = Path(sessions_dir)
+        audio_dir = Path(settings.TSUUTINA_AUDIO_PREFIX)
+        elan_files = list(sessions_dir.glob("*.eaf"))
+        for elan_file in elan_files:
+            print(elan_file)
+            elan_file_path = elan_file
+            audio_path = Path(audio_dir, elan_file.name.replace(".eaf", "-ELAN.wav"))
+            if not audio_path.is_file():
+                continue
 
-                yield s
+            _eaf = Eaf(elan_file_path)
+            if "BRS-Identifier" not in _eaf.get_tier_names():
+                continue
 
-        metadata_file.close()
+            for elem in _eaf.get_annotation_data_for_tier("BRS-Identifier"):
+                if elem[2] in md_dict.keys():
+                    entry = md_dict[elem[2]]
+                    start = elem[0]
+                    stop = elem[1]
+                    rec_date = get_session_from_filename(elan_file.name)
+                    session_id = SessionID(
+                        date=datetime.date(rec_date),
+                        time_of_day=None,
+                        subsession=None,
+                        location=None,
+                    )
+                    audio = AudioSegment.from_file(fspath(audio_path))[start:stop]
+                    s = Segment(
+                        id=elem[2],
+                        translation=entry["senses"],
+                        transcription=entry["form"],
+                        fixed_transcription=entry["corrected-form"],
+                        start=start,
+                        stop=stop,
+                        comment=entry["notes"],
+                        quality=get_quality_from_eaf(_eaf, start),
+                        session=session_id,
+                        audio=audio,
+                        type="word",
+                        speaker="BRS",
+                    )
+
+                    yield s
+
+
+def get_metadata_from_file():
+    metadata_file = open(settings.TSUUTINA_METADATA_PATH)
+    metadata = csv.DictReader(metadata_file)
+    md_dict = {}
+    for row in metadata:
+        md_dict[row["ID"]] = {
+            "form": row["Form"],
+            "corrected-form": row["Corrected form"],
+            "senses": row["Senses"],
+            "fst-gloss-template": row["FST gloss template"],
+            "morphemic-parsing": row["Morphemic parsing"],
+            "aspect": row["Aspect"],
+            "argument-structure": row["Argument structure"],
+            "inflectional-paradigm": row["Inflectional paradigm"],
+            "fst-lemma": row["FST lemma"],
+            "fst-morphology": row["FST morphology"],
+            "source": row["Source"],
+            "fst-status": row["FST status"],
+            "notes": row["Notes"],
+            "wordnet": row["WordNet"],
+            "rapidword-items": row["RapidWords items"],
+            "rapidwords-labels": row["RapidWords labels"],
+        }
+
+    metadata_file.close()
+    return md_dict
 
 
 def get_session_from_filename(filename):
@@ -142,6 +156,8 @@ def get_session_from_filename(filename):
 
 def get_quality_from_eaf(eaf_file, start):
     comment = eaf_file.get_annotation_data_at_time("BRS-Questions", start + 1) or ""
+    if comment != "":
+        comment = comment[0][2]
     if comment:
         if "good" in comment.lower():
             return "good"

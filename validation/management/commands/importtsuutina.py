@@ -3,6 +3,7 @@ from datetime import datetime
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
+import logme
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand
@@ -10,7 +11,7 @@ from pydub import AudioSegment
 
 from librecval.extract_tsuutina import TsuutinaRecordingExtractor, Segment
 from librecval.transcode_recording import transcode_to_aac
-from validation.models import Speaker, RecordingSession, Phrase, Recording
+from validation.models import Speaker, RecordingSession, Phrase, Recording, Dialect
 
 
 class RecordingError(Exception):
@@ -39,26 +40,26 @@ class Command(BaseCommand):
 
         self._handle_store_django(sessions_dir)
 
-    def _handle_store_django(self, sessions_dir: Path) -> None:
+    @logme.log
+    def _handle_store_django(self, sessions_dir, logger) -> None:
         """
         Stores m4a files, managed by Django's media engine.
         """
         # Store transcoded audio in a temp directory;
         # these files will be then handled by the currently configured storage backend.
         recording_extractor = TsuutinaRecordingExtractor()
-        for segment in recording_extractor.scan():
-            print(segment.translation)
+        for segment in recording_extractor.scan(sessions_dir):
             speaker, speaker_created = Speaker.objects.get_or_create(
                 code=segment.speaker
             )
-            print("SPEAKER ", speaker)
 
             session, session_created = RecordingSession.get_or_create_by_session_id(
                 segment.session
             )
-            print(segment.session)
 
-            print("SESSION ", session)
+            dialect, dialect_created = Dialect.objects.get_or_create(
+                code="srs", name="Tsuut'ina"
+            )
 
             phrase, phrase_created = Phrase.objects.get_or_create(
                 osid=segment.id,
@@ -66,10 +67,9 @@ class Command(BaseCommand):
                 transcription=segment.fixed_transcription or segment.transcription,
                 translation=segment.translation,
                 kind=segment.type,
-                origin=Phrase.TSUUTINA_DICTIONARY,
+                origin=Phrase.ONESPOT_SAPIR,
+                dialect=dialect,
             )
-
-            print("PHRASE ", phrase, phrase.id)
 
             recording_path = save_recording(self.audio_dir, segment, segment.audio)
             audio_data = recording_path.read_bytes()
@@ -77,8 +77,6 @@ class Command(BaseCommand):
 
             quality = Recording.GOOD if segment.quality == "good" else Recording.BAD
             rec_id = segment.compute_sha256hash()
-            if Recording.objects.filter(id=rec_id).first():
-                continue
             recording = Recording(
                 id=rec_id,
                 compressed_audio=django_file,
@@ -89,9 +87,8 @@ class Command(BaseCommand):
                 quality=quality,
                 comment=segment.comment,
             )
+            recording.clean()
             recording.save()
-
-            print("RECORDING ", recording)
 
 
 def save_recording(

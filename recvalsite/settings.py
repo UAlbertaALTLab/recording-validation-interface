@@ -199,6 +199,11 @@ TSUUTINA_METADATA_PATH = config(
     "TSUUTINA_METADATA_PATH", BASE_DIR / "private" / "tsuutina-metadata.csv", cast=Path
 )
 
+TSUUTINA_AUDIO_PREFIX = config(
+    "TSUUTINA_AUDIO_PREFIX",
+    "/Users/jolenepoulin/Documents/CRIM-Tsuutina_recordings/Onespot-Sapir/",
+)
+
 # Where the sessions should be extracted from.
 # Expecting a structure like this:
 #

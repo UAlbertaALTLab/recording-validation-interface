@@ -112,11 +112,11 @@ class Phrase(models.Model):
     )
 
     MASKWACÎS_DICTIONARY = "MD"
-    TSUUTINA_DICTIONARY = "SRS"
+    ONESPOT_SAPIR = "OS"
     NEW_WORD = "new"
     ORIGIN_CHOICES = (
         (MASKWACÎS_DICTIONARY, "Maskwacîs Dictionary"),
-        (TSUUTINA_DICTIONARY, "Tsuut'ina Dictionary"),
+        (ONESPOT_SAPIR, "Onespot-Sapir Dictionary"),
         (NEW_WORD, "New word"),
     )
 
