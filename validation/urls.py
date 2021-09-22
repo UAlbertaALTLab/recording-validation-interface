@@ -26,6 +26,7 @@ from . import views
 app_name = "validation"
 urlpatterns = [
     path("", views.index, name="index"),
+    path("throw", views.throw_500, name="throw"),
     path(
         "login",
         auth_views.LoginView.as_view(template_name="validation/login.html"),
