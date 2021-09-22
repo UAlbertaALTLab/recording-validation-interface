@@ -28,6 +28,7 @@ from pathlib import Path
 
 import mutagen as mutagen
 from django.conf import settings
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as django_login
 from django.contrib.auth.models import User
@@ -810,6 +811,11 @@ def record_audio(request):
         is_linguist=user_is_linguist(request.user),
     )
     return render(request, "validation/record_audio.html", context)
+
+
+@staff_member_required
+def throw_500(request):
+    raise Exception("test error")
 
 
 # Small Helper functions
