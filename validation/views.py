@@ -813,11 +813,6 @@ def record_audio(request):
     return render(request, "validation/record_audio.html", context)
 
 
-@staff_member_required
-def throw_500(request):
-    raise Exception("test error")
-
-
 # Small Helper functions
 
 
