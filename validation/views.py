@@ -133,7 +133,7 @@ def index(request):
     if not session or session == "all":
         session = "all sessions"
 
-    recordings, forms = prep_phrase_data(request, phrases)
+    recordings, forms = prep_phrase_data(request, phrases, dialect_object.name)
 
     speakers = Speaker.objects.all()
 
@@ -189,7 +189,8 @@ def search_phrases(request):
     page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)
 
-    recordings, forms = prep_phrase_data(request, phrases)
+    lang = Dialect.objects.get(code=request.COOKIES.get("dialect")).name
+    recordings, forms = prep_phrase_data(request, phrases, lang)
 
     speakers = Speaker.objects.all()
 
@@ -308,7 +309,8 @@ def advanced_search_results(request):
             all_matches.append(phrase)
 
     all_matches.sort(key=lambda phrase: phrase.transcription)
-    _, forms = prep_phrase_data(request, all_matches)
+    lang = Dialect.objects.get(code=request.COOKIES.get("dialect")).name
+    _, forms = prep_phrase_data(request, all_matches, lang)
 
     query = QueryDict("", mutable=True)
     query.update(
@@ -954,7 +956,7 @@ def user_is_expert(user):
     return user.groups.filter(name__in=["Linguist", "Expert"]).exists()
 
 
-def prep_phrase_data(request, phrases):
+def prep_phrase_data(request, phrases, lang):
     # The _segment_card needs a dictionary of recordings
     # in order to properly display search results
     recordings = {}
@@ -967,6 +969,9 @@ def prep_phrase_data(request, phrases):
             )
         else:
             forms[phrase.id] = FlagSegment(initial={"phrase_id": phrase.id})
+            forms[phrase.id].fields[
+                "target_language_suggestion"
+            ].label = f"{lang} suggestion"
 
     return recordings, forms
 

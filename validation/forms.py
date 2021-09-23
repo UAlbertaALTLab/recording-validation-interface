@@ -87,13 +87,13 @@ class EditSegment(forms.Form):
 
 
 class FlagSegment(forms.ModelForm):
-    cree_suggestion = forms.CharField(
-        help_text="Use the space above to suggest a better Cree spelling",
+    target_language_suggestion = forms.CharField(
+        help_text="Use the space above to suggest a better spelling for the transcription",
         required=False,
         widget=forms.Textarea(attrs={"class": "form-control issue__textarea"}),
     )
 
-    english_suggestion = forms.CharField(
+    source_language_suggestion = forms.CharField(
         help_text="Use the space above to suggest a better English word or phrase",
         required=False,
         widget=forms.Textarea(attrs={"class": "form-control issue__textarea"}),
@@ -113,6 +113,11 @@ class FlagSegment(forms.ModelForm):
     class Meta:
         model = Issue
         fields = ["phrase_id"]
+
+    def __init__(self, *args, **kwargs):
+        super(FlagSegment, self).__init__(*args, **kwargs)
+        self.fields["target_language_suggestion"].label = "Target language suggestion"
+        self.fields["source_language_suggestion"].label = "English suggestion"
 
 
 class EditIssueWithRecording(forms.ModelForm):

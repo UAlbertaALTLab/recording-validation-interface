@@ -541,14 +541,14 @@ class Issue(models.Model):
         max_length=1024,
     )
 
-    suggested_cree = models.CharField(
-        help_text="The Cree spelling suggested by the validator",
+    target_language_suggestion = models.CharField(
+        help_text="The Target Language spelling suggestion from the validator",
         blank=True,
         max_length=1024,
     )
 
-    suggested_english = models.CharField(
-        help_text="The English spelling suggested by the validator",
+    source_language_suggestion = models.CharField(
+        help_text="The Source Language spelling suggestion from the validator",
         blank=True,
         max_length=1024,
     )
