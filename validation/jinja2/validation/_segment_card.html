@@ -43,14 +43,14 @@
                         <a href="{{ url('validation:segment_detail', phrase.id) }}" class="button button--success button--more-options button--right"  data-cy="options-button">More Options</a>
                     {% endif %} {# is linguist #}
                 {% endif %}
-                <p class="card__title--cree" data-cy="transcription">
+                <p class="card__title--target-language" data-cy="transcription">
                     {% if request.COOKIES['macron'] == 'on' %}
                         {{ phrase.transcription }}
                     {% else %}
                         {{ phrase.transcription | replace("ê", "e") }}
                     {% endif %}
                 </p>
-                <p class="card__title--english" data-cy="translation">Translation: {{ phrase.translation }}</p>
+                <p class="card__title--source-language" data-cy="translation">Translation: {{ phrase.translation }}</p>
 
                 {% if is_expert and phrase.origin == "new" %}
                     <p>Are the transcription and translation both correct?

@@ -4,8 +4,8 @@
     "fields": {
       "id": "1",
       "comment": "Wrong word",
-      "suggested_cree": "",
-      "suggested_english": "",
+      "target_language_suggestion": "",
+      "source_language_suggestion": "",
       "recording": "e0032855543e65ff360a95f9ead5e5d3e477c3f866000da506e98b754196de3c",
       "created_by": "linguist",
       "created_on": "2021-07-22"
@@ -16,8 +16,8 @@
     "fields": {
       "id": "2",
       "comment": "Wrong speaker",
-      "suggested_cree": "",
-      "suggested_english": "",
+      "target_language_suggestion": "",
+      "source_language_suggestion": "",
       "recording": "e0032855543e65ff360a95f9ead5e5d3e477c3f866000da506e98b754196de3c",
       "created_by": "linguist",
       "created_on": "2021-07-22"

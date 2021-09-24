@@ -8,12 +8,12 @@
   padding: 0.75rem;
 }
 
-.card__title--cree {
+.card__title--target-language {
   font-weight: 600;
   font-size: 3rem;
 }
 
-.card__title--english {
+.card__title--source-language {
   font-weight: 300;
   font-size: 2rem;
 }

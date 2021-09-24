@@ -82,10 +82,6 @@ class Phrase(models.Model):
     already be validated.
     """
 
-    # The only characters allowed in the transcription are the Cree SRO
-    # alphabet (in circumflexes), and some selected punctuation.
-    ALLOWED_TRANSCRIPTION_CHARACTERS = set("ptkcshmn yw rl êiîoôaâ -")
-
     MAX_TRANSCRIPTION_LENGTH = 256
 
     WORD = "word"
@@ -125,7 +121,7 @@ class Phrase(models.Model):
     )
 
     transcription = models.CharField(
-        help_text="The validated transciption of the Cree phrase.",
+        help_text="The validated transciption of the target language phrase.",
         blank=False,
         max_length=MAX_TRANSCRIPTION_LENGTH,
     )
@@ -183,7 +179,7 @@ class Phrase(models.Model):
     )
 
     analysis = models.CharField(
-        help_text="The analysis of the Cree phrase", blank=True, max_length=256
+        help_text="The analysis of the phrase", blank=True, max_length=256
     )
 
     modifier = models.CharField(
@@ -226,21 +222,11 @@ class Phrase(models.Model):
 
         if self.kind == self.WORD:
             self.transcription = normalize_sro(self.transcription)
-            if not self.transcription_is_in_strict_sro():
-                raise ValidationError(
-                    f"Cree word had non-SRO characters: {self.transcription}"
-                )
 
     def save(self, *args, **kwargs):
         # Make sure the fuzzy match is always up to date
         self.fuzzy_transcription = to_indexable_form(self.transcription)
         super().save(*args, **kwargs)
-
-    def transcription_is_in_strict_sro(self) -> bool:
-        """
-        Returns True when the transcription is written in perfect SRO.
-        """
-        return self.ALLOWED_TRANSCRIPTION_CHARACTERS.issuperset(self.transcription)
 
     def __str__(self) -> str:
         return self.transcription

@@ -49,7 +49,7 @@ class Register(forms.Form):
         widget=forms.RadioSelect,
         required=False,
         help_text="""
-        Community members are considered language experts or active members in a Cree-speaking community. <br>
+        Experts are community members with an excellent understand of their target language <br>
         Linguists are expected to look at analyses and lemmas. <br>
         Instructors are those who are teaching others or advanced language learners.<br>
         Learners are students or other people currently learning the language.<br>
@@ -74,7 +74,7 @@ class Register(forms.Form):
 
 
 class EditSegment(forms.Form):
-    cree = forms.CharField(
+    target_language = forms.CharField(
         required=False, widget=forms.TextInput(attrs={"class": "form-control"})
     )
     translation = forms.CharField(
@@ -84,6 +84,10 @@ class EditSegment(forms.Form):
         required=False,
         widget=forms.TextInput(attrs={"class": "form-control bottom-margin"}),
     )
+
+    def __init__(self, *args, **kwargs):
+        super(EditSegment, self).__init__(*args, **kwargs)
+        self.fields["target_language"].label = "Entry"
 
 
 class FlagSegment(forms.ModelForm):
