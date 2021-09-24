@@ -39,18 +39,18 @@
                     {{ macros.player(issue.recording) }}<br>
                 {% endif %}
                 <h3>What's wrong with this entry?</h3>
-                {% if issue.suggested_cree %}
-                    The Cree word in this entry is wrong<br>
+                {% if issue.target_language_suggestion %}
+                    The {{ dialect }} word in this entry is wrong<br>
                 {% endif %}
-                {% if issue.suggested_english %}
+                {% if issue.source_language_suggestion %}
                     The English word in this entry is wrong<br>
                 {% endif %}
                 Comment: {{ issue.comment }}<br>
-                {% if issue.suggested_cree %}
-                    Cree spelling suggestion: {{ issue.suggested_cree }}<br>
+                {% if issue.target_language_suggestion %}
+                    {{ dialect }} spelling suggestion: {{ issue.target_language_suggestion }}<br>
                 {% endif %}
                 {% if issue.suggested_english %}
-                    English spelling suggestion: {{ issue.suggested_english }}<br>
+                    English spelling suggestion: {{ issue.source_language_suggestion }}<br>
                 {% endif %}
                 <div class="card-footer">
                     This issue was filed by {{ issue.created_by }} on {{ issue.created_on }}

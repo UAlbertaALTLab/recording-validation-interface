@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
             name="crk_bio_text",
             field=models.CharField(
                 blank=True,
-                help_text="The Cree transcription of the speaker bio",
+                help_text="The Target Language transcription of the speaker bio",
                 max_length=4096,
                 null=True,
             ),
