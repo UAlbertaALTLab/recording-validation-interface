@@ -18,7 +18,7 @@
                 {% if speaker.bio %}
                   <p class="card-text speaker-bio-preview">{{ speaker.bio }}</p>
                 {% endif %}
-                <a href="{{ url('validation:speaker_view', speaker.code) }}" class="button button--success">Learn More</a>
+                <a href="{{ url('validation:speaker_view', dialect.code, speaker.code) }}" class="button button--success">Learn More</a>
                 </div>
             </div>
         </div>

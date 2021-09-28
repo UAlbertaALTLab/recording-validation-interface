@@ -40,18 +40,18 @@ const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
   {% if dialect != None %}
     <div class="navbar-collapse collapse justify-content-stretch" id="navbarSupportedContent">
       <form class="form-inline ml-2 my-2 my-lg-0" method="GET" action="{{
-        url('validation:search_phrases')
+        url('validation:search_phrases', dialect.code)
       }}">
         <input class="form-control mr-sm-2" name="query" type="search" placeholder="Search" aria-label="Search" data-cy="search-bar">
         <button class="my-2 my-sm-0 button button--success" type="submit">Search</button>
         &nbsp;
-        <a data-cy="advanced-search-button" href="{{ url('validation:advanced_search') }}" class="button button--adv-search">Advanced Search</a>
+        <a data-cy="advanced-search-button" href="{{ url('validation:advanced_search', dialect.code) }}" class="button button--adv-search">Advanced Search</a>
     
       </form>
     </div>
       <details>
         <summary data-cy="options-button-header" class="menu__caret">Options</summary>
-        {{ menu.menu_options(request, auth, is_linguist, showMacron) }}
+        {{ menu.menu_options(request, auth, is_linguist, showMacron, dialect) }}
       </details>
   {% endif %}
 

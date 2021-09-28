@@ -18,13 +18,13 @@
 {% import 'validation/_macros.html' as macros %}
 
 
-{% macro issue_card(issue) %}
+{% macro issue_card(issue, dialect) %}
     <div class="col-sm-6">
         <article class="card shadow" data-cy="issue-card">
             <div class="card__header card__header--beige" data-cy="card-header">
                 <div class="right">
                     <button class="button button--neutral" data-cy="more-info-issue-button">
-                        <a href="{{ url('validation:issue_detail', issue.id) }}">More Info</a>
+                        <a href="{{ url('validation:issue_detail', dialect.code, issue.id) }}">More Info</a>
                     </button>
                     <button class="button button--fail" data-cy="close-issue-button">
                         <a href="/api/close_issue/{{ issue.id }}">Close Issue</a>
