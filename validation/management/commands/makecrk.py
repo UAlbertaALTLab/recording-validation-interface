@@ -8,7 +8,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         phrases = Phrase.objects.all()
-        dialect = Dialect.objects.get(code="crk-mask")
+        dialect = Dialect.objects.get(code="maskwacis")
         for phrase in phrases:
             phrase.dialect = dialect
             phrase.save()

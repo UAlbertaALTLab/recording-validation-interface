@@ -25,7 +25,7 @@ from . import views
 
 app_name = "validation"
 urlpatterns = [
-    path("<str:language>/entries", views.entries, name="index"),
+    path("<str:language>/entries", views.entries, name="entries"),
     path(
         "",
         views.home,
@@ -105,7 +105,7 @@ urlpatterns = [
         name="close_issue",
     ),
     path(
-        "<str:language>/api/bulk_search",
+        "/api/bulk_search",
         views.bulk_search_recordings,
         name="bulk_search_recordings",
     ),

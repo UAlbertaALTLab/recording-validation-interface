@@ -29,7 +29,9 @@
             {% else %}
                 <li  onclick="showMacron('off')"><a href="#" class="menu__options-link">Show e without circumflex</a></li>
             {% endif %}
-            <li><a href="{{ url('validation:record_audio', dialect.code) }}" class="menu__options-link">Record Audio</a></li>
+            {% if dialect %}
+                <li><a href="{{ url('validation:record_audio', dialect.code) }}" class="menu__options-link">Record Audio</a></li>
+            {% endif %}
             <li><a href="{{ url('validation:logout') }}" id="logout-link" class="logout-link">Logout</a></li>
 
         {% else %}

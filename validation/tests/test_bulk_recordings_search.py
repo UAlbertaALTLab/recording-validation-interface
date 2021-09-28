@@ -99,6 +99,7 @@ def test_search_recordings_not_found(client, insert_test_data):
 def insert_test_data():
     call_command(
         "loaddata",
+        "test_language",
         "speaker_info",
         "test_recordingsession",
         "test_phrases",

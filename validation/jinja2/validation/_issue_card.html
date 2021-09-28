@@ -27,7 +27,7 @@
                         <a href="{{ url('validation:issue_detail', dialect.code, issue.id) }}">More Info</a>
                     </button>
                     <button class="button button--fail" data-cy="close-issue-button">
-                        <a href="/api/close_issue/{{ issue.id }}">Close Issue</a>
+                        <a href="{{ url('validation:close_issue', dialect.code, issue.id) }}">Close Issue</a>
                     </button>
                 </div>
             </div>

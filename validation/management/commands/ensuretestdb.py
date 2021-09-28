@@ -29,6 +29,7 @@ def import_test_phrases():
         print("No phrases found, generating")
         call_command(
             "loaddata",
+            "test_language",
             "speaker_info",
             "test_recordingsession",
             "test_phrases",
