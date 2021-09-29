@@ -31,5 +31,5 @@ jobs:
         # turns into `{ "foo": "a\n a" }` !
         run: >-
           curl -X POST https://deploy.altlab.dev/speech-db-dev --fail
-          -d '{ "secret": "${{ secrets.DEPLOY_ALTLAB_DEV_SPEECH_DB_KEY }}" }'
+          -d '{ "secret": "${{ secrets.DEPLOY_ALTLAB_DEV_SPEECH_DB_DEV_KEY }}" }'
           -H 'Content-Type: application/json'
