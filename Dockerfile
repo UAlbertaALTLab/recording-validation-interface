@@ -32,10 +32,7 @@ RUN groupadd --system --gid ${UID_GID} ${WSGI_USER} \
  && useradd --no-log-init --system --gid ${WSGI_USER} --uid ${UID_GID} ${WSGI_USER} \
  && mkdir /app \
  && mkdir -p /var/www/recvalsite \
- && mkdir /app/data \
- && mkdir /app/data/tsuutina \
- && mkdir /app/data/tsuutina/annotations \
- && chown ${WSGI_USER}:${WSGI_USER} /app /var/www/recvalsite /app/data /app/data/tsuutina /app/data/tsuutina/annotations
+ && chown ${WSGI_USER}:${WSGI_USER} /app /var/www/recvalsite
 
 RUN apt-get update -qq && apt-get -y install ffmpeg
 
