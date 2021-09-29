@@ -23,7 +23,7 @@
     <div class="row">
         {% if issues %}
             {% for issue in issues %}
-                {{ issue_card.issue_card(issue) }}
+                {{ issue_card.issue_card(issue, dialect) }}
             {% endfor %}
         {% else %}
             <div class="header-large-center" data-cy="no-issues-header">

@@ -6,7 +6,7 @@ describe("Linguists", () => {
     })
 
     it("can view the advanced options", () => {
-        cy.visit(Cypress.env('home'));
+        cy.visit(Cypress.env('maskwacis'));
 
         cy.get('[data-cy="segment-card"]:first')
             .within(() => {

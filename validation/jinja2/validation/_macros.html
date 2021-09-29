@@ -74,19 +74,19 @@
 
 
 {#
- # Expands to a <td> that displays the Cree transcription.
+ # Expands to a <td> that displays the target language transcription.
   # Creates link from phrase to view more details 
  #}
 {% macro td_transcription_link(user, phrase) %}
 <td lang="crk">
-  <a name="word-link" id="{{ phrase.transcription }}" href="{{ url('validation:segment_detail', phrase.id) }} ">
+  <a name="word-link" id="{{ phrase.transcription }}" href="{{ url('validation:segment_detail', dialect.code, phrase.id) }} ">
     {{ phrase.transcription }}
   </a>
 </td>
 {% endmacro %}
 
 {#
-  # Expands to a <td> that displays the Cree transcription.
+  # Expands to a <td> that displays the target language transcription.
   #}
  {% macro td_transcription(user, phrase) %}
  <td data-cy="segment-transcription" lang="crk">

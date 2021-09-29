@@ -7,7 +7,7 @@ describe("Edit segment", () => {
 
     it("shows original word", () => {
         
-        cy.visit(Cypress.env('home'));
+        cy.visit(Cypress.env('maskwacis'));
 
         cy.get('[data-cy="segment-card"]:first')
             .within(() => {
@@ -93,7 +93,7 @@ describe("Edit segment", () => {
             
         })
         cy.get('[data-cy=edit-div]').should('be.visible')
-        cy.get('#id_cree')
+        cy.get('#id_target_language')
             .should('be.visible')
             .within(() => {
                 cy.get('@transcription')
@@ -110,7 +110,7 @@ describe("Edit segment", () => {
         cy.visit(Cypress.env("awas_url"));
 
         cy.get('[data-cy=edit-div]').should('be.visible')
-        cy.get('#id_cree')
+        cy.get('#id_target_language')
             .should('be.visible')
 
         cy.get('#id_translation')
@@ -134,7 +134,7 @@ describe("Edit segment", () => {
                 .click()
         })
         cy.get('[data-cy=edit-div]').should('be.visible')
-        cy.get('#id_cree')
+        cy.get('#id_target_language')
             .should('be.visible')
             .within(() => {
                 cy.get('@transcription')
@@ -177,7 +177,7 @@ describe("Edit segment", () => {
         })
 
         cy.get('[data-cy=edit-div]').should('be.visible')
-        cy.get('#id_cree')
+        cy.get('#id_target_language')
             .should('be.visible')
             .within(() => {
                 cy.get('@transcription')
@@ -194,7 +194,7 @@ describe("Edit segment", () => {
 describe("Edit segment, no auth", () => {
     it("can not see details page", () => {
         
-        cy.visit(Cypress.env('home'));
+        cy.visit(Cypress.env('maskwacis'));
 
         cy.get('[data-cy="segment-card"]:first')
             .within(() => {

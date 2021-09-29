@@ -21,6 +21,8 @@ describe("Logout", () => {
         cy.location('pathname')
             .should('not.include', 'login')
 
+        cy.visit(Cypress.env('maskwacis'))
+
         cy.get('[data-cy="options-button-header"]')
             .click()
 

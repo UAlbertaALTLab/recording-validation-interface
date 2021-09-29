@@ -20,7 +20,7 @@
 {% import 'validation/_speaker_code_modal.html' as speaker_code_modal %}
 {% import 'validation/_wrong_buttons.html' as wrong_buttons %}
 
-{% macro segment_card(phrase, recordings, speakers, is_linguist, is_expert, auth, forms, csrf_token, request) %}
+{% macro segment_card(phrase, recordings, speakers, is_linguist, is_expert, auth, forms, csrf_token, request, dialect) %}
 
     <article id='phrase-{{ phrase.id }}' class="card shadow-sm" data-cy="segment-card">
             {% if phrase.validated %}
@@ -40,17 +40,17 @@
                 {% if auth %}
                     <button type="button" class="button button--fail button--flag button--right" data-toggle="modal" data-target="#{{ phrase.id }}-modal" data-cy="flag-button">Flag this entry for review</button><br>
                     {% if is_linguist %}
-                        <a href="{{ url('validation:segment_detail', phrase.id) }}" class="button button--success button--more-options button--right"  data-cy="options-button">More Options</a>
+                        <a href="{{ url('validation:segment_detail', dialect.code, phrase.id) }}" class="button button--success button--more-options button--right"  data-cy="options-button">More Options</a>
                     {% endif %} {# is linguist #}
                 {% endif %}
-                <p class="card__title--cree" data-cy="transcription">
+                <p class="card__title--target-language" data-cy="transcription">
                     {% if request.COOKIES['macron'] == 'on' %}
                         {{ phrase.transcription }}
                     {% else %}
                         {{ phrase.transcription | replace("ê", "e") }}
                     {% endif %}
                 </p>
-                <p class="card__title--english" data-cy="translation">Translation: {{ phrase.translation }}</p>
+                <p class="card__title--source-language" data-cy="translation">Translation: {{ phrase.translation }}</p>
 
                 {% if is_expert and phrase.origin == "new" %}
                     <p>Are the transcription and translation both correct?
