@@ -93,7 +93,7 @@ describe("Edit segment", () => {
             
         })
         cy.get('[data-cy=edit-div]').should('be.visible')
-        cy.get('#id_target_language')
+        cy.get('#id_source_language')
             .should('be.visible')
             .within(() => {
                 cy.get('@transcription')
@@ -110,7 +110,7 @@ describe("Edit segment", () => {
         cy.visit(Cypress.env("awas_url"));
 
         cy.get('[data-cy=edit-div]').should('be.visible')
-        cy.get('#id_target_language')
+        cy.get('#id_source_language')
             .should('be.visible')
 
         cy.get('#id_translation')
@@ -134,7 +134,7 @@ describe("Edit segment", () => {
                 .click()
         })
         cy.get('[data-cy=edit-div]').should('be.visible')
-        cy.get('#id_target_language')
+        cy.get('#id_source_language')
             .should('be.visible')
             .within(() => {
                 cy.get('@transcription')
@@ -177,7 +177,7 @@ describe("Edit segment", () => {
         })
 
         cy.get('[data-cy=edit-div]').should('be.visible')
-        cy.get('#id_target_language')
+        cy.get('#id_source_language')
             .should('be.visible')
             .within(() => {
                 cy.get('@transcription')

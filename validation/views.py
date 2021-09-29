@@ -469,7 +469,7 @@ def segment_content_view(request, language, segment_id):
         phrase_id = og_phrase.id
         if form.is_valid():
             transcription = (
-                form.cleaned_data["target_language"].strip() or og_phrase.transcription
+                form.cleaned_data["source_language"].strip() or og_phrase.transcription
             )
             translation = (
                 form.cleaned_data["translation"].strip() or og_phrase.translation
@@ -495,7 +495,7 @@ def segment_content_view(request, language, segment_id):
 
     form = EditSegment(
         initial={
-            "target_language": phrase.transcription,
+            "source_language": phrase.transcription,
             "translation": phrase.translation,
             "analysis": phrase.analysis,
         }
@@ -587,7 +587,7 @@ def view_issue_detail(request, language, issue_id):
                 return handle_save_issue_with_recording(form, issue, request)
         else:
             form = EditIssueWithRecording(
-                initial={"phrase": issue.target_language_suggestion}
+                initial={"phrase": issue.source_language_suggestion}
             )
 
     if issue.phrase:
@@ -598,8 +598,8 @@ def view_issue_detail(request, language, issue_id):
         else:
             form = EditIssueWithPhrase(
                 initial={
-                    "transcription": issue.target_language_suggestion,
-                    "translation": issue.source_language_suggestion,
+                    "transcription": issue.source_language_suggestion,
+                    "translation": issue.target_language_suggestion,
                 }
             )
 
@@ -767,7 +767,7 @@ def save_wrong_word(request, language, recording_id):
 
     new_issue = Issue(
         recording=rec,
-        target_language_suggestion=suggestion,
+        source_language_suggestion=suggestion,
         comment=comment,
         created_by=request.user,
         created_on=datetime.datetime.now(),
@@ -992,7 +992,7 @@ def prep_phrase_data(request, phrases, lang):
         else:
             forms[phrase.id] = FlagSegment(initial={"phrase_id": phrase.id})
             forms[phrase.id].fields[
-                "target_language_suggestion"
+                "source_language_suggestion"
             ].label = f"{lang} suggestion"
 
     return recordings, forms
@@ -1001,8 +1001,8 @@ def prep_phrase_data(request, phrases, lang):
 def save_issue(data, user):
     phrase_id = data["phrase_id"]
     comment = data["comment"]
-    target_language_suggestion = data["target_language_suggestion"]
     source_language_suggestion = data["source_language_suggestion"]
+    target_language_suggestion = data["target_language_suggestion"]
 
     phrase = Phrase.objects.get(id=phrase_id)
     phrase.validated = False
@@ -1012,8 +1012,8 @@ def save_issue(data, user):
     new_issue = Issue(
         phrase=phrase,
         comment=comment,
-        target_language_suggestion=target_language_suggestion,
         source_language_suggestion=source_language_suggestion,
+        target_language_suggestion=target_language_suggestion,
         created_by=user,
         created_on=datetime.datetime.now(),
     )
@@ -1085,5 +1085,4 @@ def clean_text(text):
 
 
 def get_dialect_object(language):
-    print(language)
     return get_object_or_404(Dialect, code=language)

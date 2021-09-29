@@ -74,7 +74,7 @@ class Register(forms.Form):
 
 
 class EditSegment(forms.Form):
-    target_language = forms.CharField(
+    source_language = forms.CharField(
         required=False, widget=forms.TextInput(attrs={"class": "form-control"})
     )
     translation = forms.CharField(
@@ -87,17 +87,17 @@ class EditSegment(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(EditSegment, self).__init__(*args, **kwargs)
-        self.fields["target_language"].label = "Entry"
+        self.fields["source_language"].label = "Entry"
 
 
 class FlagSegment(forms.ModelForm):
-    target_language_suggestion = forms.CharField(
+    source_language_suggestion = forms.CharField(
         help_text="Use the space above to suggest a better spelling for the transcription",
         required=False,
         widget=forms.Textarea(attrs={"class": "form-control issue__textarea"}),
     )
 
-    source_language_suggestion = forms.CharField(
+    target_language_suggestion = forms.CharField(
         help_text="Use the space above to suggest a better English word or phrase",
         required=False,
         widget=forms.Textarea(attrs={"class": "form-control issue__textarea"}),
@@ -120,8 +120,8 @@ class FlagSegment(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(FlagSegment, self).__init__(*args, **kwargs)
-        self.fields["target_language_suggestion"].label = "Target language suggestion"
-        self.fields["source_language_suggestion"].label = "English suggestion"
+        self.fields["source_language_suggestion"].label = "Target language suggestion"
+        self.fields["target_language_suggestion"].label = "English suggestion"
 
 
 class EditIssueWithRecording(forms.ModelForm):

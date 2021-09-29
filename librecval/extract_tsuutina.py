@@ -9,8 +9,8 @@ from django.conf import settings
 from typing_extensions import Literal
 import re
 
-from pydub import AudioSegment
-from pympi.Elan import Eaf
+from pydub import AudioSegment  # type: ignore
+from pympi.Elan import Eaf  # type: ignore
 
 from librecval.recording_session import SessionID
 

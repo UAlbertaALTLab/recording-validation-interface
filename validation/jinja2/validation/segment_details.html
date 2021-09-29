@@ -2,14 +2,14 @@
     function showDivAccept(name, analysis) {
         document.getElementById('edit').style.display = "block";
 
-        document.getElementById('id_target_language').value = name;
+        document.getElementById('id_source_language').value = name;
         document.getElementById('id_analysis').value = analysis;
     }
 
     function revert(transcription, analysis) {
         document.getElementById('edit').style.display = "block";
 
-        document.getElementById('id_target_language').value = transcription;
+        document.getElementById('id_source_language').value = transcription;
         document.getElementById('id_analysis').value = analysis;
     }
 

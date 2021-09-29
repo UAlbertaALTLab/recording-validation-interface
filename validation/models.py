@@ -535,13 +535,13 @@ class Issue(models.Model):
         max_length=1024,
     )
 
-    target_language_suggestion = models.CharField(
+    source_language_suggestion = models.CharField(
         help_text="The Target Language spelling suggestion from the validator",
         blank=True,
         max_length=1024,
     )
 
-    source_language_suggestion = models.CharField(
+    target_language_suggestion = models.CharField(
         help_text="The Source Language spelling suggestion from the validator",
         blank=True,
         max_length=1024,

@@ -37,18 +37,18 @@
                 {{ issue.recording }}<br>
                 {{ macros.player(issue.recording) }}<br>
             {% endif %}
-            {% if issue.target_language_suggestion %}
+            {% if issue.source_language_suggestion %}
                     The {{ dialect }} word in this entry is wrong<br>
                 {% endif %}
-                {% if issue.source_language_suggestion %}
+                {% if issue.target_language_suggestion %}
                     The English word in this entry is wrong<br>
                 {% endif %}
                 Comment: {{ issue.comment }}<br>
-                {% if issue.target_language_suggestion %}
-                    {{ dialect }} spelling suggestion: {{ issue.target_language_suggestion }}<br>
-                {% endif %}
                 {% if issue.source_language_suggestion %}
-                    English spelling suggestion: {{ issue.source_language_suggestion }}<br>
+                    {{ dialect }} spelling suggestion: {{ issue.source_language_suggestion }}<br>
+                {% endif %}
+                {% if issue.target_language_suggestion %}
+                    English spelling suggestion: {{ issue.target_language_suggestion }}<br>
                 {% endif %}
             This issue was filed by {{ issue.created_by }} on
             {{ issue.created_on }}<br>

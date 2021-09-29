@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name="issue",
-            name="target_language_suggestion",
+            name="source_language_suggestion",
             field=models.CharField(
                 blank=True,
                 help_text="The Target Language spelling suggestion from the validator",
