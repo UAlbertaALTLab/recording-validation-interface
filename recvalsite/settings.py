@@ -200,8 +200,7 @@ TSUUTINA_METADATA_PATH = config(
 )
 
 TSUUTINA_AUDIO_PREFIX = config(
-    "TSUUTINA_AUDIO_PREFIX",
-    "/Users/jolenepoulin/Documents/CRIM-Tsuutina_recordings/Onespot-Sapir/",
+    "TSUUTINA_AUDIO_PREFIX", BASE_DIR / "data" / "tsuutina" / "annotations", cast=Path
 )
 
 # Where the sessions should be extracted from.
