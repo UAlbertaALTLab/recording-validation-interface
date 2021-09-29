@@ -35,7 +35,13 @@ if SECRET_KEY is None:
 DEBUG = config("DEBUG", default=False, cast=bool)
 USE_DJANGO_DEBUG_TOOLBAR = config("USE_DJANGO_DEBUG_TOOLBAR", default=DEBUG, cast=bool)
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "speech-db.altlab.app", "altlab-itw:8004"]
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "speech-db.altlab.app",
+    "altlab-itw:8004",
+    "altlab-itw:8080",
+]
 
 
 # Application definition

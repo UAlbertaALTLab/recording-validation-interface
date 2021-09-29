@@ -4,7 +4,7 @@ services:
         build: .
         restart: always
         ports:
-        - "8004:8000"
+        - "80808000"
         volumes:
         # HOST : CONTAINER
         - "./.env:/app/.env"
@@ -16,5 +16,5 @@ services:
         - "/data/maskwacis-recordings:/data/maskwacis-recordings"
         - "/data/application-data/speech-db/metadata.csv:/app/private/metadata.csv"
         - "/data/application-data/speech-db/tsuutina-metadata.csv:/app/private/tsuutina-metadata.csv"
-        - "/data/application-data/speech-db/tsuutina-annotations:/data/tsuutina/annotations"
-        - "/data/application-data/speech-db/tsuutina-recordings:/data/tsuutina/"
+        - "/data/application-data/speech-db/tsuutina-annotations:/app/data/tsuutina/annotations"
+        - "/data/application-data/speech-db/tsuutina-recordings:/app/data/tsuutina"
