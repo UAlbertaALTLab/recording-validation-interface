@@ -90,6 +90,8 @@ class TsuutinaRecordingExtractor:
             for elem in _eaf.get_annotation_data_for_tier("BRS-Identifier"):
                 if elem[2] in md_dict.keys():
                     entry = md_dict[elem[2]]
+                    if entry["form"].startswith("*"):
+                        continue
                     start = elem[0]
                     stop = elem[1]
                     rec_date = get_session_from_filename(elan_file.name)
