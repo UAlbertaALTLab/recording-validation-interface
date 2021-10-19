@@ -280,25 +280,25 @@ class Speaker(models.Model):
 
     dialects = models.ManyToManyField(Dialect, blank=True)
 
-    eng_bio_text = models.CharField(
+    target_bio_text = models.CharField(
         help_text="The English transcription of the speaker bio",
         null=True,
         blank=True,
         max_length=4096,
     )
-    crk_bio_text = models.CharField(
+    source_bio_text = models.CharField(
         help_text="The Cree transcription of the speaker bio",
         null=True,
         blank=True,
         max_length=4096,
     )
 
-    eng_bio_audio = models.FileField(
+    target_bio_audio = models.FileField(
         # relative to settings.MEDIA_ROOT
         upload_to=settings.RECVAL_AUDIO_PREFIX,
         blank=True,
     )
-    crk_bio_audio = models.FileField(
+    source_bio_audio = models.FileField(
         # relative to settings.MEDIA_ROOT
         upload_to=settings.RECVAL_AUDIO_PREFIX,
         blank=True,
@@ -310,7 +310,7 @@ class Speaker(models.Model):
         Which dialect this person speaks.
         """
         # Hard-coded for now, but it makes implementing this field trival.
-        return "Maskwacîs"
+        return [dialect.name for dialect in self.dialects]
 
     @property
     def anonymous(self):
