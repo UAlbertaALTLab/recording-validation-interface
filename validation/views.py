@@ -622,7 +622,6 @@ def all_speakers(request):
         else:
             img_src = Path(settings.BASE_DIR / settings.BIO_IMG_PREFIX / "missing.jpg")
 
-        print(img_src)
         speaker_dict = dict(
             full_name=full_name,
             code=speaker.code,
