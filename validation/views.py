@@ -583,7 +583,6 @@ def close_issue(request, issue_id):
 
 
 def speaker_view(request, speaker_code):
-    print(speaker_code)
     speaker = Speaker.objects.get(code=speaker_code)
     if speaker:
         full_name = speaker.full_name
