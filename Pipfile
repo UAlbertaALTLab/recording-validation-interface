@@ -22,6 +22,7 @@ tqdm = "*"
 whitenoise = "*"
 mutagen = "*"
 hfst-optimized-lookup = "*"
+pillow = "*"
 
 [dev-packages]
 gunicorn = "*"
