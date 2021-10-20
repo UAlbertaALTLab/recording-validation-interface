@@ -590,9 +590,15 @@ def speaker_view(request, speaker_code):
     else:
         full_name = f"No speaker found for speaker code {speaker_code}"
 
+    if speaker.image:
+        img_src = speaker.image.url
+    else:
+        img_src = Path(settings.BASE_DIR / settings.BIO_IMG_PREFIX / "missing.jpg")
+
     context = dict(
         full_name=full_name,
         auth=request.user.is_authenticated,
+        img_src=img_src,
         speaker=speaker,
     )
     return render(request, "validation/speaker_view.html", context)
