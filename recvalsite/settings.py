@@ -39,6 +39,7 @@ ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
     "speech-db.altlab.app",
+    "speech-db.altlab.dev",
     "altlab-itw:8004",
     "altlab-itw:8080",
 ]
