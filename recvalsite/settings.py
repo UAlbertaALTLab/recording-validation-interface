@@ -189,6 +189,7 @@ STATIC_ROOT = config("STATIC_ROOT", default=default_static_dir)
 # This is concatenated with MEDIA_ROOT and MEDIA_URL to store and serve the audio files.
 RECVAL_AUDIO_PREFIX = config("RECVAL_AUDIO_PREFIX", default="audio/")
 BIO_INFO_PREFIX = config("BIO_INFO_PREFIX", default="data/speakers/biographies")
+BIO_IMG_PREFIX = config("BIO_IMG_PREFIX", default="data/speakers/images/")
 
 # Where to find the metadata CSV file.
 RECVAL_METADATA_PATH = config(

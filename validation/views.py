@@ -587,15 +587,18 @@ def speaker_view(request, speaker_code):
     speaker = Speaker.objects.get(code=speaker_code)
     if speaker:
         full_name = speaker.full_name
-        image_url = get_image_url(full_name)
     else:
         full_name = f"No speaker found for speaker code {speaker_code}"
-        image_url = "#"
+
+    if speaker.image:
+        img_src = speaker.image.url
+    else:
+        img_src = Path(settings.BASE_DIR / settings.BIO_IMG_PREFIX / "missing.jpg")
 
     context = dict(
         full_name=full_name,
-        img_src=image_url,
         auth=request.user.is_authenticated,
+        img_src=img_src,
         speaker=speaker,
     )
     return render(request, "validation/speaker_view.html", context)
@@ -614,13 +617,18 @@ def all_speakers(request):
             continue
 
         full_name = speaker.full_name
-        image_url = get_image_url(full_name)
+        if speaker.image:
+            img_src = speaker.image.url
+        else:
+            img_src = Path(settings.BASE_DIR / settings.BIO_IMG_PREFIX / "missing.jpg")
 
+        print(img_src)
         speaker_dict = dict(
             full_name=full_name,
             code=speaker.code,
-            img_src=image_url,
+            img_src=img_src,
             bio=speaker.eng_bio_text or "",
+            speaker=speaker,
         )
         speakers.append(speaker_dict)
 
@@ -819,18 +827,6 @@ def throw_500(request):
 
 
 # Small Helper functions
-
-
-def get_image_url(full_name):
-    image_name = full_name.replace(" ", "") + ".jpg"
-    image_name = normalize_img_name(image_name)
-    image_url = Path(f"{settings.STATIC_URL}/images/speakers/{image_name}")
-    if not Path(
-        f"validation/{settings.STATIC_URL}/images/speakers/{image_name}"
-    ).exists():
-        image_url = Path(f"{settings.STATIC_URL}/images/missing.jpg")
-
-    return image_url
 
 
 def handle_save_issue_with_recording(form, issue, request):
