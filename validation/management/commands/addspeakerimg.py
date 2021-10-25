@@ -2,6 +2,7 @@
 Django management command to add photos to speakers
 """
 from pathlib import Path
+from tkinter import Image
 
 from django.core.management.base import BaseCommand, CommandError  # type: ignore
 
@@ -20,8 +21,11 @@ class Command(BaseCommand):
             if not Path(path).is_file():
                 print("Could not find file at", path)
                 path = f"{settings.BIO_IMG_PREFIX}missing.jpg"
-            speaker.image = path
-            speaker.save()
+
+            with open(path, "rb") as f:
+                img = f.read()
+                speaker.image = img
+                speaker.save()
 
 
 def get_name_from_speaker(speaker):
