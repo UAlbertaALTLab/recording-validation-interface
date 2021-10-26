@@ -127,7 +127,11 @@
   #}
  {% macro td_suggestion_translation(user, suggestion, suggestions) %}
  <td data-cy="suggestion-translation" lang="en">
-   {{ suggestions[suggestion]['matches'][0]['translation'] or 'No translation available' }}
+    {% if suggestions[suggestion]['matches']|length > 0 and 'translation' in suggestions[suggestion]['matches'][0] %}
+        {{ suggestions[suggestion]['matches'][0]['translation'] }}
+    {% else %}
+        No translation available
+    {% endif %}
  </td>
  {% endmacro %}
 
