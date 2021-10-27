@@ -278,6 +278,8 @@ class Speaker(models.Model):
         blank=True,
     )
 
+    image = models.ImageField(upload_to=settings.BIO_IMG_PREFIX, blank=True)
+
     dialects = models.ManyToManyField(Dialect, blank=True)
 
     target_bio_text = models.CharField(
