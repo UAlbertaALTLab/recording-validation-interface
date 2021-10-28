@@ -28,6 +28,10 @@ class Register(forms.Form):
         required=True,
         widget=forms.TextInput(attrs={"class": "form-control form-restrict"}),
     )
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={"class": "form-control form-restrict"}),
+    )
     username = forms.CharField(
         required=True,
         widget=forms.TextInput(attrs={"class": "form-control form-restrict"}),
@@ -37,7 +41,7 @@ class Register(forms.Form):
         widget=forms.PasswordInput(attrs={"class": "form-control form-restrict"}),
     )
 
-    CHOICES = [
+    ROLE_CHOICES = [
         ("expert", "Language Expert"),
         ("linguist", "Linguist"),
         ("instructor", "Instructor"),
@@ -45,7 +49,7 @@ class Register(forms.Form):
     ]
     role = forms.ChoiceField(
         label="I am a(n)...",
-        choices=CHOICES,
+        choices=ROLE_CHOICES,
         widget=forms.RadioSelect,
         required=False,
         help_text="""
@@ -54,6 +58,22 @@ class Register(forms.Form):
         Instructors are those who are teaching others or advanced language learners.<br>
         Learners are students or other people currently learning the language.<br>
         """,
+    )
+
+    LANG_CHOICES = [
+        ("maskwacis", "Maskwacîs"),
+        ("tsuutina", "Tsuut'ina"),
+        ("stoney", "Stoney Nakoda"),
+    ]
+
+    language_variant = forms.MultipleChoiceField(
+        label="I would like access to...",
+        choices=LANG_CHOICES,
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+        help_text="""
+        Please select all the languages you want access to with the role specified above. <br>
+        If you leave this selection blank, you will be given learner level access to all dialects.""",
     )
 
     def clean_username(self):

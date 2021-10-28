@@ -87,8 +87,8 @@ def entries(request, language):
     The main page.
     """
 
-    is_linguist = user_is_linguist(request.user)
-    is_expert = user_is_expert(request.user)
+    is_linguist = user_is_linguist(request.user, language)
+    is_expert = user_is_expert(request.user, language)
 
     # Only show selected dialect
     dialect_object = get_dialect_object(language)
@@ -167,8 +167,8 @@ def search_phrases(request, language):
     """
     The search results for pages.
     """
-    is_linguist = user_is_linguist(request.user)
-    is_expert = user_is_expert(request.user)
+    is_linguist = user_is_linguist(request.user, language)
+    is_expert = user_is_expert(request.user, language)
     dialect_object = get_dialect_object(language)
 
     query = request.GET.get("query")
@@ -229,7 +229,7 @@ def advanced_search(request, language):
     context = dict(
         speakers=speakers,
         auth=request.user.is_authenticated,
-        is_linguist=user_is_linguist(request.user),
+        is_linguist=user_is_linguist(request.user, language),
         dialect=dialect_object,
     )
     return render(request, "validation/advanced_search.html", context)
@@ -245,8 +245,8 @@ def advanced_search_results(request, language):
     INTERSECT status
     INTERSECT speaker
     """
-    is_linguist = user_is_linguist(request.user)
-    is_expert = user_is_expert(request.user)
+    is_linguist = user_is_linguist(request.user, language)
+    is_expert = user_is_expert(request.user, language)
 
     transcription = request.GET.get("transcription")
     translation = request.GET.get("translation")
@@ -508,7 +508,7 @@ def segment_content_view(request, language, segment_id):
         form=form,
         history=history,
         auth=auth,
-        is_linguist=user_is_linguist(request.user),
+        is_linguist=user_is_linguist(request.user, language),
         dialect=dialect_object,
     )
 
@@ -528,6 +528,8 @@ def register(request):
             first_name = form.cleaned_data["first_name"]
             last_name = form.cleaned_data["last_name"]
             group = form.cleaned_data["role"]
+            languages = form.cleaned_data["language_variant"]
+            print(languages)
             if not group:
                 group = "Learner"
             else:
@@ -545,7 +547,7 @@ def register(request):
                     # https://studygyaan.com/django/how-to-signup-user-and-send-confirmation-email-in-django
                     # Linguists need permission to be a linguist
                     subject = f"New {group} User"
-                    message = f"New user {username} has requested {group} access. Login to the admin interface to grant them access."
+                    message = f"New user {username} has requested {group} access to {languages}. Login to the admin interface to grant them access."
                     mail_admins(
                         subject,
                         message,
@@ -554,6 +556,10 @@ def register(request):
                     group = "Learner"
                 group, _ = Group.objects.get_or_create(name=group)
                 group.user_set.add(new_user)
+                if languages:
+                    for language in languages:
+                        lang_group, _ = Group.objects.get_or_create(name=language)
+                        lang_group.user_set.add(new_user)
                 response = HttpResponseRedirect("/login")
                 return response
 
@@ -569,7 +575,7 @@ def view_issues(request, language):
     context = dict(
         issues=issues,
         auth=request.user.is_authenticated,
-        is_linguist=user_is_linguist(request.user),
+        is_linguist=user_is_linguist(request.user, language),
         dialect=dialect,
     )
     return render(request, "validation/view_issues.html", context)
@@ -607,7 +613,7 @@ def view_issue_detail(request, language, issue_id):
         issue=issue,
         form=form,
         auth=request.user.is_authenticated,
-        is_linguist=user_is_linguist(request.user),
+        is_linguist=user_is_linguist(request.user, language),
         dialect=dialect,
     )
     return render(request, "validation/view_issue_detail.html", context)
@@ -822,7 +828,7 @@ def record_audio(request, language):
                 status=Phrase.USER,
                 date=datetime.datetime.now(),
                 modifier=request.user,
-                dialect=dialect_object,
+                dialect=dialect,
             )
             phrase.save()
 
@@ -835,9 +841,9 @@ def record_audio(request, language):
             )
             speaker.save()
 
-        if dialect_object not in speaker.dialects:
+        if dialect not in speaker.dialects:
             # Can only add dialect after the object exists i.e. is saved
-            speaker.dialects.add(dialect_object)
+            speaker.dialects.add(dialect)
             speaker.save()
 
         rec_id = create_new_rec_id(phrase, speaker)
@@ -872,7 +878,7 @@ def record_audio(request, language):
         context = dict(
             form=form,
             auth=request.user.is_authenticated,
-            is_linguist=user_is_linguist(request.user),
+            is_linguist=user_is_linguist(request.user, language),
             dialect=dialect,
         )
         return HttpResponseRedirect("/record_audio", context)
@@ -883,7 +889,7 @@ def record_audio(request, language):
     context = dict(
         form=form,
         auth=request.user.is_authenticated,
-        is_linguist=user_is_linguist(request.user),
+        is_linguist=user_is_linguist(request.user, language),
         dialect=dialect,
     )
     return render(request, f"validation/record_audio.html", context)
@@ -965,12 +971,18 @@ def encode_query_with_page(query, page):
     return f"?{query.urlencode()}"
 
 
-def user_is_linguist(user):
-    return user.groups.filter(name="Linguist").exists()
+def user_is_linguist(user, lang):
+    return (
+        user.groups.filter(name="Linguist").exists()
+        and user.groups.filter(name=lang).exists()
+    )
 
 
-def user_is_expert(user):
-    return user.groups.filter(name__in=["Linguist", "Expert"]).exists()
+def user_is_expert(user, lang):
+    return (
+        user.groups.filter(name__in=["Linguist", "Expert"]).exists()
+        and user.groups.filter(name=lang).exists()
+    )
 
 
 def prep_phrase_data(request, phrases, lang):
