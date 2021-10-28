@@ -676,7 +676,7 @@ def all_speakers(request, language):
             full_name=full_name,
             code=speaker.code,
             img_src=img_src,
-            bio=speaker.eng_bio_text or "",
+            bio=speaker.target_bio_text or "",
             speaker=speaker,
         )
         speakers.append(speaker_dict)
