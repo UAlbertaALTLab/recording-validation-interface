@@ -44,6 +44,8 @@ def create_test_user(username, group_name):
     user.save()
     group, _ = Group.objects.get_or_create(name=group_name)
     group.user_set.add(user)
+    lang_group, _ = Group.objects.get_or_create(name="maskwacis")
+    lang_group.user_set.add(user)
 
 
 def create_test_users():

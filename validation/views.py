@@ -53,6 +53,7 @@ from django.core.mail import mail_admins
 from django.db.models import Q, QuerySet
 
 from librecval.normalization import to_indexable_form
+from .jinja2 import url
 
 from .models import Phrase, Recording, Speaker, RecordingSession, Issue, Dialect
 from .forms import (
@@ -527,9 +528,9 @@ def register(request):
             password = form.cleaned_data["password"]
             first_name = form.cleaned_data["first_name"]
             last_name = form.cleaned_data["last_name"]
+            email = form.cleaned_data["email"]
             group = form.cleaned_data["role"]
             languages = form.cleaned_data["language_variant"]
-            print(languages)
             if not group:
                 group = "Learner"
             else:
@@ -541,6 +542,7 @@ def register(request):
                     password=password,
                     first_name=first_name,
                     last_name=last_name,
+                    email=email,
                 )
                 new_user.save()
                 if group == "Linguist" or group == "Expert":
@@ -625,7 +627,7 @@ def close_issue(request, language, issue_id):
     issue.status = Issue.RESOLVED
     issue.save()
 
-    return HttpResponseRedirect(f"{dialect.code}/issues")
+    return HttpResponseRedirect(url("validation:issues", language))
 
 
 def speaker_view(request, language, speaker_code):
@@ -734,7 +736,7 @@ def record_audio_quality_judgement(request, language, recording_id):
 @require_http_methods(["POST"])
 def save_wrong_speaker_code(request, language, recording_id):
     dialect = get_dialect_object(language)
-    rec = get_object_or_404(Recording, id=recording_id, dialect=dialect)
+    rec = get_object_or_404(Recording, id=recording_id)
     speaker = request.POST.get("speaker-code-select")
     referrer = request.POST.get("referrer")
 
