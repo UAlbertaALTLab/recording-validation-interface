@@ -256,8 +256,6 @@ class Speaker(models.Model):
         blank=True,
     )
 
-    image = models.ImageField(upload_to=settings.BIO_IMG_PREFIX, blank=True)
-
     eng_bio_text = models.CharField(
         help_text="The English transcription of the speaker bio",
         null=True,
