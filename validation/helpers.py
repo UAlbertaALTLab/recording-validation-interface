@@ -37,7 +37,7 @@ consonants = [f"  {char}" for char in "chkmnpstwy"]
 def get_edit_distance(word):
 
     ranked_suggestions = speller.suggest(word)
-    suggestions = [s[0] for s in ranked_suggestions]
+    suggestions = [s[0] for s in ranked_suggestions if len(s) > 0]
 
     rankings = {}
     for s in suggestions:
