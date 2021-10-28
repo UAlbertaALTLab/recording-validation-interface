@@ -58,7 +58,7 @@ class Command(BaseCommand):
             )
 
             dialect, dialect_created = Dialect.objects.get_or_create(
-                code="srs", name="Tsuut'ina"
+                code="tsuutina", name="Tsuut'ina"
             )
 
             phrase, phrase_created = Phrase.objects.get_or_create(
