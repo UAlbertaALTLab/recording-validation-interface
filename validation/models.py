@@ -312,7 +312,11 @@ class Speaker(models.Model):
         Which dialect this person speaks.
         """
         # Hard-coded for now, but it makes implementing this field trival.
-        return [dialect.name for dialect in self.dialects]
+        return [
+            dialect.name
+            for dialect in Dialect.objects.all()
+            if dialect in self.dialects.all()
+        ]
 
     @property
     def anonymous(self):
