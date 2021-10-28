@@ -78,8 +78,9 @@ def home(request):
     The home page that lets you select a language variant
     """
     dialects = Dialect.objects.all()
+    auth = request.user.is_authenticated
 
-    context = dict(dialects=dialects, dialect=None)
+    context = dict(dialects=dialects, dialect=None, auth=auth)
     return render(request, "validation/home.html", context)
 
 
