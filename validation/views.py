@@ -649,15 +649,15 @@ def speaker_view(request, language, speaker_code):
         auth=request.user.is_authenticated,
         img_src=img_src,
         speaker=speaker,
-        dialect=dialect,
+        language=language,
     )
     return render(request, "validation/speaker_view.html", context)
 
 
 def all_speakers(request, language):
     speakers = []
-    dialect = get_dialect_object(language)
-    speaker_objects = dialect.speaker_set.all()
+    language = get_language_object(language)
+    speaker_objects = language.speaker_set.all()
     for speaker in speaker_objects:
         if (
             "E-" in speaker.code
@@ -685,7 +685,7 @@ def all_speakers(request, language):
     context = dict(
         speakers=speakers,
         auth=request.user.is_authenticated,
-        dialect=dialect,
+        language=language,
     )
     return render(request, "validation/all_speakers.html", context)
 
@@ -696,8 +696,8 @@ def all_speakers(request, language):
 @login_required()
 @require_http_methods(["POST"])
 def record_translation_judgement(request, language, phrase_id):
-    dialect = get_dialect_object(language)
-    phrase = get_object_or_404(Phrase, id=phrase_id, dialect=dialect)
+    language = get_language_object(language)
+    phrase = get_object_or_404(Phrase, id=phrase_id, language=language)
     judgement = json.loads(request.body)
 
     if judgement["judgement"] == "yes":
@@ -720,8 +720,8 @@ def record_translation_judgement(request, language, phrase_id):
 @login_required()
 @require_http_methods(["POST"])
 def record_audio_quality_judgement(request, language, recording_id):
-    dialect = get_dialect_object(language)
-    rec = get_object_or_404(Recording, id=recording_id, dialect=dialect)
+    language = get_language_object(language)
+    rec = get_object_or_404(Recording, id=recording_id, language=language)
     judgement = json.loads(request.body)
 
     if judgement["judgement"] in ["good", "bad"]:
@@ -736,7 +736,7 @@ def record_audio_quality_judgement(request, language, recording_id):
 @login_required()
 @require_http_methods(["POST"])
 def save_wrong_speaker_code(request, language, recording_id):
-    dialect = get_dialect_object(language)
+    language = get_language_object(language)
     rec = get_object_or_404(Recording, id=recording_id)
     speaker = request.POST.get("speaker-code-select")
     referrer = request.POST.get("referrer")
@@ -751,7 +751,7 @@ def save_wrong_speaker_code(request, language, recording_id):
         comment=comment,
         created_by=request.user,
         created_on=datetime.datetime.now(),
-        dialect=dialect,
+        language=language,
     )
     new_issue.save()
 
@@ -771,8 +771,8 @@ def save_wrong_speaker_code(request, language, recording_id):
 @login_required()
 @require_http_methods(["POST"])
 def save_wrong_word(request, language, recording_id):
-    dialect = get_dialect_object(language)
-    rec = get_object_or_404(Recording, id=recording_id, dialect=dialect)
+    language = get_language_object(language)
+    rec = get_object_or_404(Recording, id=recording_id, language=language)
     suggestion = request.POST.get("wrong_word")
     referrer = request.POST.get("referrer")
 
@@ -787,7 +787,7 @@ def save_wrong_word(request, language, recording_id):
         comment=comment,
         created_by=request.user,
         created_on=datetime.datetime.now(),
-        dialect=dialect,
+        language=language,
     )
     new_issue.save()
 
@@ -807,7 +807,7 @@ def save_wrong_word(request, language, recording_id):
 
 @login_required()
 def record_audio(request, language):
-    dialect = get_dialect_object(language)
+    language = get_language_object(language)
 
     if request.method == "POST":
         form = RecordNewPhrase(request.POST, request.FILES)
@@ -820,7 +820,7 @@ def record_audio(request, language):
         # To allow for homonym differentiation, we check that the translation is *exactly* the same
         # There's likely a better way of doing this, but this should suffice for now
         phrase = Phrase.objects.filter(
-            transcription=transcription, translation=translation, dialect=dialect
+            transcription=transcription, translation=translation, language=language
         ).first()
         if not phrase:
             phrase = Phrase(
@@ -831,7 +831,7 @@ def record_audio(request, language):
                 status=Phrase.USER,
                 date=datetime.datetime.now(),
                 modifier=request.user,
-                dialect=dialect,
+                language=language,
             )
             phrase.save()
 
@@ -844,9 +844,9 @@ def record_audio(request, language):
             )
             speaker.save()
 
-        if dialect not in speaker.dialects:
-            # Can only add dialect after the object exists i.e. is saved
-            speaker.dialects.add(dialect)
+        if language not in speaker.languages:
+            # Can only add language after the object exists i.e. is saved
+            speaker.languages.add(language)
             speaker.save()
 
         rec_id = create_new_rec_id(phrase, speaker)
@@ -875,35 +875,35 @@ def record_audio(request, language):
         rec.save()
 
         save_metadata_to_file(
-            rec_id, request.user, transcription, translation, dialect.name
+            rec_id, request.user, transcription, translation, language.name
         )
 
         context = dict(
             form=form,
             auth=request.user.is_authenticated,
             is_linguist=user_is_linguist(request.user, language),
-            dialect=dialect,
+            language=language,
         )
         return HttpResponseRedirect("/record_audio", context)
     else:
         form = RecordNewPhrase()
-        form.fields["transcription"].label = dialect.name
+        form.fields["transcription"].label = language.name
 
     context = dict(
         form=form,
         auth=request.user.is_authenticated,
         is_linguist=user_is_linguist(request.user, language),
-        dialect=dialect,
+        language=language,
     )
     return render(request, f"validation/record_audio.html", context)
 
 
-def set_dialect(request, dialect_code):
-    assert get_object_or_404(LanguageVariant, code=dialect_code)
+def set_language(request, language_code):
+    assert get_object_or_404(LanguageVariant, code=language_code)
 
     response = HttpResponse(status=HTTPStatus.SEE_OTHER)
     response["Location"] = reverse(
-        "validation:entries", kwargs={"language": dialect_code}
+        "validation:entries", kwargs={"language": language_code}
     )
 
     return response
@@ -1064,7 +1064,7 @@ def create_new_rec_id(phrase, speaker):
     return sha256(signature.encode("UTF-8")).hexdigest()
 
 
-def save_metadata_to_file(rec_id, user, transcription, translation, dialect):
+def save_metadata_to_file(rec_id, user, transcription, translation, language):
     dest = (
         settings.MEDIA_ROOT
         + "/"
@@ -1081,7 +1081,7 @@ def save_metadata_to_file(rec_id, user, transcription, translation, dialect):
         "recorded_on": str(datetime.datetime.now().astimezone()),
         "transcription": transcription,
         "translation": translation,
-        "dialect": dialect,
+        "language": language,
     }
     with open(dest, "w+") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
@@ -1094,5 +1094,5 @@ def clean_text(text):
     return ret
 
 
-def get_dialect_object(language):
+def get_language_object(language):
     return get_object_or_404(LanguageVariant, code=language)
