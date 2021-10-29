@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
+import datetime
+import json
+import operator
+
 # Copyright (C) 2018 Eddie Antonio Santos <easantos@ualberta.ca>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,25 +21,21 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import subprocess
 import time
+from functools import reduce
 from hashlib import sha256
 from http import HTTPStatus
-import datetime
-import io
-import json
-import operator
-from functools import reduce
 from pathlib import Path
 
 import mutagen as mutagen
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import authenticate
-from django.contrib.auth import login as django_login
-from django.contrib.auth.models import User
-from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User, Group
+from django.core.mail import mail_admins
 from django.core.paginator import Paginator
+from django.db.models import Q, QuerySet
 from django.http import (
-    FileResponse,
     HttpResponse,
     HttpResponseBadRequest,
     HttpResponseRedirect,
@@ -43,21 +43,12 @@ from django.http import (
     QueryDict,
     HttpRequest,
 )
-from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse
-from django.contrib.auth.models import User, Group
-from django.contrib.auth import authenticate, login as django_login
+from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_http_methods
-from django.contrib.auth.decorators import login_required
-from django.core.mail import mail_admins
-from django.db.models import Q, QuerySet
 
 from librecval.normalization import to_indexable_form
-
-from .models import Phrase, Recording, Speaker, RecordingSession, Issue
 from .forms import (
     EditSegment,
-    Login,
     Register,
     FlagSegment,
     EditIssueWithRecording,
@@ -66,10 +57,8 @@ from .forms import (
 )
 from .helpers import (
     get_distance_with_translations,
-    perfect_match,
-    exactly_one_analysis,
-    normalize_img_name,
 )
+from .models import Phrase, Recording, Speaker, RecordingSession, Issue
 
 
 def index(request):
@@ -604,6 +593,26 @@ def speaker_view(request, speaker_code):
     return render(request, "validation/speaker_view.html", context)
 
 
+AVAILABLE_IMAGES = [
+    "AnnetteLee",
+    "ArleneMakinaw",
+    "BettySimon",
+    "BrianLightning",
+    "DeboraYoung",
+    "HarleySimon",
+    "IvyRaine",
+    "JerryRoasting",
+    "Kisikaw",
+    "LindaOldpan",
+    "LouiseWildcat",
+    "MaryJeanLittlechild",
+    "NormaLindaSaddleback",
+    "PaulaMackinaw",
+    "RoseMakinaw",
+    "RosieRowan",
+]
+
+
 def all_speakers(request):
     speakers = []
     speaker_objects = Speaker.objects.all()
@@ -621,9 +630,8 @@ def all_speakers(request):
         img_name = img_name.replace(" ", "")
         if full_name == "kîsikâw":
             img_name = "Kisikaw"
-        img_path = f"images/speakers/{img_name}.jpg"
-        full_path_name = f"{settings.STATIC_ROOT}/{img_path}"
-        if not Path(full_path_name).exists():
+        img_path = f"/static/images/speakers/{img_name}.jpg"
+        if img_name not in AVAILABLE_IMAGES:
             img_path = "/static/images/missing.jpg"
 
         speaker_dict = dict(
