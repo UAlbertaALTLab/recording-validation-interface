@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
+import datetime
+import json
+import operator
+
 # Copyright (C) 2018 Eddie Antonio Santos <easantos@ualberta.ca>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,25 +21,25 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import subprocess
 import time
+from functools import reduce
 from hashlib import sha256
 from http import HTTPStatus
-import datetime
-import io
-import json
-import operator
-from functools import reduce
 from pathlib import Path
 
 import mutagen as mutagen
 from django.conf import settings
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import authenticate
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User, Group
+from django.core.mail import mail_admins
 from django.contrib.auth import login as django_login
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.paginator import Paginator
+from django.db.models import Q, QuerySet
 from django.http import (
-    FileResponse,
     HttpResponse,
     HttpResponseBadRequest,
     HttpResponseRedirect,
@@ -43,14 +47,8 @@ from django.http import (
     QueryDict,
     HttpRequest,
 )
-from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse
-from django.contrib.auth.models import User, Group
-from django.contrib.auth import authenticate, login as django_login
+from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_http_methods
-from django.contrib.auth.decorators import login_required
-from django.core.mail import mail_admins
-from django.db.models import Q, QuerySet
 
 from librecval.normalization import to_indexable_form
 from .jinja2 import url
@@ -58,7 +56,6 @@ from .jinja2 import url
 from .models import Phrase, Recording, Speaker, RecordingSession, Issue, LanguageVariant
 from .forms import (
     EditSegment,
-    Login,
     Register,
     FlagSegment,
     EditIssueWithRecording,
@@ -67,20 +64,18 @@ from .forms import (
 )
 from .helpers import (
     get_distance_with_translations,
-    perfect_match,
-    exactly_one_analysis,
-    normalize_img_name,
 )
+from .models import Phrase, Recording, Speaker, RecordingSession, Issue
 
 
 def home(request):
     """
     The home page that lets you select a language variant
     """
-    dialects = LanguageVariant.objects.all()
+    languages = LanguageVariant.objects.all()
     auth = request.user.is_authenticated
 
-    context = dict(dialects=dialects, dialect=None, auth=auth)
+    context = dict(languages=languages, language=None, auth=auth)
     return render(request, "validation/home.html", context)
 
 
@@ -92,9 +87,9 @@ def entries(request, language):
     is_linguist = user_is_linguist(request.user, language)
     is_expert = user_is_expert(request.user, language)
 
-    # Only show selected dialect
-    dialect_object = get_dialect_object(language)
-    all_phrases = Phrase.objects.filter(dialect=dialect_object)
+    # Only show selected language
+    language_object = get_language_object(language)
+    all_phrases = Phrase.objects.filter(language=language_object)
 
     mode = request.GET.get("mode")
     mode_options = {
@@ -136,7 +131,7 @@ def entries(request, language):
     if not session or session == "all":
         session = "all sessions"
 
-    recordings, forms = prep_phrase_data(request, phrases, dialect_object.name)
+    recordings, forms = prep_phrase_data(request, phrases, language_object.name)
 
     speakers = Speaker.objects.all()
 
@@ -160,7 +155,7 @@ def entries(request, language):
         session=session,
         mode=mode,
         encode_query_with_page=encode_query_with_page,
-        dialect=dialect_object,
+        language=language_object,
     )
     return render(request, "validation/list_phrases.html", context)
 
@@ -171,7 +166,7 @@ def search_phrases(request, language):
     """
     is_linguist = user_is_linguist(request.user, language)
     is_expert = user_is_expert(request.user, language)
-    dialect_object = get_dialect_object(language)
+    language_object = get_language_object(language)
 
     query = request.GET.get("query")
     all_matches = (
@@ -181,7 +176,7 @@ def search_phrases(request, language):
             | Q(translation__contains=query)
         )
         .exclude(status=Phrase.USER)
-        .filter(dialect=dialect_object)
+        .filter(language=language_object)
         .prefetch_related("recording_set__speaker")
     )
     all_matches = list(all_matches)
@@ -194,7 +189,7 @@ def search_phrases(request, language):
     page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)
 
-    recordings, forms = prep_phrase_data(request, phrases, dialect_object.name)
+    recordings, forms = prep_phrase_data(request, phrases, language_object.name)
 
     speakers = Speaker.objects.all()
 
@@ -215,7 +210,7 @@ def search_phrases(request, language):
         is_expert=is_expert,
         forms=forms,
         auth=request.user.is_authenticated,
-        dialect=dialect_object,
+        language=language_object,
     )
     return render(request, "validation/search.html", context)
 
@@ -224,15 +219,15 @@ def advanced_search(request, language):
     """
     The search results for pages.
     """
-    dialect_object = get_dialect_object(language)
-    speakers = dialect_object.speaker_set.all()
+    language_object = get_language_object(language)
+    speakers = language_object.speaker_set.all()
     speakers = [speaker.code for speaker in speakers]
 
     context = dict(
         speakers=speakers,
         auth=request.user.is_authenticated,
         is_linguist=user_is_linguist(request.user, language),
-        dialect=dialect_object,
+        language=language_object,
     )
     return render(request, "validation/advanced_search.html", context)
 
@@ -257,7 +252,7 @@ def advanced_search_results(request, language):
     status = request.GET.get("status")
     speakers = request.GET.getlist("speaker-options")
     quality = request.GET.get("quality")
-    dialect_object = get_dialect_object(language)
+    language_object = get_language_object(language)
 
     if status and status != "all":
         status_choices = {
@@ -287,14 +282,14 @@ def advanced_search_results(request, language):
 
     if filter_query:
         phrase_matches = (
-            Phrase.objects.filter(dialect=dialect_object)
+            Phrase.objects.filter(language=language_object)
             .filter(reduce(operator.or_, filter_query))
             .prefetch_related("recording_set__speaker")
         )
     else:
-        phrase_matches = Phrase.objects.filter(dialect=dialect_object).prefetch_related(
-            "recording_set__speaker"
-        )
+        phrase_matches = Phrase.objects.filter(
+            language=language_object
+        ).prefetch_related("recording_set__speaker")
 
     recordings = {}
     all_matches = []
@@ -319,7 +314,7 @@ def advanced_search_results(request, language):
             all_matches.append(phrase)
 
     all_matches.sort(key=lambda phrase: phrase.transcription)
-    _, forms = prep_phrase_data(request, all_matches, dialect_object.name)
+    _, forms = prep_phrase_data(request, all_matches, language_object.name)
 
     query = QueryDict("", mutable=True)
     query.update(
@@ -347,7 +342,7 @@ def advanced_search_results(request, language):
         is_expert=is_expert,
         forms=forms,
         auth=request.user.is_authenticated,
-        dialect=dialect_object,
+        language=language_object,
     )
     return render(request, "validation/search.html", context)
 
@@ -464,10 +459,10 @@ def segment_content_view(request, language, segment_id):
     The view for a single segment
     Returns the selected phrase and info provided by the helper functions
     """
-    dialect_object = get_dialect_object(language)
+    language_object = get_language_object(language)
     if request.method == "POST":
         form = EditSegment(request.POST)
-        og_phrase = Phrase.objects.get(id=segment_id, dialect=dialect_object)
+        og_phrase = Phrase.objects.get(id=segment_id, language=language_object)
         phrase_id = og_phrase.id
         if form.is_valid():
             transcription = (
@@ -477,7 +472,7 @@ def segment_content_view(request, language, segment_id):
                 form.cleaned_data["translation"].strip() or og_phrase.translation
             )
             analysis = form.cleaned_data["analysis"].strip() or og_phrase.analysis
-            p = Phrase.objects.get(id=phrase_id, dialect=dialect_object)
+            p = Phrase.objects.get(id=phrase_id, language=language_object)
             p.transcription = transcription
             p.translation = translation
             p.analysis = analysis
@@ -486,7 +481,7 @@ def segment_content_view(request, language, segment_id):
             p.date = datetime.datetime.now()
             p.save()
 
-    phrase = Phrase.objects.get(id=segment_id, dialect=dialect_object)
+    phrase = Phrase.objects.get(id=segment_id, language=language_object)
     field_transcription = phrase.field_transcription
     suggestions = get_distance_with_translations(field_transcription)
 
@@ -511,7 +506,7 @@ def segment_content_view(request, language, segment_id):
         history=history,
         auth=auth,
         is_linguist=user_is_linguist(request.user, language),
-        dialect=dialect_object,
+        language=language_object,
     )
 
     return render(request, "validation/segment_details.html", context)
@@ -571,22 +566,22 @@ def register(request):
 
 
 def view_issues(request, language):
-    dialect = get_dialect_object(language)
+    language = get_language_object(language)
     issues = (
-        Issue.objects.filter(status=Issue.OPEN).filter(dialect=dialect).order_by("id")
+        Issue.objects.filter(status=Issue.OPEN).filter(language=language).order_by("id")
     )
     context = dict(
         issues=issues,
         auth=request.user.is_authenticated,
         is_linguist=user_is_linguist(request.user, language),
-        dialect=dialect,
+        language=language,
     )
     return render(request, "validation/view_issues.html", context)
 
 
 def view_issue_detail(request, language, issue_id):
-    dialect = get_dialect_object(language)
-    issue = Issue.objects.get(id=issue_id, dialect=dialect)
+    language = get_language_object(language)
+    issue = Issue.objects.get(id=issue_id, language=language)
 
     form = None
     if issue.recording:
@@ -617,14 +612,14 @@ def view_issue_detail(request, language, issue_id):
         form=form,
         auth=request.user.is_authenticated,
         is_linguist=user_is_linguist(request.user, language),
-        dialect=dialect,
+        language=language,
     )
     return render(request, "validation/view_issue_detail.html", context)
 
 
 def close_issue(request, language, issue_id):
-    dialect = get_dialect_object(language)
-    issue = Issue.objects.get(id=issue_id, dialect=dialect)
+    language = get_language_object(language)
+    issue = Issue.objects.get(id=issue_id, language=language)
     issue.status = Issue.RESOLVED
     issue.save()
 
@@ -632,8 +627,8 @@ def close_issue(request, language, issue_id):
 
 
 def speaker_view(request, language, speaker_code):
-    dialect = get_dialect_object(language)
-    speaker = dialect.speaker_set.get(code=speaker_code)
+    language = get_language_object(language)
+    speaker = language.speaker_set.get(code=speaker_code)
     if speaker:
         full_name = speaker.full_name
     else:
@@ -654,6 +649,26 @@ def speaker_view(request, language, speaker_code):
     return render(request, "validation/speaker_view.html", context)
 
 
+AVAILABLE_IMAGES = [
+    "AnnetteLee",
+    "ArleneMakinaw",
+    "BettySimon",
+    "BrianLightning",
+    "DeboraYoung",
+    "HarleySimon",
+    "IvyRaine",
+    "JerryRoasting",
+    "Kisikaw",
+    "LindaOldpan",
+    "LouiseWildcat",
+    "MaryJeanLittlechild",
+    "NormaLindaSaddleback",
+    "PaulaMackinaw",
+    "RoseMakinaw",
+    "RosieRowan",
+]
+
+
 def all_speakers(request, language):
     speakers = []
     language = get_language_object(language)
@@ -668,15 +683,18 @@ def all_speakers(request, language):
             continue
 
         full_name = speaker.full_name
-        if speaker.image:
-            img_src = speaker.image.url
-        else:
-            img_src = Path(settings.BASE_DIR / settings.BIO_IMG_PREFIX / "missing.jpg")
+        img_name = full_name.title()
+        img_name = img_name.replace(" ", "")
+        if full_name == "kîsikâw":
+            img_name = "Kisikaw"
+        img_path = f"/static/images/speakers/{img_name}.jpg"
+        if img_name not in AVAILABLE_IMAGES:
+            img_path = "/static/images/missing.jpg"
 
         speaker_dict = dict(
             full_name=full_name,
             code=speaker.code,
-            img_src=img_src,
+            img_path=img_path,
             bio=speaker.target_bio_text or "",
             speaker=speaker,
         )
@@ -907,6 +925,11 @@ def set_language(request, language_code):
     )
 
     return response
+
+
+@staff_member_required
+def throw_500(request):
+    raise Exception("test error")
 
 
 # Small Helper functions

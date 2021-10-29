@@ -258,6 +258,11 @@ LOGGING = {
             "level": "NOTSET",
             "class": "logging.StreamHandler",
         },
+        "mail_admins": {
+            "level": "ERROR",
+            "class": "django.utils.log.AdminEmailHandler",
+            "include_html": True,
+        },
     },
     "root": {
         "handlers": ["console"],
@@ -270,14 +275,25 @@ LOGGING = {
             "level": log_level,
             "propagate": True,
         },
+        "django.request": {
+            "handlers": [],
+            "level": "ERROR",
+            "propagate": False,
+        },
     },
 }
 
+if not DEBUG:
+    LOGGING["loggers"]["django.request"]["handlers"].append("mail_admins")
+
 ADMINS = [("Jolene", "jcpoulin@ualberta.ca")]
 
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.gmail.com"
-EMAIL_PORT = 587
-EMAIL_HOST_USER = config("SMTP_USER", default=None)
-EMAIL_HOST_PASSWORD = config("SMTP_PASS", default=None)
-EMAIL_USE_TLS = True
+if DEBUG:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+else:
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+    EMAIL_HOST = "smtp.gmail.com"
+    EMAIL_PORT = 587
+    EMAIL_HOST_USER = config("SMTP_USER", default=None)
+    EMAIL_HOST_PASSWORD = config("SMTP_PASS", default=None)
+    EMAIL_USE_TLS = True
