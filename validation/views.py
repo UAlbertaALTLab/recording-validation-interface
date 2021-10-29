@@ -629,7 +629,7 @@ def all_speakers(request):
         speaker_dict = dict(
             full_name=full_name,
             code=speaker.code,
-            img_path=img_path,
+            img_path=full_path_name,
             bio=speaker.eng_bio_text or "",
             speaker=speaker,
         )
