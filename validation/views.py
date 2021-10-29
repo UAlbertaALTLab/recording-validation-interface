@@ -572,27 +572,6 @@ def close_issue(request, issue_id):
     return HttpResponseRedirect("/issues")
 
 
-def speaker_view(request, speaker_code):
-    speaker = Speaker.objects.get(code=speaker_code)
-    if speaker:
-        full_name = speaker.full_name
-    else:
-        full_name = f"No speaker found for speaker code {speaker_code}"
-
-    if speaker.image:
-        img_src = speaker.image.url
-    else:
-        img_src = Path(settings.BASE_DIR / settings.BIO_IMG_PREFIX / "missing.jpg")
-
-    context = dict(
-        full_name=full_name,
-        auth=request.user.is_authenticated,
-        img_src=img_src,
-        speaker=speaker,
-    )
-    return render(request, "validation/speaker_view.html", context)
-
-
 AVAILABLE_IMAGES = [
     "AnnetteLee",
     "ArleneMakinaw",
@@ -611,6 +590,30 @@ AVAILABLE_IMAGES = [
     "RoseMakinaw",
     "RosieRowan",
 ]
+
+
+def speaker_view(request, speaker_code):
+    speaker = Speaker.objects.get(code=speaker_code)
+    if speaker:
+        full_name = speaker.full_name
+    else:
+        full_name = f"No speaker found for speaker code {speaker_code}"
+
+    img_name = full_name.title()
+    img_name = img_name.replace(" ", "")
+    if full_name == "kîsikâw":
+        img_name = "Kisikaw"
+    img_path = f"/static/images/speakers/{img_name}.jpg"
+    if img_name not in AVAILABLE_IMAGES:
+        img_path = "/static/images/missing.jpg"
+
+    context = dict(
+        full_name=full_name,
+        auth=request.user.is_authenticated,
+        img_path=img_path,
+        speaker=speaker,
+    )
+    return render(request, "validation/speaker_view.html", context)
 
 
 def all_speakers(request):
