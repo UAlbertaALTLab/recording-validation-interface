@@ -621,8 +621,8 @@ def all_speakers(request):
         img_name = img_name.replace(" ", "")
         if full_name == "kîsikâw":
             img_name = "Kisikaw"
-        img_path = f"/static/images/speakers/{img_name}.jpg"
-        full_path_name = f"{settings.BASE_DIR}{img_path}"
+        img_path = f"static/images/speakers/{img_name}.jpg"
+        full_path_name = f"{settings.BASE_DIR}/{img_path}"
         if not Path(full_path_name).exists():
             img_path = "/static/images/missing.jpg"
 
