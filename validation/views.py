@@ -626,10 +626,11 @@ def all_speakers(request):
         if not Path(full_path_name).exists():
             img_path = "/static/images/missing.jpg"
 
+        img_path = "/static/images/speakers/RoseMakinaw.jpg"
         speaker_dict = dict(
             full_name=full_name,
             code=speaker.code,
-            img_path=full_path_name,
+            img_path=img_path,
             bio=speaker.eng_bio_text or "",
             speaker=speaker,
         )
