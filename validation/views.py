@@ -624,12 +624,12 @@ def all_speakers(request):
         img_path = f"images/speakers/{img_name}.jpg"
         full_path_name = f"{settings.STATIC_ROOT}/{img_path}"
         if not Path(full_path_name).exists():
-            full_path_name = "/static/images/missing.jpg"
+            img_path = "/static/images/missing.jpg"
 
         speaker_dict = dict(
             full_name=full_name,
             code=speaker.code,
-            img_path=full_path_name,
+            img_path=img_path,
             bio=speaker.eng_bio_text or "",
             speaker=speaker,
         )
