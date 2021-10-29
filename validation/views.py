@@ -621,16 +621,15 @@ def all_speakers(request):
         img_name = img_name.replace(" ", "")
         if full_name == "kîsikâw":
             img_name = "Kisikaw"
-        img_path = f"static/images/speakers/{img_name}.jpg"
-        full_path_name = f"{settings.BASE_DIR}/{img_path}"
+        img_path = f"images/speakers/{img_name}.jpg"
+        full_path_name = f"{settings.STATIC_ROOT}/{img_path}"
         if not Path(full_path_name).exists():
-            img_path = "/static/images/missing.jpg"
+            full_path_name = "/static/images/missing.jpg"
 
-        img_path = "/static/images/speakers/RoseMakinaw.jpg"
         speaker_dict = dict(
             full_name=full_name,
             code=speaker.code,
-            img_path=img_path,
+            img_path=full_path_name,
             bio=speaker.eng_bio_text or "",
             speaker=speaker,
         )
