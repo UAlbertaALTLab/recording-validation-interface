@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from validation.models import Phrase, Dialect, Issue, Speaker
+from validation.models import Phrase, LanguageVariant, Issue, Speaker
 
 
 class Command(BaseCommand):
@@ -8,17 +8,17 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         phrases = Phrase.objects.all()
-        dialect = Dialect.objects.get(code="maskwacis")
+        language = LanguageVariant.objects.get(code="maskwacis")
         for phrase in phrases:
-            if not phrase.dialect:
-                phrase.dialect = dialect
+            if not phrase.language:
+                phrase.language = language
                 phrase.save()
 
         issues = Issue.objects.all()
         for issue in issues:
-            issue.dialect = dialect
+            issue.language = language
             issue.save()
 
         speakers = Speaker.objects.all()
         for speaker in speakers:
-            speaker.dialects.add(dialect)
+            speaker.languages.add(language)

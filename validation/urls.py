@@ -109,7 +109,9 @@ urlpatterns = [
         views.bulk_search_recordings,
         name="bulk_search_recordings",
     ),
-    path("api/set_dialect/<str:dialect_code>", views.set_dialect, name="set_dialect"),
+    path(
+        "api/set_language/<str:language_code>", views.set_language, name="set_language"
+    ),
     path(
         "robots.txt",
         TemplateView.as_view(

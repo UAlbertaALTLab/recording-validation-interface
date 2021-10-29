@@ -7,9 +7,9 @@
 
 {% block content %}
 <form method="GET" action="{{
-    url('validation:advanced_search_results', dialect.code)
+    url('validation:advanced_search_results', language.code)
   }}">
-    {{ dialect.name }} phrase:
+    {{ language.name }} phrase:
     <input class="form-control mr-sm-2" name="transcription" type="search" placeholder="Search" aria-label="Search"><br>
     English phrase:
     <input class="form-control mr-sm-2" name="translation" type="search" placeholder="Search" aria-label="Search"><br>

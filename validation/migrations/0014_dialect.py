@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name="Dialect",
+            name="LanguageVariant",
             fields=[
                 (
                     "id",
@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
                 (
                     "name",
                     models.CharField(
-                        help_text="The full name of the dialect", max_length=256
+                        help_text="The full name of the language", max_length=256
                     ),
                 ),
                 (
@@ -52,36 +52,36 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(
                 blank=True,
                 db_constraint=False,
-                help_text="The dialect this phrase belongs to",
+                help_text="The language this phrase belongs to",
                 null=True,
                 on_delete=django.db.models.deletion.DO_NOTHING,
                 related_name="+",
-                to="validation.Dialect",
+                to="validation.LanguageVariant",
             ),
         ),
         migrations.AddField(
             model_name="issue",
             name="dialect",
             field=models.ForeignKey(
-                help_text="The dialect this phrase belongs to",
+                help_text="The language this phrase belongs to",
                 null=True,
                 on_delete=django.db.models.deletion.PROTECT,
-                to="validation.Dialect",
+                to="validation.LanguageVariant",
             ),
         ),
         migrations.AddField(
             model_name="phrase",
             name="dialect",
             field=models.ForeignKey(
-                help_text="The dialect this phrase belongs to",
+                help_text="The language this phrase belongs to",
                 null=True,
                 on_delete=django.db.models.deletion.PROTECT,
-                to="validation.Dialect",
+                to="validation.LanguageVariant",
             ),
         ),
         migrations.AddField(
             model_name="speaker",
             name="dialects",
-            field=models.ManyToManyField(blank=True, to="validation.Dialect"),
+            field=models.ManyToManyField(blank=True, to="validation.LanguageVariant"),
         ),
     ]

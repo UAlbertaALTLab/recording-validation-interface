@@ -1,10 +1,10 @@
-{% macro dialect_card(dialect) %}
+{% macro language_card(language) %}
 
-    <a href="/api/set_dialect/{{ dialect.code }}">
-    <article id='dialect-{{ dialect.id }}' class="card shadow-lg card--dialect" data-cy="segment-card">
+    <a href="/api/set_language/{{ language.code }}">
+    <article id='language-{{ language.id }}' class="card shadow-lg card--language" data-cy="segment-card">
         <div class="card__body">
-            <h3>{{ dialect.name }}</h3>
-            <p>{{ dialect.description }}</p>
+            <h3>{{ language.name }}</h3>
+            <p>{{ language.description }}</p>
         </div>
 
     </article>

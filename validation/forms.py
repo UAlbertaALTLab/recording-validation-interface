@@ -73,7 +73,7 @@ class Register(forms.Form):
         required=False,
         help_text="""
         Please select all the languages you want access to with the role specified above. <br>
-        If you leave this selection blank, you will be given learner level access to all dialects.""",
+        If you leave this selection blank, you will be given learner level access to all languages.""",
     )
 
     def clean_username(self):

@@ -54,13 +54,13 @@ def arguments_for_choices(choices):
     return dict(choices=choices, max_length=max(len(choice[0]) for choice in choices))
 
 
-class Dialect(models.Model):
+class LanguageVariant(models.Model):
     name = models.CharField(
-        help_text="The full name of the dialect", blank=False, max_length=256
+        help_text="The full name of the language", blank=False, max_length=256
     )
 
     code = models.CharField(
-        help_text="The three character code for this language + an additional identifier",
+        help_text="A url-safe identifier for this language",
         blank=False,
         max_length=16,
     )
@@ -142,9 +142,9 @@ class Phrase(models.Model):
         help_text="Has this phrase be validated?", default=False
     )
 
-    dialect = models.ForeignKey(
-        Dialect,
-        help_text="The dialect this phrase belongs to",
+    language = models.ForeignKey(
+        LanguageVariant,
+        help_text="The language this phrase belongs to",
         on_delete=models.PROTECT,
         null=True,
     )
@@ -280,7 +280,7 @@ class Speaker(models.Model):
 
     image = models.ImageField(upload_to=settings.BIO_IMG_PREFIX, blank=True)
 
-    dialects = models.ManyToManyField(Dialect, blank=True)
+    languages = models.ManyToManyField(LanguageVariant, blank=True)
 
     target_bio_text = models.CharField(
         help_text="The English transcription of the speaker bio",
@@ -307,15 +307,15 @@ class Speaker(models.Model):
     )
 
     @property
-    def dialect(self):
+    def language(self):
         """
-        Which dialect this person speaks.
+        Which language this person speaks.
         """
         # Hard-coded for now, but it makes implementing this field trival.
         return [
-            dialect.name
-            for dialect in Dialect.objects.all()
-            if dialect in self.dialects.all()
+            language.name
+            for language in LanguageVariant.objects.all()
+            if language in self.languages.all()
         ]
 
     @property
@@ -519,7 +519,7 @@ class Recording(models.Model):
             "speaker_name": self.speaker.full_name,
             "anonymous": self.speaker.anonymous,
             "gender": self.speaker.gender,
-            "dialect": self.speaker.dialect,
+            "language": self.speaker.language,
             "recording_url": request.build_absolute_uri(self.get_absolute_url()),
             "speaker_bio_url": request.build_absolute_uri(
                 self.speaker.get_absolute_url()
@@ -559,9 +559,9 @@ class Issue(models.Model):
         Recording, on_delete=models.CASCADE, blank=True, null=True
     )
 
-    dialect = models.ForeignKey(
-        Dialect,
-        help_text="The dialect this phrase belongs to",
+    language = models.ForeignKey(
+        LanguageVariant,
+        help_text="The language this phrase belongs to",
         on_delete=models.PROTECT,
         null=True,
     )

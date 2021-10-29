@@ -27,7 +27,7 @@
 {% block content %}
 <h2> Results for <q>{{ search_term }}</q> </h2>
     {%  for phrase in phrases %}
-        {{ segment.segment_card(phrase, recordings, speakers, is_linguist, is_expert, auth, forms, csrf_token, request, dialect) }}
+        {{ segment.segment_card(phrase, recordings, speakers, is_linguist, is_expert, auth, forms, csrf_token, request, language) }}
     {% endfor %} {# phrase in phrases #}
 
     <nav>

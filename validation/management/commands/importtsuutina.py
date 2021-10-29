@@ -11,7 +11,13 @@ from pydub import AudioSegment
 
 from librecval.extract_tsuutina import TsuutinaRecordingExtractor, Segment
 from librecval.transcode_recording import transcode_to_aac
-from validation.models import Speaker, RecordingSession, Phrase, Recording, Dialect
+from validation.models import (
+    Speaker,
+    RecordingSession,
+    Phrase,
+    Recording,
+    LanguageVariant,
+)
 
 
 class RecordingError(Exception):
@@ -49,6 +55,10 @@ class Command(BaseCommand):
         # these files will be then handled by the currently configured storage backend.
         recording_extractor = TsuutinaRecordingExtractor()
         for segment in recording_extractor.scan(sessions_dir):
+            rec_id = segment.compute_sha256hash()
+            if Recording.objects.filter(id=rec_id).exists():
+                continue
+
             speaker, speaker_created = Speaker.objects.get_or_create(
                 code=segment.speaker
             )
@@ -57,7 +67,7 @@ class Command(BaseCommand):
                 segment.session
             )
 
-            dialect, dialect_created = Dialect.objects.get_or_create(
+            language, language_created = LanguageVariant.objects.get_or_create(
                 code="tsuutina", name="Tsuut'ina"
             )
 
@@ -68,7 +78,7 @@ class Command(BaseCommand):
                 translation=segment.translation,
                 kind=segment.type,
                 origin=Phrase.ONESPOT_SAPIR,
-                dialect=dialect,
+                language=language,
             )
 
             recording_path = save_recording(self.audio_dir, segment, segment.audio)
@@ -76,7 +86,6 @@ class Command(BaseCommand):
             django_file = ContentFile(audio_data, name=recording_path.name)
 
             quality = Recording.GOOD if segment.quality == "good" else Recording.BAD
-            rec_id = segment.compute_sha256hash()
             recording = Recording(
                 id=rec_id,
                 compressed_audio=django_file,

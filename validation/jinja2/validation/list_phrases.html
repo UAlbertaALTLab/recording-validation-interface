@@ -23,7 +23,7 @@
 {% block content %}
 <div class="center">
   <form method="GET" action="{{
-    url('validation:entries', dialect.code)
+    url('validation:entries', language.code)
   }}">
     <div class="filter">
         Filter by:
@@ -59,7 +59,7 @@
 <p class="description">Showing {{ mode }} entries from {{ session }}</p>
 
     {%  for phrase in phrases %}
-        {{ segment.segment_card(phrase, recordings, speakers, is_linguist, is_expert, auth, forms, csrf_token, request, dialect) }}
+        {{ segment.segment_card(phrase, recordings, speakers, is_linguist, is_expert, auth, forms, csrf_token, request, language) }}
     {% endfor %} {# phrase in phrases #}
 
 <nav>

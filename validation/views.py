@@ -55,7 +55,7 @@ from django.db.models import Q, QuerySet
 from librecval.normalization import to_indexable_form
 from .jinja2 import url
 
-from .models import Phrase, Recording, Speaker, RecordingSession, Issue, Dialect
+from .models import Phrase, Recording, Speaker, RecordingSession, Issue, LanguageVariant
 from .forms import (
     EditSegment,
     Login,
@@ -77,7 +77,7 @@ def home(request):
     """
     The home page that lets you select a language variant
     """
-    dialects = Dialect.objects.all()
+    dialects = LanguageVariant.objects.all()
     auth = request.user.is_authenticated
 
     context = dict(dialects=dialects, dialect=None, auth=auth)
@@ -899,7 +899,7 @@ def record_audio(request, language):
 
 
 def set_dialect(request, dialect_code):
-    assert get_object_or_404(Dialect, code=dialect_code)
+    assert get_object_or_404(LanguageVariant, code=dialect_code)
 
     response = HttpResponse(status=HTTPStatus.SEE_OTHER)
     response["Location"] = reverse(
@@ -1095,4 +1095,4 @@ def clean_text(text):
 
 
 def get_dialect_object(language):
-    return get_object_or_404(Dialect, code=language)
+    return get_object_or_404(LanguageVariant, code=language)
