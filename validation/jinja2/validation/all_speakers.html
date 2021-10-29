@@ -8,6 +8,7 @@
         {% for speaker in speakers %}
         <div class="col-sm-4 d-flex align-items-stretch">
             <div class="card">
+            {{ speaker.img_path }}
                 <img class="card-img-top" src="{{ speaker.img_path }}" alt="Image of {{ speaker.full_name }}">
                 <div class="card-body">
                     {% if speaker.full_name %}
