@@ -1,0 +1,9 @@
+{% extends 'validation/_base.html' %}
+{% import 'validation/_language_card.html' as card %}
+
+{% block content %}
+    <h2>Please select a language from the following choices:</h2>
+    {% for language in languages %}
+        {{ card.language_card(language) }}
+    {% endfor %}
+{% endblock content %}

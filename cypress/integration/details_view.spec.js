@@ -6,7 +6,7 @@ describe("Details View", () => {
     })
 
     it("clicks on options button", () => {
-        cy.visit(Cypress.env('home'));
+        cy.visit(Cypress.env('maskwacis'));
 
         cy.get('[data-cy="segment-card"]:first')
             .within(() => {
@@ -20,7 +20,7 @@ describe("Details View", () => {
     })
 
     it("shows original word", () => {
-        cy.visit(Cypress.env('home'));
+        cy.visit(Cypress.env('maskwacis'));
 
         cy.get('[data-cy="segment-card"]:first')
             .within(() => {
@@ -48,7 +48,7 @@ describe("Details View", () => {
     })
 
     it("shows both tables with headers", () => {
-        cy.visit(Cypress.env('home'));
+        cy.visit(Cypress.env('maskwacis'));
 
         cy.get('[data-cy="segment-card"]:first')
             .within(() => {

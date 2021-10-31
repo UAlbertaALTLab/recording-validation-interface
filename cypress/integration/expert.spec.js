@@ -6,7 +6,7 @@ describe("Language experts", () => {
     })
 
     it("can mark a translation as good or bad", () => {
-        cy.visit(Cypress.env('home'));
+        cy.visit(Cypress.env('maskwacis'));
 
         cy.get('[data-cy="segment-card"]:first')
             .within(() => {
@@ -20,7 +20,7 @@ describe("Language experts", () => {
     })
 
     it("can mark a recording as good or bad", () => {
-        cy.visit(Cypress.env('home'));
+        cy.visit(Cypress.env('maskwacis'));
 
         cy.get('[data-cy="segment-card"]:first')
             .within(() => {
@@ -34,7 +34,7 @@ describe("Language experts", () => {
     })
 
     it("can mark a recording as having the wrong speaker", () => {
-        cy.visit(Cypress.env('home'));
+        cy.visit(Cypress.env('maskwacis'));
 
         cy.get('[data-cy="segment-card"]:first')
             .within(() => {
@@ -52,7 +52,7 @@ describe("Language experts", () => {
     })
 
     it("can mark a recording as having the wrong word", () => {
-        cy.visit(Cypress.env('home'));
+        cy.visit(Cypress.env('maskwacis'));
 
         cy.get('[data-cy="segment-card"]:first')
             .within(() => {
@@ -71,7 +71,7 @@ describe("Language experts", () => {
     })
 
     it("can cancel marking a recording as having the wrong word", () => {
-        cy.visit(Cypress.env('home'));
+        cy.visit(Cypress.env('maskwacis'));
 
         cy.get('[data-cy="segment-card"]:first')
             .within(() => {
@@ -90,7 +90,7 @@ describe("Language experts", () => {
     })
 
     it("can flag an entry for review", () => {
-        cy.visit(Cypress.env('home'));
+        cy.visit(Cypress.env('maskwacis'));
 
         cy.get('[data-cy="segment-card"]:first')
             .within(() => {
@@ -105,7 +105,7 @@ describe("Language experts", () => {
     })
 
     it("can cancel flagging an entry for review", () => {
-        cy.visit(Cypress.env('home'));
+        cy.visit(Cypress.env('maskwacis'));
 
         cy.get('[data-cy="segment-card"]:first')
             .within(() => {

@@ -2,7 +2,7 @@
 
 describe("Navigation", () => {
     it("can use buttons", () => {
-        cy.visit(Cypress.env('home'));
+        cy.visit(Cypress.env('maskwacis'));
 
         cy.get('[data-cy="nav-next"]')
             .click()
@@ -30,7 +30,7 @@ describe("Navigation", () => {
     })
 
     it("can jump to page", () => {
-        cy.visit(Cypress.env('home'));
+        cy.visit(Cypress.env('maskwacis'));
 
         cy.get('[data-cy="page-num-input"]')
             .click()
