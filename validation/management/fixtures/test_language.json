@@ -1,6 +1,6 @@
 [
   {
-    "model": "validation.language",
+    "model": "validation.languagevariant",
     "fields": {
       "id": 1,
       "name": "Maskwacîs",

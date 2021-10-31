@@ -45,7 +45,6 @@ def test_search_bulk_recordings(client, query, speaker_code, insert_test_data):
     assert recording.get("anonymous") is False
     assert recording.get("speaker_bio_url").startswith(("http://", "https://"))
     assert speaker.code in recording.get("speaker_bio_url")
-    assert recording.get("dialect") == speaker.dialect
 
 
 @pytest.mark.django_db
