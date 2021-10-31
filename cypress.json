@@ -2,12 +2,13 @@
     "baseUrl": "http://localhost:8000",
     "env": {
         "home": "/",
+        "maskwacis": "/maskwacis/entries",
         "login_url": "/login",
         "register_url": "/register",
         "logout_url": "/logout",
-        "issues": "/issues",
-        "segment_details_url": "/segment/146",
-        "segment_url": "/segment/",
-        "awas_url": "/segment/6"
+        "issues": "/maskwacis/issues",
+        "segment_details_url": "/maskwacis/segment/146",
+        "segment_url": "/maskwacis/segment/",
+        "awas_url": "/maskwacis/segment/6"
       }
 }

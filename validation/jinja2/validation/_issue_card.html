@@ -18,16 +18,16 @@
 {% import 'validation/_macros.html' as macros %}
 
 
-{% macro issue_card(issue) %}
+{% macro issue_card(issue, language) %}
     <div class="col-sm-6">
         <article class="card shadow" data-cy="issue-card">
             <div class="card__header card__header--beige" data-cy="card-header">
                 <div class="right">
                     <button class="button button--neutral" data-cy="more-info-issue-button">
-                        <a href="{{ url('validation:issue_detail', issue.id) }}">More Info</a>
+                        <a href="{{ url('validation:issue_detail', language.code, issue.id) }}">More Info</a>
                     </button>
                     <button class="button button--fail" data-cy="close-issue-button">
-                        <a href="/api/close_issue/{{ issue.id }}">Close Issue</a>
+                        <a href="{{ url('validation:close_issue', language.code, issue.id) }}">Close Issue</a>
                     </button>
                 </div>
             </div>
@@ -39,18 +39,18 @@
                     {{ macros.player(issue.recording) }}<br>
                 {% endif %}
                 <h3>What's wrong with this entry?</h3>
-                {% if issue.suggested_cree %}
-                    The Cree word in this entry is wrong<br>
+                {% if issue.source_language_suggestion %}
+                    The {{ language }} word in this entry is wrong<br>
                 {% endif %}
-                {% if issue.suggested_english %}
+                {% if issue.target_language_suggestion %}
                     The English word in this entry is wrong<br>
                 {% endif %}
                 Comment: {{ issue.comment }}<br>
-                {% if issue.suggested_cree %}
-                    Cree spelling suggestion: {{ issue.suggested_cree }}<br>
+                {% if issue.source_language_suggestion %}
+                    {{ language }} spelling suggestion: {{ issue.source_language_suggestion }}<br>
                 {% endif %}
                 {% if issue.suggested_english %}
-                    English spelling suggestion: {{ issue.suggested_english }}<br>
+                    English spelling suggestion: {{ issue.target_language_suggestion }}<br>
                 {% endif %}
                 <div class="card-footer">
                     This issue was filed by {{ issue.created_by }} on {{ issue.created_on }}

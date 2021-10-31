@@ -83,7 +83,7 @@ function createDownloadLink(blob) {
         let transcription = document.getElementById("id_transcription").value
         fd.append("translation", translation)
         fd.append("transcription", transcription)
-        const response = await fetch(`/secrets/record_audio`, {
+        const response = await fetch(`/record_audio`, {
             method: 'POST',
             mode: 'same-origin',    // Do not send CSRF token to another domain.
             headers: {

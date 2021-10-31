@@ -1,0 +1,13 @@
+{% macro language_card(language) %}
+
+    <a href="/api/set_language/{{ language.code }}">
+    <article id='language-{{ language.id }}' class="card shadow-lg card--language" data-cy="segment-card">
+        <div class="card__body">
+            <h3>{{ language.name }}</h3>
+            <p>{{ language.description }}</p>
+        </div>
+
+    </article>
+    </a>
+
+{% endmacro %}

@@ -1,21 +1,15 @@
 <script>
     function showDivAccept(name, analysis) {
         document.getElementById('edit').style.display = "block";
-        document.getElementById('id_cree').focus()
 
-        document.getElementById('id_cree').value = name;
+        document.getElementById('id_source_language').value = name;
         document.getElementById('id_analysis').value = analysis;
-    }
-
-    function hideDiv() {
-        document.getElementById('edit').style.display = "none";
     }
 
     function revert(transcription, analysis) {
         document.getElementById('edit').style.display = "block";
-        document.getElementById('id_cree').focus()
 
-        document.getElementById('id_cree').value = transcription;
+        document.getElementById('id_source_language').value = transcription;
         document.getElementById('id_analysis').value = analysis;
     }
 

@@ -16,7 +16,13 @@ const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
       <script src="{{ static('index.js') }}"></script>
       <script src="{{ static('menu.js') }}"></script>
       <script src="{{ static('nav.js') }}"></script>
-      <title>{% block title %} Maskwacîs Recordings Validation {% endblock title %}</title>
+      <title>{% block title %}
+          {% if auth %}
+              {{ language.name if language != None else "" }} Speech DB
+          {% else %}
+               Speech DB
+          {% endif %}
+      {% endblock title %}</title>
   {% endblock head %}
 
 </head>
@@ -26,31 +32,49 @@ const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
   {# The header #}
   <nav class="navbar navbar-expand-md navbar-dark header--dark">
-    <a class="navbar-brand" href="{{ url('validation:index') }}">
-      <span lang="en" class="d-none d-sm-inline"> Maskwacîs </span>
-      <span lang="crk" class="d-sm-none"> ᒪᐢᑿᒋᐢ </span>
-      Recordings Validation
-    </a>
+    {% if language %}
+        <a class="navbar-brand" href="{{ url('validation:entries', language.code) }}">
+            {% if language != None %}
+                <span lang="en" class="d-none d-sm-inline"> {{ language.name }} </span>
+            {% endif %}
+          Speech DB
+        </a>
+    {% else %}
+        <a class="navbar-brand" href="{{ url('validation:home') }}">
+            Speech DB
+        </a>
+    {% endif %}
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
     {# The navbar #}
+  {% if language %}
     <div class="navbar-collapse collapse justify-content-stretch" id="navbarSupportedContent">
       <form class="form-inline ml-2 my-2 my-lg-0" method="GET" action="{{
-        url('validation:search_phrases')
+        url('validation:search_phrases', language.code)
       }}">
         <input class="form-control mr-sm-2" name="query" type="search" placeholder="Search" aria-label="Search" data-cy="search-bar">
         <button class="my-2 my-sm-0 button button--success" type="submit">Search</button>
         &nbsp;
-        <a data-cy="advanced-search-button" href="{{ url('validation:advanced_search') }}" class="button button--adv-search">Advanced Search</a>
+        <a data-cy="advanced-search-button" href="{{ url('validation:advanced_search', language.code) }}" class="button button--adv-search">Advanced Search</a>
     
       </form>
     </div>
       <details>
         <summary data-cy="options-button-header" class="menu__caret">Options</summary>
-        {{ menu.menu_options(request, auth, is_linguist, showMacron) }}
+        {{ menu.menu_options(request, auth, is_linguist, showMacron, language) }}
       </details>
+      {% else %}
+      <div class="navbar-collapse collapse justify-content-stretch" id="navbarSupportedContent">
+
+    </div>
+      <details>
+        <summary data-cy="options-button-header" class="menu__caret">Options</summary>
+        {{ menu.menu_options(request, auth, is_linguist, showMacron, "") }}
+      </details>
+    {% endif %}
+
 
   </nav>
 

@@ -33,6 +33,10 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Group
 from django.core.mail import mail_admins
+from django.contrib.auth import login as django_login
+from django.contrib.auth.models import User
+from django.contrib.auth.views import LoginView
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.paginator import Paginator
 from django.db.models import Q, QuerySet
 from django.http import (
@@ -44,9 +48,13 @@ from django.http import (
     HttpRequest,
 )
 from django.shortcuts import get_object_or_404, render
+from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
 from librecval.normalization import to_indexable_form
+from .jinja2 import url
+
+from .models import Phrase, Recording, Speaker, RecordingSession, Issue, LanguageVariant
 from .forms import (
     EditSegment,
     Register,
@@ -61,13 +69,28 @@ from .helpers import (
 from .models import Phrase, Recording, Speaker, RecordingSession, Issue
 
 
-def index(request):
+def home(request):
     """
-    The home page.
+    The home page that lets you select a language variant
+    """
+    languages = LanguageVariant.objects.all()
+    auth = request.user.is_authenticated
+
+    context = dict(languages=languages, language=None, auth=auth)
+    return render(request, "validation/home.html", context)
+
+
+def entries(request, language):
+    """
+    The main page.
     """
 
-    is_linguist = user_is_linguist(request.user)
-    is_expert = user_is_expert(request.user)
+    is_linguist = user_is_linguist(request.user, language)
+    is_expert = user_is_expert(request.user, language)
+
+    # Only show selected language
+    language_object = get_language_object(language)
+    all_phrases = Phrase.objects.filter(language=language_object)
 
     mode = request.GET.get("mode")
     mode_options = {
@@ -80,9 +103,9 @@ def index(request):
         mode = mode_options[mode]
 
     if mode == "all" or not mode:
-        all_phrases = Phrase.objects.exclude(status=Phrase.USER)
+        all_phrases = all_phrases.exclude(status=Phrase.USER)
     else:
-        all_phrases = Phrase.objects.filter(status=mode)
+        all_phrases = all_phrases.filter(status=mode)
 
     all_phrases = all_phrases.prefetch_related("recording_set__speaker")
 
@@ -109,7 +132,7 @@ def index(request):
     if not session or session == "all":
         session = "all sessions"
 
-    recordings, forms = prep_phrase_data(request, phrases)
+    recordings, forms = prep_phrase_data(request, phrases, language_object.name)
 
     speakers = Speaker.objects.all()
 
@@ -133,16 +156,18 @@ def index(request):
         session=session,
         mode=mode,
         encode_query_with_page=encode_query_with_page,
+        language=language_object,
     )
     return render(request, "validation/list_phrases.html", context)
 
 
-def search_phrases(request):
+def search_phrases(request, language):
     """
     The search results for pages.
     """
-    is_linguist = user_is_linguist(request.user)
-    is_expert = user_is_expert(request.user)
+    is_linguist = user_is_linguist(request.user, language)
+    is_expert = user_is_expert(request.user, language)
+    language_object = get_language_object(language)
 
     query = request.GET.get("query")
     all_matches = (
@@ -152,6 +177,7 @@ def search_phrases(request):
             | Q(translation__contains=query)
         )
         .exclude(status=Phrase.USER)
+        .filter(language=language_object)
         .prefetch_related("recording_set__speaker")
     )
     all_matches = list(all_matches)
@@ -164,7 +190,7 @@ def search_phrases(request):
     page_no = request.GET.get("page", 1)
     phrases = paginator.get_page(page_no)
 
-    recordings, forms = prep_phrase_data(request, phrases)
+    recordings, forms = prep_phrase_data(request, phrases, language_object.name)
 
     speakers = Speaker.objects.all()
 
@@ -185,37 +211,40 @@ def search_phrases(request):
         is_expert=is_expert,
         forms=forms,
         auth=request.user.is_authenticated,
+        language=language_object,
     )
     return render(request, "validation/search.html", context)
 
 
-def advanced_search(request):
+def advanced_search(request, language):
     """
     The search results for pages.
     """
-    query = Speaker.objects.all()
-    speakers = [q.code for q in query]
+    language_object = get_language_object(language)
+    speakers = language_object.speaker_set.all()
+    speakers = [speaker.code for speaker in speakers]
 
     context = dict(
         speakers=speakers,
         auth=request.user.is_authenticated,
-        is_linguist=user_is_linguist(request.user),
+        is_linguist=user_is_linguist(request.user, language),
+        language=language_object,
     )
     return render(request, "validation/advanced_search.html", context)
 
 
-def advanced_search_results(request):
+def advanced_search_results(request, language):
     """
     Search results for advanced search
     Takes in parameters from GET request and makes necessary
     queries to return all the appropriate entries
     The steps are:
-    cree phrases UNION english phrases UNION analysis
+    target language phrases UNION english phrases UNION analysis
     INTERSECT status
     INTERSECT speaker
     """
-    is_linguist = user_is_linguist(request.user)
-    is_expert = user_is_expert(request.user)
+    is_linguist = user_is_linguist(request.user, language)
+    is_expert = user_is_expert(request.user, language)
 
     transcription = request.GET.get("transcription")
     translation = request.GET.get("translation")
@@ -224,6 +253,7 @@ def advanced_search_results(request):
     status = request.GET.get("status")
     speakers = request.GET.getlist("speaker-options")
     quality = request.GET.get("quality")
+    language_object = get_language_object(language)
 
     if status and status != "all":
         status_choices = {
@@ -252,11 +282,15 @@ def advanced_search_results(request):
         filter_query.append(Q(kind=filter_kind))
 
     if filter_query:
-        phrase_matches = Phrase.objects.filter(
-            reduce(operator.or_, filter_query)
-        ).prefetch_related("recording_set__speaker")
+        phrase_matches = (
+            Phrase.objects.filter(language=language_object)
+            .filter(reduce(operator.or_, filter_query))
+            .prefetch_related("recording_set__speaker")
+        )
     else:
-        phrase_matches = Phrase.objects.all().prefetch_related("recording_set__speaker")
+        phrase_matches = Phrase.objects.filter(
+            language=language_object
+        ).prefetch_related("recording_set__speaker")
 
     recordings = {}
     all_matches = []
@@ -281,7 +315,7 @@ def advanced_search_results(request):
             all_matches.append(phrase)
 
     all_matches.sort(key=lambda phrase: phrase.transcription)
-    _, forms = prep_phrase_data(request, all_matches)
+    _, forms = prep_phrase_data(request, all_matches, language_object.name)
 
     query = QueryDict("", mutable=True)
     query.update(
@@ -309,6 +343,7 @@ def advanced_search_results(request):
         is_expert=is_expert,
         forms=forms,
         auth=request.user.is_authenticated,
+        language=language_object,
     )
     return render(request, "validation/search.html", context)
 
@@ -420,22 +455,25 @@ def add_cors_headers(response):
 
 
 @login_required()
-def segment_content_view(request, segment_id):
+def segment_content_view(request, language, segment_id):
     """
     The view for a single segment
     Returns the selected phrase and info provided by the helper functions
     """
+    language_object = get_language_object(language)
     if request.method == "POST":
         form = EditSegment(request.POST)
-        og_phrase = Phrase.objects.get(id=segment_id)
+        og_phrase = Phrase.objects.get(id=segment_id, language=language_object)
         phrase_id = og_phrase.id
         if form.is_valid():
-            transcription = form.cleaned_data["cree"].strip() or og_phrase.transcription
+            transcription = (
+                form.cleaned_data["source_language"].strip() or og_phrase.transcription
+            )
             translation = (
                 form.cleaned_data["translation"].strip() or og_phrase.translation
             )
             analysis = form.cleaned_data["analysis"].strip() or og_phrase.analysis
-            p = Phrase.objects.get(id=phrase_id)
+            p = Phrase.objects.get(id=phrase_id, language=language_object)
             p.transcription = transcription
             p.translation = translation
             p.analysis = analysis
@@ -444,7 +482,7 @@ def segment_content_view(request, segment_id):
             p.date = datetime.datetime.now()
             p.save()
 
-    phrase = Phrase.objects.get(id=segment_id)
+    phrase = Phrase.objects.get(id=segment_id, language=language_object)
     field_transcription = phrase.field_transcription
     suggestions = get_distance_with_translations(field_transcription)
 
@@ -455,7 +493,7 @@ def segment_content_view(request, segment_id):
 
     form = EditSegment(
         initial={
-            "cree": phrase.transcription,
+            "source_language": phrase.transcription,
             "translation": phrase.translation,
             "analysis": phrase.analysis,
         }
@@ -468,7 +506,8 @@ def segment_content_view(request, segment_id):
         form=form,
         history=history,
         auth=auth,
-        is_linguist=user_is_linguist(request.user),
+        is_linguist=user_is_linguist(request.user, language),
+        language=language_object,
     )
 
     return render(request, "validation/segment_details.html", context)
@@ -486,7 +525,9 @@ def register(request):
             password = form.cleaned_data["password"]
             first_name = form.cleaned_data["first_name"]
             last_name = form.cleaned_data["last_name"]
+            email = form.cleaned_data["email"]
             group = form.cleaned_data["role"]
+            languages = form.cleaned_data["language_variant"]
             if not group:
                 group = "Learner"
             else:
@@ -498,13 +539,14 @@ def register(request):
                     password=password,
                     first_name=first_name,
                     last_name=last_name,
+                    email=email,
                 )
                 new_user.save()
                 if group == "Linguist" or group == "Expert":
                     # https://studygyaan.com/django/how-to-signup-user-and-send-confirmation-email-in-django
                     # Linguists need permission to be a linguist
                     subject = f"New {group} User"
-                    message = f"New user {username} has requested {group} access. Login to the admin interface to grant them access."
+                    message = f"New user {username} has requested {group} access to {languages}. Login to the admin interface to grant them access."
                     mail_admins(
                         subject,
                         message,
@@ -513,6 +555,10 @@ def register(request):
                     group = "Learner"
                 group, _ = Group.objects.get_or_create(name=group)
                 group.user_set.add(new_user)
+                if languages:
+                    for language in languages:
+                        lang_group, _ = Group.objects.get_or_create(name=language)
+                        lang_group.user_set.add(new_user)
                 response = HttpResponseRedirect("/login")
                 return response
 
@@ -520,18 +566,23 @@ def register(request):
     return render(request, "validation/register.html", context)
 
 
-def view_issues(request):
-    issues = Issue.objects.filter(status=Issue.OPEN).order_by("id")
+def view_issues(request, language):
+    language = get_language_object(language)
+    issues = (
+        Issue.objects.filter(status=Issue.OPEN).filter(language=language).order_by("id")
+    )
     context = dict(
         issues=issues,
         auth=request.user.is_authenticated,
-        is_linguist=user_is_linguist(request.user),
+        is_linguist=user_is_linguist(request.user, language),
+        language=language,
     )
     return render(request, "validation/view_issues.html", context)
 
 
-def view_issue_detail(request, issue_id):
-    issue = Issue.objects.get(id=issue_id)
+def view_issue_detail(request, language, issue_id):
+    language = get_language_object(language)
+    issue = Issue.objects.get(id=issue_id, language=language)
 
     form = None
     if issue.recording:
@@ -540,7 +591,9 @@ def view_issue_detail(request, issue_id):
             if request.method == "POST" and form.is_valid():
                 return handle_save_issue_with_recording(form, issue, request)
         else:
-            form = EditIssueWithRecording(initial={"phrase": issue.suggested_cree})
+            form = EditIssueWithRecording(
+                initial={"phrase": issue.source_language_suggestion}
+            )
 
     if issue.phrase:
         if request.method == "POST":
@@ -550,8 +603,8 @@ def view_issue_detail(request, issue_id):
         else:
             form = EditIssueWithPhrase(
                 initial={
-                    "transcription": issue.suggested_cree,
-                    "translation": issue.suggested_english,
+                    "transcription": issue.source_language_suggestion,
+                    "translation": issue.target_language_suggestion,
                 }
             )
 
@@ -559,21 +612,24 @@ def view_issue_detail(request, issue_id):
         issue=issue,
         form=form,
         auth=request.user.is_authenticated,
-        is_linguist=user_is_linguist(request.user),
+        is_linguist=user_is_linguist(request.user, language),
+        language=language,
     )
     return render(request, "validation/view_issue_detail.html", context)
 
 
-def close_issue(request, issue_id):
-    issue = Issue.objects.filter(id=issue_id).first()
+def close_issue(request, language, issue_id):
+    language = get_language_object(language)
+    issue = Issue.objects.get(id=issue_id, language=language)
     issue.status = Issue.RESOLVED
     issue.save()
 
-    return HttpResponseRedirect("/issues")
+    return HttpResponseRedirect(url("validation:issues", language))
 
 
-def speaker_view(request, speaker_code):
-    speaker = Speaker.objects.get(code=speaker_code)
+def speaker_view(request, language, speaker_code):
+    language = get_language_object(language)
+    speaker = language.speaker_set.get(code=speaker_code)
     if speaker:
         full_name = speaker.full_name
     else:
@@ -589,6 +645,7 @@ def speaker_view(request, speaker_code):
         auth=request.user.is_authenticated,
         img_src=img_src,
         speaker=speaker,
+        language=language,
     )
     return render(request, "validation/speaker_view.html", context)
 
@@ -613,9 +670,10 @@ AVAILABLE_IMAGES = [
 ]
 
 
-def all_speakers(request):
+def all_speakers(request, language):
     speakers = []
-    speaker_objects = Speaker.objects.all()
+    language = get_language_object(language)
+    speaker_objects = language.speaker_set.all()
     for speaker in speaker_objects:
         if (
             "E-" in speaker.code
@@ -638,12 +696,16 @@ def all_speakers(request):
             full_name=full_name,
             code=speaker.code,
             img_path=img_path,
-            bio=speaker.eng_bio_text or "",
+            bio=speaker.target_bio_text or "",
             speaker=speaker,
         )
         speakers.append(speaker_dict)
 
-    context = dict(speakers=speakers, auth=request.user.is_authenticated)
+    context = dict(
+        speakers=speakers,
+        auth=request.user.is_authenticated,
+        language=language,
+    )
     return render(request, "validation/all_speakers.html", context)
 
 
@@ -652,8 +714,9 @@ def all_speakers(request):
 
 @login_required()
 @require_http_methods(["POST"])
-def record_translation_judgement(request, phrase_id):
-    phrase = get_object_or_404(Phrase, id=phrase_id)
+def record_translation_judgement(request, language, phrase_id):
+    language = get_language_object(language)
+    phrase = get_object_or_404(Phrase, id=phrase_id, language=language)
     judgement = json.loads(request.body)
 
     if judgement["judgement"] == "yes":
@@ -675,8 +738,9 @@ def record_translation_judgement(request, phrase_id):
 
 @login_required()
 @require_http_methods(["POST"])
-def record_audio_quality_judgement(request, recording_id):
-    rec = get_object_or_404(Recording, id=recording_id)
+def record_audio_quality_judgement(request, language, recording_id):
+    language = get_language_object(language)
+    rec = get_object_or_404(Recording, id=recording_id, language=language)
     judgement = json.loads(request.body)
 
     if judgement["judgement"] in ["good", "bad"]:
@@ -690,7 +754,8 @@ def record_audio_quality_judgement(request, recording_id):
 
 @login_required()
 @require_http_methods(["POST"])
-def save_wrong_speaker_code(request, recording_id):
+def save_wrong_speaker_code(request, language, recording_id):
+    language = get_language_object(language)
     rec = get_object_or_404(Recording, id=recording_id)
     speaker = request.POST.get("speaker-code-select")
     referrer = request.POST.get("referrer")
@@ -705,6 +770,7 @@ def save_wrong_speaker_code(request, recording_id):
         comment=comment,
         created_by=request.user,
         created_on=datetime.datetime.now(),
+        language=language,
     )
     new_issue.save()
 
@@ -723,8 +789,9 @@ def save_wrong_speaker_code(request, recording_id):
 
 @login_required()
 @require_http_methods(["POST"])
-def save_wrong_word(request, recording_id):
-    rec = get_object_or_404(Recording, id=recording_id)
+def save_wrong_word(request, language, recording_id):
+    language = get_language_object(language)
+    rec = get_object_or_404(Recording, id=recording_id, language=language)
     suggestion = request.POST.get("wrong_word")
     referrer = request.POST.get("referrer")
 
@@ -735,10 +802,11 @@ def save_wrong_word(request, recording_id):
 
     new_issue = Issue(
         recording=rec,
-        suggested_cree=suggestion,
+        source_language_suggestion=suggestion,
         comment=comment,
         created_by=request.user,
         created_on=datetime.datetime.now(),
+        language=language,
     )
     new_issue.save()
 
@@ -757,7 +825,9 @@ def save_wrong_word(request, recording_id):
 
 
 @login_required()
-def record_audio(request):
+def record_audio(request, language):
+    language = get_language_object(language)
+
     if request.method == "POST":
         form = RecordNewPhrase(request.POST, request.FILES)
         translation = request.POST.get("translation")
@@ -766,7 +836,11 @@ def record_audio(request):
         transcription = clean_text(transcription)
         audio_data = request.FILES["audio_data"]
 
-        phrase = Phrase.objects.filter(transcription=transcription).first()
+        # To allow for homonym differentiation, we check that the translation is *exactly* the same
+        # There's likely a better way of doing this, but this should suffice for now
+        phrase = Phrase.objects.filter(
+            transcription=transcription, translation=translation, language=language
+        ).first()
         if not phrase:
             phrase = Phrase(
                 translation=translation,
@@ -776,6 +850,7 @@ def record_audio(request):
                 status=Phrase.USER,
                 date=datetime.datetime.now(),
                 modifier=request.user,
+                language=language,
             )
             phrase.save()
 
@@ -786,6 +861,11 @@ def record_audio(request):
                 code=request.user.username,
                 user=request.user,
             )
+            speaker.save()
+
+        if language not in speaker.languages:
+            # Can only add language after the object exists i.e. is saved
+            speaker.languages.add(language)
             speaker.save()
 
         rec_id = create_new_rec_id(phrase, speaker)
@@ -813,23 +893,39 @@ def record_audio(request):
         rec.compressed_audio = dest
         rec.save()
 
-        save_metadata_to_file(rec_id, request.user, transcription, translation)
+        save_metadata_to_file(
+            rec_id, request.user, transcription, translation, language.name
+        )
 
         context = dict(
             form=form,
             auth=request.user.is_authenticated,
-            is_linguist=user_is_linguist(request.user),
+            is_linguist=user_is_linguist(request.user, language),
+            language=language,
         )
-        return HttpResponseRedirect("/secrets/record_audio", context)
+        return HttpResponseRedirect("/record_audio", context)
     else:
         form = RecordNewPhrase()
+        form.fields["transcription"].label = language.name
 
     context = dict(
         form=form,
         auth=request.user.is_authenticated,
-        is_linguist=user_is_linguist(request.user),
+        is_linguist=user_is_linguist(request.user, language),
+        language=language,
     )
-    return render(request, "validation/record_audio.html", context)
+    return render(request, f"validation/record_audio.html", context)
+
+
+def set_language(request, language_code):
+    assert get_object_or_404(LanguageVariant, code=language_code)
+
+    response = HttpResponse(status=HTTPStatus.SEE_OTHER)
+    response["Location"] = reverse(
+        "validation:entries", kwargs={"language": language_code}
+    )
+
+    return response
 
 
 @staff_member_required
@@ -902,15 +998,21 @@ def encode_query_with_page(query, page):
     return f"?{query.urlencode()}"
 
 
-def user_is_linguist(user):
-    return user.groups.filter(name="Linguist").exists()
+def user_is_linguist(user, lang):
+    return (
+        user.groups.filter(name="Linguist").exists()
+        and user.groups.filter(name=lang).exists()
+    )
 
 
-def user_is_expert(user):
-    return user.groups.filter(name__in=["Linguist", "Expert"]).exists()
+def user_is_expert(user, lang):
+    return (
+        user.groups.filter(name__in=["Linguist", "Expert"]).exists()
+        and user.groups.filter(name=lang).exists()
+    )
 
 
-def prep_phrase_data(request, phrases):
+def prep_phrase_data(request, phrases, lang):
     # The _segment_card needs a dictionary of recordings
     # in order to properly display search results
     recordings = {}
@@ -923,6 +1025,9 @@ def prep_phrase_data(request, phrases):
             )
         else:
             forms[phrase.id] = FlagSegment(initial={"phrase_id": phrase.id})
+            forms[phrase.id].fields[
+                "source_language_suggestion"
+            ].label = f"{lang} suggestion"
 
     return recordings, forms
 
@@ -930,8 +1035,8 @@ def prep_phrase_data(request, phrases):
 def save_issue(data, user):
     phrase_id = data["phrase_id"]
     comment = data["comment"]
-    cree_suggestion = data["cree_suggestion"]
-    english_suggestion = data["english_suggestion"]
+    source_language_suggestion = data["source_language_suggestion"]
+    target_language_suggestion = data["target_language_suggestion"]
 
     phrase = Phrase.objects.get(id=phrase_id)
     phrase.validated = False
@@ -941,8 +1046,8 @@ def save_issue(data, user):
     new_issue = Issue(
         phrase=phrase,
         comment=comment,
-        suggested_cree=cree_suggestion,
-        suggested_english=english_suggestion,
+        source_language_suggestion=source_language_suggestion,
+        target_language_suggestion=target_language_suggestion,
         created_by=user,
         created_on=datetime.datetime.now(),
     )
@@ -983,7 +1088,7 @@ def create_new_rec_id(phrase, speaker):
     return sha256(signature.encode("UTF-8")).hexdigest()
 
 
-def save_metadata_to_file(rec_id, user, transcription, translation):
+def save_metadata_to_file(rec_id, user, transcription, translation, language):
     dest = (
         settings.MEDIA_ROOT
         + "/"
@@ -1000,7 +1105,7 @@ def save_metadata_to_file(rec_id, user, transcription, translation):
         "recorded_on": str(datetime.datetime.now().astimezone()),
         "transcription": transcription,
         "translation": translation,
-        "dialect": "Plains Cree",
+        "language": language,
     }
     with open(dest, "w+") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
@@ -1011,3 +1116,7 @@ def clean_text(text):
     ret = ret.replace("\n", "")
     ret = ret.replace("\t", "")
     return ret
+
+
+def get_language_object(language):
+    return get_object_or_404(LanguageVariant, code=language)

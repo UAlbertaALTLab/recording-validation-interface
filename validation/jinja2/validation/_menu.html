@@ -1,37 +1,49 @@
 {#
-      Copyright (C) 2021 Jolene Poulin <jcpoulin@ualberta.ca>
+Copyright (C) 2021 Jolene Poulin
+<jcpoulin@ualberta.ca>
 
-      This program is free software: you can redistribute it and/or modify
-      it under the terms of the GNU Affero General Public License as
-      published by the Free Software Foundation, either version 3 of the
-      License, or (at your option) any later version.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
 
-      This program is distributed in the hope that it will be useful,
-      but WITHOUT ANY WARRANTY; without even the implied warranty of
-      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-      GNU Affero General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
 
-      You should have received a copy of the GNU Affero General Public License
-      along with this program.  If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see
+<http://www.gnu.org/licenses/>.
 #}
 
 
-{% macro menu_options(request, auth, is_linguist, showMacron) %}
+{% macro menu_options(request, auth, is_linguist, showMacron, language) %}
     <ul id="options-menu" class="menu__options menu__options--list menu__options--right">
-        <li><a href="/speakers" class="menu__options-link">Speakers</a></li>
+        {% if language %}
+            <li><a href="{{ url('validation:all_speakers', language.code) }}" class="menu__options-link">Speakers</a>
+            </li>
+            <li><a href="{{ url('validation:home') }}" class="menu__options-link">Change Language</a></li>
+        {% endif %}
         {% if is_linguist %}
-            <li><a href="{{ url('validation:issues') }}" class="menu__options-link">View open Issues</a></li>
+            <li><a href="{{ url('validation:issues', language.code) }}" class="menu__options-link">View open Issues</a>
+            </li>
         {% endif %}
         {% if auth %}
             {% if request.COOKIES['macron'] == 'off' %}
                 <li onclick="showMacron('on')"><a href="#" class="menu__options-link">Show ê with circumflex</a></li>
             {% else %}
-                <li  onclick="showMacron('off')"><a href="#" class="menu__options-link">Show e without circumflex</a></li>
+                <li onclick="showMacron('off')"><a href="#" class="menu__options-link">Show e without circumflex</a>
+                </li>
             {% endif %}
-            <li><a href="/logout" id="logout-link" class="logout-link">Logout</a></li>
+            {% if language %}
+                <li><a href="{{ url('validation:record_audio', language.code) }}" class="menu__options-link">Record
+                    Audio</a></li>
+            {% endif %}
+            <li><a href="{{ url('validation:logout') }}" id="logout-link" class="logout-link">Logout</a></li>
 
         {% else %}
-            <li><a href="/login" id="login-link" class="login-link">Login</a></li>
+            <li><a href="{{ url('validation:login') }}" id="login-link" class="login-link">Login</a></li>
         {% endif %}
     </ul>
 {% endmacro %}

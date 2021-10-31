@@ -35,7 +35,14 @@ if SECRET_KEY is None:
 DEBUG = config("DEBUG", default=False, cast=bool)
 USE_DJANGO_DEBUG_TOOLBAR = config("USE_DJANGO_DEBUG_TOOLBAR", default=DEBUG, cast=bool)
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "speech-db.altlab.app", "altlab-itw:8004"]
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "speech-db.altlab.app",
+    "speech-db.altlab.dev",
+    "altlab-itw:8004",
+    "altlab-itw:8080",
+]
 
 
 # Application definition
@@ -196,6 +203,14 @@ RECVAL_METADATA_PATH = config(
     "RECVAL_METADATA_PATH", BASE_DIR / "private" / "metadata.csv", cast=Path
 )
 
+TSUUTINA_METADATA_PATH = config(
+    "TSUUTINA_METADATA_PATH", BASE_DIR / "private" / "tsuutina-metadata.csv", cast=Path
+)
+
+TSUUTINA_AUDIO_PREFIX = config(
+    "TSUUTINA_AUDIO_PREFIX", BASE_DIR / "data" / "tsuutina" / "annotations", cast=Path
+)
+
 # Where the sessions should be extracted from.
 # Expecting a structure like this:
 #
@@ -205,6 +220,10 @@ RECVAL_METADATA_PATH = config(
 # └── 2016-01-18-PM-___-_/
 RECVAL_SESSIONS_DIR = config(
     "RECVAL_SESSIONS_DIR", BASE_DIR / "data" / "sessions", cast=Path
+)
+
+TSUUTINA_SESSIONS_DIR = config(
+    "TSUUTINA_SESSIONS_DIR", BASE_DIR / "data" / "tsuutina", cast=Path
 )
 
 ################################### MEDIA (Uploads) ####################################
