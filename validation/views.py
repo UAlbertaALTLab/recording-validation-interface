@@ -48,6 +48,7 @@ from django.http import (
     HttpRequest,
 )
 from django.shortcuts import get_object_or_404, render
+from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
 from librecval.normalization import to_indexable_form

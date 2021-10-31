@@ -18,15 +18,15 @@ along with this program.  If not, see
 #}
 
 
-{% macro menu_options(request, auth, is_linguist, showMacron, dialect) %}
+{% macro menu_options(request, auth, is_linguist, showMacron, language) %}
     <ul id="options-menu" class="menu__options menu__options--list menu__options--right">
-        {% if dialect %}
-            <li><a href="{{ url('validation:all_speakers', dialect.code) }}" class="menu__options-link">Speakers</a>
+        {% if language %}
+            <li><a href="{{ url('validation:all_speakers', language.code) }}" class="menu__options-link">Speakers</a>
             </li>
             <li><a href="{{ url('validation:home') }}" class="menu__options-link">Change Language</a></li>
         {% endif %}
         {% if is_linguist %}
-            <li><a href="{{ url('validation:issues', dialect.code) }}" class="menu__options-link">View open Issues</a>
+            <li><a href="{{ url('validation:issues', language.code) }}" class="menu__options-link">View open Issues</a>
             </li>
         {% endif %}
         {% if auth %}
@@ -36,8 +36,8 @@ along with this program.  If not, see
                 <li onclick="showMacron('off')"><a href="#" class="menu__options-link">Show e without circumflex</a>
                 </li>
             {% endif %}
-            {% if dialect %}
-                <li><a href="{{ url('validation:record_audio', dialect.code) }}" class="menu__options-link">Record
+            {% if language %}
+                <li><a href="{{ url('validation:record_audio', language.code) }}" class="menu__options-link">Record
                     Audio</a></li>
             {% endif %}
             <li><a href="{{ url('validation:logout') }}" id="logout-link" class="logout-link">Logout</a></li>

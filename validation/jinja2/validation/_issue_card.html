@@ -27,7 +27,7 @@
                         <a href="{{ url('validation:issue_detail', language.code, issue.id) }}">More Info</a>
                     </button>
                     <button class="button button--fail" data-cy="close-issue-button">
-                        <a href="{{ url('validation:close_issue', dialect.code, issue.id) }}">Close Issue</a>
+                        <a href="{{ url('validation:close_issue', language.code, issue.id) }}">Close Issue</a>
                     </button>
                 </div>
             </div>
@@ -40,14 +40,14 @@
                 {% endif %}
                 <h3>What's wrong with this entry?</h3>
                 {% if issue.source_language_suggestion %}
-                    The {{ dialect }} word in this entry is wrong<br>
+                    The {{ language }} word in this entry is wrong<br>
                 {% endif %}
                 {% if issue.target_language_suggestion %}
                     The English word in this entry is wrong<br>
                 {% endif %}
                 Comment: {{ issue.comment }}<br>
                 {% if issue.source_language_suggestion %}
-                    {{ dialect }} spelling suggestion: {{ issue.source_language_suggestion }}<br>
+                    {{ language }} spelling suggestion: {{ issue.source_language_suggestion }}<br>
                 {% endif %}
                 {% if issue.suggested_english %}
                     English spelling suggestion: {{ issue.target_language_suggestion }}<br>

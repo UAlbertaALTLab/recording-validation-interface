@@ -38,14 +38,14 @@
                 {{ macros.player(issue.recording) }}<br>
             {% endif %}
             {% if issue.source_language_suggestion %}
-                    The {{ dialect }} word in this entry is wrong<br>
+                    The {{ language }} word in this entry is wrong<br>
                 {% endif %}
                 {% if issue.target_language_suggestion %}
                     The English word in this entry is wrong<br>
                 {% endif %}
                 Comment: {{ issue.comment }}<br>
                 {% if issue.source_language_suggestion %}
-                    {{ dialect }} spelling suggestion: {{ issue.source_language_suggestion }}<br>
+                    {{ language }} spelling suggestion: {{ issue.source_language_suggestion }}<br>
                 {% endif %}
                 {% if issue.target_language_suggestion %}
                     English spelling suggestion: {{ issue.target_language_suggestion }}<br>

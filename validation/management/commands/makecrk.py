@@ -8,7 +8,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         phrases = Phrase.objects.all()
-        language = LanguageVariant.objects.get(code="maskwacis")
+        language, _ = LanguageVariant.objects.get_or_create(
+            name="Maskwacîs", code="maskwacis"
+        )
         for phrase in phrases:
             if not phrase.language:
                 phrase.language = language
