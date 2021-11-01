@@ -10,6 +10,7 @@ let recordButton = document.getElementById("recordButton");
 let stopButton = document.getElementById("stopButton");
 let recordingsList = document.getElementById("recordingsList");
 let recNewEntryButton = document.getElementById("recNewEntryButton");
+const lang = document.getElementById("language-span").dataset.lang
 
 recordButton.addEventListener("click", startRecording)
 stopButton.addEventListener("click", stopRecording)
@@ -83,7 +84,7 @@ function createDownloadLink(blob) {
         let transcription = document.getElementById("id_transcription").value
         fd.append("translation", translation)
         fd.append("transcription", transcription)
-        const response = await fetch(`/record_audio`, {
+        const response = await fetch(`/${lang}/record_audio`, {
             method: 'POST',
             mode: 'same-origin',    // Do not send CSRF token to another domain.
             headers: {
