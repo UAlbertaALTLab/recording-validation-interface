@@ -4,7 +4,7 @@ services:
         build: .
         restart: always
         ports:
-        - "8080:8000"
+        - "8004:8000"
         volumes:
         # HOST : CONTAINER
         - "./.env:/app/.env"
