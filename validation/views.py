@@ -863,7 +863,7 @@ def record_audio(request, language):
             )
             speaker.save()
 
-        if language not in speaker.languages:
+        if language not in speaker.languages.all():
             # Can only add language after the object exists i.e. is saved
             speaker.languages.add(language)
             speaker.save()
@@ -903,7 +903,7 @@ def record_audio(request, language):
             is_linguist=user_is_linguist(request.user, language),
             language=language,
         )
-        return HttpResponseRedirect("/record_audio", context)
+        return HttpResponseRedirect(f"/{language.code}/record_audio", context)
     else:
         form = RecordNewPhrase()
         form.fields["transcription"].label = language.name
