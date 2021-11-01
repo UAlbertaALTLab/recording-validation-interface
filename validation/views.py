@@ -92,6 +92,12 @@ def entries(request, language):
     language_object = get_language_object(language)
     all_phrases = Phrase.objects.filter(language=language_object)
 
+    language_sessions = (
+        Recording.objects.filter(phrase_id__in=all_phrases).values("session").distinct()
+    )
+    language_sessions = [i["session"] for i in language_sessions]
+    language_sessions = RecordingSession.objects.filter(id__in=language_sessions)
+
     mode = request.GET.get("mode")
     mode_options = {
         "auto-standardized": Phrase.AUTO,
@@ -150,7 +156,7 @@ def entries(request, language):
         is_linguist=is_linguist,
         is_expert=is_expert,
         forms=forms,
-        sessions=sessions,
+        sessions=language_sessions,
         speakers=speakers,
         query=query_term,
         session=session,
