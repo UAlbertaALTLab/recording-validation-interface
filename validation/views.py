@@ -679,7 +679,7 @@ def speaker_view(request, language, speaker_code):
     return render(request, "validation/speaker_view.html", context)
 
 
-def all_speakers(request):
+def all_speakers(request, language):
     speakers = []
     language = get_language_object(language)
     speaker_objects = language.speaker_set.all()
