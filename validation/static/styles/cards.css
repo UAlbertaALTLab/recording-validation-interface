@@ -8,12 +8,12 @@
   padding: 0.75rem;
 }
 
-.card__title--cree {
+.card__title--source-language {
   font-weight: 600;
   font-size: 3rem;
 }
 
-.card__title--english {
+.card__title--target-language {
   font-weight: 300;
   font-size: 2rem;
 }
@@ -46,3 +46,12 @@
   background-color: var(--custom-beige);
 }
 
+.card--language {
+  color: black;
+  text-decoration: none;
+}
+
+.card--language:hover {
+  cursor: pointer;
+  text-decoration: none;
+}

@@ -13,7 +13,8 @@
             "date": "2021-03-29",
             "analysis": "kwaskwepitew+V+TA+Ind+3Sg+4Sg/PlO",
             "modifier": "linguist",
-            "field_transcription": "kwaskwepitew"
+            "field_transcription": "kwaskwepitew",
+            "language_id": 1
         }
     },
     {
@@ -30,7 +31,8 @@
             "date": "2021-03-17",
             "analysis": "kwaskwepitamawew+V+TA+Ind+3Sg+4Sg/PlO",
             "modifier": "AUTO",
-            "field_transcription": "kwaskwepitamawew"
+            "field_transcription": "kwaskwepitamawew",
+            "language_id": 1
         }
     },
     {
@@ -47,7 +49,8 @@
             "date": "2021-03-17",
             "analysis": "",
             "modifier": "AUTO",
-            "field_transcription": "emicimikacikeyin"
+            "field_transcription": "emicimikacikeyin",
+            "language_id": 1
         }
     },
     {
@@ -64,7 +67,8 @@
             "date": "2021-03-17",
             "analysis": "kosapewin+N+I+Sg",
             "modifier": "AUTO",
-            "field_transcription": "kosapewin"
+            "field_transcription": "kosapewin",
+            "language_id": 1
         }
     },
     {
@@ -81,7 +85,8 @@
             "date": "2021-03-17",
             "analysis": "kosapew+V+AI+Ind+3Sg",
             "modifier": "AUTO",
-            "field_transcription": "kosapew"
+            "field_transcription": "kosapew",
+            "language_id": 1
         }
     },
     {
@@ -98,7 +103,8 @@
             "date": "2021-03-17",
             "analysis": "",
             "modifier": "AUTO",
-            "field_transcription": "awas"
+            "field_transcription": "awas",
+            "language_id": 1
         }
     },
     {
@@ -115,7 +121,8 @@
             "date": "2021-03-17",
             "analysis": "",
             "modifier": "AUTO",
-            "field_transcription": "ocewipakamayikan"
+            "field_transcription": "ocewipakamayikan",
+            "language_id": 1
         }
     },
     {
@@ -132,7 +139,8 @@
             "date": "2021-03-17",
             "analysis": "",
             "modifier": "AUTO",
-            "field_transcription": "nipiy"
+            "field_transcription": "nipiy",
+            "language_id": 1
         }
     },
     {
@@ -149,7 +157,8 @@
             "date": "2021-03-17",
             "analysis": "",
             "modifier": "AUTO",
-            "field_transcription": "nîpiy"
+            "field_transcription": "nîpiy",
+            "language_id": 1
         }
     }
 ]

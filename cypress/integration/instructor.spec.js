@@ -6,7 +6,7 @@ describe("Instructors", () => {
     })
 
     it("can flag entries", () => {
-        cy.visit(Cypress.env('home'));
+        cy.visit(Cypress.env('maskwacis'));
 
         cy.get('[data-cy="segment-card"]:first')
             .within(() => {

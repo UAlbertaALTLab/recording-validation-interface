@@ -54,16 +54,33 @@ def arguments_for_choices(choices):
     return dict(choices=choices, max_length=max(len(choice[0]) for choice in choices))
 
 
+class LanguageVariant(models.Model):
+    name = models.CharField(
+        help_text="The full name of the language", blank=False, max_length=256
+    )
+
+    code = models.CharField(
+        help_text="A url-safe identifier for this language",
+        blank=False,
+        max_length=16,
+    )
+
+    description = models.CharField(
+        help_text="A short description of this language/where it is spoken",
+        null=True,
+        max_length=1024,
+    )
+
+    def __str__(self) -> str:
+        return self.name
+
+
 class Phrase(models.Model):
     """
     A recorded phrase. A phrase may either be a word or a sentence with at
     least one recording. Phrases may be awaiting validation, or may have
     already be validated.
     """
-
-    # The only characters allowed in the transcription are the Cree SRO
-    # alphabet (in circumflexes), and some selected punctuation.
-    ALLOWED_TRANSCRIPTION_CHARACTERS = set("ptkcshmn yw rl êiîoôaâ -")
 
     MAX_TRANSCRIPTION_LENGTH = 256
 
@@ -91,9 +108,11 @@ class Phrase(models.Model):
     )
 
     MASKWACÎS_DICTIONARY = "MD"
+    ONESPOT_SAPIR = "OS"
     NEW_WORD = "new"
     ORIGIN_CHOICES = (
         (MASKWACÎS_DICTIONARY, "Maskwacîs Dictionary"),
+        (ONESPOT_SAPIR, "Onespot-Sapir Dictionary"),
         (NEW_WORD, "New word"),
     )
 
@@ -104,7 +123,7 @@ class Phrase(models.Model):
     )
 
     transcription = models.CharField(
-        help_text="The validated transciption of the Cree phrase.",
+        help_text="The validated transciption of the target language phrase.",
         blank=False,
         max_length=MAX_TRANSCRIPTION_LENGTH,
     )
@@ -123,6 +142,13 @@ class Phrase(models.Model):
         help_text="Has this phrase be validated?", default=False
     )
 
+    language = models.ForeignKey(
+        LanguageVariant,
+        help_text="The language this phrase belongs to",
+        on_delete=models.PROTECT,
+        null=True,
+    )
+
     status = models.CharField(
         help_text="Status in the validation process",
         blank=False,
@@ -136,6 +162,12 @@ class Phrase(models.Model):
         null=True,
         default=NEW_WORD,
         **arguments_for_choices(ORIGIN_CHOICES),
+    )
+
+    osid = models.CharField(
+        help_text="Typically, this is the os##### for Tsuut'ina recordings",
+        null=True,
+        max_length=16,
     )
 
     # A hidden field that will be indexed to make fuzzy matching easier.
@@ -155,7 +187,7 @@ class Phrase(models.Model):
     )
 
     analysis = models.CharField(
-        help_text="The analysis of the Cree phrase", blank=True, max_length=256
+        help_text="The analysis of the phrase", blank=True, max_length=256
     )
 
     modifier = models.CharField(
@@ -198,21 +230,11 @@ class Phrase(models.Model):
 
         if self.kind == self.WORD:
             self.transcription = normalize_sro(self.transcription)
-            if not self.transcription_is_in_strict_sro():
-                raise ValidationError(
-                    f"Cree word had non-SRO characters: {self.transcription}"
-                )
 
     def save(self, *args, **kwargs):
         # Make sure the fuzzy match is always up to date
         self.fuzzy_transcription = to_indexable_form(self.transcription)
         super().save(*args, **kwargs)
-
-    def transcription_is_in_strict_sro(self) -> bool:
-        """
-        Returns True when the transcription is written in perfect SRO.
-        """
-        return self.ALLOWED_TRANSCRIPTION_CHARACTERS.issuperset(self.transcription)
 
     def __str__(self) -> str:
         return self.transcription
@@ -256,37 +278,43 @@ class Speaker(models.Model):
         blank=True,
     )
 
-    eng_bio_text = models.CharField(
+    languages = models.ManyToManyField(LanguageVariant, blank=True)
+
+    target_bio_text = models.CharField(
         help_text="The English transcription of the speaker bio",
         null=True,
         blank=True,
         max_length=4096,
     )
-    crk_bio_text = models.CharField(
+    source_bio_text = models.CharField(
         help_text="The Cree transcription of the speaker bio",
         null=True,
         blank=True,
         max_length=4096,
     )
 
-    eng_bio_audio = models.FileField(
+    target_bio_audio = models.FileField(
         # relative to settings.MEDIA_ROOT
         upload_to=settings.RECVAL_AUDIO_PREFIX,
         blank=True,
     )
-    crk_bio_audio = models.FileField(
+    source_bio_audio = models.FileField(
         # relative to settings.MEDIA_ROOT
         upload_to=settings.RECVAL_AUDIO_PREFIX,
         blank=True,
     )
 
     @property
-    def dialect(self):
+    def language(self):
         """
-        Which dialect this person speaks.
+        Which language this person speaks.
         """
         # Hard-coded for now, but it makes implementing this field trival.
-        return "Maskwacîs"
+        return [
+            language.name
+            for language in LanguageVariant.objects.all()
+            if language in self.languages.all()
+        ]
 
     @property
     def anonymous(self):
@@ -489,7 +517,7 @@ class Recording(models.Model):
             "speaker_name": self.speaker.full_name,
             "anonymous": self.speaker.anonymous,
             "gender": self.speaker.gender,
-            "dialect": self.speaker.dialect,
+            "language": self.speaker.language,
             "recording_url": request.build_absolute_uri(self.get_absolute_url()),
             "speaker_bio_url": request.build_absolute_uri(
                 self.speaker.get_absolute_url()
@@ -511,14 +539,14 @@ class Issue(models.Model):
         max_length=1024,
     )
 
-    suggested_cree = models.CharField(
-        help_text="The Cree spelling suggested by the validator",
+    source_language_suggestion = models.CharField(
+        help_text="The Target Language spelling suggestion from the validator",
         blank=True,
         max_length=1024,
     )
 
-    suggested_english = models.CharField(
-        help_text="The English spelling suggested by the validator",
+    target_language_suggestion = models.CharField(
+        help_text="The Source Language spelling suggestion from the validator",
         blank=True,
         max_length=1024,
     )
@@ -527,6 +555,13 @@ class Issue(models.Model):
 
     recording = models.ForeignKey(
         Recording, on_delete=models.CASCADE, blank=True, null=True
+    )
+
+    language = models.ForeignKey(
+        LanguageVariant,
+        help_text="The language this phrase belongs to",
+        on_delete=models.PROTECT,
+        null=True,
     )
 
     created_by = models.CharField(

@@ -16,7 +16,7 @@
 #}
 
 
-{% macro modal(recording_id, speakers, csrf_token, request) %}
+{% macro modal(recording_id, speakers, csrf_token, language, request) %}
     <div id="{{ recording_id }}-modal" class="modal fade" role="dialog">
             <div class="modal-dialog">
 
@@ -28,7 +28,7 @@
 
                     <div class="modal__speaker-select">
                         Yes, it should be...
-                        <form id="{{ recording_id }}-form" method="POST" action="/api/save_wrong_speaker_code/{{ recording_id }}">
+                        <form id="{{ recording_id }}-form" method="POST" action="/{{ language.code }}/api/save_wrong_speaker_code/{{ recording_id }}">
                             <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
                             <input type="hidden" name="referrer" value="{{ request.build_absolute_uri() }}">
                             <select name="speaker-code-select" id="speaker-code-select" data-cy="select-speaker">

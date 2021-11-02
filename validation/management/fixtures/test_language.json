@@ -1,0 +1,11 @@
+[
+  {
+    "model": "validation.languagevariant",
+    "fields": {
+      "id": 1,
+      "name": "Maskwacîs",
+      "code": "maskwacis",
+      "description": "Plains Cree as spoken in the Maskwacîs community"
+    }
+  }
+]

@@ -2,7 +2,7 @@
 
 describe("Search", () => {
     it("should search for then display the first word on the main page", () => { 
-        cy.visit(Cypress.env("home"))
+        cy.visit(Cypress.env("maskwacis"))
         let word = 'awas'
 
         cy.get('[data-cy="search-bar"]')
@@ -22,7 +22,7 @@ describe("Search", () => {
 
 describe("Advanced Search", () => {
     it("should display the advanced search results", () => {
-        cy.visit(Cypress.env("home"))
+        cy.visit(Cypress.env("maskwacis"))
 
         cy.get('[data-cy="advanced-search-button"]')
             .click()

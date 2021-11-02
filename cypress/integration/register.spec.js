@@ -31,6 +31,9 @@ describe("Register", () => {
         cy.get('#id_last_name')
             .should('be.visible');
 
+        cy.get('#id_email')
+            .should('be.visible');
+
         cy.get('#id_username')
             .should('be.visible');
 
@@ -57,6 +60,9 @@ describe("Register", () => {
 
         cy.get('#id_last_name')
             .type('Last');
+
+        cy.get('#id_email')
+            .type('test@user.com');
 
         cy.get('#id_username')
             .type('test_user');

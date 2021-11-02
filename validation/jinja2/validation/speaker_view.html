@@ -8,13 +8,13 @@
     </div>
 
     <div class="speaker-bio">
-        {% if speaker.eng_bio_text %}
+        {% if speaker.target_bio_text %}
             <h3>Listen in English:</h3>
-            <p>{{ macros.bio_player(speaker.eng_bio_audio) }}</p>
+            <p>{{ macros.bio_player(speaker.target_bio_audio) }}</p>
             {% if request.COOKIES['macron'] == 'on' %}
-                <p>{{ speaker.eng_bio_text }}</p>
+                <p>{{ speaker.target_bio_text }}</p>
             {% else %}
-                <p>{{ speaker.eng_bio_text | replace("ê", "e") }}</p>
+                <p>{{ speaker.target_bio_text | replace("ê", "e") }}</p>
             {% endif %}
 
             {% if request.COOKIES['macron'] == 'on' %}
@@ -22,8 +22,8 @@
             {% else %}
                 <h3>Listen in nehiyawewin:</h3>
             {% endif %}
-            <p>{{ macros.bio_player(speaker.crk_bio_audio) }}</p>
-            <p>(Cree translation coming soon)</p>
+            <p>{{ macros.bio_player(speaker.source_bio_audio) }}</p>
+            <p>({{ language }} translation coming soon)</p>
         {% endif %}
     </div>
 {% endblock content %}

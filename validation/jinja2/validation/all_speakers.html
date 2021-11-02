@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="speakers--grid">
-    <h2>Maskwacîs Speakers</h2>
+    <h2>{{ language.name }} Speakers</h2>
     <div class="row">
         {% for speaker in speakers %}
         <div class="col-sm-4 d-flex align-items-stretch">
@@ -18,7 +18,7 @@
                 {% if speaker.bio %}
                   <p class="card-text speaker-bio-preview">{{ speaker.bio }}</p>
                 {% endif %}
-                <a href="{{ url('validation:speaker_view', speaker.code) }}" class="button button--success">Learn More</a>
+                <a href="{{ url('validation:speaker_view', language.code, speaker.code) }}" class="button button--success">Learn More</a>
                 </div>
             </div>
         </div>
