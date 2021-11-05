@@ -723,9 +723,8 @@ def all_speakers(request, language):
 
 @login_required()
 @require_http_methods(["POST"])
-def record_translation_judgement(request, language, phrase_id):
-    language = get_language_object(language)
-    phrase = get_object_or_404(Phrase, id=phrase_id, language=language)
+def record_translation_judgement(request, phrase_id):
+    phrase = get_object_or_404(Phrase, id=phrase_id)
     judgement = json.loads(request.body)
 
     if judgement["judgement"] == "yes":
@@ -747,9 +746,8 @@ def record_translation_judgement(request, language, phrase_id):
 
 @login_required()
 @require_http_methods(["POST"])
-def record_audio_quality_judgement(request, language, recording_id):
-    language = get_language_object(language)
-    rec = get_object_or_404(Recording, id=recording_id, language=language)
+def record_audio_quality_judgement(request, recording_id):
+    rec = get_object_or_404(Recording, id=recording_id)
     judgement = json.loads(request.body)
 
     if judgement["judgement"] in ["good", "bad"]:
@@ -800,7 +798,7 @@ def save_wrong_speaker_code(request, language, recording_id):
 @require_http_methods(["POST"])
 def save_wrong_word(request, language, recording_id):
     language = get_language_object(language)
-    rec = get_object_or_404(Recording, id=recording_id, language=language)
+    rec = get_object_or_404(Recording, id=recording_id)
     suggestion = request.POST.get("wrong_word")
     referrer = request.POST.get("referrer")
 
