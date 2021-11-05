@@ -80,12 +80,12 @@ urlpatterns = [
     path("<str:language>/speakers/", views.all_speakers, name="all_speakers"),
     path("<str:language>/record_audio", views.record_audio, name="record_audio"),
     path(
-        "<str:language>/api/record_translation_judgement/<int:phrase_id>",
+        "api/record_translation_judgement/<int:phrase_id>",
         views.record_translation_judgement,
         name="record_translation_judgement",
     ),
     path(
-        "<str:language>/api/record_audio_quality_judgement/<str:recording_id>",
+        "api/record_audio_quality_judgement/<str:recording_id>",
         views.record_audio_quality_judgement,
         name="record_audio_quality_judgement",
     ),

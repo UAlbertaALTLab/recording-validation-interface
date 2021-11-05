@@ -15,12 +15,12 @@
       along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #}
 
-{% macro button_col(recording, csrf_token, request) %}
+{% macro button_col(recording, csrf_token, request, language) %}
 
     <button class="button {{ 'button--neutral-solid' if recording.wrong_speaker else 'button--neutral' }} wrong-speaker-button" data-cy="wrong-speaker-button" data-toggle="modal" data-target="#{{ recording.id }}-modal" data-rec-id={{ recording.id }}>Wrong Speaker</button>
     <button class="button {{ 'button--neutral-solid' if recording.wrong_word else 'button--neutral' }} wrong-word-button" data-cy="wrong-word-button" data-rec-id={{ recording.id }} onclick="showWrongWordDiv('{{ recording.id }}')">Wrong Word</button>
     <div class="menu__none rec-wrong-word" data-rec-id={{ recording.id }}>
-        <form id="{{ recording.id }}-wrong-word" method="POST" action="/api/save_wrong_word/{{ recording.id }}">
+        <form id="{{ recording.id }}-wrong-word" method="POST" action="/{{ language.code }}/api/save_wrong_word/{{ recording.id }}">
             <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
             <input type="hidden" name="referrer" value="{{ request.build_absolute_uri() }}">
             What word is being spoken?
