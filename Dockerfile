@@ -45,7 +45,7 @@ COPY --chown=${WSGI_USER}:${WSGI_USER} . .
 
 ENV VIRTUAL_ENV="/app/.venv"
 ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
-RUN python manage.py collectstatic
+RUN ./manage.py collectstatic --noinput
 
 EXPOSE 8000
 ENV UWSGI_HTTP=:8000 UWSGI_MASTER=1 UWSGI_HTTP_KEEPALIVE=1 UWSGI_AUTO_CHUNKED=1 UWSGI_WSGI_ENV_BEHAVIOUR=holy

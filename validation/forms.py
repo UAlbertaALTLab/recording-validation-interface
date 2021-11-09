@@ -63,7 +63,9 @@ class Register(forms.Form):
     LANG_CHOICES = [
         ("maskwacis", "Maskwacîs"),
         ("tsuutina", "Tsuut'ina"),
-        ("stoney", "Stoney Nakoda"),
+        ("stoney-alexis", "Stoney Nakoda"),
+        ("stoney-paul", "Stoney, Paul First Nation"),
+        ("beaver", "Beaver"),
     ]
 
     language_variant = forms.MultipleChoiceField(
