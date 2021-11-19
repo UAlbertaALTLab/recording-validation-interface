@@ -28,7 +28,7 @@ class RecordingError(Exception):
 
 
 class Command(BaseCommand):
-    help = "imports Tsuut'ina recordings into the database"
+    help = "imports Tsuut'ina Verb-Phrase Dictionary recordings into the database"
 
     def handle(
         self,

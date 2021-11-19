@@ -54,15 +54,6 @@ class Segment(NamedTuple):
         return sha256(self.signature().encode("UTF-8")).hexdigest()
 
 
-"""
-For each .eaf file in the folder, iterate through the ID tier
-store the start and stop times, as well as the ID
-Use the metadata sheet to find the transcription(s) and translation
-The speaker is always Bruce Starlight -- BRS
-The session has to come from the filename
-"""
-
-
 class TvpdRecordingExtractor:
     """
     Extracts recordings from a directory of Tsuut'ina files
@@ -98,10 +89,7 @@ class TvpdRecordingExtractor:
                 if elan_file.name == "srs-CRIM-20190508-CKCU-01.eaf":
                     temp = translation
                     translation = transcription
-                    transcription = translation
-                    # transcription = _eaf.get_annotation_data_at_time("BRS-VPD-OriginalTranslation", start+1)
-                    # if transcription:
-                    #     transcription = transcription[0][2]
+                    transcription = temp
                 rec_date = get_session_from_filename(elan_file.name)
                 session_id = SessionID(
                     date=datetime.date(rec_date),
@@ -133,7 +121,7 @@ class TvpdRecordingExtractor:
 def get_session_from_filename(filename):
     """
     >>> get_session_from_filename("srs-CRIM-20190507-CKCU-01")
-    2019-05-07
+    2019-05-07 00:00:00
     """
     date = re.search(r"\d{8}", filename)[0]
     return datetime.strptime(date, "%Y%m%d")
