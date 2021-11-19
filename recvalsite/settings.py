@@ -226,6 +226,10 @@ TSUUTINA_SESSIONS_DIR = config(
     "TSUUTINA_SESSIONS_DIR", BASE_DIR / "data" / "tsuutina", cast=Path
 )
 
+TVPD_SESSIONS_DIR = config(
+    "TVPD_SESSIONS_DIR", BASE_DIR / "data" / "tvpd-sessions", cast=Path
+)
+
 ################################### MEDIA (Uploads) ####################################
 
 # Audio (including compressed recordings) and pictures are uploaded here.
