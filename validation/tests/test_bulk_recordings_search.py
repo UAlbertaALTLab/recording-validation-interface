@@ -23,7 +23,7 @@ def test_search_bulk_recordings(client, query, speaker_code, insert_test_data):
     phrase = Phrase.objects.filter(transcription=query).first()
     speaker = Speaker.objects.filter(code=speaker_code).first()
 
-    url = reverse("validation:bulk_search_recordings")
+    url = reverse("validation:bulk_search_recordings", args=["maskwacis"])
 
     response = client.get(url + "?" + urllib.parse.urlencode([("q", query)]))
 
@@ -51,7 +51,7 @@ def test_search_bulk_recordings(client, query, speaker_code, insert_test_data):
 def test_search_multiple_recordings(client, insert_test_data):
     wordforms = ["nipiy", "nîpiy"]
 
-    url = reverse("validation:bulk_search_recordings")
+    url = reverse("validation:bulk_search_recordings", args=["maskwacis"])
 
     query_params = [("q", form) for form in wordforms]
     response = client.get(url + "?" + urllib.parse.urlencode(query_params))
@@ -79,7 +79,7 @@ def test_search_recordings_not_found(client, insert_test_data):
     non_word = "Fhqwhgads"
     wordforms = [real_word, non_word]
 
-    url = reverse("validation:bulk_search_recordings")
+    url = reverse("validation:bulk_search_recordings", args=["maskwacis"])
 
     query_params = [("q", form) for form in wordforms]
     response = client.get(url + "?" + urllib.parse.urlencode(query_params))
@@ -92,6 +92,42 @@ def test_search_recordings_not_found(client, insert_test_data):
     results = recordings["matched_recordings"]
     assert non_word in recordings["not_found"]
     assert all([r["wordform"] == real_word for r in results])
+
+
+@pytest.mark.django_db
+def test_search_language_does_not_exist(client, insert_test_data):
+    test_word = "nîpiy"
+    wordforms = [test_word]
+
+    url = reverse("validation:bulk_search_recordings", args=["foo-bar"])
+
+    query_params = [("q", form) for form in wordforms]
+    response = client.get(url + "?" + urllib.parse.urlencode(query_params))
+    recordings = response.json()
+
+    assert isinstance(recordings, dict)
+    assert len(recordings["matched_recordings"]) == 0
+    assert len(recordings["not_found"]) == 1
+
+    assert test_word in recordings["not_found"]
+
+
+@pytest.mark.django_db
+def test_search_recordings_in_wrong_language(client, insert_test_data):
+    test_word = "nîpiy"
+    wordforms = [test_word]
+
+    url = reverse("validation:bulk_search_recordings", args=["tsuutina"])
+
+    query_params = [("q", form) for form in wordforms]
+    response = client.get(url + "?" + urllib.parse.urlencode(query_params))
+    recordings = response.json()
+
+    assert isinstance(recordings, dict)
+    assert len(recordings["matched_recordings"]) == 0
+    assert len(recordings["not_found"]) == 1
+
+    assert test_word in recordings["not_found"]
 
 
 @pytest.fixture
