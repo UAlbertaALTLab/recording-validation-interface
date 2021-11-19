@@ -121,7 +121,7 @@ class TvpdRecordingExtractor:
 def get_session_from_filename(filename):
     """
     >>> get_session_from_filename("srs-CRIM-20190507-CKCU-01")
-    2019-05-07 00:00:00
+    datetime.datetime(2019, 5, 7, 0, 0)
     """
     date = re.search(r"\d{8}", filename)[0]
     return datetime.strptime(date, "%Y%m%d")
