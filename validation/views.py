@@ -427,7 +427,7 @@ def search_recordings(request, query):
 def bulk_search_recordings(request: HttpRequest, language: str):
     """
     API endpoint to retrieve EXACT wordforms and return the URLs and metadata for the recordings.
-    Example: /api/bulk_search?q=mistik&q=minahik&q=waskay&q=mîtos&q=mistikow&q=mêstan
+    Example: /maskwacis/api/bulk_search?q=mistik&q=minahik&q=waskay&q=mîtos&q=mistikow&q=mêstan
     """
 
     query_terms = request.GET.getlist("q")
@@ -439,6 +439,9 @@ def bulk_search_recordings(request: HttpRequest, language: str):
         response = {"matched_recordings": matched_recordings, "not_found": not_found}
         json_response = JsonResponse(response)
         return add_cors_headers(json_response)
+
+    if language == "tsuutina":
+        query_terms.extend([f"{q.title()}." for q in query_terms])
 
     for term in query_terms:
         language_object = get_language_object(language)
