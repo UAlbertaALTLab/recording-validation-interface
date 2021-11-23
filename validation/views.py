@@ -424,7 +424,7 @@ def search_recordings(request, query):
     return add_cors_headers(response)
 
 
-def bulk_search_recordings(request: HttpRequest):
+def bulk_search_recordings(request: HttpRequest, language: str):
     """
     API endpoint to retrieve EXACT wordforms and return the URLs and metadata for the recordings.
     Example: /api/bulk_search?q=mistik&q=minahik&q=waskay&q=mîtos&q=mistikow&q=mêstan
@@ -434,8 +434,17 @@ def bulk_search_recordings(request: HttpRequest):
     matched_recordings = []
     not_found = []
 
+    if not LanguageVariant.objects.filter(code=language).exists():
+        not_found = [term for term in query_terms]
+        response = {"matched_recordings": matched_recordings, "not_found": not_found}
+        json_response = JsonResponse(response)
+        return add_cors_headers(json_response)
+
     for term in query_terms:
-        all_matches = Recording.objects.filter(phrase__transcription=term)
+        language_object = get_language_object(language)
+        all_matches = Recording.objects.filter(
+            phrase__transcription=term, phrase__language=language_object
+        )
         results = exclude_known_bad_recordings(all_matches)
 
         if results:
@@ -1071,6 +1080,7 @@ def exclude_known_bad_recordings(recordings: QuerySet):
         recordings.exclude(quality=Recording.BAD)
         .exclude(wrong_word=True)
         .exclude(wrong_speaker=True)
+        .exclude(is_user_submitted=True)
         # We use the "gender" field as a proxy to see whether a speaker's data has
         # been properly filled out: exclude speakers whose gender field has not been
         # input. An admin must put *something* in the gender field before the

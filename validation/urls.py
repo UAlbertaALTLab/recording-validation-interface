@@ -105,7 +105,7 @@ urlpatterns = [
         name="close_issue",
     ),
     path(
-        "api/bulk_search",
+        "<str:language>/api/bulk_search",
         views.bulk_search_recordings,
         name="bulk_search_recordings",
     ),
