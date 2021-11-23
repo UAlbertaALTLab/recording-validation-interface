@@ -440,9 +440,6 @@ def bulk_search_recordings(request: HttpRequest, language: str):
         json_response = JsonResponse(response)
         return add_cors_headers(json_response)
 
-    if language == "tsuutina":
-        query_terms.extend([f"{q.title()}." for q in query_terms])
-
     for term in query_terms:
         language_object = get_language_object(language)
         all_matches = Recording.objects.filter(
