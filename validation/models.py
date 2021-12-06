@@ -343,9 +343,8 @@ class Speaker(models.Model):
         """
         Returns a URL for where to find the speaker bio.
         """
-        # TODO: Change this when implementing:
-        # https://github.com/UAlbertaALTLab/recording-validation-interface/issues/72
-        return f"https://www.altlab.dev/maskwacis/Speakers/{self.code}.html"
+        lang_code = LanguageVariant.objects.get(name=self.languages[0])
+        return f"https://speech-db.altlab.app/{lang_code}/speakers/{self.code}.html"
 
     def __str__(self):
         return self.code
