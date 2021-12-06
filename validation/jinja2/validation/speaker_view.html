@@ -8,15 +8,20 @@
     </div>
 
     <div class="speaker-bio">
-        {% if speaker.target_bio_text %}
+        {% if speaker.target_bio_audio %}
             <h3>Listen in English:</h3>
             <p>{{ macros.bio_player(speaker.target_bio_audio) }}</p>
+        {% endif %}
+
+        {% if speaker.target_bio_text %}
             {% if request.COOKIES['macron'] == 'on' %}
                 <p>{{ speaker.target_bio_text }}</p>
             {% else %}
                 <p>{{ speaker.target_bio_text | replace("ê", "e") }}</p>
             {% endif %}
+        {% endif %}
 
+        {% if speaker.source_bio_audio %}
             {% if request.COOKIES['macron'] == 'on' %}
                 <h3>Listen in nêhiyawêwin:</h3>
             {% else %}
