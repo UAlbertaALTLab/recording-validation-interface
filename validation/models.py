@@ -344,7 +344,7 @@ class Speaker(models.Model):
         Returns a URL for where to find the speaker bio.
         """
         if self.language:
-            lang_code = LanguageVariant.objects.get(name=self.language[0])
+            lang_code = LanguageVariant.objects.get(name=self.language[0]).code
             return f"https://speech-db.altlab.app/{lang_code}/speakers/{self.code}.html"
         else:
             return "https://speech-db.altlab.app/maskwacis/speakers/"
