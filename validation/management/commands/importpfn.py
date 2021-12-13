@@ -42,8 +42,8 @@ class Command(BaseCommand):
     ) -> None:
 
         if sessions_dir is None:
-            sessions_dir = settings.PFN_AUDIO_DIR
-
+            # sessions_dir = settings.PFN_AUDIO_DIR
+            sessions_dir = "/Users/jolenepoulin/Documents/pfn_audio"
         self.audio_dir = audio_dir
 
         self._handle_store_django(sessions_dir)
@@ -61,10 +61,6 @@ class Command(BaseCommand):
             if Recording.objects.filter(id=rec_id).exists():
                 continue
 
-            speaker, speaker_created = Speaker.objects.get_or_create(
-                code=segment.speaker
-            )
-
             session, session_created = RecordingSession.get_or_create_by_session_id(
                 segment.session
             )
@@ -72,6 +68,12 @@ class Command(BaseCommand):
             language, language_created = LanguageVariant.objects.get_or_create(
                 code="stoney-paul"
             )
+
+            speaker, speaker_created = Speaker.objects.get_or_create(
+                code=segment.speaker
+            )
+            speaker.languages.add(language)
+            speaker.save()
 
             kind = Phrase.SENTENCE if segment.type == "sentence" else Phrase.WORD
 
