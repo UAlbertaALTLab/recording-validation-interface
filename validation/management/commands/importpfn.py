@@ -42,8 +42,8 @@ class Command(BaseCommand):
     ) -> None:
 
         if sessions_dir is None:
-            # sessions_dir = settings.PFN_AUDIO_DIR
-            sessions_dir = "/Users/jolenepoulin/Documents/pfn_audio"
+            sessions_dir = settings.PFN_AUDIO_DIR
+
         self.audio_dir = audio_dir
 
         self._handle_store_django(sessions_dir)
