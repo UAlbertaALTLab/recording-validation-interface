@@ -41,7 +41,7 @@ def transcode_to_aac(
     else:
         raise TypeError("Invalid recording: %r" % (recording,))
 
-    assert audio.channels == 1, "Recording is not mono"
+    assert audio.channels == 1, f"Recording is not mono, has {audio.channels} channels"
     assert len(audio) > 0, "Recording is empty"
     assert destination.suffix == ".m4a", "Don't you want an .m4a file?"
 

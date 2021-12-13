@@ -23,6 +23,7 @@ whitenoise = "*"
 mutagen = "*"
 hfst-optimized-lookup = "*"
 pillow = "*"
+scipy = "*"
 
 [dev-packages]
 gunicorn = "*"
