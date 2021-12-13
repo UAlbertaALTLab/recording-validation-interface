@@ -2,15 +2,13 @@ import os
 import time
 from datetime import datetime
 from hashlib import sha256
-from os import fspath
 from pathlib import Path
 from typing import NamedTuple
 
 from typing_extensions import Literal
 
 from pydub import AudioSegment  # type: ignore
-import wavefile
-from scipy.io.wavfile import read
+from scipy.io.wavfile import read  # type: ignore
 
 from librecval.recording_session import SessionID
 from validation.models import Recording
