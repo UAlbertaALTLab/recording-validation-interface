@@ -149,7 +149,7 @@ def entries(request, language):
 
     recordings, forms = prep_phrase_data(request, phrases, language_object.name)
 
-    speakers = Speaker.objects.all()
+    speakers = Speaker.objects.filter(languages=language_object)
 
     if request.method == "POST":
         form = forms.get(int(request.POST.get("phrase_id")), None)
