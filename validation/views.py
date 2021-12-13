@@ -91,36 +91,45 @@ def entries(request, language):
     # Only show selected language
     language_object = get_language_object(language)
     all_phrases = Phrase.objects.filter(language=language_object)
+    if (not language == "stoney-alexis") or user_has_alexis_permissions(request.user):
+        language_sessions = (
+            Recording.objects.filter(phrase_id__in=all_phrases)
+            .values("session")
+            .distinct()
+        )
+        language_sessions = [i["session"] for i in language_sessions]
+        language_sessions = RecordingSession.objects.filter(id__in=language_sessions)
 
-    language_sessions = (
-        Recording.objects.filter(phrase_id__in=all_phrases).values("session").distinct()
-    )
-    language_sessions = [i["session"] for i in language_sessions]
-    language_sessions = RecordingSession.objects.filter(id__in=language_sessions)
+        mode = request.GET.get("mode")
+        mode_options = {
+            "auto-standardized": Phrase.AUTO,
+            "new": Phrase.NEW,
+            "linked": Phrase.LINKED,
+            "user-submitted": Phrase.USER,
+        }
+        if mode and mode != "all":
+            mode = mode_options[mode]
 
-    mode = request.GET.get("mode")
-    mode_options = {
-        "auto-standardized": Phrase.AUTO,
-        "new": Phrase.NEW,
-        "linked": Phrase.LINKED,
-        "user-submitted": Phrase.USER,
-    }
-    if mode and mode != "all":
-        mode = mode_options[mode]
+        if mode == "all" or not mode:
+            all_phrases = all_phrases.exclude(status=Phrase.USER)
+        else:
+            all_phrases = all_phrases.filter(status=mode)
 
-    if mode == "all" or not mode:
-        all_phrases = all_phrases.exclude(status=Phrase.USER)
+        all_phrases = all_phrases.prefetch_related("recording_set__speaker")
+
+        sessions = (
+            RecordingSession.objects.order_by("id").values("id", "date").distinct()
+        )
+        session = request.GET.get("session")
+        if session != "all" and session:
+            all_phrases = all_phrases.filter(recording__session__id=session).distinct()
+
+        all_phrases = all_phrases.order_by("transcription")
     else:
-        all_phrases = all_phrases.filter(status=mode)
-
-    all_phrases = all_phrases.prefetch_related("recording_set__speaker")
-
-    sessions = RecordingSession.objects.order_by("id").values("id", "date").distinct()
-    session = request.GET.get("session")
-    if session != "all" and session:
-        all_phrases = all_phrases.filter(recording__session__id=session).distinct()
-
-    all_phrases = all_phrases.order_by("transcription")
+        all_phrases = []
+        session = None
+        mode = None
+        language_sessions = []
 
     paginator = Paginator(all_phrases, 5)
     page_no = request.GET.get("page", 1)
@@ -1027,6 +1036,10 @@ def user_is_expert(user, lang):
         user.groups.filter(name__in=["Linguist", "Expert"]).exists()
         and user.groups.filter(name=lang).exists()
     )
+
+
+def user_has_alexis_permissions(user):
+    return user.groups.filter(name="stoney-alexis").exists()
 
 
 def prep_phrase_data(request, phrases, lang):
