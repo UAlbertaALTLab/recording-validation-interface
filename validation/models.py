@@ -110,11 +110,13 @@ class Phrase(models.Model):
     MASKWACÎS_DICTIONARY = "MD"
     ONESPOT_SAPIR = "OS"
     TVPD = "TVPD"
+    PFN = "PFN"
     NEW_WORD = "new"
     ORIGIN_CHOICES = (
         (MASKWACÎS_DICTIONARY, "Maskwacîs Dictionary"),
         (ONESPOT_SAPIR, "Onespot-Sapir Dictionary"),
         (TVPD, "Tsuut'ina Verb Phrase Dictionary"),
+        (PFN, "Paul First Nation"),
         (NEW_WORD, "New word"),
     )
 
@@ -157,8 +159,7 @@ class Phrase(models.Model):
         default=NEW,
         **arguments_for_choices(STATUS_CHOICES),
     )
-    # TODO: during the import process, try to determine automatically whether
-    # the word came from the Maswkacîs dictionary.
+
     origin = models.CharField(
         help_text="How did we get this phrase?",
         null=True,
@@ -471,7 +472,6 @@ class Recording(models.Model):
     phrase = models.ForeignKey(Phrase, on_delete=models.CASCADE)
     session = models.ForeignKey(RecordingSession, on_delete=models.CASCADE, null=True)
 
-    # TODO: determine this automatically during import process
     quality = models.CharField(
         help_text="Is the recording clean? Is it suitable to use publicly?",
         max_length=64,
