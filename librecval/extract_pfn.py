@@ -2,13 +2,13 @@ import os
 import time
 from datetime import datetime
 from hashlib import sha256
+from os import fspath
 from pathlib import Path
 from typing import NamedTuple
 
 from typing_extensions import Literal
 
 from pydub import AudioSegment  # type: ignore
-from scipy.io.wavfile import read  # type: ignore
 
 from librecval.recording_session import SessionID
 from validation.models import Recording
@@ -71,34 +71,23 @@ class PfnRecordingExtractor:
             entry, speaker = get_entry_and_speaker_from_filename(audio_file)
             _type = "sentence" if " " in entry else "word"
 
-            try:
-                # These files were recorded in stereo, so we need to convert them to mono
-                # Referencing: https://stackoverflow.com/questions/35735497/how-to-create-a-pydub-audiosegment-using-an-numpy-array
-                rate, signal = read(audio_file)
-                channel1 = signal[:, 0]
+            # Must convert stereo sound to mono sound
+            # https://stackoverflow.com/questions/5120555/how-can-i-convert-a-wav-from-stereo-to-mono-in-python
+            audio = AudioSegment.from_file(fspath(audio_file))
+            audio = audio.set_channels(1)
 
-                audio_segment = AudioSegment(
-                    channel1.tobytes(),
-                    frame_rate=rate,
-                    sample_width=channel1.dtype.itemsize,
-                    channels=1,
-                )
+            s = Segment(
+                translation=entry,
+                transcription="",
+                fixed_transcription="",
+                quality=Recording.UNKNOWN,
+                session=session_id,
+                audio=audio,
+                type=_type,
+                speaker=speaker,
+            )
 
-                s = Segment(
-                    translation=entry,
-                    transcription="",
-                    fixed_transcription="",
-                    quality=Recording.UNKNOWN,
-                    session=session_id,
-                    audio=audio_segment,
-                    type=_type,
-                    speaker=speaker,
-                )
-
-                yield s
-            except ValueError as e:
-                print("Could not import file", audio_file)
-                print(e)
+            yield s
 
 
 def get_entry_and_speaker_from_filename(filename):
