@@ -20,3 +20,4 @@ services:
         - "/data/application-data/speech-db/tsuutina-annotations:/app/data/tsuutina-annotations"
         - "/data/application-data/speech-db/tvpd-sessions:/app/data/tvpd-sessions"
         - "/data/application-data/speech-db/pfn-audio:/app/data/pfn-audio"
+        - "/data/application-data/speech-db/wapamewwav:/app/data/wapamewwav"
