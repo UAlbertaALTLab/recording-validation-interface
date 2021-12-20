@@ -232,6 +232,8 @@ TVPD_SESSIONS_DIR = config(
 
 PFN_AUDIO_DIR = config("PFN_AUDIO_DIR", BASE_DIR / "data" / "pfn-audio", cast=Path)
 
+SYNTH_AUDIO_DIR = config("SYNTH_AUDIO_DIR", BASE_DIR / "data" / "wapamewwav", cast=Path)
+
 ################################### MEDIA (Uploads) ####################################
 
 # Audio (including compressed recordings) and pictures are uploaded here.
