@@ -38,7 +38,13 @@ from django.core.management.base import BaseCommand, CommandError  # type: ignor
 from librecval import REPOSITORY_ROOT
 from librecval.extract_phrases import Segment
 from librecval.import_recordings import initialize as import_recordings
-from validation.models import Phrase, Recording, RecordingSession, Speaker
+from validation.models import (
+    Phrase,
+    Recording,
+    RecordingSession,
+    Speaker,
+    LanguageVariant,
+)
 
 
 class Command(BaseCommand):
@@ -122,6 +128,10 @@ def django_recording_importer(info: Segment, recording_path: Path, logger) -> No
     Imports a single recording.
     """
 
+    if Recording.objects.filter(id=info.compute_sha256hash()).exists():
+        # This recording is already in the DB, return early
+        return
+
     # Recording requires a Speaker, a RecordingSession, and a Phrase.
     # Make those first.
     speaker, speaker_created = Speaker.objects.get_or_create(
@@ -136,13 +146,18 @@ def django_recording_importer(info: Segment, recording_path: Path, logger) -> No
     if session_created:
         logger.info("New session: %s", session)
 
+    language = LanguageVariant.objects.get(name="Maskwacîs", code="maskwacis")
+
     phrase, phrase_created = Phrase.objects.get_or_create(
         field_transcription=info.cree_transcription,
         transcription=info.cree_transcription,
-        status="new",
+        status=Phrase.NEW,
         kind=info.type,
+        language=language,
         defaults=dict(
-            translation=info.english_translation, validated=False, origin=None
+            translation=info.english_translation,
+            validated=False,
+            origin=Phrase.MASKWACÎS_DICTIONARY,
         ),
     )
     if phrase_created:
