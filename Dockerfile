@@ -34,8 +34,6 @@ RUN groupadd --system --gid ${UID_GID} ${WSGI_USER} \
  && mkdir -p /var/www/recvalsite \
  && chown ${WSGI_USER}:${WSGI_USER} /app /var/www/recvalsite
 
-RUN /app/.venv/bin/python ./manage.py collectstatic --noinput
-
 RUN apt-get update -qq && apt-get -y install ffmpeg
 
 USER ${WSGI_USER}:${WSGI_USER}
@@ -47,6 +45,8 @@ COPY --chown=${WSGI_USER}:${WSGI_USER} . .
 
 ENV VIRTUAL_ENV="/app/.venv"
 ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
+
+RUN /app/.venv/bin/python ./manage.py collectstatic --noinput
 
 EXPOSE 8000
 ENV UWSGI_HTTP=:8000 UWSGI_MASTER=1 UWSGI_HTTP_KEEPALIVE=1 UWSGI_AUTO_CHUNKED=1 UWSGI_WSGI_ENV_BEHAVIOUR=holy
