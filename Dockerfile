@@ -34,8 +34,7 @@ RUN groupadd --system --gid ${UID_GID} ${WSGI_USER} \
  && mkdir -p /var/www/recvalsite \
  && chown ${WSGI_USER}:${WSGI_USER} /app /var/www/recvalsite
 
-RUN /app/.venv/bin/python `# .venv python sees libs from pipenv` \
-    ./manage.py collectstatic --noinput; \
+RUN /app/.venv/bin/python ./manage.py collectstatic --noinput
 
 RUN apt-get update -qq && apt-get -y install ffmpeg
 
