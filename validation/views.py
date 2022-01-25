@@ -507,8 +507,8 @@ def segment_content_view(request, language, segment_id):
             p.save()
 
     phrase = Phrase.objects.get(id=segment_id, language=language_object)
-    field_transcription = phrase.field_transcription
-    suggestions = get_distance_with_translations(field_transcription)
+    _transcription = phrase.field_transcription or phrase.transcription
+    suggestions = get_distance_with_translations(_transcription)
 
     segment_name = phrase.transcription
 
