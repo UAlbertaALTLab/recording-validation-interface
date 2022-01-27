@@ -21,5 +21,3 @@ data/
 
 # Databases
 *.sqlite3
-
-*.dump
