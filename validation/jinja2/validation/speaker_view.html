@@ -23,9 +23,9 @@
 
         {% if speaker.source_bio_audio %}
             {% if request.COOKIES['macron'] == 'off' %}
-                <h3>Listen in nêhiyawewin:</h3>
+                <h3>Listen in nehiyawewin:</h3>
             {% else %}
-                <h3>Listen in nehiyawêwin:</h3>
+                <h3>Listen in nêhiyawêwin:</h3>
             {% endif %}
             <p>{{ macros.bio_player(speaker.source_bio_audio) }}</p>
             <p>({{ language }} translation coming soon)</p>
