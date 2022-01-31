@@ -1,7 +1,5 @@
 # Do not copy files these when dealing with Docker
 
-*
-
 # Dependencies
 node_modules/
 .venv/
