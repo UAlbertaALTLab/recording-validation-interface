@@ -9,15 +9,19 @@ data/
 
 # Caches
 .pytest_cache/
+.mypy_cache/
+.hypothesis/
 
 # Tests
-.tests/
+./tests
 ./cypress
 
 # Development files
 .git/
 .vscode/
 .idea/
+.github/
+.githooks/
 
 # Databases
 *.sqlite3
