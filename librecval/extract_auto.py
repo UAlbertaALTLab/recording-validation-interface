@@ -80,7 +80,7 @@ class SynthesizedRecordingExtractor:
                 session=session_id,
                 audio=audio,
                 type="word",
-                speaker="A-DOL",
+                speaker="SDOL",
             )
 
             yield s
