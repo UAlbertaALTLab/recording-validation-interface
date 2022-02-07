@@ -1,7 +1,7 @@
 version: '3'
 services:
     web:
-        build: '-'
+        build: .
         restart: always
         ports:
         - "8004:8000"
