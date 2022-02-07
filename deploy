@@ -7,5 +7,4 @@ set -eux
 cd "$(dirname "$0")"
 
 git pull
-export DOCKER_TMPDIR=$(pwd)
 docker-compose up -d --build --remove-orphans
