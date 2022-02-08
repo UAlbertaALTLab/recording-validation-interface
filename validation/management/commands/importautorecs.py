@@ -68,7 +68,7 @@ class Command(BaseCommand):
             )
 
             language, language_created = LanguageVariant.objects.get_or_create(
-                code="maskwacis"
+                code="synth"
             )
 
             speaker, speaker_created = Speaker.objects.get_or_create(
@@ -81,10 +81,10 @@ class Command(BaseCommand):
 
             phrase, phrase_created = Phrase.objects.get_or_create(
                 field_transcription=segment.transcription,
-                transcription=segment.fixed_transcription or segment.transcription,
+                transcription=segment.transcription,
                 translation=segment.translation,
                 kind=kind,
-                origin=Phrase.AUTO,
+                origin=Phrase.NEW,
                 language=language,
             )
 
