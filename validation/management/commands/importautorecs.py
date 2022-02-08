@@ -44,6 +44,7 @@ class Command(BaseCommand):
 
         if sessions_dir is None:
             sessions_dir = settings.SYNTH_AUDIO_DIR
+        print(sessions_dir)
 
         self.audio_dir = audio_dir
 
