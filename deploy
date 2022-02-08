@@ -7,4 +7,5 @@ set -eux
 cd "$(dirname "$0")"
 
 git pull
-docker-compose up -d --build --remove-orphans
+docker build .
+docker-compose up -d --remove-orphans
