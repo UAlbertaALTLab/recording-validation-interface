@@ -2,6 +2,7 @@ version: '3'
 services:
     web:
         build: .
+        image: speechdb_web
         restart: always
         ports:
         - "8004:8000"
