@@ -14,18 +14,18 @@
         {% endif %}
 
         {% if speaker.target_bio_text %}
-            {% if request.COOKIES['macron'] == 'on' %}
-                <p>{{ speaker.target_bio_text }}</p>
-            {% else %}
+            {% if request.COOKIES['macron'] == 'off' %}
                 <p>{{ speaker.target_bio_text | replace("ê", "e") }}</p>
+            {% else %}
+                <p>{{ speaker.target_bio_text }}</p>
             {% endif %}
         {% endif %}
 
         {% if speaker.source_bio_audio %}
-            {% if request.COOKIES['macron'] == 'on' %}
-                <h3>Listen in nêhiyawêwin:</h3>
-            {% else %}
+            {% if request.COOKIES['macron'] == 'off' %}
                 <h3>Listen in nehiyawewin:</h3>
+            {% else %}
+                <h3>Listen in nêhiyawêwin:</h3>
             {% endif %}
             <p>{{ macros.bio_player(speaker.source_bio_audio) }}</p>
             <p>({{ language }} translation coming soon)</p>

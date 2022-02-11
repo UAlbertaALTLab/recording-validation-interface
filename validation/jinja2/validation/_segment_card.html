@@ -44,10 +44,10 @@
                     {% endif %} {# is linguist #}
                 {% endif %}
                 <p class="card__title--source-language" data-cy="transcription">
-                    {% if request.COOKIES['macron'] == 'on' %}
-                        {{ phrase.transcription }}
-                    {% else %}
+                    {% if request.COOKIES['macron'] == 'off' %}
                         {{ phrase.transcription | replace("ê", "e") }}
+                    {% else %}
+                        {{ phrase.transcription }}
                     {% endif %}
                 </p>
                 <p class="card__title--target-language" data-cy="translation">Translation: {{ phrase.translation }}</p>
