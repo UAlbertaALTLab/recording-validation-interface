@@ -188,7 +188,7 @@ X_FRAME_OPTIONS = "DENY"
 STATIC_URL = "/static/"
 
 # Remember to run manage.py collectstatic!
-default_static_dir = "/var/www/recvalsite/static"
+default_static_dir = "validation/static/validation"
 if DEBUG:
     default_static_dir = BASE_DIR / "static"
 STATIC_ROOT = config("STATIC_ROOT", default=default_static_dir)
