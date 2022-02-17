@@ -192,6 +192,7 @@ default_static_dir = "/var/www/recvalsite/static"
 if DEBUG:
     default_static_dir = BASE_DIR / "static"
 STATIC_ROOT = config("STATIC_ROOT", default=default_static_dir)
+STATICFILES_DIRS = (os.path.join(BASE_DIR, "validation/static"),)
 
 # This is concatenated with MEDIA_ROOT and MEDIA_URL to store and serve the audio files.
 RECVAL_AUDIO_PREFIX = config("RECVAL_AUDIO_PREFIX", default="audio/")
