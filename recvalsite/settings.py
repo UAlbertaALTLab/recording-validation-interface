@@ -233,6 +233,11 @@ TVPD_SESSIONS_DIR = config(
 
 PFN_AUDIO_DIR = config("PFN_AUDIO_DIR", BASE_DIR / "data" / "pfn-audio", cast=Path)
 
+
+OKIMASIS_AUDIO_DIR = config(
+    "OKIMASIS_AUDIO_DIR", BASE_DIR / "data" / "okimasis-recordings", cast=Path
+)
+
 SYNTH_AUDIO_DIR = config(
     "SYNTH_AUDIO_DIR", BASE_DIR / "data" / "synth-speech", cast=Path
 )
