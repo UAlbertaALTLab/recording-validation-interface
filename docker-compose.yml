@@ -17,3 +17,4 @@ services:
         - "/data/maskwacis-recordings/speakers:/app/data/speakers"
         - "/data/application-data/speech-db/metadata.csv:/app/private/metadata.csv"
         - "/data/application-data/speech-db/synth-speech:/app/data/synth-speech"
+        - "/data/application-data/speech-db/okimasis-recordings:/app/data/okimasis-recordings"
