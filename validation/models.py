@@ -71,6 +71,13 @@ class LanguageVariant(models.Model):
         max_length=1024,
     )
 
+    language_family = models.CharField(
+        help_text="The larger language family that this variant belongs to, if any",
+        null=True,
+        blank=True,
+        max_length=256,
+    )
+
     def __str__(self) -> str:
         return self.name
 

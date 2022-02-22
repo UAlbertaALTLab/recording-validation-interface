@@ -75,8 +75,21 @@ def home(request):
     """
     languages = LanguageVariant.objects.all()
     auth = request.user.is_authenticated
+    language_dict = {}
+    no_lang_family = []
 
-    context = dict(languages=languages, language=None, auth=auth)
+    for language in languages:
+        if language.language_family:
+            if language.language_family not in language_dict:
+                language_dict[language.language_family] = [language]
+            else:
+                language_dict[language.language_family].append(language)
+        else:
+            no_lang_family.append(language)
+
+    language_dict["All"] = no_lang_family
+
+    context = dict(languages=language_dict, language=None, auth=auth)
     return render(request, "validation/home.html", context)
 
 
