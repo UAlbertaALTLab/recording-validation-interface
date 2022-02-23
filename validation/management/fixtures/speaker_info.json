@@ -102,5 +102,13 @@
       "full_name": "Betty Simon",
       "gender": "F"
     }
+  },
+  {
+    "model": "validation.speaker",
+    "fields": {
+      "code": "OKI",
+      "full_name": "Jean Okimāsis",
+      "gender": "F"
+    }
   }
 ]

@@ -463,6 +463,10 @@ def bulk_search_recordings(request: HttpRequest, language: str):
         json_response = JsonResponse(response)
         return add_cors_headers(json_response)
 
+    if language == "moswacihk":
+        # For mōswacīhk, we use macrons instead of circumflexes
+        query_terms = query_terms + [replace_circumflexes(term) for term in query_terms]
+
     for term in query_terms:
         language_object = get_language_object(language)
         all_matches = Recording.objects.filter(
@@ -1165,3 +1169,10 @@ def clean_text(text):
 
 def get_language_object(language):
     return get_object_or_404(LanguageVariant, code=language)
+
+
+def replace_circumflexes(term):
+    ret_term = (
+        term.replace("ê", "ē").replace("â", "ā").replace("î", "ī").replace("ô", "ō")
+    )
+    return ret_term

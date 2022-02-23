@@ -115,5 +115,18 @@
       "session_id": "2015-05-29-AM-___-_",
       "speaker_id": "ROS"
     }
+  },
+  {
+    "model": "validation.recording",
+    "fields": {
+      "id": "7f0733bc22e1db4e55523fd47af694a1b3dead8a9f4b2476310ded06cf0b6327",
+      "compressed_audio": "audio/7f0733bc22e1db4e55523fd47af694a1b3dead8a9f4b2476310ded06cf0b6327.m4a",
+      "timestamp": 2403521,
+      "quality": "good",
+      "comment": "Good",
+      "phrase_id": 10,
+      "session_id": "2015-05-29-AM-___-_",
+      "speaker_id": "OKI"
+    }
   }
 ]
