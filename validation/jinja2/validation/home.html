@@ -3,7 +3,10 @@
 
 {% block content %}
     <h2>Please select a language from the following choices:</h2>
-    {% for language in languages %}
-        {{ card.language_card(language) }}
+    {% for category in languages %}
+        <h3>{{ category }}:<br></h3>
+        {% for language in languages[category] %}
+            {{ card.language_card(language) }}
+        {% endfor %}
     {% endfor %}
 {% endblock content %}
