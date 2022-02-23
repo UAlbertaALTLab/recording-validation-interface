@@ -7,5 +7,14 @@
       "code": "maskwacis",
       "description": "Plains Cree as spoken in the Maskwacîs community"
     }
+  },
+  {
+    "model": "validation.languagevariant",
+    "fields": {
+      "id": 2,
+      "name": "mōswacīhk",
+      "code": "moswacihk",
+      "description": "Plains Cree as spoken in White Bear First Nations"
+    }
   }
 ]
