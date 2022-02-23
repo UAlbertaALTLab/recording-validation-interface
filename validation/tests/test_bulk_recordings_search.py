@@ -131,6 +131,34 @@ def test_search_recordings_in_wrong_language(client, insert_test_data):
     assert test_word in recordings["not_found"]
 
 
+@pytest.mark.django_db
+def test_search_recordings_with_macrons(client, insert_test_data):
+    test_word = "nipâw"
+    wordforms = [test_word]
+    phrase = Phrase.objects.filter(transcription="nipāw").first()
+    speaker = Speaker.objects.filter(code="OKI").first()
+
+    url = reverse("validation:bulk_search_recordings", args=["moswacihk"])
+
+    query_params = [("q", form) for form in wordforms]
+    response = client.get(url + "?" + urllib.parse.urlencode(query_params))
+
+    recordings = response.json()
+
+    assert isinstance(recordings, dict)
+    assert len(recordings["matched_recordings"]) == 1
+    assert len(recordings["not_found"]) == 1
+
+    recording = recordings["matched_recordings"][0]
+    assert recording.get("wordform") == phrase.transcription
+    assert "speaker" in recording.keys()
+    assert recording.get("gender") in ("M", "F")
+    assert recording.get("recording_url").startswith(("http://", "https://"))
+    assert recording.get("recording_url").endswith(".m4a")
+    assert recording.get("speaker_name") == speaker.full_name
+    assert recording.get("anonymous") is False
+
+
 @pytest.fixture
 def insert_test_data():
     call_command(
