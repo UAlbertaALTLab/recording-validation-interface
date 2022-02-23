@@ -87,7 +87,8 @@ def home(request):
         else:
             no_lang_family.append(language)
 
-    language_dict["All"] = no_lang_family
+    if no_lang_family:
+        language_dict["All"] = no_lang_family
 
     context = dict(languages=language_dict, language=None, auth=auth)
     return render(request, "validation/home.html", context)
