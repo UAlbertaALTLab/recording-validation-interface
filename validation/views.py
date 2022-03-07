@@ -66,6 +66,7 @@ from .forms import (
 from .helpers import (
     get_distance_with_translations,
 )
+from .crk_sort import custom_sort
 from .models import Phrase, Recording, Speaker, RecordingSession, Issue
 
 
@@ -138,7 +139,10 @@ def entries(request, language):
         if session != "all" and session:
             all_phrases = all_phrases.filter(recording__session__id=session).distinct()
 
-        all_phrases = all_phrases.order_by("transcription")
+        if language in ["maskwacis", "moswacihk"]:
+            all_phrases = custom_sort(all_phrases)
+        else:
+            all_phrases = all_phrases.order_by("transcription")
     else:
         all_phrases = []
         session = None
