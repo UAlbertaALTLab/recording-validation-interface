@@ -167,7 +167,7 @@ def entries(request, language):
 
     recordings, forms = prep_phrase_data(request, phrases, language_object.name)
 
-    speakers = Speaker.objects.filter(languages=language_object)
+    speakers = language_object.speaker_set.all()
 
     if request.method == "POST":
         form = forms.get(int(request.POST.get("phrase_id")), None)
@@ -225,7 +225,7 @@ def search_phrases(request, language):
 
     recordings, forms = prep_phrase_data(request, phrases, language_object.name)
 
-    speakers = Speaker.objects.all()
+    speakers = language_object.speaker_set.all()
 
     if request.method == "POST":
         form = forms.get(int(request.POST.get("phrase_id")), None)
@@ -1070,7 +1070,7 @@ def prep_phrase_data(request, phrases, lang):
     recordings = {}
     forms = {}
     for phrase in phrases:
-        recordings[phrase] = phrase.recordings
+        recordings[phrase] = [rec for rec in phrase.recordings if rec.speaker != "DAR"]
         if request.method == "POST" and int(request.POST.get("phrase_id")) == phrase.id:
             forms[phrase.id] = FlagSegment(
                 request.POST, initial={"phrase_id": phrase.id}
