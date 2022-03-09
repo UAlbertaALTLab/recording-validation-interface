@@ -8,19 +8,6 @@
     </div>
 
     <div class="speaker-bio">
-        {% if speaker.target_bio_audio %}
-            <h3>Listen in English:</h3>
-            <p>{{ macros.bio_player(speaker.target_bio_audio) }}</p>
-        {% endif %}
-
-        {% if speaker.target_bio_text %}
-            {% if request.COOKIES['macron'] == 'off' %}
-                <p>{{ speaker.target_bio_text | replace("ê", "e") }}</p>
-            {% else %}
-                <p>{{ speaker.target_bio_text }}</p>
-            {% endif %}
-        {% endif %}
-
         {% if speaker.source_bio_audio %}
             {% if request.COOKIES['macron'] == 'off' %}
                 <h3>Listen in nehiyawewin:</h3>
@@ -28,7 +15,28 @@
                 <h3>Listen in nêhiyawêwin:</h3>
             {% endif %}
             <p>{{ macros.bio_player(speaker.source_bio_audio) }}</p>
+        {% endif %}
+        {% if speaker.source_bio_text %}
+            Read in {{ language }}:<br>
+            {{ speaker.source_bio_text }}
+        {% else %}
             <p>({{ language }} translation coming soon)</p>
         {% endif %}
+    
+        {% if speaker.target_bio_audio %}
+            <h3>Listen in English:</h3>
+            <p>{{ macros.bio_player(speaker.target_bio_audio) }}</p>
+        {% endif %}
+
+        {% if speaker.target_bio_text %}
+            Read in English:
+            {% if request.COOKIES['macron'] == 'off' %}
+                <p>{{ speaker.target_bio_text | replace("ê", "e") }}</p>
+            {% else %}
+                <p>{{ speaker.target_bio_text }}</p>
+            {% endif %}
+        {% endif %}
+
+
     </div>
 {% endblock content %}
