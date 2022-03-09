@@ -36,7 +36,7 @@ class Command(BaseCommand):
     help = "imports Jean's bios into the database"
 
     def handle(self, *args, **kwargs) -> None:
-        speaker = Speaker.objects.filter(code="OKI")
+        speaker = Speaker.objects.get(code="OKI")
         with open("/app/data/okimasis-bios/jean_bio_cree.txt") as f:
             content = f.read()
             speaker.source_bio_text = content
