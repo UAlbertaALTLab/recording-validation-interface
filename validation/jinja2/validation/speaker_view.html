@@ -17,7 +17,7 @@
             <p>{{ macros.bio_player(speaker.source_bio_audio) }}</p>
         {% endif %}
         {% if speaker.source_bio_text %}
-            Read in {{ language }}:<br>
+            <h3>Read in {{ language }}:<br></h3>
             {{ speaker.source_bio_text }}
         {% else %}
             <p>({{ language }} translation coming soon)</p>
@@ -29,7 +29,7 @@
         {% endif %}
 
         {% if speaker.target_bio_text %}
-            Read in English:
+            <h3>Read in English:<br></h3>
             {% if request.COOKIES['macron'] == 'off' %}
                 <p>{{ speaker.target_bio_text | replace("ê", "e") }}</p>
             {% else %}
