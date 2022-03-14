@@ -18,7 +18,7 @@
         {% endif %}
         {% if speaker.source_bio_text %}
             <h3>Read in {{ language }}:<br></h3>
-            {{ speaker.source_bio_text }}
+            {{ speaker.source_bio_text | safe}}
         {% else %}
             <p>({{ language }} translation coming soon)</p>
         {% endif %}
@@ -31,9 +31,9 @@
         {% if speaker.target_bio_text %}
             <h3>Read in English:<br></h3>
             {% if request.COOKIES['macron'] == 'off' %}
-                <p>{{ speaker.target_bio_text | replace("ê", "e") }}</p>
+                <p>{{ speaker.target_bio_text | replace("ê", "e") | safe}}</p>
             {% else %}
-                <p>{{ speaker.target_bio_text }}</p>
+                <p>{{ speaker.target_bio_text | safe}}</p>
             {% endif %}
         {% endif %}
 
