@@ -9,7 +9,8 @@
       "comment": "Good",
       "phrase_id": 1,
       "session_id": "2015-05-29-AM-___-_",
-      "speaker_id": "MAR"
+      "speaker_id": "MAR",
+      "is_best": false
     }
   },
   {
@@ -22,7 +23,8 @@
       "comment": "Good",
       "phrase_id": 2,
       "session_id": "2015-05-29-AM-___-_",
-      "speaker_id": "MAR"
+      "speaker_id": "MAR",
+      "is_best": false
     }
   },
   {
@@ -35,7 +37,8 @@
       "comment": "Good",
       "phrase_id": 3,
       "session_id": "2015-05-29-AM-___-_",
-      "speaker_id": "MAR"
+      "speaker_id": "MAR",
+      "is_best": false
     }
   },
   {
@@ -48,7 +51,8 @@
       "comment": "Good",
       "phrase_id": 4,
       "session_id": "2015-05-29-AM-___-_",
-      "speaker_id": "MAR"
+      "speaker_id": "MAR",
+      "is_best": true
     }
   },
   {
@@ -61,7 +65,8 @@
       "comment": "Good",
       "phrase_id": 5,
       "session_id": "2015-05-29-AM-___-_",
-      "speaker_id": "MAR"
+      "speaker_id": "MAR",
+      "is_best": false
     }
   },
   {
@@ -74,7 +79,8 @@
       "comment": "Good",
       "phrase_id": 6,
       "session_id": "2015-05-29-AM-___-_",
-      "speaker_id": "MAR"
+      "speaker_id": "MAR",
+      "is_best": false
     }
   },
   {
@@ -87,7 +93,8 @@
       "comment": "Good",
       "phrase_id": 7,
       "session_id": "2015-05-29-AM-___-_",
-      "speaker_id": "MAR"
+      "speaker_id": "MAR",
+      "is_best": false
     }
   },
   {
@@ -100,7 +107,8 @@
       "comment": "Good",
       "phrase_id": 8,
       "session_id": "2015-05-29-AM-___-_",
-      "speaker_id": "MAR"
+      "speaker_id": "MAR",
+      "is_best": false
     }
   },
   {
@@ -113,7 +121,8 @@
       "comment": "Good",
       "phrase_id": 9,
       "session_id": "2015-05-29-AM-___-_",
-      "speaker_id": "ROS"
+      "speaker_id": "ROS",
+      "is_best": false
     }
   },
   {
@@ -126,7 +135,8 @@
       "comment": "Good",
       "phrase_id": 10,
       "session_id": "2015-05-29-AM-___-_",
-      "speaker_id": "OKI"
+      "speaker_id": "OKI",
+      "is_best": false
     }
   }
 ]

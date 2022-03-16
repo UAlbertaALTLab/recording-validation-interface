@@ -539,6 +539,7 @@ class Recording(models.Model):
             "speaker_bio_url": request.build_absolute_uri(
                 self.speaker.get_absolute_url()
             ),
+            "is_best": self.is_best,
         }
 
     @staticmethod
