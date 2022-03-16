@@ -475,7 +475,7 @@ def bulk_search_recordings(request: HttpRequest, language: str):
         language_object = get_language_object(language)
         all_matches = Recording.objects.filter(
             phrase__transcription=term, phrase__language=language_object
-        ).order_by("is_best")
+        )
         results = exclude_known_bad_recordings(all_matches)
 
         if results:
@@ -484,6 +484,10 @@ def bulk_search_recordings(request: HttpRequest, language: str):
             )
         else:
             not_found.append(term)
+
+    matched_recordings = sorted(
+        matched_recordings, key=lambda recording: recording.is_best
+    )
 
     response = {"matched_recordings": matched_recordings, "not_found": not_found}
 
