@@ -131,3 +131,16 @@ a:hover {
 .space {
   margin: 0.5rem;
 }
+
+.no-link-style {
+  text-decoration: none;
+}
+
+.no-link-style:hover {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.green {
+  color: var(--custom-pale-green);
+}
