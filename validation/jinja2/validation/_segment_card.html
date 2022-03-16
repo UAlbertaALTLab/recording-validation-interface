@@ -62,6 +62,7 @@
                 {% endif %}
 
                 <table class="card__body--table">
+                    <th>Best</th>
                     <th>Recording</th>
                     <th>Speaker</th>
 
@@ -76,6 +77,7 @@
 
                 {% for recording in recordings[phrase] %}
                     <tr>
+                        <td><a data-cy="is-best" data-recording-id="{{ recording.id }}" data-phrase-id-best="{{ phrase.id }}" class="no-link-style green">&#9734;</a></td>
                         <td>
                             <div class="rec-height" data-cy="recording">
                             {{ macros.player(recording) }}

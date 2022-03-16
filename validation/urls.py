@@ -90,6 +90,11 @@ urlpatterns = [
         name="record_audio_quality_judgement",
     ),
     path(
+        "api/record_audio_is_best/<str:recording_id>",
+        views.record_audio_is_best,
+        name="record_audio_is_best",
+    ),
+    path(
         "<str:language>/api/save_wrong_speaker_code/<str:recording_id>",
         views.save_wrong_speaker_code,
         name="save_wrong_speaker_code",
