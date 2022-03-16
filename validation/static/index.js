@@ -23,8 +23,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 const header = getElementByPhraseId("card__header", phraseId)
-                const noButton =  getElementByPhraseId("translation-judgement-accuracy-no", phraseId)
-                const yesButton =  getElementByPhraseId("translation-judgement-accuracy-yes", phraseId);
+                const noButton = getElementByPhraseId("translation-judgement-accuracy-no", phraseId)
+                const yesButton = getElementByPhraseId("translation-judgement-accuracy-yes", phraseId);
                 const idkButton = getElementByPhraseId("translation-judgement-accuracy-idk", phraseId);
 
                 if (judgement === 'yes') {
@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     header.classList.remove('card__header--green')
                     header.classList.remove("card__header--grey")
                     header.classList.add("card__header--red")
-                    
+
                 } else if (judgement === "idk") {
                     button.classList.replace("button--neutral", "button--neutral-solid")
 
@@ -77,9 +77,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: JSON.stringify({judgement})
                 })
 
-                let r = await response.json()
+                let r = await response.json();
 
-                if (r.status != 'ok') {
+                if (r.status !== 'ok') {
                     return
                 }
 
@@ -101,6 +101,40 @@ document.addEventListener('DOMContentLoaded', () => {
             })
         }
     }
+
+    for (let button of document.querySelectorAll(`[data-cy="is-best"]`)) {
+        button.addEventListener("click", async (e) => {
+            const recordingId = e.target.dataset.recordingId;
+            const phraseId = e.target.dataset.phraseIdBest;
+
+            const response = await fetch(`/api/record_audio_is_best/${recordingId}`, {
+                method: 'POST',
+                mode: 'same-origin',    // Do not send CSRF token to another domain.
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify({phraseId})
+            });
+
+            let r = await response.json();
+
+            if (r.status !== 'ok') {
+                return
+            }
+
+            // const bestElement = document.querySelector(`[data-recording-id='${recordingId}']`)
+            const otherElements = document.querySelectorAll(`[data-phrase-id-best='${phraseId}']`)
+
+            for (let el of otherElements) {
+                el.classList.remove("green");
+                el.innerHTML = "&#9734;";
+            }
+
+            e.target.classList.add("green");
+            e.target.innerHTML = "&#9733;";
+        })
+    }
 })
 
 function showWrongWordDiv(recordingId) {
@@ -114,19 +148,19 @@ function hideWrongWordDiv(recordingId) {
 }
 
 function getElementByPhraseId(className, phraseId) {
-    const elements =  document.getElementsByClassName(className);
+    const elements = document.getElementsByClassName(className);
     for (let e of elements) {
         if (e.dataset.phraseId === phraseId) {
-           return e
+            return e
         }
     }
 }
 
 function getElementByRecordingId(className, recordingId) {
-    const elements =  document.getElementsByClassName(className);
+    const elements = document.getElementsByClassName(className);
     for (let e of elements) {
         if (e.dataset.recId === recordingId) {
-           return e
+            return e
         }
     }
 }

@@ -488,6 +488,10 @@ class Recording(models.Model):
         choices=QUALITY_CHOICES,
     )
 
+    is_best = models.BooleanField(
+        help_text="Is this the best recording of the bunch?", default=False
+    )
+
     comment = models.CharField(
         help_text="The comment provided in the ELAN file",
         max_length=256,
