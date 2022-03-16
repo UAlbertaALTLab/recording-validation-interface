@@ -485,9 +485,8 @@ def bulk_search_recordings(request: HttpRequest, language: str):
         else:
             not_found.append(term)
 
-    matched_recordings = sorted(
-        matched_recordings, key=lambda recording: recording.is_best
-    )
+    if matched_recordings:
+        matched_recordings.sort(key=lambda recording: recording.get("is_best"))
 
     response = {"matched_recordings": matched_recordings, "not_found": not_found}
 
