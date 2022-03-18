@@ -71,6 +71,10 @@ mōswacīhk Speakers
 ------------------
 #### [Jean Okimāsis](https://speech-db.altlab.app/moswacihk/speakers/OKI)
 
+Tsuut'ina Speakers
+--------------------
+#### [Bruce Starlight](https://speech-db.altlab.app/tsuutina/speakers/BRS)
+
 Computational Modeling
 ----------------------
 
