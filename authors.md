@@ -83,3 +83,11 @@ Please refer to the [authors of the Plains Cree FSTs](https://github.com/giellal
 Special Thanks
 --------------
 #### [MESC](https://www.maskwacised.ca/)
+
+#### Brian Wildcat
+#### Eileen Marthiensen
+#### Patricia Johnson
+#### [Anna Kazantseva][ILT]
+#### [Roland Khun][ILT]
+
+[ILT]: https://nrc.canada.ca/en/node/1378
