@@ -133,7 +133,7 @@ a:hover {
 }
 
 .green-star, .green-star > a {
-  color: var(--custom-pale-purple);
+  color: var(--custom-pale-green);
   text-decoration: none;
   font-size:120%;
 }
