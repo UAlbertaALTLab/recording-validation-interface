@@ -1,18 +1,20 @@
 {#
-      Copyright (C) 2021 Jolene Poulin <jcpoulin@ualberta.ca>
+Copyright (C) 2021 Jolene Poulin
+<jcpoulin@ualberta.ca>
 
-      This program is free software: you can redistribute it and/or modify
-      it under the terms of the GNU Affero General Public License as
-      published by the Free Software Foundation, either version 3 of the
-      License, or (at your option) any later version.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
 
-      This program is distributed in the hope that it will be useful,
-      but WITHOUT ANY WARRANTY; without even the implied warranty of
-      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-      GNU Affero General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
 
-      You should have received a copy of the GNU Affero General Public License
-      along with this program.  If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see
+<http://www.gnu.org/licenses/>.
 #}
 
 {% import 'validation/_macros.html' as macros %}
@@ -23,78 +25,103 @@
 {% macro segment_card(phrase, recordings, speakers, is_linguist, is_expert, auth, forms, csrf_token, request, language) %}
 
     <article id='phrase-{{ phrase.id }}' class="card shadow-sm" data-cy="segment-card">
-            {% if phrase.validated %}
-                <div class="card__header card__header--green" data-cy="card-header" data-phrase-id={{ phrase.id }}>
+        {% if phrase.validated %}
+            <div class="card__header card__header--green" data-cy="card-header" data-phrase-id={{ phrase.id }}>
                 &nbsp;
-                </div>
-            {% elif phrase.status == "needs review" %}
-                <div class="card__header card__header--red" data-cy="card-header" data-phrase-id={{ phrase.id }}>
+            </div>
+        {% elif phrase.status == "needs review" %}
+            <div class="card__header card__header--red" data-cy="card-header" data-phrase-id={{ phrase.id }}>
                 &nbsp;
-                </div>
-            {% else %}
-                <div class="card__header card__header--grey" data-cy="card-header" data-phrase-id={{ phrase.id }}>
+            </div>
+        {% else %}
+            <div class="card__header card__header--grey" data-cy="card-header" data-phrase-id={{ phrase.id }}>
                 &nbsp;
-                </div>
+            </div>
+        {% endif %}
+        <div class="card__body">
+            {% if auth %}
+                <button type="button" class="button button--fail button--flag button--right" data-toggle="modal"
+                        data-target="#{{ phrase.id }}-modal" data-cy="flag-button">Flag this entry for review
+                </button><br>
+                {% if is_linguist %}
+                    <a href="{{ url('validation:segment_detail', language.code, phrase.id) }}"
+                       class="button button--success button--more-options button--right" data-cy="options-button">More
+                        Options</a>
+                {% endif %} {# is linguist #}
             {% endif %}
-            <div class="card__body">
-                {% if auth %}
-                    <button type="button" class="button button--fail button--flag button--right" data-toggle="modal" data-target="#{{ phrase.id }}-modal" data-cy="flag-button">Flag this entry for review</button><br>
-                    {% if is_linguist %}
-                        <a href="{{ url('validation:segment_detail', language.code, phrase.id) }}" class="button button--success button--more-options button--right"  data-cy="options-button">More Options</a>
-                    {% endif %} {# is linguist #}
+            <p class="card__title--source-language" data-cy="transcription">
+                {% if request.COOKIES['macron'] == 'off' %}
+                    {{ phrase.transcription | replace("ê", "e") }}
+                {% else %}
+                    {{ phrase.transcription }}
                 {% endif %}
-                <p class="card__title--source-language" data-cy="transcription">
-                    {% if request.COOKIES['macron'] == 'off' %}
-                        {{ phrase.transcription | replace("ê", "e") }}
-                    {% else %}
-                        {{ phrase.transcription }}
-                    {% endif %}
+            </p>
+            <p class="card__title--target-language" data-cy="translation">Translation: {{ phrase.translation }}</p>
+
+            {% if is_expert and phrase.origin == "new" %}
+                <p>Are the transcription and translation both correct?
+                    <button class="button
+                            {{ 'button--success-solid' if phrase.status == 'linked' else 'button--success' }} translation-judgement-accuracy-yes"
+                            data-phrase-id={{ phrase.id }} data-cy="yes-button">Yes
+                    </button>
+                    <button class="button
+                            {{ 'button--fail-solid' if phrase.status == 'needs review' else 'button--fail' }} translation-judgement-accuracy-no"
+                            data-phrase-id={{ phrase.id }} data-toggle="modal" data-target="#{{ phrase.id }}-modal"
+                            data-cy="no-button">No
+                    </button>
+                    <button class="button
+                            {{ 'button--neutral-solid' if phrase.status != 'linked' and phrase.status != 'needs review' else 'button--neutral' }} translation-judgement-accuracy-idk"
+                            data-phrase-id={{ phrase.id }} data-cy="idk-button">I don't know
+                    </button>
                 </p>
-                <p class="card__title--target-language" data-cy="translation">Translation: {{ phrase.translation }}</p>
+            {% elif is_expert %}
+                <p>This phrase is already in the {{ language.name }} dictionary.</p>
+            {% endif %}
 
-                {% if is_expert and phrase.origin == "new" %}
-                    <p>Are the transcription and translation both correct?
-                    <button class="button {{ 'button--success-solid' if phrase.status == 'linked' else 'button--success' }} translation-judgement-accuracy-yes" data-phrase-id={{ phrase.id }} data-cy="yes-button">Yes</button>
-                    <button class="button {{ 'button--fail-solid' if phrase.status == 'needs review' else 'button--fail' }} translation-judgement-accuracy-no" data-phrase-id={{ phrase.id }} data-toggle="modal" data-target="#{{ phrase.id }}-modal" data-cy="no-button">No</button>
-                    <button class="button {{ 'button--neutral-solid' if phrase.status != 'linked' and phrase.status != 'needs review' else 'button--neutral' }} translation-judgement-accuracy-idk" data-phrase-id={{ phrase.id }} data-cy="idk-button">I don't know</button></p>
-                {% elif is_expert %}
-                    <p>This phrase is already in the {{ language.name }} dictionary.</p>
+            <table class="card__body--table">
+                {% if is_expert %}
+                    <th>Best</th>{% endif %}
+                <th>Recording</th>
+                <th>Speaker</th>
+
+                {% if is_expert %}
+                    <th>This recording is...</th>
+                    <th>This recording has the...</th>
                 {% endif %}
 
-                <table class="card__body--table">
-                    <th>Best</th>
-                    <th>Recording</th>
-                    <th>Speaker</th>
-
-                    {% if is_expert %}
-                        <th>This recording is...</th>
-                        <th>This recording has the...</th>
-                    {% endif %}
-
-                    {% if is_linguist %}
-                        <th>Recording Session</th>
-                    {% endif %}
+                {% if is_linguist %}
+                    <th>Recording Session</th>
+                {% endif %}
 
                 {% for recording in recordings[phrase] %}
                     <tr>
-                        <td><a data-cy="is-best" data-recording-id="{{ recording.id }}" data-phrase-id-best="{{ phrase.id }}" class="no-link-style green">&#9734;</a></td>
+                        {% if is_expert %}
+                            <td class="green-star"><a data-cy="is-best" data-recording-id="{{ recording.id }}"
+                                   data-phrase-id-best="{{ phrase.id }}">{% if recording.is_best %}&#9733;{% else %}&#9734;{% endif %}</a></td>
+                        {% endif %}
                         <td>
                             <div class="rec-height" data-cy="recording">
-                            {{ macros.player(recording) }}
+                                {{ macros.player(recording) }}
                             </div>
                         </td>
                         <td data-cy="speaker">
                             {{ macros.speaker(recording) }}
                         </td>
                         {% if is_expert %}
-                        <td>
-                                <button class="button {{ 'button--success-solid' if recording.quality == 'good' else 'button--success' }} audio-quality-good" data-cy="good-button" data-rec-id={{ recording.id }}>Good</button>
-                                <button class="button {{ 'button--fail-solid' if recording.quality == 'bad' else 'button--fail' }} audio-quality-bad" data-cy="bad-button" data-rec-id={{ recording.id }}>Bad</button>
-                        </td>
+                            <td>
+                                <button class="button
+                                        {{ 'button--success-solid' if recording.quality == 'good' else 'button--success' }} audio-quality-good"
+                                        data-cy="good-button" data-rec-id={{ recording.id }}>Good
+                                </button>
+                                <button class="button
+                                        {{ 'button--fail-solid' if recording.quality == 'bad' else 'button--fail' }} audio-quality-bad"
+                                        data-cy="bad-button" data-rec-id={{ recording.id }}>Bad
+                                </button>
+                            </td>
 
-                        <td>
-                            {{ wrong_buttons.button_col(recording, csrf_token, request, language) }}
-                        </td>
+                            <td>
+                                {{ wrong_buttons.button_col(recording, csrf_token, request, language) }}
+                            </td>
                         {% endif %}
                         {% if is_linguist %}
                             <td>{{ recording.session.id or "" }}</td>
@@ -108,7 +135,7 @@
         </div>
 
         <!-- Modal -->
-        {{  issue_modal.modal(forms, phrase.id, csrf_token) }}
+        {{ issue_modal.modal(forms, phrase.id, csrf_token) }}
 
     </article>
 
