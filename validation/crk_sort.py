@@ -17,7 +17,7 @@ def merge(left, right):
     output = []
     i = j = 0
     while i < len(left) and j < len(right):
-        if custom_less_than(left[i], right[j]):
+        if custom_less_than(left[i].transcription, right[j].transcription):
             output.append(left[i])
             i += 1
         else:
@@ -39,10 +39,23 @@ def custom_less_than(l, r):
         Cree alphabet: (space) -  a  â  A Â c  C ê Ê h H i î I Î
         k K m M n N o  ô O Ô p P s S t T w W y Y
         bB dD fF gG jJ lL qQ rR uU vV zZ
+
+    >>> custom_less_than("abc", "def")
+    True
+    >>> custom_less_than("def", "abc")
+    False
+    >>> custom_less_than("acahkos", "acâhkos")
+    True
+    >>> custom_less_than("Aword", "aword")
+    False
+    >>> custom_less_than("a word", "aword")
+    True
+    >>> custom_less_than("abc", "abcdef")
+    True
     """
 
-    l = l.transcription
-    r = r.transcription
+    # l = l.transcription
+    # r = r.transcription
 
     priority_list = [
         " ",
@@ -142,4 +155,8 @@ def custom_less_than(l, r):
         elif l_char_pos > r_char_pos:
             return False
         j += 1
+
+    if len(l) < len(r):
+        # We get here when l is a subset of r
+        return True
     return False
