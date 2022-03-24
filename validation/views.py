@@ -880,7 +880,12 @@ def record_audio_is_best(request, recording_id):
     phrase_id = json.loads(request.body)["phraseId"]
 
     recording = get_object_or_404(Recording, id=recording_id)
-    recording.is_best = True
+    if recording.is_best:
+        recording.is_best = False
+        set_solid = False
+    else:
+        recording.is_best = True
+        set_solid = True
     recording.save()
 
     recording_set = Recording.objects.filter(phrase_id=phrase_id)
@@ -890,7 +895,7 @@ def record_audio_is_best(request, recording_id):
         rec.is_best = False
         rec.save()
 
-    return JsonResponse({"status": "ok"})
+    return JsonResponse({"status": "ok", "set_solid": set_solid})
 
 
 @login_required()
