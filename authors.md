@@ -71,6 +71,10 @@ mōswacīhk Speakers
 ------------------
 #### [Jean Okimāsis](https://speech-db.altlab.app/moswacihk/speakers/OKI)
 
+Tsuut'ina Speakers
+--------------------
+#### [Bruce Starlight](https://speech-db.altlab.app/tsuutina/speakers/BRS)
+
 Computational Modeling
 ----------------------
 
@@ -79,3 +83,11 @@ Please refer to the [authors of the Plains Cree FSTs](https://github.com/giellal
 Special Thanks
 --------------
 #### [MESC](https://www.maskwacised.ca/)
+
+#### Brian Wildcat
+#### Eileen Marthiensen
+#### Patricia Johnson
+#### [Anna Kazantseva][ILT]
+#### [Roland Khun][ILT]
+
+[ILT]: https://nrc.canada.ca/en/node/1378
