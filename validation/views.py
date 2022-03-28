@@ -695,6 +695,7 @@ AVAILABLE_IMAGES = [
     "RosieRowan",
     "BruceStarlight",
     "JeanOkimāsis",
+    "DoloresGreyeyesSand",
 ]
 
 
