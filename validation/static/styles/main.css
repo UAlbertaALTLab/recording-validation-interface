@@ -132,15 +132,13 @@ a:hover {
   margin: 0.5rem;
 }
 
-.no-link-style {
+.green-star, .green-star > a {
+  color: blue;
   text-decoration: none;
+  font-size:120%;
 }
 
-.no-link-style:hover {
+.green-star:hover {
   text-decoration: none;
   cursor: pointer;
-}
-
-.green {
-  color: var(--custom-pale-green);
 }
