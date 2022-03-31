@@ -127,12 +127,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const otherElements = document.querySelectorAll(`[data-phrase-id-best='${phraseId}']`)
 
             for (let el of otherElements) {
-                el.classList.remove("green");
                 el.innerHTML = "&#9734;";
             }
 
-            e.target.classList.add("green");
-            e.target.innerHTML = "&#9733;";
+            if (r.set_solid) {
+                e.target.innerHTML = "&#9733;";
+            } else {
+                e.target.innerHTML = "&#9734;";
+            }
         })
     }
 })

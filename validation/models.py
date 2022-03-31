@@ -78,6 +78,13 @@ class LanguageVariant(models.Model):
         max_length=256,
     )
 
+    endonym = models.CharField(
+        help_text="The name of the language in the language itself",
+        null=True,
+        blank=True,
+        max_length=256,
+    )
+
     def __str__(self) -> str:
         return self.name
 
