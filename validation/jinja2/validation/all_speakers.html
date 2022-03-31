@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="speakers--grid">
-    <h2>{{ language.name }} Speakers</h2>
+    <h2>{% if language.endonym %}{{ language.endonym }}{% endif %} Speakers in {{ language.name }}</h2>
     <div class="row">
         {% for speaker in speakers %}
         <div class="col-sm-4 d-flex align-items-stretch">
