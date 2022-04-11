@@ -44,7 +44,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs) -> None:
         speaker = Speaker.objects.get(code="OKI")
-        audio_dir = settings.OKIMASIS_AUDIO_DIR
+        audio_dir = settings.OKIMASIS_BIOS_AUDIO_DIR
         with open(f"{audio_dir}/jean_bio_cree.txt") as f:
             content = f.read()
             speaker.source_bio_text = content
