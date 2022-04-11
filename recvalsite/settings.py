@@ -238,6 +238,10 @@ OKIMASIS_AUDIO_DIR = config(
     "OKIMASIS_AUDIO_DIR", BASE_DIR / "data" / "okimasis-recordings", cast=Path
 )
 
+OKIMASIS_BIOS_AUDIO_DIR = config(
+    "OKIMASIS_BIOS_AUDIO_DIR", BASE_DIR / "data" / "okimasis-bios", cast=Path
+)
+
 SYNTH_AUDIO_DIR = config(
     "SYNTH_AUDIO_DIR", BASE_DIR / "data" / "synth-speech", cast=Path
 )
