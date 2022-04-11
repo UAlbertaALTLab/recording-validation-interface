@@ -16,7 +16,7 @@
                         <h5 class="card-title">{{ speaker.code }}</h5>
                     {% endif %}
                 {% if speaker.bio %}
-                  <p class="card-text speaker-bio-preview">{{ speaker.bio }}</p>
+                  <p class="card-text speaker-bio-preview">{{ speaker.bio | safe }}</p>
                 {% endif %}
                 <a href="{{ url('validation:speaker_view', language.code, speaker.code) }}" class="button button--success">Learn More</a>
                 </div>
