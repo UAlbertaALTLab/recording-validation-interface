@@ -83,7 +83,7 @@ class Command(BaseCommand):
                 audio_data = recording_path.read_bytes()
                 django_file = ContentFile(audio_data, name=recording_path.name)
 
-                if "crk" in audio_file:
+                if "cree" in audio_file:
                     speaker.source_bio_audio = django_file
                     speaker.save()
                 if "eng" in audio_file:
