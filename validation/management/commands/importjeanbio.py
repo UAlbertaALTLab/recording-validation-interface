@@ -26,9 +26,16 @@ Its defaults are configured using the following settings:
     RECVAL_SESSIONS_DIR
 See recvalsite/settings.py for more information.
 """
+from os import fspath
+from pathlib import Path
+from tempfile import TemporaryDirectory
 
+from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand  # type: ignore
+from pydub import AudioSegment
 
+from librecval.transcode_recording import transcode_to_aac
+from recvalsite import settings
 from validation.models import Speaker
 
 
@@ -37,12 +44,48 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs) -> None:
         speaker = Speaker.objects.get(code="OKI")
-        with open("/app/data/okimasis-bios/jean_bio_cree.txt") as f:
+        audio_dir = settings.OKIMASIS_AUDIO_DIR
+        with open(f"{audio_dir}/jean_bio_cree.txt") as f:
             content = f.read()
             speaker.source_bio_text = content
 
-        with open("/app/data/okimasis-bios/jean_bio_eng.txt") as f:
+        with open(f"{audio_dir}/jean_bio_eng.txt") as f:
             content = f.read()
             speaker.target_bio_text = content
 
         speaker.save()
+
+        for audio_file in [
+            f"{audio_dir}/jean_bio_eng.mp3",
+            f"{audio_dir}/jean_bio_cree.mp3",
+        ]:
+            audio = AudioSegment.from_file(fspath(audio_file))
+            audio = audio.set_channels(1)
+
+            sound_bite = audio.normalize(headroom=0.1)
+            rec_name = Path(audio_file).name
+
+            with TemporaryDirectory() as audio_dir:
+                recording_path = Path(settings.RECVAL_AUDIO_PREFIX) / Path(
+                    f"{rec_name}.m4a"
+                )
+
+                transcode_to_aac(
+                    sound_bite,
+                    recording_path,
+                    tags=dict(
+                        title=rec_name,
+                        artist=speaker,
+                        language="crk",
+                    ),
+                )
+
+                audio_data = recording_path.read_bytes()
+                django_file = ContentFile(audio_data, name=recording_path.name)
+
+                if "crk" in audio_file:
+                    speaker.source_bio_audio = django_file
+                    speaker.save()
+                if "eng" in audio_file:
+                    speaker.target_bio_audio = django_file
+                    speaker.save()
