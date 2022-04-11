@@ -10,17 +10,17 @@
     <div class="speaker-bio">
         {% if speaker.source_bio_audio %}
             {% if request.COOKIES['macron'] == 'off' %}
-                <h3>Listen in nehiyawewin:</h3>
+                <h3>Listen in {{ language.endonym | replace("ê", "e") }}:</h3>
             {% else %}
-                <h3>Listen in nêhiyawêwin:</h3>
+                <h3>Listen in {{ language.endonym }}:</h3>
             {% endif %}
             <p>{{ macros.bio_player(speaker.source_bio_audio) }}</p>
         {% endif %}
         {% if speaker.source_bio_text %}
-            <h3>Read in {{ language }}:<br></h3>
+            <h3>Read in {{ language.endonym }}:<br></h3>
             {{ speaker.source_bio_text | safe}}
         {% else %}
-            <p>({{ language }} translation coming soon)</p>
+            <p>({% if language.endonym %}{{ language.endonym }} {% endif %}translation coming soon)</p>
         {% endif %}
     
         {% if speaker.target_bio_audio %}
