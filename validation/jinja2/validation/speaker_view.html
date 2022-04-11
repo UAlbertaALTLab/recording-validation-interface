@@ -10,9 +10,9 @@
     <div class="speaker-bio">
         {% if speaker.source_bio_audio %}
             {% if request.COOKIES['macron'] == 'off' %}
-                <h3>Listen in {{ language.endonym }}:</h3>
-            {% else %}
                 <h3>Listen in {{ language.endonym | replace("ê", "e") }}:</h3>
+            {% else %}
+                <h3>Listen in {{ language.endonym }}:</h3>
             {% endif %}
             <p>{{ macros.bio_player(speaker.source_bio_audio) }}</p>
         {% endif %}
