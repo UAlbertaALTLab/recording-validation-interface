@@ -27,15 +27,21 @@ along with this program.  If not, see
     <article id='phrase-{{ phrase.id }}' class="card shadow-sm" data-cy="segment-card">
         {% if phrase.validated %}
             <div class="card__header card__header--green" data-cy="card-header" data-phrase-id={{ phrase.id }}>
-                &nbsp;
+                {% if phrase.status == "user-submitted" %}<td><button class="button button--success" data-cy="approve-button" data-phrase-id="{{ phrase.id }}">Approve for Use</button></td>
+                {% else %} &nbsp;
+                {% endif %}
             </div>
         {% elif phrase.status == "needs review" %}
             <div class="card__header card__header--red" data-cy="card-header" data-phrase-id={{ phrase.id }}>
-                &nbsp;
+                {% if phrase.status == "user-submitted" %}<td><button class="button button--success" data-cy="approve-button" data-phrase-id="{{ phrase.id }}">Approve for Use</button></td>
+                {% else %} &nbsp;
+                {% endif %}
             </div>
         {% else %}
             <div class="card__header card__header--grey" data-cy="card-header" data-phrase-id={{ phrase.id }}>
-                &nbsp;
+                {% if phrase.status == "user-submitted" %}<td><button class="button button--success" data-cy="approve-button" data-phrase-id="{{ phrase.id }}">Approve for Use</button></td>
+                {% else %} &nbsp;
+                {% endif %}
             </div>
         {% endif %}
         <div class="card__body">
@@ -125,11 +131,7 @@ along with this program.  If not, see
                             </td>
                         {% endif %}
                         {% if is_linguist %}
-                            <td>{{ recording.session.id or "" }}</td>
-                            {% if recording.is_user_submitted %}
-                            <td><button class="button button--success" data-cy="approve-button" data-rec-id="{{ recording.id }}">Approve for Use</button></td>
-                                {% else %} &nbsp;
-                                {% endif %}
+                            <td>{{ recording.session.id or "-" }}</td>
                         {% endif %}
                     </tr>
 

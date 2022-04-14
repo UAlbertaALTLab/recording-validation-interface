@@ -899,6 +899,14 @@ def record_audio_is_best(request, recording_id):
     return JsonResponse({"status": "ok", "set_solid": set_solid})
 
 
+def approve_user_phrase(request, phrase_id):
+    phrase = get_object_or_404(Phrase, id=phrase_id)
+    phrase.status = Phrase.NEW
+    phrase.save()
+
+    return JsonResponse({"status": "ok"})
+
+
 @login_required()
 def record_audio(request, language):
     language = get_language_object(language)
