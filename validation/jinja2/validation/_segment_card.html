@@ -91,6 +91,7 @@ along with this program.  If not, see
 
                 {% if is_linguist %}
                     <th>Recording Session</th>
+                    <th>&nbsp</th>
                 {% endif %}
 
                 {% for recording in recordings[phrase] %}
@@ -125,6 +126,10 @@ along with this program.  If not, see
                         {% endif %}
                         {% if is_linguist %}
                             <td>{{ recording.session.id or "" }}</td>
+                            {% if recording.is_user_submitted %}
+                            <td><button class="button button--success" data-cy="approve-button" data-rec-id="{{ recording.id }}">Approve for Use</button></td>
+                                {% else %} &nbsp;
+                                {% endif %}
                         {% endif %}
                     </tr>
 
