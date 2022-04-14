@@ -517,6 +517,12 @@ class Recording(models.Model):
         help_text="This recording was submitted online by a user", default=False
     )
 
+    was_user_submitted = models.BooleanField(
+        help_text="This recording was submitted online by a user, but is now approved",
+        default=False,
+        blank=True,
+    )
+
     # Keep track of the recording's history.
     history = HistoricalRecords(excluded_fields=["compressed_audio"])
 

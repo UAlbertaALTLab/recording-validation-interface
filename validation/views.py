@@ -52,6 +52,7 @@ from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
 from librecval.normalization import to_indexable_form
+from librecval.recording_session import SessionID
 from .jinja2 import url
 
 from .models import Phrase, Recording, Speaker, RecordingSession, Issue, LanguageVariant
@@ -899,6 +900,20 @@ def record_audio_is_best(request, recording_id):
     return JsonResponse({"status": "ok", "set_solid": set_solid})
 
 
+def approve_user_phrase(request, phrase_id):
+    phrase = get_object_or_404(Phrase, id=phrase_id)
+    phrase.status = Phrase.NEW
+    phrase.save()
+
+    recordings = Recording.objects.filter(phrase_id=phrase.id)
+    for rec in recordings:
+        rec.is_user_submitted = False
+        rec.was_user_submitted = True
+        rec.save()
+
+    return JsonResponse({"status": "ok"})
+
+
 @login_required()
 def record_audio(request, language):
     language = get_language_object(language)
@@ -943,6 +958,15 @@ def record_audio(request, language):
             speaker.languages.add(language)
             speaker.save()
 
+        recording_session, created = RecordingSession.get_or_create_by_session_id(
+            SessionID(
+                date=datetime.date.today(),
+                time_of_day=None,
+                subsession=None,
+                location=None,
+            )
+        )
+
         rec_id = create_new_rec_id(phrase, speaker)
         audio_data.name = rec_id + ".wav"
         rec = Recording(
@@ -953,6 +977,7 @@ def record_audio(request, language):
             timestamp=0,
             comment=f"Uploaded by user: {request.user}",
             is_user_submitted=True,
+            session_id=recording_session.id,
         )
         rec.save()
         source = settings.RECVAL_AUDIO_PREFIX + rec_id + ".wav"
