@@ -29,7 +29,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         recordings = Recording.objects.filter(session_id=None)
-        print(recordings)
         for rec in recordings:
             try:
                 historical_recording = Recording.history.filter(id=rec.id).first()
