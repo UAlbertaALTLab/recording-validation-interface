@@ -905,6 +905,12 @@ def approve_user_phrase(request, phrase_id):
     phrase.status = Phrase.NEW
     phrase.save()
 
+    recordings = Recording.objects.filter(phrase_id=phrase.id)
+    for rec in recordings:
+        rec.is_user_submitted = False
+        rec.was_user_submitted = True
+        rec.save()
+
     return JsonResponse({"status": "ok"})
 
 
