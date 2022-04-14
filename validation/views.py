@@ -140,6 +140,7 @@ def entries(request, language):
             all_phrases = all_phrases.filter(recording__session__id=session).distinct()
 
         if language in ["maskwacis", "moswacihk"]:
+            print(len(all_phrases))
             all_phrases = custom_sort(all_phrases)
         else:
             all_phrases = all_phrases.order_by("transcription")
