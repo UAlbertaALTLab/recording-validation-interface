@@ -47,8 +47,9 @@ from django.http import (
     QueryDict,
     HttpRequest,
 )
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
+from django.utils.http import urlencode
 from django.views.decorators.http import require_http_methods
 
 from librecval.normalization import to_indexable_form
@@ -917,6 +918,8 @@ def approve_user_phrase(request, phrase_id):
 @login_required()
 def record_audio(request, language):
     language = get_language_object(language)
+    transcription = request.GET.get("transcription") or ""
+    translation = request.GET.get("translation") or ""
 
     if request.method == "POST":
         form = RecordNewPhrase(request.POST, request.FILES)
@@ -1005,7 +1008,9 @@ def record_audio(request, language):
         )
         return HttpResponseRedirect(f"/{language.code}/record_audio", context)
     else:
-        form = RecordNewPhrase()
+        form = RecordNewPhrase(
+            {"transcription": transcription, "translation": translation}
+        )
         form.fields["transcription"].label = language.name
 
     context = dict(
