@@ -138,9 +138,11 @@ along with this program.  If not, see
 
                 {% endfor %}{# for recording in phrase.recordings #}
             </table>
+        {% if is_expert %}
         <button class="button button--neutral"  data-cy="record-from-entry">
             <a href="/{{ language.code }}/record_audio?transcription={{ phrase.transcription }}&translation={{ phrase.translation }}">Add a New Recording</a></button>
         </div>
+    {% endif %}
 
         <!-- Modal -->
         {{ issue_modal.modal(forms, phrase.id, csrf_token) }}
