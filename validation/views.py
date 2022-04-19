@@ -55,7 +55,15 @@ from librecval.normalization import to_indexable_form
 from librecval.recording_session import SessionID
 from .jinja2 import url
 
-from .models import Phrase, Recording, Speaker, RecordingSession, Issue, LanguageVariant
+from .models import (
+    Phrase,
+    Recording,
+    Speaker,
+    RecordingSession,
+    Issue,
+    LanguageVariant,
+    SemanticClass,
+)
 from .forms import (
     EditSegment,
     Register,
@@ -140,6 +148,10 @@ def entries(request, language):
         if session != "all" and session:
             all_phrases = all_phrases.filter(recording__session__id=session).distinct()
 
+        semantic = request.GET.get("semantic_class")
+        if semantic:
+            all_phrases = all_phrases.filter(semantic_class__classification=semantic)
+
         if language in ["maskwacis", "moswacihk"]:
             all_phrases = custom_sort(all_phrases)
         else:
@@ -148,6 +160,7 @@ def entries(request, language):
         all_phrases = []
         session = None
         mode = None
+        semantic = None
         language_sessions = []
 
     paginator = Paginator(all_phrases, 5)
@@ -159,12 +172,21 @@ def entries(request, language):
         query_term.update({"session": session})
     if mode:
         query_term.update({"mode": mode})
+    if semantic:
+        query_term.update({"semantic_class": semantic})
 
     if not mode:
         mode = "all"
 
     if not session or session == "all":
         session = "all sessions"
+
+    if semantic:
+        semantic_display = f"relating to semantic class {semantic}"
+    else:
+        semantic_display = ""
+
+    all_semantic_classes = SemanticClass.objects.all()
 
     recordings, forms = prep_phrase_data(request, phrases, language_object.name)
 
@@ -189,6 +211,9 @@ def entries(request, language):
         query=query_term,
         session=session,
         mode=mode,
+        semantic_display=semantic_display,
+        all_semantic_classes=all_semantic_classes,
+        semantic=semantic,
         encode_query_with_page=encode_query_with_page,
         language=language_object,
     )
