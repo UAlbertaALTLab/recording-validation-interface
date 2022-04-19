@@ -89,6 +89,58 @@ class LanguageVariant(models.Model):
         return self.name
 
 
+class SemanticClass(models.Model):
+    """
+    A semantic class, typically from WordNet or RapidWords that describes a phrase
+    """
+
+    MAX_TRANSCRIPTION_LENGTH = 256
+
+    META = "metadata"
+    MANUAL = "manual classification"
+    ELICIT = "elicitation sheet"
+    SOURCE_CHOICES = (
+        (META, "Metadata"),
+        (MANUAL, "Manual Classification"),
+        (ELICIT, "Elicitation Sheet"),
+    )
+
+    # Origin values
+    RW = "rapidwords"
+    WN = "wordnet"
+    O = "other"
+
+    ORIGIN_CHOICES = (
+        (RW, "RapidWords"),
+        (WN, "WordNet"),
+        (O, "Other"),
+    )
+
+    source = models.CharField(
+        help_text="How did we determine this class?",
+        blank=True,
+        **arguments_for_choices(SOURCE_CHOICES),
+    )
+
+    origin = models.CharField(
+        help_text="Where did this class come from?",
+        blank=True,
+        **arguments_for_choices(ORIGIN_CHOICES),
+    )
+
+    classification = models.CharField(
+        help_text="The classification for this semantic class",
+        blank=True,
+        max_length=256,
+    )
+
+    # Keep track of Phrases' history, so we can review, revert, and inspect them.
+    history = HistoricalRecords()
+
+    def __str__(self) -> str:
+        return self.classification
+
+
 class Phrase(models.Model):
     """
     A recorded phrase. A phrase may either be a word or a sentence with at
@@ -168,6 +220,8 @@ class Phrase(models.Model):
         on_delete=models.PROTECT,
         null=True,
     )
+
+    semantic_class = models.ManyToManyField(SemanticClass, blank=True)
 
     status = models.CharField(
         help_text="Status in the validation process",
@@ -342,9 +396,6 @@ class Speaker(models.Model):
         """
         # XXX: For now, all speakers are NOT anonymous.
         return False
-
-    # TODO: add field for speaker bio (en)
-    # TODO: add field for speaker bio (crk)
 
     def clean(self):
         self.code = self.code.strip().upper()
