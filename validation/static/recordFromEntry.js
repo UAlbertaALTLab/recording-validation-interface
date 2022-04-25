@@ -5,7 +5,6 @@ lang = document.getElementById("language-span").dataset.lang
 
 for (let recButton of recordButtons) {
     const phrase = recButton.dataset.phrase
-    console.log(recButton);
     let stopButton = document.getElementById(`stopButton-${phrase}`);
     const transcription = document.getElementById(`transcription-span-${phrase}`).dataset.transcription
     const translation = document.getElementById(`translation-span-${phrase}`).dataset.translation
