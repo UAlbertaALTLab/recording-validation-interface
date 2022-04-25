@@ -21,25 +21,41 @@ along with this program.  If not, see
 {% import 'validation/_issue_modal.html' as issue_modal %}
 {% import 'validation/_speaker_code_modal.html' as speaker_code_modal %}
 {% import 'validation/_wrong_buttons.html' as wrong_buttons %}
+{% import 'validation/_record_feature.html' as record %}
 
 {% macro segment_card(phrase, recordings, speakers, is_linguist, is_expert, auth, forms, csrf_token, request, language) %}
 
     <article id='phrase-{{ phrase.id }}' class="card shadow-sm" data-cy="segment-card">
         {% if phrase.validated %}
             <div class="card__header card__header--green" data-cy="card-header" data-phrase-id={{ phrase.id }}>
-                {% if phrase.status == "user-submitted" %}<td><button class="button button--success" data-cy="approve-button" data-phrase-id="{{ phrase.id }}">Approve for Use</button></td>
+                {% if phrase.status == "user-submitted" %}
+                    <td>
+                        <button class="button button--success" data-cy="approve-button"
+                                data-phrase-id="{{ phrase.id }}">Approve for Use
+                        </button>
+                    </td>
                 {% else %} &nbsp;
                 {% endif %}
             </div>
         {% elif phrase.status == "needs review" %}
             <div class="card__header card__header--red" data-cy="card-header" data-phrase-id={{ phrase.id }}>
-                {% if phrase.status == "user-submitted" %}<td><button class="button button--success" data-cy="approve-button" data-phrase-id="{{ phrase.id }}">Approve for Use</button></td>
+                {% if phrase.status == "user-submitted" %}
+                    <td>
+                        <button class="button button--success" data-cy="approve-button"
+                                data-phrase-id="{{ phrase.id }}">Approve for Use
+                        </button>
+                    </td>
                 {% else %} &nbsp;
                 {% endif %}
             </div>
         {% else %}
             <div class="card__header card__header--grey" data-cy="card-header" data-phrase-id={{ phrase.id }}>
-                {% if phrase.status == "user-submitted" %}<td><button class="button button--success" data-cy="approve-button" data-phrase-id="{{ phrase.id }}">Approve for Use</button></td>
+                {% if phrase.status == "user-submitted" %}
+                    <td>
+                        <button class="button button--success" data-cy="approve-button"
+                                data-phrase-id="{{ phrase.id }}">Approve for Use
+                        </button>
+                    </td>
                 {% else %} &nbsp;
                 {% endif %}
             </div>
@@ -67,15 +83,18 @@ along with this program.  If not, see
             {% if is_expert and phrase.origin == "new" %}
                 <p>Are the transcription and translation both correct?
                     <button class="button
+
                             {{ 'button--success-solid' if phrase.status == 'linked' else 'button--success' }} translation-judgement-accuracy-yes"
                             data-phrase-id={{ phrase.id }} data-cy="yes-button">Yes
                     </button>
                     <button class="button
+
                             {{ 'button--fail-solid' if phrase.status == 'needs review' else 'button--fail' }} translation-judgement-accuracy-no"
                             data-phrase-id={{ phrase.id }} data-toggle="modal" data-target="#{{ phrase.id }}-modal"
                             data-cy="no-button">No
                     </button>
                     <button class="button
+
                             {{ 'button--neutral-solid' if phrase.status != 'linked' and phrase.status != 'needs review' else 'button--neutral' }} translation-judgement-accuracy-idk"
                             data-phrase-id={{ phrase.id }} data-cy="idk-button">I don't know
                     </button>
@@ -103,7 +122,8 @@ along with this program.  If not, see
                     <tr>
                         {% if is_expert %}
                             <td class="green-star"><a data-cy="is-best" data-recording-id="{{ recording.id }}"
-                                   data-phrase-id-best="{{ phrase.id }}">{% if recording.is_best %}&#9733;{% else %}&#9734;{% endif %}</a></td>
+                                                      data-phrase-id-best="{{ phrase.id }}">{% if recording.is_best %}
+                                &#9733;{% else %}&#9734;{% endif %}</a></td>
                         {% endif %}
                         <td>
                             <div class="rec-height" data-cy="recording">
@@ -116,10 +136,12 @@ along with this program.  If not, see
                         {% if is_expert %}
                             <td>
                                 <button class="button
+
                                         {{ 'button--success-solid' if recording.quality == 'good' else 'button--success' }} audio-quality-good"
                                         data-cy="good-button" data-rec-id={{ recording.id }}>Good
                                 </button>
                                 <button class="button
+
                                         {{ 'button--fail-solid' if recording.quality == 'bad' else 'button--fail' }} audio-quality-bad"
                                         data-cy="bad-button" data-rec-id={{ recording.id }}>Bad
                                 </button>
@@ -138,11 +160,13 @@ along with this program.  If not, see
 
                 {% endfor %}{# for recording in phrase.recordings #}
             </table>
-        {% if is_expert %}
-        <button class="button button--neutral"  data-cy="record-from-entry">
-            <a href="/{{ language.code }}/record_audio?transcription={{ phrase.transcription }}&translation={{ phrase.translation }}">Add a New Recording</a></button>
-        </div>
-    {% endif %}
+            {% if is_expert %}
+                <h4>Add a New Recording:</h4>
+                <div id="record-from-entry-div-{{ phrase.id }}">
+                    {{ record.record_new_entry(phrase.translation, phrase.transcription, phrase, language) }}</div>
+
+                </div>
+            {% endif %}
 
         <!-- Modal -->
         {{ issue_modal.modal(forms, phrase.id, csrf_token) }}
