@@ -186,7 +186,11 @@ def entries(request, language):
     else:
         semantic_display = ""
 
-    all_semantic_classes = SemanticClass.objects.all()
+    all_semantic_classes = (
+        SemanticClass.objects.filter(phrase__language=language_object)
+        .distinct()
+        .order_by("classification")
+    )
 
     recordings, forms = prep_phrase_data(request, phrases, language_object.name)
 
