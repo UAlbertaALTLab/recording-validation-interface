@@ -5,7 +5,6 @@ let gumStream;      // stream from getUserMedia()
 let rec;            // Recorder.js object
 let input;          // MediaStreamAudioSourceNode
 let recordButtons = document.getElementsByClassName(`recordButton`);
-// let stopButtons = document.getElementsByClassName(`stopButton`);
 const audioContext = new AudioContext();
 let lang;
 

@@ -1,7 +1,7 @@
 "use strict";
 
 // referencing: https://blog.addpipe.com/using-recorder-js-to-capture-wav-audio-in-your-html5-web-site/
-lang = document.getElementById("language-span").dataset.lang
+try { lang = document.getElementById("language-span").dataset.lang; } catch { lang = ""; }
 
 for (let recButton of recordButtons) {
     const phrase = recButton.dataset.phrase
