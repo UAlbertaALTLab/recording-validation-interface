@@ -47,15 +47,24 @@ from django.http import (
     QueryDict,
     HttpRequest,
 )
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
+from django.utils.http import urlencode
 from django.views.decorators.http import require_http_methods
 
 from librecval.normalization import to_indexable_form
 from librecval.recording_session import SessionID
 from .jinja2 import url
 
-from .models import Phrase, Recording, Speaker, RecordingSession, Issue, LanguageVariant
+from .models import (
+    Phrase,
+    Recording,
+    Speaker,
+    RecordingSession,
+    Issue,
+    LanguageVariant,
+    SemanticClass,
+)
 from .forms import (
     EditSegment,
     Register,
@@ -140,6 +149,10 @@ def entries(request, language):
         if session != "all" and session:
             all_phrases = all_phrases.filter(recording__session__id=session).distinct()
 
+        semantic = request.GET.get("semantic_class")
+        if semantic:
+            all_phrases = all_phrases.filter(semantic_class__classification=semantic)
+
         if language in ["maskwacis", "moswacihk"]:
             all_phrases = custom_sort(all_phrases)
         else:
@@ -148,6 +161,7 @@ def entries(request, language):
         all_phrases = []
         session = None
         mode = None
+        semantic = None
         language_sessions = []
 
     paginator = Paginator(all_phrases, 5)
@@ -159,12 +173,25 @@ def entries(request, language):
         query_term.update({"session": session})
     if mode:
         query_term.update({"mode": mode})
+    if semantic:
+        query_term.update({"semantic_class": semantic})
 
     if not mode:
         mode = "all"
 
     if not session or session == "all":
         session = "all sessions"
+
+    if semantic:
+        semantic_display = f"relating to semantic class {semantic}"
+    else:
+        semantic_display = ""
+
+    all_semantic_classes = (
+        SemanticClass.objects.filter(phrase__language=language_object)
+        .distinct()
+        .order_by("classification")
+    )
 
     recordings, forms = prep_phrase_data(request, phrases, language_object.name)
 
@@ -189,6 +216,9 @@ def entries(request, language):
         query=query_term,
         session=session,
         mode=mode,
+        semantic_display=semantic_display,
+        all_semantic_classes=all_semantic_classes,
+        semantic=semantic,
         encode_query_with_page=encode_query_with_page,
         language=language_object,
     )
@@ -621,11 +651,17 @@ def view_issues(request, language):
     issues = (
         Issue.objects.filter(status=Issue.OPEN).filter(language=language).order_by("id")
     )
+
+    paginator = Paginator(issues, 10)
+    page_no = request.GET.get("page", 1)
+    paged_issues = paginator.get_page(page_no)
+
     context = dict(
-        issues=issues,
+        issues=paged_issues,
         auth=request.user.is_authenticated,
         is_linguist=user_is_linguist(request.user, language),
         language=language,
+        encode_query_with_page=encode_query_with_page,
     )
     return render(request, "validation/view_issues.html", context)
 
@@ -639,7 +675,7 @@ def view_issue_detail(request, language, issue_id):
         if request.method == "POST":
             form = EditIssueWithRecording(request.POST)
             if request.method == "POST" and form.is_valid():
-                return handle_save_issue_with_recording(form, issue, request)
+                return handle_save_issue_with_recording(form, issue, request, language)
         else:
             form = EditIssueWithRecording(
                 initial={"phrase": issue.source_language_suggestion}
@@ -649,7 +685,7 @@ def view_issue_detail(request, language, issue_id):
         if request.method == "POST":
             form = EditIssueWithPhrase(request.POST)
             if request.method == "POST" and form.is_valid():
-                return handle_save_issue_with_phrase(form, issue, request)
+                return handle_save_issue_with_phrase(form, issue, request, language)
         else:
             form = EditIssueWithPhrase(
                 initial={
@@ -674,7 +710,7 @@ def close_issue(request, language, issue_id):
     issue.status = Issue.RESOLVED
     issue.save()
 
-    return HttpResponseRedirect(url("validation:issues", language))
+    return HttpResponseRedirect(url("validation:issues", language.code))
 
 
 AVAILABLE_IMAGES = [
@@ -825,6 +861,7 @@ def save_wrong_speaker_code(request, language, recording_id):
         created_by=request.user,
         created_on=datetime.datetime.now(),
         language=language,
+        status=Issue.OPEN,
     )
     new_issue.save()
 
@@ -861,6 +898,7 @@ def save_wrong_word(request, language, recording_id):
         created_by=request.user,
         created_on=datetime.datetime.now(),
         language=language,
+        status=Issue.OPEN,
     )
     new_issue.save()
 
@@ -917,6 +955,8 @@ def approve_user_phrase(request, phrase_id):
 @login_required()
 def record_audio(request, language):
     language = get_language_object(language)
+    transcription = request.GET.get("transcription") or ""
+    translation = request.GET.get("translation") or ""
 
     if request.method == "POST":
         form = RecordNewPhrase(request.POST, request.FILES)
@@ -1005,7 +1045,9 @@ def record_audio(request, language):
         )
         return HttpResponseRedirect(f"/{language.code}/record_audio", context)
     else:
-        form = RecordNewPhrase()
+        form = RecordNewPhrase(
+            {"transcription": transcription, "translation": translation}
+        )
         form.fields["transcription"].label = language.name
 
     context = dict(
@@ -1015,6 +1057,81 @@ def record_audio(request, language):
         language=language,
     )
     return render(request, f"validation/record_audio.html", context)
+
+
+@login_required()
+def record_audio_from_entry(request, language, phrase):
+    language = get_language_object(language)
+    transcription = request.GET.get("transcription")
+    translation = request.GET.get("translation")
+    # phrase = request.GET.get("phrase")
+    print(phrase)
+
+    phrase_object = Phrase.objects.get(id=phrase)
+
+    # form = RecordNewPhrase(request.POST, request.FILES)
+    # translation = request.POST.get("translation")
+    # translation = clean_text(translation)
+    # transcription = request.POST.get("transcription")
+    # transcription = clean_text(transcription)
+    audio_data = request.FILES["audio_data"]
+
+    speaker = Speaker.objects.filter(user=request.user).first()
+    if not speaker:
+        speaker = Speaker(
+            full_name=request.user.first_name + " " + request.user.last_name,
+            code=request.user.username,
+            user=request.user,
+        )
+        speaker.save()
+
+    if language not in speaker.languages.all():
+        # Can only add language after the object exists i.e. is saved
+        speaker.languages.add(language)
+        speaker.save()
+
+    recording_session, created = RecordingSession.get_or_create_by_session_id(
+        SessionID(
+            date=datetime.date.today(),
+            time_of_day=None,
+            subsession=None,
+            location=None,
+        )
+    )
+
+    rec_id = create_new_rec_id(phrase_object, speaker)
+    audio_data.name = rec_id + ".wav"
+    rec = Recording(
+        id=rec_id,
+        compressed_audio=audio_data,
+        speaker=speaker,
+        phrase=phrase_object,
+        timestamp=0,
+        comment=f"Uploaded by user: {request.user}",
+        is_user_submitted=True,
+        session_id=recording_session.id,
+    )
+    rec.save()
+    source = settings.RECVAL_AUDIO_PREFIX + rec_id + ".wav"
+    dest = settings.RECVAL_AUDIO_PREFIX + rec_id + ".m4a"
+    audio_info = mutagen.File(settings.MEDIA_ROOT + "/" + source).info
+    new_length = (
+        audio_info.length - 0.1
+    )  # It takes the average human 0.1 seconds to click down on a button
+    subprocess.check_call(
+        ["ffmpeg", "-i", source, "-ss", "0", "-to", str(new_length), dest],
+        cwd=settings.MEDIA_ROOT,
+    )
+    rec.compressed_audio = dest
+    rec.save()
+
+    save_metadata_to_file(
+        rec_id, request.user, transcription, translation, language.name
+    )
+
+    response = {"status": "ok"}
+    json_response = JsonResponse(response)
+    return add_cors_headers(json_response)
 
 
 def set_language(request, language_code):
@@ -1036,7 +1153,7 @@ def throw_500(request):
 # Small Helper functions
 
 
-def handle_save_issue_with_recording(form, issue, request):
+def handle_save_issue_with_recording(form, issue, request, language):
     rec = Recording.objects.get(id=issue.recording.id)
 
     speaker_code = form.cleaned_data["speaker"]
@@ -1065,10 +1182,10 @@ def handle_save_issue_with_recording(form, issue, request):
 
     issue.status = Issue.RESOLVED
     issue.save()
-    return HttpResponseRedirect("/issues")
+    return HttpResponseRedirect(url("validation:issues", language.code))
 
 
-def handle_save_issue_with_phrase(form, issue, request):
+def handle_save_issue_with_phrase(form, issue, request, language):
     phrase = Phrase.objects.get(id=issue.phrase.id)
 
     transcription = form.cleaned_data["transcription"].strip()
@@ -1090,10 +1207,12 @@ def handle_save_issue_with_phrase(form, issue, request):
 
     issue.status = Issue.RESOLVED
     issue.save()
-    return HttpResponseRedirect("/issues")
+    return HttpResponseRedirect(url("validation:issues", language.code))
 
 
 def encode_query_with_page(query, page):
+    if not query:
+        query = QueryDict("", mutable=True)
     query["page"] = page
     return f"?{query.urlencode()}"
 
@@ -1154,6 +1273,7 @@ def save_issue(data, user):
         target_language_suggestion=target_language_suggestion,
         created_by=user,
         created_on=datetime.datetime.now(),
+        status=Issue.OPEN,
     )
 
     new_issue.save()

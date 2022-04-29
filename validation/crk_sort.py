@@ -3,7 +3,7 @@
 
 def custom_sort(words):
     list_len = len(words)
-    if list_len == 1:
+    if list_len <= 1:
         return words
 
     mid_point = list_len // 2

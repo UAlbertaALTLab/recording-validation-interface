@@ -16,6 +16,7 @@
 #}
 
 {% extends 'validation/_base.html' %}
+{% import 'validation/_macros.html' as macros %}
 
 {% import 'validation/_issue_card.html' as issue_card %}
 
@@ -31,4 +32,7 @@
             </div>
         {% endif %}
     </div>
+    <nav>
+{{ macros.pagination_with_query(issues, 'validation:issues', query, encode_query_with_page) }}
+</nav>
 {% endblock content %}
