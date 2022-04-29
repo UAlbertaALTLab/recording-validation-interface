@@ -237,15 +237,20 @@ class SessionMetadata:
     on Google Sheets.
     """
 
-    def __init__(self, session: SessionID, raw_name: str, mics=Dict[int, str]) -> None:
+    def __init__(
+        self, session: SessionID, raw_name: str, rapid_words, mics=Dict[int, str]
+    ) -> None:
         self.session = session
         self.raw_name = raw_name
         self.mics = mics
+        self.rapid_words = rapid_words
 
     def __getitem__(self, index: int) -> Optional[str]:
         """
         Return the ONE-INDEXED speaker's name.
         """
+        if index == "rapid_words":
+            return self.rapid_words
         if index not in self.mics.keys():
             raise IndexError(f"Invalid mic number: {index}")
         return self.mics.get(index, None)
@@ -255,7 +260,8 @@ class SessionMetadata:
             f"{type(self).__qualname__}("
             f"session={self.session!r}, "
             f"raw_name={self.raw_name!r}, "
-            f"mics={self.mics!r}"
+            f"mics={self.mics!r}, "
+            f"rapid_words={self.rapid_words!r}"
             ")"
         )
 
@@ -285,9 +291,22 @@ class SessionMetadata:
         }
 
         # TODO: parse the elicitation sheets
-        # TODO: parse the rapidwords sesction(s)
+        rapid_words_section = row["Rapidwords Section(s)"].split(",")
+        for i, section in enumerate(rapid_words_section):
+            if "." not in section:
+                try:
+                    numerals = rapid_words_section[i - 1].replace("_", " ").split()[0]
+                    section = numerals + section
+                    rapid_words_section[i] = section
+                except:
+                    print("Could not parse section: ", section)
 
-        return cls(session=session, raw_name=raw_name, mics=mics)
+        return cls(
+            session=session,
+            raw_name=raw_name,
+            rapid_words=rapid_words_section,
+            mics=mics,
+        )
 
 
 class Overrides:

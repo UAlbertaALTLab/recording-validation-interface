@@ -50,13 +50,21 @@
               {% for session in sessions %}
                 <option value="{{ session.id }}">{{ session.id }}</option>
               {% endfor %}
+          </select><br>
+    Choose a semantic class:
+  <select name="semantic_class" id="semantic_class">
+        <option value=""> - </option>
+              {% for section in all_semantic_classes %}
+                <option value="{{ section.classification }}">{{ section.classification }}</option>
+              {% endfor %}
           </select>
+
           <input type="submit" value="Select" class="button button--success button--small">
     </div>
   </form>
 </div>
 
-<p class="description">Showing {{ mode }} entries from {{ session }}</p>
+<p class="description">Showing {{ mode }} entries from {{ session }} {{ semantic_display }}</p>
 
     {%  for phrase in phrases %}
         {{ segment.segment_card(phrase, recordings, speakers, is_linguist, is_expert, auth, forms, csrf_token, request, language) }}
