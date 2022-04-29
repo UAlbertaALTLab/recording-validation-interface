@@ -212,6 +212,10 @@ TSUUTINA_AUDIO_PREFIX = config(
     "TSUUTINA_AUDIO_PREFIX", BASE_DIR / "data" / "tsuutina" / "annotations", cast=Path
 )
 
+RECVAL_SEMANTIC_DIR = config(
+    "RECVAL_SEMANTIC_DIR", BASE_DIR / "private" / "elicitation-sheets", cast=Path
+)
+
 # Where the sessions should be extracted from.
 # Expecting a structure like this:
 #
