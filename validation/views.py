@@ -650,11 +650,17 @@ def view_issues(request, language):
     issues = (
         Issue.objects.filter(status=Issue.OPEN).filter(language=language).order_by("id")
     )
+
+    paginator = Paginator(issues, 10)
+    page_no = request.GET.get("page", 1)
+    paged_issues = paginator.get_page(page_no)
+
     context = dict(
-        issues=issues,
+        issues=paged_issues,
         auth=request.user.is_authenticated,
         is_linguist=user_is_linguist(request.user, language),
         language=language,
+        encode_query_with_page=encode_query_with_page,
     )
     return render(request, "validation/view_issues.html", context)
 
@@ -854,6 +860,7 @@ def save_wrong_speaker_code(request, language, recording_id):
         created_by=request.user,
         created_on=datetime.datetime.now(),
         language=language,
+        status=Issue.OPEN,
     )
     new_issue.save()
 
@@ -890,6 +897,7 @@ def save_wrong_word(request, language, recording_id):
         created_by=request.user,
         created_on=datetime.datetime.now(),
         language=language,
+        status=Issue.OPEN,
     )
     new_issue.save()
 
@@ -1123,6 +1131,8 @@ def handle_save_issue_with_phrase(form, issue, request):
 
 
 def encode_query_with_page(query, page):
+    if not query:
+        query = QueryDict("", mutable=True)
     query["page"] = page
     return f"?{query.urlencode()}"
 
@@ -1183,6 +1193,7 @@ def save_issue(data, user):
         target_language_suggestion=target_language_suggestion,
         created_by=user,
         created_on=datetime.datetime.now(),
+        status=Issue.OPEN,
     )
 
     new_issue.save()
