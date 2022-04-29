@@ -1,5 +1,14 @@
 "use strict";
 
+// Vars for recording from an entry
+let gumStream;      // stream from getUserMedia()
+let rec;            // Recorder.js object
+let input;          // MediaStreamAudioSourceNode
+let recordButtons = document.getElementsByClassName(`recordButton`);
+const audioContext = new AudioContext();
+let lang;
+
+
 document.addEventListener('DOMContentLoaded', () => {
     for (let judgement of ["yes", "no", "idk"]) {
         for (let button of document.querySelectorAll(`.translation-judgement-accuracy-${judgement}`)) {
