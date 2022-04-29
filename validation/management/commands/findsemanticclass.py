@@ -9,6 +9,7 @@ from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand
 from django.db.models import Q
 from pydub import AudioSegment
+from tqdm import tqdm
 
 from librecval.extract_auto import SynthesizedRecordingExtractor
 from librecval.extract_pfn import PfnRecordingExtractor
@@ -33,7 +34,7 @@ class Command(BaseCommand):
         filepath = Path(settings.RECVAL_SEMANTIC_DIR)
 
         data = {}
-        for filename in filepath.iterdir():
+        for filename in tqdm(filepath.iterdir()):
             if filename.suffix == ".txt":
                 with open(filename) as f:
                     lines = f.readlines()
@@ -100,7 +101,7 @@ class Command(BaseCommand):
                                 data[rapid_words_class] = []
                             data[rapid_words_class].extend([p for p in phrases if p])
 
-        for _class in data:
+        for _class in tqdm(data):
             semantic_class, created = SemanticClass.objects.get_or_create(
                 source=SemanticClass.ELICIT,
                 origin=SemanticClass.RW,
