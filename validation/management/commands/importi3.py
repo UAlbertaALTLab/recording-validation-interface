@@ -20,6 +20,7 @@ from validation.models import (
     Phrase,
     Recording,
     LanguageVariant,
+    SemanticClass,
 )
 
 
@@ -60,8 +61,8 @@ class Command(BaseCommand):
 
         for segment in recording_extractor.scan(sessions_dir):
             rec_id = segment.compute_sha256hash()
-            if Recording.objects.filter(id=rec_id).exists():
-                continue
+            # if Recording.objects.filter(id=rec_id).exists():
+            #     continue
 
             session, session_created = RecordingSession.get_or_create_by_session_id(
                 segment.session
@@ -87,6 +88,17 @@ class Command(BaseCommand):
                 origin=Phrase.I3,
                 language=language,
             )
+
+            semantic_class, semantic_created = SemanticClass.objects.get_or_create(
+                classification=segment.semantic,
+                source=SemanticClass.META,
+                origin=SemanticClass.O,
+            )
+
+            phrase.semantic_class.add(semantic_class)
+            phrase.save()
+            if semantic_created:
+                print("Added semantic class", semantic_class)
 
             recording_path = save_recording(self.audio_dir, segment, segment.audio)
             audio_data = recording_path.read_bytes()
