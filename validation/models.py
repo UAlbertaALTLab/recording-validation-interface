@@ -177,6 +177,7 @@ class Phrase(models.Model):
     ONESPOT_SAPIR = "OS"
     TVPD = "TVPD"
     PFN = "PFN"
+    I3 = "I3"
     AUTO = "AUTO"
     NEW_WORD = "new"
     ORIGIN_CHOICES = (
@@ -184,6 +185,7 @@ class Phrase(models.Model):
         (ONESPOT_SAPIR, "Onespot-Sapir Dictionary"),
         (TVPD, "Tsuut'ina Verb Phrase Dictionary"),
         (PFN, "Paul First Nation"),
+        (I3, "Îethka Îabi Institude"),
         (AUTO, "Auto-synthesized speech"),
         (NEW_WORD, "New word"),
     )

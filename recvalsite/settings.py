@@ -237,6 +237,11 @@ TVPD_SESSIONS_DIR = config(
 
 PFN_AUDIO_DIR = config("PFN_AUDIO_DIR", BASE_DIR / "data" / "pfn-audio", cast=Path)
 
+I3_AUDIO_DIR = config("I3_AUDIO_DIR", BASE_DIR / "data" / "i3-audio", cast=Path)
+I3_METADATA_PATH = config(
+    "I3_METADATA_PATH", BASE_DIR / "private" / "i3-metadata.csv", cast=Path
+)
+
 
 OKIMASIS_AUDIO_DIR = config(
     "OKIMASIS_AUDIO_DIR", BASE_DIR / "data" / "okimasis-recordings", cast=Path
