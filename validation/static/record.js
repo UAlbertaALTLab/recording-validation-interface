@@ -2,15 +2,10 @@
 
 // referencing: https://blog.addpipe.com/using-recorder-js-to-capture-wav-audio-in-your-html5-web-site/
 
-let gumStream;      // stream from getUserMedia()
-let rec;            // Recorder.js object
-let input;          // MediaStreamAudioSourceNode
-const audioContext = new AudioContext();
-let recordButton = document.getElementById("recordButton");
 let stopButton = document.getElementById("stopButton");
 let recordingsList = document.getElementById("recordingsList");
 let recNewEntryButton = document.getElementById("recNewEntryButton");
-const lang = document.getElementById("language-span").dataset.lang
+lang = document.getElementById("language-span").dataset.lang
 
 recordButton.addEventListener("click", startRecording)
 stopButton.addEventListener("click", stopRecording)
