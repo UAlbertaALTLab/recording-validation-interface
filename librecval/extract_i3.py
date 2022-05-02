@@ -24,6 +24,7 @@ class Segment(NamedTuple):
     fixed_transcription: str
     type: str
     speaker: str
+    semantic: str
     quality: GoodBadUnknown
     session: SessionID
     audio: AudioSegment
@@ -97,6 +98,7 @@ class I3RecordingExtractor:
                 audio=audio,
                 type=_type,
                 speaker=speaker,
+                semantic=semantic_class,
             )
 
             yield s
