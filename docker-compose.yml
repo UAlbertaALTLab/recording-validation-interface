@@ -19,4 +19,5 @@ services:
         - "/data/application-data/speech-db/elicitation-sheets:/app/private/elicitation-sheets"
         - "/data/application-data/speech-db/synth-speech:/app/data/synth-speech"
         - "/data/application-data/speech-db/okimasis-recordings:/app/data/okimasis-recordings"
+        - "/data/application-data/speech-db/i3-audio:/app/data/i3-audio"
         - "/data/application-data/speech-db/okimasis-bios:/app/data/okimasis-bios"
