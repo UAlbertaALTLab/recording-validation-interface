@@ -1048,7 +1048,7 @@ def record_audio(request, language):
         form = RecordNewPhrase(
             {"transcription": transcription, "translation": translation}
         )
-        form.fields["transcription"].label = language.name
+        form.fields["transcription"].label = language.endonym
 
     context = dict(
         form=form,
@@ -1338,8 +1338,8 @@ def save_metadata_to_file(rec_id, user, transcription, translation, language):
 
 def clean_text(text):
     ret = text.strip()
-    ret = ret.replace("\n", "")
-    ret = ret.replace("\t", "")
+    ret = ret.replace("\\n", "")
+    ret = ret.replace("\\t", "")
     return ret
 
 

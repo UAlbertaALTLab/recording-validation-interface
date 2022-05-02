@@ -192,7 +192,7 @@ class RecordNewPhrase(forms.ModelForm):
         widget=forms.Textarea(attrs={"class": "form-control issue__textarea"}),
     )
 
-    file = forms.FileField(widget=forms.HiddenInput())
+    file = forms.FileField(widget=forms.HiddenInput(), required=False)
 
     class Meta:
         model = Recording
