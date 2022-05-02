@@ -1048,7 +1048,7 @@ def record_audio(request, language):
         form = RecordNewPhrase(
             {"transcription": transcription, "translation": translation}
         )
-        form.fields["transcription"].label = language.name
+        form.fields["transcription"].label = language.endonym
 
     context = dict(
         form=form,
