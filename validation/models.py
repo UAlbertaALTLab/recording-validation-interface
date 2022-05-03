@@ -577,7 +577,7 @@ class Recording(models.Model):
     )
 
     was_user_submitted = models.BooleanField(
-        help_text="This recording was submitted online by a user, but is now approved",
+        help_text="This recording was submitted online by a user, but is now approved for use",
         default=False,
         blank=True,
     )
