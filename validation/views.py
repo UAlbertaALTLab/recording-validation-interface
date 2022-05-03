@@ -553,10 +553,12 @@ def segment_content_view(request, language, segment_id):
                 form.cleaned_data["translation"].strip() or og_phrase.translation
             )
             analysis = form.cleaned_data["analysis"].strip() or og_phrase.analysis
+            comment = form.cleaned_data["comment"].strip() or og_phrase.comment
             p = Phrase.objects.get(id=phrase_id, language=language_object)
             p.transcription = transcription
             p.translation = translation
             p.analysis = analysis
+            p.comment = comment
             p.validated = True
             p.modifier = str(request.user)
             p.date = datetime.datetime.now()
@@ -576,6 +578,7 @@ def segment_content_view(request, language, segment_id):
             "source_language": phrase.transcription,
             "translation": phrase.translation,
             "analysis": phrase.analysis,
+            "comment": phrase.comment,
         }
     )
 
