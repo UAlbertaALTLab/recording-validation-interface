@@ -154,7 +154,6 @@ def entries(request, language):
             all_phrases = all_phrases.filter(semantic_class__classification=semantic)
 
         if language in ["maskwacis", "moswacihk"]:
-            print(len(all_phrases))
             all_phrases = custom_sort(all_phrases)
         else:
             all_phrases = all_phrases.order_by("transcription")
