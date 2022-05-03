@@ -14,7 +14,7 @@
     }
 
     function goBack() {
-        window.history.back()
+        window.location = document.referrer;
     }
 
 
@@ -27,7 +27,7 @@
     <div class="table-responsive">
 
         <div>
-            <button class="button button--success button--back">Back</button>
+            <button class="button button--success button--back" onclick="goBack()">Back</button>
         </div>
         {% if history|length > 0 %}
             <p>This entry was last edited by {{ history[0].modifier }} on
