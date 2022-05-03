@@ -14,7 +14,7 @@
     }
 
     function goBack() {
-        window.history.back()
+        window.location = document.referrer;
     }
 
 
@@ -27,7 +27,7 @@
     <div class="table-responsive">
 
         <div>
-            <button class="button button--success button--back">Back</button>
+            <button class="button button--success button--back" onclick="goBack()">Back</button>
         </div>
         {% if history|length > 0 %}
             <p>This entry was last edited by {{ history[0].modifier }} on
@@ -40,6 +40,7 @@
                 <th scope="col"> Transcription</th>
                 <th scope="col"> Translation</th>
                 <th scope="col"> Analysis</th>
+                <th scope="col"> Comments</th>
                 <th scope="col"> Recordings</th>
                 <th scope="col">Speaker</th>
             </tr>
@@ -48,6 +49,7 @@
                 {{ macros.td_transcription(user, phrase) }}
                 {{ macros.td_translation(user, phrase) }}
                 {{ macros.td_analysis(user, phrase) }}
+                <td>{{ phrase.comment }}</td>
                 <td>
                     <ul class="list__recording">
                         {% for recording in phrase.recordings %}
@@ -75,61 +77,63 @@
             {% include 'validation/segment_edit.html' %}
         </div>
 
-        <table id="suggestions-table" class="table table-striped">
-            <thead>
-            <tr>
-                <th scope="col"> Suggestion</th>
-                <th scope="col"> MED</th>
-                <th scope="col"> Translation</th>
-                <th scope="col"> Analysis</th>
-                <th scope="col"> Source</th>
-                {% if auth %}
-                    <th scope="col"> Options</th>
-                {% endif %}
-            </tr>
-            </thead>
-            {% for suggestion in suggestions %}
+        {% if language.code == "maskwacis" or language.code == "moswacihk" %}
+            <table id="suggestions-table" class="table table-striped">
+                <thead>
                 <tr>
-                    {{ macros.td_suggestion_transcription(user, suggestion, suggestions) }}
-                    {{ macros.td_suggestion_med(user, suggestion, suggestions) }}
-                    {% if suggestions[suggestion]['len'] > 1 %}
-                        <td>Multiple Translations</td>
-                        <td>Multiple Analyses</td>
-                        <td></td>
-                        <td></td>
-                    {% else %}
-                        {{ macros.td_suggestion_translation(user, suggestion, suggestions) }}
-                        {{ macros.td_suggestion_analysis(user, suggestion, suggestions) }}
-                        {{ macros.td_suggestion_source(user, suggestion, suggestions) }}
-                        {% if auth %}
-                            <td>
-                                {% if suggestions[suggestion]["matches"]|length > 0 %}
-                                    {% set analysis = suggestions[suggestion]["matches"][0]["analysis"] %}
-                                    <input type="button" class="button button--success" value="Accept"
-                                           onclick="showDivAccept('{{ suggestion }}', '{{ analysis }}')"/>
-                                {% endif %}
-                            </td>
-                        {% endif %}
+                    <th scope="col"> Suggestion</th>
+                    <th scope="col"> MED</th>
+                    <th scope="col"> Translation</th>
+                    <th scope="col"> Analysis</th>
+                    <th scope="col"> Source</th>
+                    {% if auth %}
+                        <th scope="col"> Options</th>
                     {% endif %}
                 </tr>
-                {% if suggestions[suggestion]['len'] > 1 %}
-                    {% for match in suggestions[suggestion]['matches'] %}
-                        <tr>
-                            <td>{{ match['translation'] }}</td>
-                            <td>{{ match['analysis'] }}</td>
-                            <td>{{ match['source'] }}</td>
+                </thead>
+                {% for suggestion in suggestions %}
+                    <tr>
+                        {{ macros.td_suggestion_transcription(user, suggestion, suggestions) }}
+                        {{ macros.td_suggestion_med(user, suggestion, suggestions) }}
+                        {% if suggestions[suggestion]['len'] > 1 %}
+                            <td>Multiple Translations</td>
+                            <td>Multiple Analyses</td>
+                            <td></td>
+                            <td></td>
+                        {% else %}
+                            {{ macros.td_suggestion_translation(user, suggestion, suggestions) }}
+                            {{ macros.td_suggestion_analysis(user, suggestion, suggestions) }}
+                            {{ macros.td_suggestion_source(user, suggestion, suggestions) }}
                             {% if auth %}
                                 <td>
-                                    {% set analysis = match["analysis"] %}
-                                    <input type="button" class="button button--success" value="Accept"
-                                           onclick="showDivAccept('{{ suggestion }}', '{{ analysis }}')"/>
+                                    {% if suggestions[suggestion]["matches"]|length > 0 %}
+                                        {% set analysis = suggestions[suggestion]["matches"][0]["analysis"] %}
+                                        <input type="button" class="button button--success" value="Accept"
+                                               onclick="showDivAccept('{{ suggestion }}', '{{ analysis }}')"/>
+                                    {% endif %}
                                 </td>
-                                </tr>
                             {% endif %}
-                    {% endfor %}
-                {% endif %}
-            {% endfor %}{# for suggestion in suggestions #}
-        </table>
+                        {% endif %}
+                    </tr>
+                    {% if suggestions[suggestion]['len'] > 1 %}
+                        {% for match in suggestions[suggestion]['matches'] %}
+                            <tr>
+                                <td>{{ match['translation'] }}</td>
+                                <td>{{ match['analysis'] }}</td>
+                                <td>{{ match['source'] }}</td>
+                                {% if auth %}
+                                    <td>
+                                        {% set analysis = match["analysis"] %}
+                                        <input type="button" class="button button--success" value="Accept"
+                                               onclick="showDivAccept('{{ suggestion }}', '{{ analysis }}')"/>
+                                    </td>
+                                    </tr>
+                                {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}{# for suggestion in suggestions #}
+            </table>
+        {% endif %}
         <h4>Revision History:</h4>
         <table id="revision-table" class="table table-striped">
             <thead>

@@ -104,6 +104,10 @@ class EditSegment(forms.Form):
     )
     analysis = forms.CharField(
         required=False,
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+    )
+    comment = forms.CharField(
+        required=False,
         widget=forms.TextInput(attrs={"class": "form-control bottom-margin"}),
     )
 
