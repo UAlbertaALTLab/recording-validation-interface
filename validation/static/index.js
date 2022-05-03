@@ -1,5 +1,14 @@
 "use strict";
 
+// Vars for recording from an entry
+let gumStream;      // stream from getUserMedia()
+let rec;            // Recorder.js object
+let input;          // MediaStreamAudioSourceNode
+let recordButtons = document.getElementsByClassName(`recordButton`);
+const audioContext = new AudioContext();
+let lang;
+
+
 document.addEventListener('DOMContentLoaded', () => {
     for (let judgement of ["yes", "no", "idk"]) {
         for (let button of document.querySelectorAll(`.translation-judgement-accuracy-${judgement}`)) {
@@ -135,6 +144,29 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 e.target.innerHTML = "&#9734;";
             }
+        })
+    }
+
+    for (let button of document.querySelectorAll(`[data-cy="approve-button"]`)) {
+        button.addEventListener("click", async (e) => {
+            const phraseId = e.target.dataset.phraseId;
+
+            const response = await fetch(`/api/approve_user_phrase/${phraseId}`, {
+                method: 'POST',
+                mode: 'same-origin',    // Do not send CSRF token to another domain.
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify({phraseId})
+            });
+
+            let r = await response.json();
+
+            if (r.status !== 'ok') {
+                return
+            }
+            e.target.innerHTML = "Approved"
         })
     }
 })

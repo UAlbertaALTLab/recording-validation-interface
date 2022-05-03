@@ -89,6 +89,58 @@ class LanguageVariant(models.Model):
         return self.name
 
 
+class SemanticClass(models.Model):
+    """
+    A semantic class, typically from WordNet or RapidWords that describes a phrase
+    """
+
+    MAX_TRANSCRIPTION_LENGTH = 256
+
+    META = "metadata"
+    MANUAL = "manual classification"
+    ELICIT = "elicitation sheet"
+    SOURCE_CHOICES = (
+        (META, "Metadata"),
+        (MANUAL, "Manual Classification"),
+        (ELICIT, "Elicitation Sheet"),
+    )
+
+    # Origin values
+    RW = "rapidwords"
+    WN = "wordnet"
+    O = "other"
+
+    ORIGIN_CHOICES = (
+        (RW, "RapidWords"),
+        (WN, "WordNet"),
+        (O, "Other"),
+    )
+
+    source = models.CharField(
+        help_text="How did we determine this class?",
+        blank=True,
+        **arguments_for_choices(SOURCE_CHOICES),
+    )
+
+    origin = models.CharField(
+        help_text="Where did this class come from?",
+        blank=True,
+        **arguments_for_choices(ORIGIN_CHOICES),
+    )
+
+    classification = models.CharField(
+        help_text="The classification for this semantic class",
+        blank=True,
+        max_length=256,
+    )
+
+    # Keep track of Phrases' history, so we can review, revert, and inspect them.
+    history = HistoricalRecords()
+
+    def __str__(self) -> str:
+        return self.classification
+
+
 class Phrase(models.Model):
     """
     A recorded phrase. A phrase may either be a word or a sentence with at
@@ -125,6 +177,7 @@ class Phrase(models.Model):
     ONESPOT_SAPIR = "OS"
     TVPD = "TVPD"
     PFN = "PFN"
+    I3 = "I3"
     AUTO = "AUTO"
     NEW_WORD = "new"
     ORIGIN_CHOICES = (
@@ -132,6 +185,7 @@ class Phrase(models.Model):
         (ONESPOT_SAPIR, "Onespot-Sapir Dictionary"),
         (TVPD, "Tsuut'ina Verb Phrase Dictionary"),
         (PFN, "Paul First Nation"),
+        (I3, "Îethka Îabi Institude"),
         (AUTO, "Auto-synthesized speech"),
         (NEW_WORD, "New word"),
     )
@@ -168,6 +222,8 @@ class Phrase(models.Model):
         on_delete=models.PROTECT,
         null=True,
     )
+
+    semantic_class = models.ManyToManyField(SemanticClass, blank=True)
 
     status = models.CharField(
         help_text="Status in the validation process",
@@ -213,6 +269,12 @@ class Phrase(models.Model):
         help_text="The person who added or modified the phrase",
         default="AUTO",
         max_length=64,
+    )
+
+    comment = models.CharField(
+        help_text="Comments about the phrase",
+        blank=True,
+        max_length=2048,
     )
 
     # Keep track of Phrases' history, so we can review, revert, and inspect them.
@@ -342,9 +404,6 @@ class Speaker(models.Model):
         """
         # XXX: For now, all speakers are NOT anonymous.
         return False
-
-    # TODO: add field for speaker bio (en)
-    # TODO: add field for speaker bio (crk)
 
     def clean(self):
         self.code = self.code.strip().upper()
@@ -518,8 +577,9 @@ class Recording(models.Model):
     )
 
     was_user_submitted = models.BooleanField(
-        help_text="This recording was submitted by a user, but is now approved for use",
+        help_text="This recording was submitted online by a user, but is now approved for use",
         default=False,
+        blank=True,
     )
 
     # Keep track of the recording's history.

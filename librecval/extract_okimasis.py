@@ -112,6 +112,12 @@ class OkimasisRecordingExtractor:
 
                 yield s
 
+    def scan_mp3(self, sessions_dir):
+        sessions_dir = Path(sessions_dir)
+        audio_files = list(sessions_dir.glob("*.mp3"))
+        for audio_file in audio_files:
+            print(audio_file.name)
+
 
 def get_session_from_mtime(mtime):
     mod_time = time.strftime("%Y-%m-%d", time.localtime(mtime))

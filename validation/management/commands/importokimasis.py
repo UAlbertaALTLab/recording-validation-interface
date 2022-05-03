@@ -54,49 +54,50 @@ class Command(BaseCommand):
         # Store transcoded audio in a temp directory;
         # these files will be then handled by the currently configured storage backend.
         recording_extractor = OkimasisRecordingExtractor()
-        for segment in recording_extractor.scan(sessions_dir):
-            rec_id = segment.compute_sha256hash()
-            if Recording.objects.filter(id=rec_id).exists():
-                continue
-
-            session, session_created = RecordingSession.get_or_create_by_session_id(
-                segment.session
-            )
-
-            language, language_created = LanguageVariant.objects.get_or_create(
-                code="moswacihk"
-            )
-
-            speaker, speaker_created = Speaker.objects.get_or_create(
-                code=segment.speaker
-            )
-            speaker.languages.add(language)
-            speaker.save()
-
-            phrase, phrase_created = Phrase.objects.get_or_create(
-                field_transcription=segment.transcription,
-                transcription=segment.fixed_transcription or segment.transcription,
-                translation=segment.translation,
-                kind=segment.type,
-                origin=Phrase.NEW,
-                language=language,
-            )
-
-            recording_path = save_recording(self.audio_dir, segment, segment.audio)
-            audio_data = recording_path.read_bytes()
-            django_file = ContentFile(audio_data, name=recording_path.name)
-
-            recording = Recording(
-                id=rec_id,
-                compressed_audio=django_file,
-                speaker=speaker,
-                timestamp=0,
-                phrase=phrase,
-                session=session,
-                quality=segment.quality,
-            )
-            recording.clean()
-            recording.save()
+        recording_extractor.scan_mp3(sessions_dir)
+        # for segment in recording_extractor.scan(sessions_dir):
+        #     rec_id = segment.compute_sha256hash()
+        #     if Recording.objects.filter(id=rec_id).exists():
+        #         continue
+        #
+        #     session, session_created = RecordingSession.get_or_create_by_session_id(
+        #         segment.session
+        #     )
+        #
+        #     language, language_created = LanguageVariant.objects.get_or_create(
+        #         code="moswacihk"
+        #     )
+        #
+        #     speaker, speaker_created = Speaker.objects.get_or_create(
+        #         code=segment.speaker
+        #     )
+        #     speaker.languages.add(language)
+        #     speaker.save()
+        #
+        #     phrase, phrase_created = Phrase.objects.get_or_create(
+        #         field_transcription=segment.transcription,
+        #         transcription=segment.fixed_transcription or segment.transcription,
+        #         translation=segment.translation,
+        #         kind=segment.type,
+        #         origin=Phrase.NEW,
+        #         language=language,
+        #     )
+        #
+        #     recording_path = save_recording(self.audio_dir, segment, segment.audio)
+        #     audio_data = recording_path.read_bytes()
+        #     django_file = ContentFile(audio_data, name=recording_path.name)
+        #
+        #     recording = Recording(
+        #         id=rec_id,
+        #         compressed_audio=django_file,
+        #         speaker=speaker,
+        #         timestamp=0,
+        #         phrase=phrase,
+        #         session=session,
+        #         quality=segment.quality,
+        #     )
+        #     recording.clean()
+        #     recording.save()
 
 
 def save_recording(

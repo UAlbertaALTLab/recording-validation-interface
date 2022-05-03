@@ -80,6 +80,11 @@ urlpatterns = [
     path("<str:language>/speakers/", views.all_speakers, name="all_speakers"),
     path("<str:language>/record_audio", views.record_audio, name="record_audio"),
     path(
+        "<str:language>/record_audio_from_entry/<str:phrase>",
+        views.record_audio_from_entry,
+        name="record_audio_from_entry",
+    ),
+    path(
         "api/record_translation_judgement/<int:phrase_id>",
         views.record_translation_judgement,
         name="record_translation_judgement",
@@ -93,6 +98,11 @@ urlpatterns = [
         "api/record_audio_is_best/<str:recording_id>",
         views.record_audio_is_best,
         name="record_audio_is_best",
+    ),
+    path(
+        "api/approve_user_phrase/<str:phrase_id>",
+        views.approve_user_phrase,
+        name="approve_user_phrase",
     ),
     path(
         "<str:language>/api/save_wrong_speaker_code/<str:recording_id>",

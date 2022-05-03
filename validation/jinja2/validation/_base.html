@@ -13,9 +13,9 @@
 <script>
 const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 </script>
-      <script src="{{ static('index.js') }}"></script>
-      <script src="{{ static('menu.js') }}"></script>
-      <script src="{{ static('nav.js') }}"></script>
+      <script type="application/javascript" src="{{ static('index.js') }}"></script>
+      <script type="application/javascript" src="{{ static('menu.js') }}"></script>
+      <script type="application/javascript" src="{{ static('nav.js') }}"></script>
       <title>{% block title %}
           {% if auth %}
               {{ language.name if language != None else "" }} Speech DB

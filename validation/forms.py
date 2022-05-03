@@ -104,6 +104,10 @@ class EditSegment(forms.Form):
     )
     analysis = forms.CharField(
         required=False,
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+    )
+    comment = forms.CharField(
+        required=False,
         widget=forms.TextInput(attrs={"class": "form-control bottom-margin"}),
     )
 
@@ -192,7 +196,7 @@ class RecordNewPhrase(forms.ModelForm):
         widget=forms.Textarea(attrs={"class": "form-control issue__textarea"}),
     )
 
-    file = forms.FileField(widget=forms.HiddenInput())
+    file = forms.FileField(widget=forms.HiddenInput(), required=False)
 
     class Meta:
         model = Recording

@@ -1,0 +1,16 @@
+{% macro record_new_entry(transcription, translation, phrase, language) %}
+    <div>
+        <div id="controls" class="space">
+            <button id="recordButton-{{ phrase.id }}" class="button button--success recordButton"
+                    data-phrase="{{ phrase.id }}">Record
+            </button>
+            <button id="stopButton-{{ phrase.id }}" class="button button--fail stopButton" disabled>Stop</button>
+        </div>
+        <h5>Recordings</h5>
+        <span id="language-span" data-lang="{{ language.code }}"></span>
+        <span id="translation-span-{{ phrase.id }}" data-translation="{{ translation }}"></span>
+        <span id="transcription-span-{{ phrase.id }}" data-transcription="{{ transcription }}"></span>
+        <span id="phrase-span-{{ phrase.id }}" data-phrase="{{ phrase.id }}"></span>
+        <ol id="recordingsList-{{ phrase.id }}"></ol>
+    </div>
+{% endmacro %}
