@@ -271,6 +271,12 @@ class Phrase(models.Model):
         max_length=64,
     )
 
+    comment = models.CharField(
+        help_text="Comments about the phrase",
+        blank=True,
+        max_length=2048,
+    )
+
     # Keep track of Phrases' history, so we can review, revert, and inspect them.
     history = HistoricalRecords()
 

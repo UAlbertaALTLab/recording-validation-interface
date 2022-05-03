@@ -40,6 +40,7 @@
                 <th scope="col"> Transcription</th>
                 <th scope="col"> Translation</th>
                 <th scope="col"> Analysis</th>
+                <th scope="col"> Comments</th>
                 <th scope="col"> Recordings</th>
                 <th scope="col">Speaker</th>
             </tr>
@@ -48,6 +49,7 @@
                 {{ macros.td_transcription(user, phrase) }}
                 {{ macros.td_translation(user, phrase) }}
                 {{ macros.td_analysis(user, phrase) }}
+                <td>{{ phrase.comment }}</td>
                 <td>
                     <ul class="list__recording">
                         {% for recording in phrase.recordings %}
