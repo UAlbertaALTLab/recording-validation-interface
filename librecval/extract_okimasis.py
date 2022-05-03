@@ -177,8 +177,3 @@ def get_transcription_and_type_from_timestamp(eaf_file, start):
     else:
         transcription = transcription[0][2]
     return transcription, Phrase.WORD
-
-
-def get_session_from_mtime(mtime):
-    mod_time = time.strftime("%Y-%m-%d", time.localtime(mtime))
-    return datetime.strptime(mod_time, "%Y-%m-%d")
