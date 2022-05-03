@@ -15,7 +15,7 @@ from pydub import AudioSegment  # type: ignore
 from pympi.Elan import Eaf  # type: ignore
 
 from librecval.recording_session import SessionID
-from validation.models import Phrase
+from validation.models import Phrase, Recording
 
 WordOrSentence = Literal["word", "sentence"]
 
@@ -116,7 +116,35 @@ class OkimasisRecordingExtractor:
         sessions_dir = Path(sessions_dir)
         audio_files = list(sessions_dir.glob("*.mp3"))
         for audio_file in audio_files:
-            print(audio_file.name)
+            word = Path(audio_file).stem
+
+            session = get_session_from_mtime(os.path.getmtime(audio_file))
+            session_id = SessionID(
+                date=datetime.date(session),
+                time_of_day=None,
+                subsession=None,
+                location=None,
+            )
+
+            audio = AudioSegment.from_file(fspath(audio_file))
+            audio = audio.set_channels(1)
+
+            s = Segment(
+                id="",
+                translation="",
+                transcription=word,
+                fixed_transcription=word,
+                start=0,
+                stop=0,
+                comment="",
+                quality=Recording.UNKNOWN,
+                session=session_id,
+                audio=audio,
+                type=Phrase.WORD,
+                speaker="OKI",
+            )
+
+            yield s
 
 
 def get_session_from_mtime(mtime):
@@ -149,3 +177,8 @@ def get_transcription_and_type_from_timestamp(eaf_file, start):
     else:
         transcription = transcription[0][2]
     return transcription, Phrase.WORD
+
+
+def get_session_from_mtime(mtime):
+    mod_time = time.strftime("%Y-%m-%d", time.localtime(mtime))
+    return datetime.strptime(mod_time, "%Y-%m-%d")
