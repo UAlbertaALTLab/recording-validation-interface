@@ -29,6 +29,9 @@
     {%  for phrase in phrases %}
         {{ segment.segment_card(phrase, recordings, speakers, is_linguist, is_expert, auth, forms, csrf_token, request, language) }}
     {% endfor %} {# phrase in phrases #}
+    <script type="module"
+            src="https://cdn.jsdelivr.net/gh/mattdiamond/Recorderjs@08e7abd99739be6946f19f6806ccb368138f2dd3/dist/recorder.js"></script>
+    <script type="application/javascript" src="{{ static('recordFromEntry.js') }}"></script>
 
     <nav>
       {{ macros.pagination_with_query(phrases, 'validation:search_phrases', query, encode_query_with_page) }}
