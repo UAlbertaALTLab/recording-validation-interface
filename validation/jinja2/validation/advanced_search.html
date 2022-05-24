@@ -51,6 +51,14 @@
     <input type="radio" id="sentence" name="kind" value="sentence">
     <label for="sentence">Sentence</label> <br>
 
+    Semantic class:
+    <select name="semantic_class" id="semantic_class">
+        <option value=""> - </option>
+              {% for section in semantic_classes %}
+                <option value="{{ section.classification }}">{{ section.classification }}</option>
+              {% endfor %}
+          </select><br>
+
     Speaker:
     <input type="checkbox" id="all_speakers" name="speaker-options" value="all">
     <label for="all_spakers">All</label><br>
