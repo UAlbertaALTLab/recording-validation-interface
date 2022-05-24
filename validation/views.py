@@ -320,6 +320,7 @@ def advanced_search_results(request, language):
     translation = request.GET.get("translation").strip()
     exact = request.GET.get("exact")
     analysis = request.GET.get("analysis")
+    lemma = request.GET.get("lemma").strip()
     kind = request.GET.get("kind")
     status = request.GET.get("status")
     semantic = request.GET.get("semantic_class")
@@ -349,6 +350,8 @@ def advanced_search_results(request, language):
         filter_query.append(Q(translation__contains=translation))
     if analysis:
         filter_query.append(Q(analysis__contains=analysis))
+    if lemma:
+        filter_query.append(Q(analysis__contains=lemma))
     if status and status != "all":
         filter_query.append(Q(status=status))
     if semantic:
