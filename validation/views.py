@@ -310,8 +310,9 @@ def advanced_search_results(request, language):
     is_linguist = user_is_linguist(request.user, language)
     is_expert = user_is_expert(request.user, language)
 
-    transcription = request.GET.get("transcription")
-    translation = request.GET.get("translation")
+    transcription = request.GET.get("transcription").strip()
+    translation = request.GET.get("translation").strip()
+    exact = request.GET.get("exact")
     analysis = request.GET.get("analysis")
     kind = request.GET.get("kind")
     status = request.GET.get("status")
@@ -330,10 +331,13 @@ def advanced_search_results(request, language):
 
     filter_query = []
     if transcription:
-        filter_query.append(
-            Q(fuzzy_transcription__contains=to_indexable_form(transcription))
-        )
-        filter_query.append(Q(transcription__contains=transcription))
+        if exact == "exact":
+            filter_query.append(Q(transcription=transcription))
+        else:
+            filter_query.append(
+                Q(fuzzy_transcription__contains=to_indexable_form(transcription))
+            )
+            filter_query.append(Q(transcription__contains=transcription))
     if translation:
         filter_query.append(Q(translation__contains=translation))
     if analysis:
