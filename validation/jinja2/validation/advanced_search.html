@@ -9,12 +9,16 @@
 <form method="GET" action="{{
     url('validation:advanced_search_results', language.code)
   }}">
-    {{ language.name }} phrase:
+    {{ language.endonym }} phrase:
     <input class="form-control mr-sm-2" name="transcription" type="search" placeholder="Search" aria-label="Search"><br>
     English phrase:
     <input class="form-control mr-sm-2" name="translation" type="search" placeholder="Search" aria-label="Search"><br>
     Analysis:
     <input class="form-control mr-sm-2" name="analysis" type="search" placeholder="Search" aria-label="Search"><br>
+    Lemma:
+    <input class="form-control mr-sm-2" name="lemma" type="search" placeholder="Search" aria-label="Search"><br>
+
+    <input type="checkbox" id="exact" name="exact" value="exact"> Exact match <br >
 
     Status:
     <input type="radio" id="all" name="status" value="all" checked>
@@ -48,6 +52,14 @@
     <label for="word">Word</label>
     <input type="radio" id="sentence" name="kind" value="sentence">
     <label for="sentence">Sentence</label> <br>
+
+    Semantic class:
+    <select name="semantic_class" id="semantic_class">
+        <option value=""> - </option>
+              {% for section in semantic_classes %}
+                <option value="{{ section.classification }}">{{ section.classification }}</option>
+              {% endfor %}
+          </select><br>
 
     Speaker:
     <input type="checkbox" id="all_speakers" name="speaker-options" value="all">
