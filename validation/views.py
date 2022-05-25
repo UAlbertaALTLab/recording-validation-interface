@@ -287,12 +287,18 @@ def advanced_search(request, language):
     language_object = get_language_object(language)
     speakers = language_object.speaker_set.all()
     speakers = [speaker.code for speaker in speakers]
+    semantic_classes = (
+        SemanticClass.objects.filter(phrase__language=language_object)
+        .distinct()
+        .order_by("classification")
+    )
 
     context = dict(
         speakers=speakers,
         auth=request.user.is_authenticated,
         is_linguist=user_is_linguist(request.user, language),
         language=language_object,
+        semantic_classes=semantic_classes,
     )
     return render(request, "validation/advanced_search.html", context)
 
@@ -310,11 +316,14 @@ def advanced_search_results(request, language):
     is_linguist = user_is_linguist(request.user, language)
     is_expert = user_is_expert(request.user, language)
 
-    transcription = request.GET.get("transcription")
-    translation = request.GET.get("translation")
+    transcription = request.GET.get("transcription").strip()
+    translation = request.GET.get("translation").strip()
+    exact = request.GET.get("exact")
     analysis = request.GET.get("analysis")
+    lemma = request.GET.get("lemma").strip()
     kind = request.GET.get("kind")
     status = request.GET.get("status")
+    semantic = request.GET.get("semantic_class")
     speakers = request.GET.getlist("speaker-options")
     quality = request.GET.get("quality")
     language_object = get_language_object(language)
@@ -330,16 +339,24 @@ def advanced_search_results(request, language):
 
     filter_query = []
     if transcription:
-        filter_query.append(
-            Q(fuzzy_transcription__contains=to_indexable_form(transcription))
-        )
-        filter_query.append(Q(transcription__contains=transcription))
+        if exact == "exact":
+            filter_query.append(Q(transcription=transcription))
+        else:
+            filter_query.append(
+                Q(fuzzy_transcription__contains=to_indexable_form(transcription))
+            )
+            filter_query.append(Q(transcription__contains=transcription))
     if translation:
         filter_query.append(Q(translation__contains=translation))
     if analysis:
         filter_query.append(Q(analysis__contains=analysis))
+    if lemma:
+        filter_query.append(Q(analysis__contains=lemma))
     if status and status != "all":
         filter_query.append(Q(status=status))
+    if semantic:
+        semantic_object = SemanticClass.objects.get(classification=semantic)
+        filter_query.append(Q(semantic_class=semantic_object))
 
     if kind and kind != "all":
         filter_kind = Phrase.WORD if kind == "word" else Phrase.SENTENCE
