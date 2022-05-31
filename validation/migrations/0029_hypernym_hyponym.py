@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("validation", "0028_auto_20220512_1536"),
+        ("validation", "0028_was_user_submitted"),
     ]
 
     operations = [
