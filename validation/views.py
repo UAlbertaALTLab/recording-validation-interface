@@ -412,6 +412,10 @@ def advanced_search_results(request, language):
             "analysis": analysis,
             "status": status,
             "kind": kind,
+            "semantic": semantic,
+            "exact": exact,
+            "lemma": lemma,
+            "quality": quality,
         }
     )
     for speaker in speakers:
