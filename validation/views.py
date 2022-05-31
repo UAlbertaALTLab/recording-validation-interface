@@ -151,7 +151,15 @@ def entries(request, language):
 
         semantic = request.GET.get("semantic_class")
         if semantic:
-            all_phrases = all_phrases.filter(semantic_class__classification=semantic)
+            semantic_object = SemanticClass.objects.get(classification=semantic)
+            hyponyms = request.GET.get("hyponyms")
+            if hyponyms == "checked":
+                all_phrases = all_phrases.filter(
+                    Q(semantic_class__hyponyms=semantic_object)
+                    | Q(semantic_class=semantic_object)
+                ).distinct()
+            else:
+                all_phrases = all_phrases.filter(semantic_class=semantic_object)
 
         if language in ["maskwacis", "moswacihk"]:
             all_phrases = custom_sort(all_phrases)
@@ -412,6 +420,10 @@ def advanced_search_results(request, language):
             "analysis": analysis,
             "status": status,
             "kind": kind,
+            "semantic": semantic,
+            "exact": exact,
+            "lemma": lemma,
+            "quality": quality,
         }
     )
     for speaker in speakers:

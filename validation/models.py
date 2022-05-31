@@ -134,7 +134,10 @@ class SemanticClass(models.Model):
         max_length=256,
     )
 
-    # Keep track of Phrases' history, so we can review, revert, and inspect them.
+    hypernyms = models.ManyToManyField("self", blank=True, default=None)
+    hyponyms = models.ManyToManyField("self", blank=True, default=None)
+
+    # Keep track of Semantic Class' history, so we can review, revert, and inspect them.
     history = HistoricalRecords()
 
     def __str__(self) -> str:
@@ -274,6 +277,7 @@ class Phrase(models.Model):
     comment = models.CharField(
         help_text="Comments about the phrase",
         blank=True,
+        null=True,
         max_length=2048,
     )
 
