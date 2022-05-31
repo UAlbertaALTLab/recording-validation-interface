@@ -324,11 +324,17 @@ def advanced_search_results(request, language):
     is_linguist = user_is_linguist(request.user, language)
     is_expert = user_is_expert(request.user, language)
 
-    transcription = request.GET.get("transcription").strip()
-    translation = request.GET.get("translation").strip()
+    transcription = request.GET.get("transcription")
+    if transcription:
+        transcription = transcription.strip()
+    translation = request.GET.get("translation")
+    if translation:
+        translation = translation.strip()
     exact = request.GET.get("exact")
     analysis = request.GET.get("analysis")
-    lemma = request.GET.get("lemma").strip()
+    lemma = request.GET.get("lemma")
+    if lemma:
+        lemma = lemma.strip()
     kind = request.GET.get("kind")
     status = request.GET.get("status")
     semantic = request.GET.get("semantic_class")
@@ -414,6 +420,10 @@ def advanced_search_results(request, language):
             "analysis": analysis,
             "status": status,
             "kind": kind,
+            "semantic": semantic,
+            "exact": exact,
+            "lemma": lemma,
+            "quality": quality,
         }
     )
     for speaker in speakers:
