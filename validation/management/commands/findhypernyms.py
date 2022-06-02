@@ -20,6 +20,8 @@ class Command(BaseCommand):
             name = c.classification
             name = name.replace("_", " ")
             name = name.split()
+            if len(name) < 1:
+                continue
             if "." not in name[0]:
                 continue
 
