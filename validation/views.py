@@ -150,9 +150,9 @@ def entries(request, language):
             all_phrases = all_phrases.filter(recording__session__id=session).distinct()
 
         semantic = request.GET.get("semantic_class")
+        hyponyms = request.GET.get("hyponyms")
         if semantic:
             semantic_object = SemanticClass.objects.get(classification=semantic)
-            hyponyms = request.GET.get("hyponyms")
             if hyponyms == "checked":
                 all_phrases = all_phrases.filter(
                     Q(semantic_class__hyponyms=semantic_object)
@@ -183,6 +183,8 @@ def entries(request, language):
         query_term.update({"mode": mode})
     if semantic:
         query_term.update({"semantic_class": semantic})
+    if hyponyms:
+        query_term.update({"hyponyms": hyponyms})
 
     if not mode:
         mode = "all"
