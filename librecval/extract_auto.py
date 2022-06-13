@@ -73,8 +73,8 @@ class SynthesizedRecordingExtractor:
             audio = AudioSegment.from_file(fspath(audio_file))
 
             s = Segment(
-                translation=entry,
-                transcription="",
+                translation="",
+                transcription=entry,
                 fixed_transcription="",
                 quality=Recording.UNKNOWN,
                 session=session_id,
