@@ -57,7 +57,7 @@ class Command(BaseCommand):
         # Store transcoded audio in a temp directory;
         # these files will be then handled by the currently configured storage backend.
         recording_extractor = OkimasisRecordingExtractor()
-        for segment in recording_extractor.scan_mp3(sessions_dir):
+        for segment in recording_extractor.scan_wav(sessions_dir):
             rec_id = segment.compute_sha256hash()
             if Recording.objects.filter(id=rec_id).exists():
                 continue
