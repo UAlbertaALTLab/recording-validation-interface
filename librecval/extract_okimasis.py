@@ -112,11 +112,12 @@ class OkimasisRecordingExtractor:
 
                 yield s
 
-    def scan_mp3(self, sessions_dir):
+    def scan_wav(self, sessions_dir):
         sessions_dir = Path(sessions_dir)
-        audio_files = list(sessions_dir.glob("*.mp3"))
+        audio_files = list(sessions_dir.glob("*.wav"))
         for audio_file in audio_files:
             word = Path(audio_file).stem
+            print(word)
 
             session = get_session_from_mtime(os.path.getmtime(audio_file))
             session_id = SessionID(
