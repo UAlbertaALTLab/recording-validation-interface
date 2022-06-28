@@ -1,32 +1,13 @@
 import csv
-import os
-from datetime import datetime
-from pathlib import Path
-from tempfile import TemporaryDirectory
 
-import logme
 from django.conf import settings
-from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand
-from pydub import AudioSegment
 from tqdm import tqdm
 
-from librecval.extract_tsuutina import TsuutinaRecordingExtractor, Segment
-from librecval.transcode_recording import transcode_to_aac
 from validation.models import (
-    Speaker,
-    RecordingSession,
     Phrase,
-    Recording,
-    LanguageVariant,
     SemanticClass,
 )
-
-
-class RecordingError(Exception):
-    """
-    The error that gets raised if something bad happens with the recording.
-    """
 
 
 class Command(BaseCommand):
@@ -42,7 +23,7 @@ class Command(BaseCommand):
                 number = number.split(".")
                 number = number[:-1]
                 number = ".".join(number)
-                data[row[0]] = number + " " + row[16]
+                data[row[0]] = number + " " + row[16].replace("_", " ")
 
         for item in tqdm(data):
             if Phrase.objects.filter(osid=item).exists():
