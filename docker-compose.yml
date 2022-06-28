@@ -16,6 +16,7 @@ services:
         - "/data/maskwacis-recordings/sessions:/app/data/sessions"
         - "/data/maskwacis-recordings/speakers:/app/data/speakers"
         - "/data/application-data/speech-db/metadata.csv:/app/private/metadata.csv"
+        - "/data/application-data/speech-db/tsuutina-metadata.csv:/app/private/tsuutina-metadata.csv"
         - "/data/application-data/speech-db/i3-metadata.csv:/app/private/i3-metadata.csv"
         - "/data/application-data/speech-db/elicitation-sheets:/app/private/elicitation-sheets"
         - "/data/application-data/speech-db/synth-speech:/app/data/synth-speech"
