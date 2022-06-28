@@ -255,6 +255,8 @@ SYNTH_AUDIO_DIR = config(
     "SYNTH_AUDIO_DIR", BASE_DIR / "data" / "synth-speech", cast=Path
 )
 
+RW_FILEPATH = config("RW_FILEPATH", BASE_DIR / "private" / "rw_doc.txt")
+
 ################################### MEDIA (Uploads) ####################################
 
 # Audio (including compressed recordings) and pictures are uploaded here.
