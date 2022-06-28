@@ -38,11 +38,16 @@ class Command(BaseCommand):
         with open(metadata_file) as csvfile:
             spamreader = csv.reader(csvfile, delimiter=",")
             for row in spamreader:
-                data[row[0]] = row[15].split(",")[0] + " " + row[16]
+                number = row[15].split(",")[0]
+                number = number.split(".")
+                number = number[:-1]
+                number = ".".join(number)
+                data[row[0]] = number + " " + row[16]
 
         for item in tqdm(data):
             if Phrase.objects.filter(osid=item).exists():
                 phrase = Phrase.objects.filter(osid=item).first()
+                phrase.semantic_class.clear()
                 semantic_class, _ = SemanticClass.objects.get_or_create(
                     source=SemanticClass.META,
                     origin=SemanticClass.RW,
