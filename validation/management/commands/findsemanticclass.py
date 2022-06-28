@@ -39,7 +39,9 @@ class Command(BaseCommand):
                             "0",
                         ]:
                             rapid_words_class = line
-                            rapid_words_class = rapid_words_class.replace("\n", "")
+                            rapid_words_class = rapid_words_class.replace(
+                                "\n", ""
+                            ).replace("_", " ")
 
                         elif "=" in line:
                             split_line = line.split("=")
