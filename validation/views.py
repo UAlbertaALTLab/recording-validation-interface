@@ -613,13 +613,18 @@ def segment_content_view(request, language, segment_id):
     history = phrase.history.all()
     auth = request.user.is_authenticated
 
+    if phrase.semantic_class.all():
+        sem_class = phrase.semantic_class.all()[0].classification
+    else:
+        sem_class = ""
+
     form = EditSegment(
         initial={
             "source_language": phrase.transcription,
             "translation": phrase.translation,
             "analysis": phrase.analysis,
             "comment": phrase.comment,
-            "semantic_class": phrase.semantic_class.all()[0].classification,
+            "semantic_class": sem_class,
         }
     )
 
