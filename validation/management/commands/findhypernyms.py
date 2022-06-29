@@ -22,8 +22,6 @@ class Command(BaseCommand):
             name = name.split()
             if len(name) < 1:
                 continue
-            if "." not in name[0]:
-                continue
 
             number = name[0]
             iter_classes = SemanticClass.objects.all()
