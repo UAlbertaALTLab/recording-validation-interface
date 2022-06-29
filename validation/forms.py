@@ -112,19 +112,16 @@ class EditSegment(forms.Form):
     )
     semantic_class = forms.CharField(
         label="Semantic class",
-        widget=forms.Select(
-            choices=[
-                (p.classification, p.classification)
-                for p in SemanticClass.objects.all()
-                .distinct()
-                .order_by("classification")
-            ]
-        ),
+        widget=forms.Select(choices=[]),
     )
 
     def __init__(self, *args, **kwargs):
         super(EditSegment, self).__init__(*args, **kwargs)
         self.fields["source_language"].label = "Entry"
+        self.fields["semantic_class"].choices = (
+            (p.classification, p.classification)
+            for p in SemanticClass.objects.all().distinct().order_by("classification")
+        )
 
 
 class FlagSegment(forms.ModelForm):
