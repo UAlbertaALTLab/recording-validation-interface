@@ -587,11 +587,18 @@ def segment_content_view(request, language, segment_id):
             )
             analysis = form.cleaned_data["analysis"].strip() or og_phrase.analysis
             comment = form.cleaned_data["comment"].strip() or og_phrase.comment
+            semantic_class = form.cleaned_data["semantic_class"]
             p = Phrase.objects.get(id=phrase_id, language=language_object)
             p.transcription = transcription
             p.translation = translation
             p.analysis = analysis
             p.comment = comment
+            if semantic_class:
+                s_class = SemanticClass.objects.filter(
+                    classification=semantic_class
+                ).first()
+                p.semantic_class.clear()
+                p.semantic_class.add(s_class)
             p.validated = True
             p.modifier = str(request.user)
             p.date = datetime.datetime.now()
@@ -606,12 +613,18 @@ def segment_content_view(request, language, segment_id):
     history = phrase.history.all()
     auth = request.user.is_authenticated
 
+    if phrase.semantic_class.all():
+        sem_class = phrase.semantic_class.all()[0].classification
+    else:
+        sem_class = ""
+
     form = EditSegment(
         initial={
             "source_language": phrase.transcription,
             "translation": phrase.translation,
             "analysis": phrase.analysis,
             "comment": phrase.comment,
+            "semantic_class": sem_class,
         }
     )
 

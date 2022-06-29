@@ -3,7 +3,7 @@ import re
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 
-from validation.models import Issue, Recording, Phrase
+from validation.models import Issue, Recording, Phrase, SemanticClass
 
 DEFAULT_MAX_LENGTH = 256
 
@@ -108,12 +108,20 @@ class EditSegment(forms.Form):
     )
     comment = forms.CharField(
         required=False,
-        widget=forms.TextInput(attrs={"class": "form-control bottom-margin"}),
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+    )
+    semantic_class = forms.CharField(
+        label="Semantic class",
+        widget=forms.Select(choices=[]),
     )
 
     def __init__(self, *args, **kwargs):
         super(EditSegment, self).__init__(*args, **kwargs)
         self.fields["source_language"].label = "Entry"
+        self.fields["semantic_class"].choices = (
+            (p.classification, p.classification)
+            for p in SemanticClass.objects.all().distinct().order_by("classification")
+        )
 
 
 class FlagSegment(forms.ModelForm):
