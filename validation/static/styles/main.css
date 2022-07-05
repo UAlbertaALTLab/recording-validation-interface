@@ -142,3 +142,7 @@ a:hover {
   text-decoration: none;
   cursor: pointer;
 }
+
+.empty-semantic-class {
+  color: grey;
+}

@@ -57,7 +57,7 @@ along with this program.  If not, see
   <select name="semantic_class" id="semantic_class">
         <option value=""> - </option>
               {% for section in all_semantic_classes %}
-                <option value="{{ section.classification }}">{{ section.classification }}</option>
+                <option value="{{ section }}" {% if not all_semantic_classes[section] %} class="empty-semantic-class" {% endif %}>{{ section }}</option>
               {% endfor %}
           </select>
             <input type="checkbox" id="hyponyms" name="hyponyms" value="checked"> Include hyponyms
