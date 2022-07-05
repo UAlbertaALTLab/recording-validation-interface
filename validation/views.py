@@ -198,6 +198,15 @@ def entries(request, language):
         semantic_display = ""
 
     all_semantic_classes = SemanticClass.objects.distinct().order_by("classification")
+    semantic_classes_with_values = SemanticClass.objects.filter(
+        phrase__language=language_object
+    )
+    semantic_choices = {}
+    for semantic_class in all_semantic_classes:
+        if semantic_class not in semantic_classes_with_values:
+            semantic_choices[semantic_class.classification] = False
+        else:
+            semantic_choices[semantic_class.classification] = True
 
     recordings, forms = prep_phrase_data(request, phrases, language_object.name)
 
@@ -223,7 +232,7 @@ def entries(request, language):
         session=session,
         mode=mode,
         semantic_display=semantic_display,
-        all_semantic_classes=all_semantic_classes,
+        all_semantic_classes=semantic_choices,
         semantic=semantic,
         encode_query_with_page=encode_query_with_page,
         language=language_object,
