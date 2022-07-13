@@ -137,6 +137,10 @@ class SemanticClass(models.Model):
     hypernyms = models.ManyToManyField("self", blank=True, default=None)
     hyponyms = models.ManyToManyField("self", blank=True, default=None)
 
+    language_variants = models.ManyToManyField(
+        LanguageVariant, blank=True, default=None
+    )
+
     # Keep track of Semantic Class' history, so we can review, revert, and inspect them.
     history = HistoricalRecords()
 
