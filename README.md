@@ -244,6 +244,17 @@ Each directory should have `*.eaf` files paired with a `*.wav` file:
     2015-05-08-03.wav
     ...
 
+#### Importing recordings from Arok or Jean
+These recordings live in a Google drive and are formatted with <word>.wav 
+or <word>.mp3. To import these recordings, first copy them to the 
+altlab.dev server at the following location: `/data/application-data/speech-db/okimasis-recordings` 
+with all related recordings in a folder.
+
+Then, from itw.altlab.dev, run `docker ps` to get the container ID for the 
+speech-DB container and enter it using `docker exec -it <container ID> bash`. From 
+this point, you can run `./manage.py importokimasis <path-to-recordings>`. The recordings 
+are all mounted in the image, so your path will look something like `/app/data/okimasis-recordings/<folder name>`.
+
 ### Auto-validating entries
 
 Some entries have very close spellings that can be auto-validated. This only needs to be done once after the initial
