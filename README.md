@@ -255,6 +255,15 @@ speech-DB container and enter it using `docker exec -it <container ID> bash`. Fr
 this point, you can run `./manage.py importokimasis <path-to-recordings>`. The recordings 
 are all mounted in the image, so your path will look something like `/app/data/okimasis-recordings/<folder name>`.
 
+From time to time, you'll see that recordings with circumflexes are not 
+correctly matched with entries in itwêwina. This is likely because the 
+characters with circumflexes are secrectly a combined character: `ˆ+<vowel>`. 
+The only current way I know to fix this is to go into the speech-db 
+as someone with permission to edit entries and replace all the two-character 
+characters with a single character. There's no way of knowing which characters 
+are secretly two characters, so you simply have to do this for all 
+new entries.
+
 ### Auto-validating entries
 
 Some entries have very close spellings that can be auto-validated. This only needs to be done once after the initial
