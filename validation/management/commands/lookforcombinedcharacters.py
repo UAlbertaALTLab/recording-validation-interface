@@ -22,7 +22,7 @@ class Command(BaseCommand):
             i = 0  # index in unicode_phrase
             j = 0  # index in phrase.transcription
             new_phrase = ""
-            while i < len(unicode_phrase):
+            while i < len(unicode_phrase) and j < len(phrase.transcription):
                 c = unicode_phrase[i]
                 if c == "'":
                     i += 1
