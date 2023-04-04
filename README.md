@@ -695,7 +695,22 @@ This should create:
 If there are auto-validated entries in the database, it will also create:
 * Transcription files for the *auto-validated* data to be used by **Persephone**, eg: `./audio/LOU/auto-val/label/audio_id.txt`
 * Transcription files for the *auto-validated* data to be used by **Simple4All**, eg: `./audio/LOU/auto-val/audio_id.txt`
+ 
 
+
+## Where did all the styles go?
+Did you deploy the site and now it looks entirely wrong? Like a base HTML page with no CSS? Not to worry, 
+this has a simple 2 step fix (that looks like 7 steps, but it's still simple):
+1. `ssh itw.altlab.dev`
+2. `docker ps`
+3. Find the container ID associated with `speech-db web`. This is <container-id>
+4. `docker exec -it <container-id> bash`
+5. `./manage collectstatic`
+6. `exit`
+7. `docker restart <container-id>`
+
+In short: run `collectstatic` and then restart the container. This should solve your problem. If you have 
+any style-related issues with the speech-db, start here.
 
 Frequently Asked Questions
 --------------------------

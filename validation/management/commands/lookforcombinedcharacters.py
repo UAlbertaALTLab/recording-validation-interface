@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand  # type: ignore
 
 from validation.models import Phrase, LanguageVariant
+from tqdm import tqdm
 
 
 class Command(BaseCommand):
@@ -20,19 +21,13 @@ class Command(BaseCommand):
         """
         language = LanguageVariant.objects.get(code="moswacihk")
         phrases = Phrase.objects.filter(language=language)
-        for phrase in phrases:
+        for phrase in tqdm(phrases):
             ascii_phrase = phrase.transcription.encode("ascii", "replace")
             i = 0  # index in string
-            indices_to_replace = []
-            for c in ascii_phrase:
-                if c == "63":
-                    indices_to_replace.append(i)
-                i += 1
-            j = 0
             new_phrase = ""
-            while j < len(phrase.transcription):
-                if j in indices_to_replace:
-                    char = phrase.transcription[j]
+            for c in ascii_phrase:
+                char = phrase.transcription[i]
+                if c == "63":
                     if char == "ê":
                         new_phrase += "ê"
                     elif char == "â":
@@ -43,9 +38,9 @@ class Command(BaseCommand):
                         new_phrase += "ô"
                     else:
                         # maybe we actually have a '?'
-                        new_phrase += phrase.transcription[j]
+                        new_phrase += char
                 else:
-                    new_phrase += phrase.transcription[j]
-                j += 1
-
+                    new_phrase += char
+                i += 1
+            phrase.transcription = new_phrase
             phrase.save()
