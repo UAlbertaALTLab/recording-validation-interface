@@ -14,6 +14,8 @@ class Command(BaseCommand):
         We replace those characters with the correct single character, which appears as the character before
         the \xcc\x82. That is, the combined "ahâm" is represented as "'aha\\xcc\\x82m'", so we replace the
         "a\\xcc\\x82" with "â"
+
+        NOTE: This script really should work, but it simply doesn't. More work is needed here.
         """
         language = LanguageVariant.objects.get(code="moswacihk")
         phrases = Phrase.objects.filter(language=language)
