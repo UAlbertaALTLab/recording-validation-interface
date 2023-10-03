@@ -777,6 +777,12 @@ AVAILABLE_IMAGES = [
     "BruceStarlight",
     "JeanOkimāsis",
     "DoloresGreyeyesSand",
+    "BrianLee",
+    "RonaldLittlechild",
+    "MarvinLittlechild",
+    "LindaWhitebear",
+    "LawrenceWildcat",
+    "JackMackinaw",
 ]
 
 
