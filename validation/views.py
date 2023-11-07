@@ -1293,6 +1293,7 @@ def prep_phrase_data(request, phrases, lang):
     forms = {}
     for phrase in phrases:
         recordings[phrase] = [rec for rec in phrase.recordings if rec.speaker != "DAR"]
+        
         if request.method == "POST" and int(request.POST.get("phrase_id")) == phrase.id:
             forms[phrase.id] = FlagSegment(
                 request.POST, initial={"phrase_id": phrase.id}
