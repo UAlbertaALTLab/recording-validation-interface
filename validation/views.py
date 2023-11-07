@@ -839,6 +839,7 @@ def all_speakers(request, language):
             code=speaker.code,
             img_path=img_path,
             bio=speaker.target_bio_text or "",
+            image_enabled=speaker.image_enabled,
             speaker=speaker,
         )
         speakers.append(speaker_dict)
