@@ -393,6 +393,8 @@ class Speaker(models.Model):
         blank=True,
     )
 
+    image_enabled = models.BooleanField(default=True)
+
     @property
     def language(self):
         """
