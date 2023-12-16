@@ -186,12 +186,12 @@ def entries(request, language):
 
             else:
                 # 2nd Step
-                #all_phrases = all_phrases.order_by('display_order')
+                all_phrases = all_phrases.order_by('display_order')
                 
                 # 1st Step did it ot load the db for the first time with the sort order
-                all_phrases = custom_sort(all_phrases)
-                sorted_updated_phrases = update_phrase_order(all_phrases)
-                all_phrases = sorted_updated_phrases
+                # all_phrases = custom_sort(all_phrases)
+                # sorted_updated_phrases = update_phrase_order(all_phrases)
+                # all_phrases = sorted_updated_phrases
         else:
             # If language is not in the specified list, order by transcription
             all_phrases = all_phrases.order_by("transcription")
