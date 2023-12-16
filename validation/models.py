@@ -284,6 +284,8 @@ class Phrase(models.Model):
         null=True,
         max_length=2048,
     )
+    
+    display_order = models.IntegerField(default=0)
 
     # Keep track of Phrases' history, so we can review, revert, and inspect them.
     history = HistoricalRecords()
