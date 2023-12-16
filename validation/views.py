@@ -176,8 +176,8 @@ def entries(request, language):
                 ).distinct()
             else:
                 all_phrases = all_phrases.filter(semantic_class=semantic_object)
-
-         if language in ["maskwacis", "moswacihk"]:
+        
+        if language in ["maskwacis", "moswacihk"]:
             # step 3:
             if sorted_phrases == "checked":
                 all_phrases = custom_sort(all_phrases)
