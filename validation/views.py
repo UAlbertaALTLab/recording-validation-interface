@@ -25,6 +25,7 @@ from functools import reduce
 from hashlib import sha256
 from http import HTTPStatus
 from pathlib import Path
+from django.db import transaction
 
 import mutagen as mutagen
 from django.conf import settings
@@ -104,6 +105,19 @@ def home(request):
     context = dict(languages=language_dict, language=None, auth=auth)
     return render(request, "validation/home.html", context)
 
+@transaction.atomic
+def update_phrase_order(all_phrases):
+    # Create a dictionary to store the order of phrases
+    phrase_order = {phrase.id: index for index, phrase in enumerate(all_phrases)}
+
+    # Use a single database query to update the order of all phrases
+    for phrase_id, new_order in phrase_order.items():
+        Phrase.objects.filter(pk=phrase_id).update(display_order=new_order)
+
+    # Retrieve the updated instances in the original order
+    sorted_updated_phrases = sorted(all_phrases, key=lambda x: phrase_order[x.id])
+
+    return sorted_updated_phrases
 
 def entries(request, language):
     """
@@ -151,6 +165,8 @@ def entries(request, language):
 
         semantic = request.GET.get("semantic_class")
         hyponyms = request.GET.get("hyponyms")
+        sorted_phrases = request.GET.get("sorted_phrases")
+        
         if semantic:
             semantic_object = SemanticClass.objects.get(classification=semantic)
             if hyponyms == "checked":
@@ -161,10 +177,25 @@ def entries(request, language):
             else:
                 all_phrases = all_phrases.filter(semantic_class=semantic_object)
 
-        if language in ["maskwacis", "moswacihk"]:
-            all_phrases = custom_sort(all_phrases)
+         if language in ["maskwacis", "moswacihk"]:
+            # step 3:
+            if sorted_phrases == "checked":
+                all_phrases = custom_sort(all_phrases)
+                sorted_updated_phrases = update_phrase_order(all_phrases)
+                all_phrases = sorted_updated_phrases
+
+            else:
+                # 2nd Step
+                #all_phrases = all_phrases.order_by('display_order')
+                
+                # 1st Step did it ot load the db for the first time with the sort order
+                all_phrases = custom_sort(all_phrases)
+                sorted_updated_phrases = update_phrase_order(all_phrases)
+                all_phrases = sorted_updated_phrases
         else:
+            # If language is not in the specified list, order by transcription
             all_phrases = all_phrases.order_by("transcription")
+            
     else:
         all_phrases = []
         session = None
