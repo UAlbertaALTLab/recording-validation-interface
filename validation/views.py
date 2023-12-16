@@ -80,8 +80,6 @@ from .helpers import (
 from .crk_sort import custom_sort
 from .models import Phrase, Recording, Speaker, RecordingSession, Issue
 
-has_run_initial_sort = False
-
 def home(request):
     """
     The home page that lets you select a language variant
@@ -127,7 +125,6 @@ def entries(request, language):
 
     is_linguist = user_is_linguist(request.user, language)
     is_expert = user_is_expert(request.user, language)
-    global has_run_initial_sort
 
     # Only show selected language
     language_object = get_language_object(language)
@@ -187,15 +184,12 @@ def entries(request, language):
                 all_phrases = sorted_updated_phrases
 
             else:
-                if not has_run_initial_sort:
-                    all_phrases = custom_sort(all_phrases)
-                    sorted_updated_phrases = update_phrase_order(all_phrases)
-                    all_phrases = sorted_updated_phrases
-                    has_run_initial_sort = True
+                # all_phrases = custom_sort(all_phrases)
+                # sorted_updated_phrases = update_phrase_order(all_phrases)
+                # all_phrases = sorted_updated_phrases
                 
                 # 2nd Step
-                else:
-                    all_phrases = all_phrases.order_by('display_order')
+                all_phrases = all_phrases.order_by('display_order')
                 
         else:
             # If language is not in the specified list, order by transcription
