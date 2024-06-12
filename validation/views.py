@@ -807,14 +807,14 @@ AVAILABLE_IMAGES = [
     "HarleySimon",
     "IvyRaine",
     "JerryRoasting",
-    "Kisikaw",
+    "KisikawKiseyiniw",
     "LindaOldpan",
     "LouiseWildcat",
     "MaryJeanLittlechild",
     "NormaLindaSaddleback",
     "PaulaMackinaw",
     "RoseMakinaw",
-    "RosieRowan",
+    "RosieRoan",
     "BruceStarlight",
     "JeanOkimāsis",
     "DoloresGreyeyesSand",
@@ -837,8 +837,8 @@ def speaker_view(request, language, speaker_code):
 
     img_name = full_name.title()
     img_name = img_name.replace(" ", "")
-    if full_name == "kîsikâw":
-        img_name = "Kisikaw"
+    if full_name == "Kîsikâw Kiseyiniw":
+        img_name = "KisikawKiseyiniw"
     img_path = f"/static/images/speakers/{img_name}.jpg"
     if img_name not in AVAILABLE_IMAGES:
         img_path = "/static/images/missing.jpg"
