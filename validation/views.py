@@ -5,7 +5,8 @@ import datetime
 import json
 import operator
 
-# Copyright (C) 2018 Eddie Antonio Santos <easantos@ualberta.ca>
+# Copyright (C) 2018 Eddie Antonio Santos <easantos@ualberta.ca>,
+#               2024 Felipe Banados Schwerter <banadoss@ualberta.ca>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -80,6 +81,7 @@ from .helpers import (
 from .crk_sort import custom_sort
 from .models import Phrase, Recording, Speaker, RecordingSession, Issue
 
+
 def home(request):
     """
     The home page that lets you select a language variant
@@ -104,6 +106,7 @@ def home(request):
     context = dict(languages=language_dict, language=None, auth=auth)
     return render(request, "validation/home.html", context)
 
+
 @transaction.atomic
 def update_phrase_order(all_phrases):
     # Create a dictionary to store the order of phrases
@@ -117,6 +120,7 @@ def update_phrase_order(all_phrases):
     sorted_updated_phrases = sorted(all_phrases, key=lambda x: phrase_order[x.id])
 
     return sorted_updated_phrases
+
 
 def entries(request, language):
     """
@@ -165,7 +169,7 @@ def entries(request, language):
         semantic = request.GET.get("semantic_class")
         hyponyms = request.GET.get("hyponyms")
         sorted_phrases = request.GET.get("sorted_phrases")
-        
+
         if semantic:
             semantic_object = SemanticClass.objects.get(classification=semantic)
             if hyponyms == "checked":
@@ -175,7 +179,7 @@ def entries(request, language):
                 ).distinct()
             else:
                 all_phrases = all_phrases.filter(semantic_class=semantic_object)
-        
+
         if language in ["maskwacis", "moswacihk"]:
             # step 3:
             if sorted_phrases == "checked":
@@ -187,14 +191,14 @@ def entries(request, language):
                 # all_phrases = custom_sort(all_phrases)
                 # sorted_updated_phrases = update_phrase_order(all_phrases)
                 # all_phrases = sorted_updated_phrases
-                
+
                 # 2nd Step
-                all_phrases = all_phrases.order_by('display_order')
-                
+                all_phrases = all_phrases.order_by("display_order")
+
         else:
             # If language is not in the specified list, order by transcription
             all_phrases = all_phrases.order_by("transcription")
-            
+
     else:
         all_phrases = []
         session = None
@@ -761,10 +765,17 @@ def view_issue_detail(request, language, issue_id):
             if request.method == "POST" and form.is_valid():
                 return handle_save_issue_with_phrase(form, issue, request, language)
         else:
+            transcription_initial = issue.source_language_suggestion
+            if not transcription_initial:
+                transcription_initial = issue.phrase.transcription
+            translation_initial = issue.target_language_suggestion
+            if not translation_initial:
+                translation_initial = issue.phrase.translation
+
             form = EditIssueWithPhrase(
                 initial={
-                    "transcription": issue.source_language_suggestion,
-                    "translation": issue.target_language_suggestion,
+                    "transcription": transcription_initial,
+                    "translation": translation_initial,
                 }
             )
 
@@ -1323,7 +1334,7 @@ def prep_phrase_data(request, phrases, lang):
     forms = {}
     for phrase in phrases:
         recordings[phrase] = [rec for rec in phrase.recordings if rec.speaker != "DAR"]
-        
+
         if request.method == "POST" and int(request.POST.get("phrase_id")) == phrase.id:
             forms[phrase.id] = FlagSegment(
                 request.POST, initial={"phrase_id": phrase.id}

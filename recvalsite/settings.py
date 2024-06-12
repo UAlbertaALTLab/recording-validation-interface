@@ -42,6 +42,7 @@ ALLOWED_HOSTS = [
     "speech-db.altlab.dev",
     "altlab-itw:8004",
     "altlab-itw:8080",
+    "vm-dev",
 ]
 
 
