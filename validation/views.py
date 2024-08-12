@@ -756,7 +756,10 @@ def view_issue_detail(request, language, issue_id):
                 return handle_save_issue_with_recording(form, issue, request, language)
         else:
             form = EditIssueWithRecording(
-                initial={"phrase": issue.source_language_suggestion}
+                initial={
+                    "phrase": issue.source_language_suggestion,
+                    "speaker": issue.recording.speaker,
+                }
             )
 
     if issue.phrase:
