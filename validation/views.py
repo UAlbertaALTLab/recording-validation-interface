@@ -749,17 +749,24 @@ def view_issue_detail(request, language, issue_id):
     issue = Issue.objects.get(id=issue_id, language=language)
 
     form = None
+    autocomplete = None
     if issue.recording:
         if request.method == "POST":
             form = EditIssueWithRecording(request.POST)
             if request.method == "POST" and form.is_valid():
                 return handle_save_issue_with_recording(form, issue, request, language)
         else:
+            phrase = issue.source_language_suggestion
+            if not phrase:
+                phrase = issue.recording.phrase.transcription
             form = EditIssueWithRecording(
                 initial={
-                    "phrase": issue.source_language_suggestion,
+                    "phrase": phrase,
                     "speaker": issue.recording.speaker,
                 }
+            )
+            autocomplete = list(
+                Phrase.objects.values_list("transcription", flat=True).distinct()
             )
 
     if issue.phrase:
@@ -788,6 +795,7 @@ def view_issue_detail(request, language, issue_id):
         auth=request.user.is_authenticated,
         is_linguist=user_is_linguist(request.user, language),
         language=language,
+        autocomplete=autocomplete,
     )
     return render(request, "validation/view_issue_detail.html", context)
 

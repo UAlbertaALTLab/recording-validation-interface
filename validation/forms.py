@@ -152,9 +152,9 @@ class FlagSegment(forms.ModelForm):
 
 class EditIssueWithRecording(forms.ModelForm):
     phrase = forms.CharField(
-        widget=forms.Textarea(),
+        widget=forms.TextInput(attrs={"id": "autoCompleteTranscriptions"}),
         required=False,
-        help_text="What word or phrase this recording is actually for",
+        help_text="What word or phrase this recording is actually for.  Field has autocompletion.",
     )
 
     class Meta:

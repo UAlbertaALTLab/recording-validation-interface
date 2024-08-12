@@ -65,4 +65,19 @@
             {% endif %}
         </section>
     </container>
+    {% if autocomplete %}
+    <script>
+        $( () => {
+            let completions = {{ autocomplete|safe }};
+            $( "#autoCompleteTranscriptions").autocomplete({
+                source: completions,
+                minLength: 3
+            });
+            var first = true;
+            $( "#autoCompleteTranscriptions").focus(() => {
+                    $("#autoCompleteTranscriptions").autocomplete("search");
+                })
+        });
+    </script>
+    {% endif %}
 {% endblock content %}
