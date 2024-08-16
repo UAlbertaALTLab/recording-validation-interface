@@ -28,6 +28,7 @@ See recvalsite/settings.py for more information.
 """
 
 from pathlib import Path
+from typing import Callable
 from tempfile import TemporaryDirectory
 
 import logme  # type: ignore
@@ -74,6 +75,14 @@ class Command(BaseCommand):
             default=Path("./audio"),
         )
 
+        parser.add_argument(
+            "--compare-current-recordings",
+            action="store_true",
+            default=False,
+            dest="compare_recordings",
+            help="compare compressed audio present in database against new candidates.  Generates a log useful when audio files already in the database may be incorrect",
+        )
+
     def handle(
         self,
         *args,
@@ -81,13 +90,14 @@ class Command(BaseCommand):
         wav=False,
         audio_dir: Path = Path("./audio"),
         sessions_dir=None,
+        compare_recordings=False,
         **options
     ) -> None:
         if sessions_dir is None:
             sessions_dir = settings.RECVAL_SESSIONS_DIR
 
         if store_db:
-            self._handle_store_django(sessions_dir)
+            self._handle_store_django(sessions_dir, compare_recordings)
         else:
             self._handle_store_wav(sessions_dir, audio_dir, wav)
 
@@ -105,7 +115,9 @@ class Command(BaseCommand):
             recording_format="wav" if wav else "m4a",
         )
 
-    def _handle_store_django(self, sessions_dir: Path) -> None:
+    def _handle_store_django(
+        self, sessions_dir: Path, compare_recordings: bool
+    ) -> None:
         """
         Stores m4a files, managed by Django's media engine.
         """
@@ -117,76 +129,98 @@ class Command(BaseCommand):
                 directory=sessions_dir,
                 transcoded_recordings_path=audio_dir,
                 metadata_filename=settings.RECVAL_METADATA_PATH,
-                import_recording=django_recording_importer,
+                import_recording=django_recording_importer(compare_recordings),
                 recording_format="m4a",
             )
 
 
 @logme.log
-def django_recording_importer(info: Segment, recording_path: Path, logger) -> None:
+def django_recording_importer(
+    compare_recordings: bool, logger
+) -> Callable[[Segment, Path], None]:
     """
-    Imports a single recording.
+    Generates a function to import a single recording that is passed the options
+    to decide whether to compare against a compressed version or not.
+    This adds noticeable overhead and is only useful when there is doubts about
+    entries already in the database, so it should only be used sporadically.
     """
 
-    if Recording.objects.filter(id=info.compute_sha256hash()).exists():
-        # This recording is already in the DB, return early
-        if info.sound_equals(
-            Recording.objects.get(id=info.compute_sha256hash()).compressed_audio.path
-        ):
-            print("Managed to find equal files.")
-        return
+    def recording_importer(info: Segment, recording_path: Path) -> None:
+        """
+        Imports a single recording.
+        """
+        if Recording.objects.filter(id=info.compute_sha256hash()).exists():
+            # This recording is already in the DB. Usually, return early
+            if compare_recordings:
+                """
+                Unless we need to check the database contents.
+                Check if the files we are processing would generate
+                a different compressed input.
+                """
+                if not info.compressed_sound_equals(
+                    Recording.objects.get(
+                        id=info.compute_sha256hash()
+                    ).compressed_audio.path
+                ):
+                    logger.warn(
+                        "Recording already in database is different from what we would now introduce for Segment:\n%sYou may want to reimport this recording.",
+                        info.signature(),
+                    )
+            return
 
-    # Recording requires a Speaker, a RecordingSession, and a Phrase.
-    # Make those first.
-    speaker, speaker_created = Speaker.objects.get_or_create(
-        code=info.speaker  # TODO: normalized?
-    )
-    if speaker_created:
-        logger.info("New speaker: %s", speaker)
+        # Recording requires a Speaker, a RecordingSession, and a Phrase.
+        # Make those first.
+        speaker, speaker_created = Speaker.objects.get_or_create(
+            code=info.speaker  # TODO: normalized?
+        )
+        if speaker_created:
+            logger.info("New speaker: %s", speaker)
 
-    session, session_created = RecordingSession.get_or_create_by_session_id(
-        info.session
-    )
-    if session_created:
-        logger.info("New session: %s", session)
+        session, session_created = RecordingSession.get_or_create_by_session_id(
+            info.session
+        )
+        if session_created:
+            logger.info("New session: %s", session)
 
-    language = LanguageVariant.objects.get(name="Maskwacîs", code="maskwacis")
+        language = LanguageVariant.objects.get(name="Maskwacîs", code="maskwacis")
 
-    phrase, phrase_created = Phrase.objects.get_or_create(
-        field_transcription=info.cree_transcription,
-        transcription=info.cree_transcription,
-        status=Phrase.NEW,
-        kind=info.type,
-        language=language,
-        defaults=dict(
-            translation=info.english_translation,
-            validated=False,
-            origin=Phrase.MASKWACÎS_DICTIONARY,
-        ),
-    )
-    if phrase_created:
-        logger.info("New phrase: %s", phrase)
+        phrase, phrase_created = Phrase.objects.get_or_create(
+            field_transcription=info.cree_transcription,
+            transcription=info.cree_transcription,
+            status=Phrase.NEW,
+            kind=info.type,
+            language=language,
+            defaults=dict(
+                translation=info.english_translation,
+                validated=False,
+                origin=Phrase.MASKWACÎS_DICTIONARY,
+            ),
+        )
+        if phrase_created:
+            logger.info("New phrase: %s", phrase)
 
-    # XXX: this is kind of dumb; the compressed audio is written to storage, read again,
-    # and will be written back by Django :/
-    audio_data = recording_path.read_bytes()
-    django_file = ContentFile(audio_data, name=recording_path.name)
+        # XXX: this is kind of dumb; the compressed audio is written to storage, read again,
+        # and will be written back by Django :/
+        audio_data = recording_path.read_bytes()
+        django_file = ContentFile(audio_data, name=recording_path.name)
 
-    # Finally, we can create the recording.
-    recording = Recording(
-        id=info.compute_sha256hash(),
-        speaker=speaker,
-        compressed_audio=django_file,
-        timestamp=info.start,
-        phrase=phrase,
-        session=session,
-        quality=info.quality,
-        comment=info.comment,
-    )
-    recording.clean()
+        # Finally, we can create the recording.
+        recording = Recording(
+            id=info.compute_sha256hash(),
+            speaker=speaker,
+            compressed_audio=django_file,
+            timestamp=info.start,
+            phrase=phrase,
+            session=session,
+            quality=info.quality,
+            comment=info.comment,
+        )
+        recording.clean()
 
-    logger.debug("Saving recording %s", recording)
-    recording.save()
+        logger.debug("Saving recording %s", recording)
+        recording.save()
+
+    return recording_importer
 
 
 def null_recording_importer(info: Segment, recording_path: Path) -> None:
