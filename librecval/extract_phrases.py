@@ -123,6 +123,18 @@ class Segment(NamedTuple):
         """
         return sha256(self.signature().encode("UTF-8")).hexdigest()
 
+    def sound_equals(self, path) -> bool:
+        other = AudioSegment.from_file(fspath(path))
+        # AudioSegment.from_file == AudioSegment.from_file(fspath('/home/fbanados/code/recording-validation-interface/data/audio/1a5442ed4a3bc52e5e7e22b29ee4610f8dc9fe6432f60e67a79919a0fc0e1352_EJlFAPG.m4a'))
+        return (
+            AudioSegment.from_file(
+                self.audio.export(
+                    format="ipod", codec="aac", parameters=["-strict", "-2"]
+                )
+            )
+            == other
+        )
+
 
 # One recording, with all its metadata along with its audio.
 SegmentAndAudio = Tuple[Segment, AudioSegment]
@@ -186,7 +198,10 @@ class RecordingExtractor:
         """
         Extracts recordings from a single session.
         """
-        session_id = SessionID.from_name(session_dir.stem)
+        try:
+            session_id = SessionID.from_name(session_dir.stem)
+        except SessionParseError:
+            session_id = SessionID.parse_dirty(session_dir.stem)
         if session_id not in self.metadata:
             raise MissingMetadataError(f"Missing metadata for {session_id}")
 
@@ -211,6 +226,14 @@ class RecordingExtractor:
 
             try:
                 mic_id = get_mic_id(_path.stem)
+                recording_mic_id = get_mic_id(sound_file.stem)
+                if mic_id != recording_mic_id:
+                    self.logger.error(
+                        "Attempted to match a track with a different mic id to an ELAN file: %s and %s",
+                        _path.stem,
+                        sound_file.stem,
+                    )
+                    continue
             except InvalidFileName:
                 if len(annotations) != 1:
                     raise  # There's no way to determine the speaker.
@@ -375,6 +398,8 @@ def extract_data(
 def find_audio_oddities(annotation_path: Path, logger=None) -> Optional[Path]:
     """
     Finds the associated audio in Audacity's format.
+    NOTE: This method does not check for a single file option, but is trying its best to match to something.
+    Thus, if there are multiple options, it will take the first.  This has been a problem in the past.
     """
 
     # Get folder name without expected track name
@@ -400,6 +425,21 @@ def find_audio_oddities(annotation_path: Path, logger=None) -> Optional[Path]:
         # try 1: the .wav file is in a subfolder, but it has 'Track number' in it
         dirs = list(_path.glob(f"**/{track}*.wav"))
         sound_file = Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
+
+    if not sound_file:
+        # try 1b: the .wav file is in a subfolder, but it has 'Track number' in it,
+        #         ** without leading zeros **
+        track_1 = track.split("_")[0]
+        try:
+            track_2 = int(track.split("_")[1])
+            dirs = [
+                path
+                for path in _path.glob(f"**/{track_1} {track_2}*.wav")
+                if Path(path).exists()
+            ]
+            sound_file = Path(dirs[0]) if len(dirs) == 1 else None
+        except ValueError:
+            pass
 
     if not sound_file:
         # try 2: the .wav file has no space between 'Track' and the number

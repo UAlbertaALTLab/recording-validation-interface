@@ -130,6 +130,10 @@ def django_recording_importer(info: Segment, recording_path: Path, logger) -> No
 
     if Recording.objects.filter(id=info.compute_sha256hash()).exists():
         # This recording is already in the DB, return early
+        if info.sound_equals(
+            Recording.objects.get(id=info.compute_sha256hash()).compressed_audio.path
+        ):
+            print("Managed to find equal files.")
         return
 
     # Recording requires a Speaker, a RecordingSession, and a Phrase.

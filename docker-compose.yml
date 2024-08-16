@@ -2,10 +2,10 @@ version: '3'
 services:
     web:
         build: .
-        image: speechdb_web
+        image: speechdb_web_prod
         restart: always
         ports:
-        - "8004:8000"
+        - "8006:8000"
         volumes:
         # HOST : CONTAINER
         - "./.env:/app/.env"
