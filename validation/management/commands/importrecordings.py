@@ -38,7 +38,10 @@ from django.core.management.base import BaseCommand, CommandError  # type: ignor
 
 from librecval import REPOSITORY_ROOT
 from librecval.extract_phrases import Segment
-from librecval.import_recordings import initialize as import_recordings
+from librecval.import_recordings import (
+    initialize as import_recordings,
+    equal_soundfiles,
+)
 from validation.models import (
     Phrase,
     Recording,
@@ -83,6 +86,14 @@ class Command(BaseCommand):
             help="compare compressed audio present in database against new candidates.  Generates a log useful when audio files already in the database may be incorrect",
         )
 
+        parser.add_argument(
+            "--replace-different-recordings",
+            action="store_true",
+            default=False,
+            dest="replace_recordings",
+            help="even if a recording already exists, replace its contents with a new evaluation.  Requires --compare-current-recordings as well, otherwise it does nothing.",
+        )
+
     def handle(
         self,
         *args,
@@ -91,13 +102,16 @@ class Command(BaseCommand):
         audio_dir: Path = Path("./audio"),
         sessions_dir=None,
         compare_recordings=False,
+        replace_recordings=False,
         **options
     ) -> None:
         if sessions_dir is None:
             sessions_dir = settings.RECVAL_SESSIONS_DIR
 
         if store_db:
-            self._handle_store_django(sessions_dir, compare_recordings)
+            self._handle_store_django(
+                sessions_dir, compare_recordings, replace_recordings
+            )
         else:
             self._handle_store_wav(sessions_dir, audio_dir, wav)
 
@@ -116,7 +130,7 @@ class Command(BaseCommand):
         )
 
     def _handle_store_django(
-        self, sessions_dir: Path, compare_recordings: bool
+        self, sessions_dir: Path, compare_recordings: bool, replace_recordings: bool
     ) -> None:
         """
         Stores m4a files, managed by Django's media engine.
@@ -129,14 +143,16 @@ class Command(BaseCommand):
                 directory=sessions_dir,
                 transcoded_recordings_path=audio_dir,
                 metadata_filename=settings.RECVAL_METADATA_PATH,
-                import_recording=django_recording_importer(compare_recordings),
+                import_recording=django_recording_importer(
+                    compare_recordings, replace_recordings
+                ),
                 recording_format="m4a",
             )
 
 
 @logme.log
 def django_recording_importer(
-    compare_recordings: bool, logger
+    compare_recordings: bool, replace_recordings: bool, logger
 ) -> Callable[[Segment, Path], None]:
     """
     Generates a function to import a single recording that is passed the options
@@ -157,15 +173,23 @@ def django_recording_importer(
                 Check if the files we are processing would generate
                 a different compressed input.
                 """
-                if not info.compressed_sound_equals(
-                    Recording.objects.get(
-                        id=info.compute_sha256hash()
-                    ).compressed_audio.path
+                recording_entry = Recording.objects.get(id=info.compute_sha256hash())
+                if not equal_soundfiles(
+                    recording_path, recording_entry.compressed_audio.path
                 ):
                     logger.warn(
                         "Recording already in database is different from what we would now introduce for Segment:\n%sYou may want to reimport this recording.",
                         info.signature(),
                     )
+                    if replace_recordings:
+                        logger.warn(
+                            "Replacing sound file for recording entry with ID %s",
+                            recording_entry.id,
+                        )
+                        audio_data = recording_path.read_bytes()
+                        django_file = ContentFile(audio_data, name=recording_path.name)
+                        recording_entry.compressed_audio = django_file
+                        recording_entry.save()
             return
 
         # Recording requires a Speaker, a RecordingSession, and a Phrase.

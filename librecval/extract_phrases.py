@@ -123,22 +123,6 @@ class Segment(NamedTuple):
         """
         return sha256(self.signature().encode("UTF-8")).hexdigest()
 
-    def compressed_sound_equals(self, path) -> bool:
-        """
-        Compare sound file candidate to something already in the database.
-        This is useful to cross-check entries already present in the database.
-        """
-        other = AudioSegment.from_file(fspath(path))
-        # AudioSegment.from_file == AudioSegment.from_file(fspath('/home/fbanados/code/recording-validation-interface/data/audio/1a5442ed4a3bc52e5e7e22b29ee4610f8dc9fe6432f60e67a79919a0fc0e1352_EJlFAPG.m4a'))
-        compressed = AudioSegment.from_file(
-            self.audio.export(format="ipod", codec="aac", parameters=["-strict", "-2"])
-        )
-        """
-        Although this technique has some false positives (say, e.g., some entries for MAR like ayâ in 2018-04-18-PM-KCH),
-        it provides a simple technique to test that should generate no false negatives.
-        """
-        return compressed == other
-
 
 # One recording, with all its metadata along with its audio.
 SegmentAndAudio = Tuple[Segment, AudioSegment]

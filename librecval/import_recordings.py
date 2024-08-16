@@ -121,3 +121,9 @@ def save_recording(
         audio.export(os.fspath(recording_path), format="wav")
     assert recording_path.exists()
     return recording_path
+
+
+def equal_soundfiles(path1: Path, path2: Path) -> bool:
+    return AudioSegment.from_file(os.fspath(path1)) == AudioSegment.from_file(
+        os.fspath(path2)
+    )
