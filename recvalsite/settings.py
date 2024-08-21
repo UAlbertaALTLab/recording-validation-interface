@@ -328,4 +328,4 @@ else:
     EMAIL_HOST_PASSWORD = config("SMTP_PASS", default=None)
     EMAIL_USE_TLS = True
 
-DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
