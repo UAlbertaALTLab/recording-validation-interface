@@ -65,7 +65,7 @@ describe("Register", () => {
             .type('test@user.com');
 
         cy.get('#id_username')
-            .type('test_user');
+            .type('test_user_'+Date.now());
 
         cy.get('#id_password')
             .type('password');

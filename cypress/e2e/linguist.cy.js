@@ -29,44 +29,42 @@ describe("Linguists", () => {
             .should('be.visible')
     })
 
-    it("can resolve an open issue", () => {
+    it.only("can resolve an open issue", () => {
         cy.visit(Cypress.env('issues'));
-
+        
         cy.get('[data-cy="issue-card"]')
-          .filter(':contains("Recording:")')
+            .filter(':contains("Recording:")')
             .first()
-            .within(() => {
-                cy.get('[data-cy="more-info-issue-button"]')
-                .within(($button) => {
-                    cy.wrap($button).find('a')
+            .find('[data-cy="more-info-issue-button"]')
+            .then(($button) => {
+                cy.wrap($button).find('a')
                     .should('have.attr', 'href')
                     .then((old_href) => {
                         cy.wrap($button).click()
-                        .then(() => {
                           
                         cy.location('pathname')
                         .should('include', old_href)
-    
-                        cy.get('[name="speaker"]')
+                        
+                        cy.get('#id_speaker')
                         .select('JER')
     
-                    cy.get('[name="phrase"]')
-                        .click()
-                        .type("hello")
+                        cy.get('[name="phrase"]')
+                            .click()
+                            .type("hello")
     
-                    cy.get('[data-cy=save-button]')
-                        .click()
+                        cy.get('[data-cy=save-button]')
+                            .click()
     
-                    cy.location('pathname')
-                        .should('include', '/issues')
+                        cy.location('pathname')
+                            .should('include', '/issues')
                 
-                    cy.get('[data-cy="issue-card"]').find('a')
-                        .should("have.attr", 'href')
-                        .should("not.contain", old_href)  
-                        })
+                        // Now make sure the issue is gone
+                        cy.visit(Cypress.env('issues'));
+                        cy.get('[data-cy="issue-card"]').find('a')
+                            .should("have.attr", 'href')
+                            .should("not.contain", old_href)  
                     })
-                })
-        })
+            })
     })
 
     it("can close an open issue", () => {
