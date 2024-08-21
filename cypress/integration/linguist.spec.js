@@ -36,6 +36,7 @@ describe("Linguists", () => {
           .contains('Recording:')
             .first()
             .within(() => {
+                cy.closest('[data-cy="issue-card"')
                 cy.get('[data-cy="more-info-issue-button"]')
                 .within(($button) => {
                     cy.wrap($button).find('a')
