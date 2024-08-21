@@ -33,6 +33,7 @@ from typing import (
     Optional,
     TextIO,
     TypeVar,
+    Union,
 )
 
 import logme  # type: ignore
@@ -266,7 +267,9 @@ class SessionMetadata:
         )
 
     @classmethod
-    def parse(cls, row: Dict[str, Any], session_name: str = None) -> "SessionMetadata":
+    def parse(
+        cls, row: Dict[str, Any], session_name: Union[str, None] = None
+    ) -> "SessionMetadata":
         """
         Parses a row from the metadata CSV file.
         Can pass an explicit session name to override what's written in the

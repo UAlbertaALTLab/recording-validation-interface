@@ -1,5 +1,5 @@
 # We suggest using the major.minor tag, not major.minor.patch.
-FROM python:3.7 AS builder
+FROM python:3.10 AS builder
 
 # Sets an environmental variable that ensures output from python is sent straight to the terminal without buffering it first
 ENV PYTHONUNBUFFERED 1
@@ -20,7 +20,7 @@ RUN PIPENV_VENV_IN_PROJECT=1 pipenv install --deploy --dev
 
 ############################# Application image ##############################
 
-FROM python:3.7
+FROM python:3.10
 
 # Choose an ID that will be consistent across all machines in the network
 # To avoid overlap with user IDs, use an ID over
