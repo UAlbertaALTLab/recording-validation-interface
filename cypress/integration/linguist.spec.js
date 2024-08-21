@@ -10,12 +10,14 @@ describe("Linguists", () => {
 
         cy.get('[data-cy="segment-card"]:first')
             .within(() => {
+                cy.get('[data-cy="card-header"]').should('have.attr', 'data-phrase-id')
+                .then((id) => {
+                    cy.get('[data-cy="options-button"]')
+                        .click()
 
-                cy.get('[data-cy="options-button"]')
-                    .click()
-
-                cy.location('pathname')
-                    .should('include', Cypress.env("awas_url"))
+                    cy.location('pathname')
+                        .should('include', Cypress.env("segment_url")+id)
+                })
             })
     })
 
