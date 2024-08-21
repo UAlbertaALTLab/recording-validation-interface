@@ -419,7 +419,7 @@ def find_audio_oddities(annotation_path: Path, logger=None) -> Optional[Path]:
         #         ** without leading zeros **
         track_1 = track.split("_")[0]
         try:
-            track_2 = int(track.split("_")[1])
+            track_2 = str(int(track.split("_")[1]))
             dirs = [
                 path
                 for path in _path.glob(f"**/{track_1} {track_2}*.wav")
