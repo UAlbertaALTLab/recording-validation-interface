@@ -316,7 +316,7 @@ LOGGING = {
 if not DEBUG:
     LOGGING["loggers"]["django.request"]["handlers"].append("mail_admins")
 
-ADMINS = [("Jolene", "jcpoulin@ualberta.ca")]
+ADMINS = [("Felipe", "banadoss@ualberta.ca")]
 
 if DEBUG:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
@@ -327,3 +327,5 @@ else:
     EMAIL_HOST_USER = config("SMTP_USER", default=None)
     EMAIL_HOST_PASSWORD = config("SMTP_PASS", default=None)
     EMAIL_USE_TLS = True
+
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"

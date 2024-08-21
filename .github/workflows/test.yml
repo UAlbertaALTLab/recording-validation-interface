@@ -3,9 +3,6 @@ name: Tests
 on:
   pull_request:
   push:
-  schedule:
-    # * is a special character in YAML so you have to quote this string
-    - cron:  '05 16 * * *'
 
 jobs:
   unit-test:
@@ -13,11 +10,11 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python: [3.7]
+        python: [3.10]
 
     steps:
       - name: checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Do LFS checkout
         # actions/checkout@v2 has a `with: lfs: true` option, but it only
@@ -29,7 +26,7 @@ jobs:
 
       - name: Set up Python
         id: set-up-python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
 
@@ -48,7 +45,7 @@ jobs:
       #   2. Setting `restore-key` to reuse caches from other Pipfile.lock
       #      versions can leave extra dependencies installed, because
       #      `pipenv install --dev` doesn’t `pipenv clean`
-      - uses: actions/cache@v2
+      - uses: actions/cache@v4
         with:
           path: ~/.local/share/virtualenvs
           key: ${{ runner.os }}-python-${{ steps.set-up-python.outputs.python-version }}-pipenv-${{ hashFiles('Pipfile.lock') }}
@@ -62,7 +59,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python: [3.7]
+        python: [3.10]
 
     steps:
       - name: checkout
@@ -78,7 +75,7 @@ jobs:
 
       - name: Set up Python
         id: set-up-python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
 
@@ -94,21 +91,21 @@ jobs:
       #   2. Setting `restore-key` to reuse caches from other Pipfile.lock
       #      versions can leave extra dependencies installed, because
       #      `pipenv install --dev` doesn’t `pipenv clean`
-      - uses: actions/cache@v2
+      - uses: actions/cache@v4
         with:
           path: ~/.local/share/virtualenvs
           key: ${{ runner.os }}-python-${{ steps.set-up-python.outputs.python-version }}-pipenv-${{ hashFiles('Pipfile.lock') }}
 
       - run: pipenv install --dev
 
-      - name: Setup Node 14
-        uses: actions/setup-node@v1
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
         with:
-          node-version: '14'
+          node-version: '22'
 
       - run: npm install
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v4
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}

@@ -10,7 +10,7 @@ A Django web app for viewing and validating Cree recordings done in Maskwacîs.
 Install
 -------
 
-Requires Python 3.7, [Pipenv][], and [ffmpeg].
+Requires Python 3.10, [Pipenv][], and [ffmpeg].
 
 [Pipenv]: https://github.com/pypa/pipenv#installation
 [ffmpeg]: https://www.ffmpeg.org/
@@ -703,7 +703,7 @@ This aggregates all of the Django apps under one deployable website.
 License
 -------
 
-Copyright (C) 2021 Eddie Antonio Santos <easantos@ualberta.ca>, Jolene Poulin <jcpoulin@ualberta.ca>
+Copyright (C) 2021-2024 Eddie Antonio Santos <easantos@ualberta.ca>, Jolene Poulin <jcpoulin@ualberta.ca>, Felipe Bañados Schwerter <banadoss@ualberta.ca>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
