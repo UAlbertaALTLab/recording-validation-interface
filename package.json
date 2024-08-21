@@ -1,4 +1,19 @@
 {
+  "name": "recording-validation-interface",
+  "private": true,
+  "engines": {
+    "node": ">=20.0"
+  },
+  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/UAlbertaALTLab/recording-validation-interface.git"
+  },
+  "author": "University of Alberta ALTLab",
+  "bugs": {
+    "url": "https://github.com/UAlbertaALTLab/recording-validation-interface/issues"
+  },
+  "homepage": "https://github.com/UAlbertaALTLab/recording-validation-interface#readme",
   "dependencies": {
     "recorderjs": "^1.0.1",
     "tailwindcss": "^2.0.3"
