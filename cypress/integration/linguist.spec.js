@@ -33,27 +33,38 @@ describe("Linguists", () => {
         cy.visit(Cypress.env('issues'));
 
         cy.get('[data-cy="issue-card"]')
+          .contains('Recording:')
             .first()
             .within(() => {
                 cy.get('[data-cy="more-info-issue-button"]')
-                    .click()
-            })
+                .within(($button) => {
+                    cy.wrap($button).find('a')
+                    .should('have.attr', 'href')
+                    .then((old_href) => {
+                        cy.wrap($button).click()
 
-        cy.location('pathname')
-            .should('include', '/issues/1')
-
-        cy.get('#id_speaker')
-            .select('JER')
-
-        cy.get('#id_phrase')
-            .click()
-            .type("hello")
-
-        cy.get('[data-cy=save-button]')
-            .click()
-
-        cy.location('pathname')
-            .should('include', '/issues')
+                        cy.location('pathname')
+                            .should('include', old_href)
+        
+                        cy.get('#id_speaker')
+                            .select('JER')
+        
+                        cy.get('#id_phrase')
+                            .click()
+                            .type("hello")
+        
+                        cy.get('[data-cy=save-button]')
+                            .click()
+        
+                        cy.location('pathname')
+                            .should('include', '/issues')
+                    
+                        cy.get('[data-cy="issue-card"]').find('a')
+                            .should("have.attr", 'href')
+                            .should("not.contain", old_href)
+                    })
+                })
+        })
     })
 
     it("can close an open issue", () => {
