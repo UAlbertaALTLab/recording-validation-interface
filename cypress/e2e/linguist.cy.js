@@ -29,7 +29,7 @@ describe("Linguists", () => {
             .should('be.visible')
     })
 
-    it.only("can resolve an open issue", () => {
+    it("can resolve an open issue", () => {
         cy.visit(Cypress.env('issues'));
         
         cy.get('[data-cy="issue-card"]')
