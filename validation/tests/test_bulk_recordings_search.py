@@ -1,6 +1,7 @@
 """
 Unit/Integration tests for the bulk recordings search API.
 """
+
 import urllib
 
 import pytest  # type: ignore

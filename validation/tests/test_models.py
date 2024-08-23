@@ -283,7 +283,7 @@ def test_phrase_has_history():
 @pytest.mark.django_db
 def test_recording():
     # Keep it in a 32 bit signed integer
-    MAX_RECORDING_LENGTH = 2 ** 31 - 1
+    MAX_RECORDING_LENGTH = 2**31 - 1
 
     recording = Recipe(
         Recording, timestamp=lambda: random.randint(0, MAX_RECORDING_LENGTH)
@@ -310,7 +310,7 @@ def test_recording():
 @pytest.mark.django_db
 def test_phrase_recordings():
     # Keep it in a 32 bit signed integer
-    MAX_RECORDING_LENGTH = 2 ** 31 - 1
+    MAX_RECORDING_LENGTH = 2**31 - 1
 
     phrase = baker.make(Phrase)
 

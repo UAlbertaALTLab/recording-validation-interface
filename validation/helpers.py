@@ -186,7 +186,7 @@ def get_translations(results):
     for i in results["results"]:
         translations, sources = extract_translations(i["lemma_wordform"])
         analysis = get_analysis_from_fst(i["wordform_text"])
-        for (source, translation) in zip(sources, translations):
+        for source, translation in zip(sources, translations):
             if {
                 "translation": translation,
                 "analysis": analysis,

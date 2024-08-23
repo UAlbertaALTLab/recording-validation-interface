@@ -35,7 +35,7 @@ MIN_TRANSCRIPTION_LENGTH = 2
 MAX_TRANSCRIPTION_LENGTH = 64
 
 # What's the longest a recording can be, in milliseconds?
-MAX_RECORDING_LENGTH = 2 ** 31 - 1
+MAX_RECORDING_LENGTH = 2**31 - 1
 
 
 def random_gender():
