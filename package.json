@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "recorderjs": "github:mattdiamond/Recorderjs",
+    "recorderjs": "github:UAlbertaALTLab/Recorderjs",
     "tailwindcss": "^2.2.19"
   },
   "devDependencies": {
