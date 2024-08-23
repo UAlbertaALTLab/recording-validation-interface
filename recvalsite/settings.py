@@ -43,7 +43,7 @@ ALLOWED_HOSTS = [
     "vm-dev",
 ]
 
-CSRF_TRUSTED_ORIGINS = [ 'https://' + host for host in ALLOWED_HOSTS ]
+CSRF_TRUSTED_ORIGINS = ["https://" + host for host in ALLOWED_HOSTS]
 
 # Application definition
 
