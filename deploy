@@ -7,5 +7,8 @@ set -eux
 cd "$(dirname "$0")"
 
 git pull
-docker build --compress -t speechdb_web .
+docker build --compress -t speechdb_web_prod .
 docker-compose up -d --remove-orphans
+docker-compose exec web python manage.py collectstatic
+docker-compose exec web python manage.py migrate
+docker-compose restart web
