@@ -152,7 +152,15 @@ along with this program.  If not, see
                             </td>
                         {% endif %}
                         {% if is_linguist %}
-                            <td>{{ recording.session.id or "-" }}</td>
+                            <td>
+                                {% if recording.updated_compressed_audio %}
+                                <strong>
+                                {% endif %}
+                                {{ recording.session.id or "-" }}
+                                {% if recording.updated_compressed_audio %}
+                                </strong>
+                                {% endif %}
+                            </td>
                         {% endif %}
                     </tr>
 

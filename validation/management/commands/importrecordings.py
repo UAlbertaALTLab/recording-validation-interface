@@ -189,6 +189,7 @@ def django_recording_importer(
                         audio_data = recording_path.read_bytes()
                         django_file = ContentFile(audio_data, name=recording_path.name)
                         recording_entry.compressed_audio = django_file
+                        recording_entry.updated_compressed_audio = True
                         recording_entry.save()
             return
 

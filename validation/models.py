@@ -594,6 +594,11 @@ class Recording(models.Model):
         blank=True,
     )
 
+    updated_compressed_audio = models.BooleanField(
+        help_text="Whether this recording was reprocessed. If true, likely the original version had the incorrect track for the session",
+        default=False
+    )
+
     # Keep track of the recording's history.
     history = HistoricalRecords(excluded_fields=["compressed_audio"])
 
