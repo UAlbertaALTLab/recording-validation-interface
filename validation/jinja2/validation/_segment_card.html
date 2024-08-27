@@ -23,7 +23,7 @@ along with this program.  If not, see
 {% import 'validation/_wrong_buttons.html' as wrong_buttons %}
 {% import 'validation/_record_feature.html' as record %}
 
-{% macro segment_card(phrase, recordings, speakers, is_linguist, is_expert, auth, forms, csrf_token, request, language) %}
+{% macro segment_card(phrase, recordings, speakers, roles, auth, forms, csrf_token, request, language) %}
 
     <article id='phrase-{{ phrase.id }}' class="card shadow-sm" data-cy="segment-card">
         {% if phrase.validated %}
@@ -65,11 +65,11 @@ along with this program.  If not, see
                 <button type="button" class="button button--fail button--flag button--right" data-toggle="modal"
                         data-target="#{{ phrase.id }}-modal" data-cy="flag-button">Flag this entry for review
                 </button><br>
-                {% if is_linguist %}
+                {% if roles.is_linguist %}
                     <a href="{{ url('validation:segment_detail', language.code, phrase.id) }}"
                        class="button button--success button--more-options button--right" data-cy="options-button">More
                         Options</a>
-                {% endif %} {# is linguist #}
+                {% endif %} {# roles.is_linguist #}
             {% endif %}
             <p class="card__title--source-language" data-cy="transcription">
                 {% if request.COOKIES['macron'] == 'off' %}
@@ -80,7 +80,7 @@ along with this program.  If not, see
             </p>
             <p class="card__title--target-language" data-cy="translation">Translation: {{ phrase.translation }}</p>
 
-            {% if is_expert and phrase.origin == "new" %}
+            {% if roles.is_expert and phrase.origin == "new" %}
                 <p>Are the transcription and translation both correct?
                     <button class="button
 
@@ -99,28 +99,28 @@ along with this program.  If not, see
                             data-phrase-id={{ phrase.id }} data-cy="idk-button">I don't know
                     </button>
                 </p>
-            {% elif is_expert %}
+            {% elif roles.is_expert %}
                 <p>This phrase is already in the {{ language.name }} dictionary.</p>
             {% endif %}
 
             <table class="card__body--table">
-                {% if is_expert %}
+                {% if roles.is_expert %}
                     <th>Best</th>{% endif %}
                 <th>Recording</th>
                 <th>Speaker</th>
 
-                {% if is_expert %}
+                {% if roles.is_expert %}
                     <th>This recording is...</th>
                     <th>This recording has the...</th>
                 {% endif %}
 
-                {% if is_linguist %}
+                {% if roles.is_linguist %}
                     <th>Recording Session</th>
                 {% endif %}
 
                 {% for recording in recordings[phrase] %}
                     <tr>
-                        {% if is_expert %}
+                        {% if roles.is_expert %}
                             <td class="green-star"><a data-cy="is-best" data-recording-id="{{ recording.id }}"
                                                       data-phrase-id-best="{{ phrase.id }}">{% if recording.is_best %}
                                 &#9733;{% else %}&#9734;{% endif %}</a></td>
@@ -133,7 +133,7 @@ along with this program.  If not, see
                         <td data-cy="speaker">
                             {{ macros.speaker(recording) }}
                         </td>
-                        {% if is_expert %}
+                        {% if roles.is_expert %}
                             <td>
                                 <button class="button
 
@@ -158,7 +158,7 @@ along with this program.  If not, see
                                 {{ wrong_buttons.button_col(recording, csrf_token, request, language) }}
                             </td>
                         {% endif %}
-                        {% if is_linguist %}
+                        {% if roles.is_linguist %}
                             <td>
                                 {% if recording.updated_compressed_audio %}
                                 <strong>
@@ -175,7 +175,7 @@ along with this program.  If not, see
 
                 {% endfor %}{# for recording in phrase.recordings #}
             </table>
-            {% if is_expert %}
+            {% if roles.is_expert %}
                 <h4>Add a New Recording:</h4>
                 <div id="record-from-entry-div-{{ phrase.id }}">
                     {{ record.record_new_entry(phrase.translation, phrase.transcription, phrase, language) }}</div>

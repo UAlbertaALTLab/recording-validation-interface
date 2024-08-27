@@ -18,14 +18,14 @@ along with this program.  If not, see
 #}
 
 
-{% macro menu_options(request, auth, is_linguist, showMacron, language) %}
+{% macro menu_options(request, auth, roles, showMacron, language) %}
     <ul id="options-menu" class="menu__options menu__options--list menu__options--right">
         {% if language %}
             <li><a href="{{ url('validation:all_speakers', language.code) }}" class="menu__options-link">Speakers</a>
             </li>
             <li><a href="{{ url('validation:home') }}" class="menu__options-link">Change Language</a></li>
         {% endif %}
-        {% if is_linguist %}
+        {% if roles.is_linguist %}
             <li><a href="{{ url('validation:issues', language.code) }}" class="menu__options-link">View open Issues</a>
             </li>
         {% endif %}
@@ -39,6 +39,10 @@ along with this program.  If not, see
             {% if language %}
                 <li><a href="{{ url('validation:record_audio', language.code) }}" class="menu__options-link">Record
                     Audio</a></li>
+            {% endif %}
+            <li>&nbsp;</li>
+            {% if roles.is_admin %}
+                <li> <a href="{{ url('admin:index') }}" class="menu__options-link">Django admin section</a></li>
             {% endif %}
             <li><a href="{{ url('validation:logout') }}" id="logout-link" class="logout-link">Logout</a></li>
 

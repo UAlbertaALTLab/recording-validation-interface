@@ -37,7 +37,7 @@ from django.contrib.auth.models import User, Group
 from django.core.mail import mail_admins
 from django.contrib.auth import login as django_login
 from django.contrib.auth.models import User
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, LogoutView
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.paginator import Paginator
 from django.db.models import Q, QuerySet
@@ -81,6 +81,12 @@ from .helpers import (
 from .crk_sort import custom_sort
 from .models import Phrase, Recording, Speaker, RecordingSession, Issue
 
+class UserRoles:
+    def __init__(self, user=None, lang=None):
+        self.is_linguist = user and user.groups.filter(name="Linguist").exists() and user.groups.filter(name=lang).exists()
+        self.is_expert = user and user.groups.filter(name__in=["Linguist", "Expert"]).exists() and user.groups.filter(name=lang).exists()
+        self.is_admin = user and user.is_superuser
+
 
 def home(request):
     """
@@ -103,8 +109,30 @@ def home(request):
     if no_lang_family:
         language_dict["All"] = no_lang_family
 
-    context = dict(languages=language_dict, language=None, auth=auth)
+    context = dict(languages=language_dict, language=None, auth=auth, roles=UserRoles(request.user, language))
     return render(request, "validation/home.html", context)
+
+
+class RecvalLoginView(LoginView):
+    template_name = 'validation/login.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'roles': UserRoles()
+        })
+        return context
+
+
+class RecvalLogoutView(LogoutView):
+    template_name = 'validation/logout.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'roles': UserRoles()
+        })
+        return context
 
 
 @transaction.atomic
@@ -126,9 +154,7 @@ def entries(request, language):
     """
     The main page.
     """
-
-    is_linguist = user_is_linguist(request.user, language)
-    is_expert = user_is_expert(request.user, language)
+    roles = UserRoles(request.user, language)
 
     # Only show selected language
     language_object = get_language_object(language)
@@ -251,8 +277,7 @@ def entries(request, language):
         phrases=phrases,
         recordings=recordings,
         auth=auth,
-        is_linguist=is_linguist,
-        is_expert=is_expert,
+        roles=roles,
         forms=forms,
         sessions=language_sessions,
         speakers=speakers,
@@ -272,8 +297,7 @@ def search_phrases(request, language):
     """
     The search results for pages.
     """
-    is_linguist = user_is_linguist(request.user, language)
-    is_expert = user_is_expert(request.user, language)
+    roles = UserRoles(request.user, language)
     language_object = get_language_object(language)
 
     query = request.GET.get("query")
@@ -314,8 +338,7 @@ def search_phrases(request, language):
         search_term=query,
         query=query_term,
         encode_query_with_page=encode_query_with_page,
-        is_linguist=is_linguist,
-        is_expert=is_expert,
+        roles=roles,
         forms=forms,
         auth=request.user.is_authenticated,
         language=language_object,
@@ -339,7 +362,7 @@ def advanced_search(request, language):
     context = dict(
         speakers=speakers,
         auth=request.user.is_authenticated,
-        is_linguist=user_is_linguist(request.user, language),
+        roles=UserRoles(request.user, language),
         language=language_object,
         semantic_classes=semantic_classes,
     )
@@ -356,8 +379,7 @@ def advanced_search_results(request, language):
     INTERSECT status
     INTERSECT speaker
     """
-    is_linguist = user_is_linguist(request.user, language)
-    is_expert = user_is_expert(request.user, language)
+    roles = UserRoles(request.user, language)
 
     transcription = request.GET.get("transcription")
     if transcription:
@@ -473,8 +495,7 @@ def advanced_search_results(request, language):
         search_term="advanced search",
         query=query,
         encode_query_with_page=encode_query_with_page,
-        is_linguist=is_linguist,
-        is_expert=is_expert,
+        roles=roles,
         forms=forms,
         auth=request.user.is_authenticated,
         language=language_object,
@@ -663,7 +684,7 @@ def segment_content_view(request, language, segment_id):
         form=form,
         history=history,
         auth=auth,
-        is_linguist=user_is_linguist(request.user, language),
+        roles=UserRoles(request.user, language),
         language=language_object,
         semantic_list=semantic_class_list,
     )
@@ -720,7 +741,7 @@ def register(request):
                 response = HttpResponseRedirect("/login")
                 return response
 
-    context = dict(form=form)
+    context = dict(form=form, roles=UserRoles())
     return render(request, "validation/register.html", context)
 
 
@@ -737,7 +758,7 @@ def view_issues(request, language):
     context = dict(
         issues=paged_issues,
         auth=request.user.is_authenticated,
-        is_linguist=user_is_linguist(request.user, language),
+        roles=UserRoles(request.user, language),
         language=language,
         encode_query_with_page=encode_query_with_page,
     )
@@ -793,7 +814,7 @@ def view_issue_detail(request, language, issue_id):
         issue=issue,
         form=form,
         auth=request.user.is_authenticated,
-        is_linguist=user_is_linguist(request.user, language),
+        roles=UserRoles(request.user, language),
         language=language,
         autocomplete=autocomplete,
     )
@@ -860,6 +881,7 @@ def speaker_view(request, language, speaker_code):
         img_path=img_path,
         speaker=speaker,
         language=language,
+        roles=UserRoles(request.user, language)
     )
     return render(request, "validation/speaker_view.html", context)
 
@@ -900,6 +922,7 @@ def all_speakers(request, language):
         speakers=speakers,
         auth=request.user.is_authenticated,
         language=language,
+        roles=UserRoles(request.user, language)
     )
     return render(request, "validation/all_speakers.html", context)
 
@@ -1143,7 +1166,7 @@ def record_audio(request, language):
         context = dict(
             form=form,
             auth=request.user.is_authenticated,
-            is_linguist=user_is_linguist(request.user, language),
+            roles=UserRoles(request.user, language),
             language=language,
         )
         return HttpResponseRedirect(f"/{language.code}/record_audio", context)
@@ -1156,7 +1179,7 @@ def record_audio(request, language):
     context = dict(
         form=form,
         auth=request.user.is_authenticated,
-        is_linguist=user_is_linguist(request.user, language),
+        roles=UserRoles(request.user, language),
         language=language,
     )
     return render(request, f"validation/record_audio.html", context)
@@ -1318,20 +1341,6 @@ def encode_query_with_page(query, page):
         query = QueryDict("", mutable=True)
     query["page"] = page
     return f"?{query.urlencode()}"
-
-
-def user_is_linguist(user, lang):
-    return (
-        user.groups.filter(name="Linguist").exists()
-        and user.groups.filter(name=lang).exists()
-    )
-
-
-def user_is_expert(user, lang):
-    return (
-        user.groups.filter(name__in=["Linguist", "Expert"]).exists()
-        and user.groups.filter(name=lang).exists()
-    )
 
 
 def user_has_alexis_permissions(user):
