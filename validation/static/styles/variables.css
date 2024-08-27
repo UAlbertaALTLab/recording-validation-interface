@@ -8,12 +8,19 @@
     --custom-pale-green: #43590090;
     --custom-purple: #39221f;
     --custom-pale-purple: #39221f90;
+    --custom-yellow: #DE970B;
     --custom-orange: #a20000;
     --custom-pale-orange: #a2000090;
     --custom-white: #ffffff;
     --custom-grey: #cccccc;
     --custom-light-grey: #eeeeee;
     --custom-beige: #e9dac4;
+    --custom-retro-1: #d5aa61;
+    --custom-retro-2: #e7dbbc;
+    --custom-retro-3: #e4844d;
+    --custom-retro-4: #cb5d46;
+    --custom-retro-5: #054150;
+    --custom-retro-6: #5aa297;
 
     /* button styles */
     --button-radius: 0.25rem;

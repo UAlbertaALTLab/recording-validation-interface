@@ -21,9 +21,9 @@
 {% block content %}
     <h2>
         {% if issue.phrase %}
-            You are editing the Phrase object for this entry
+            You are editing the Phrase object for <a href="{{ url('validation:segment_detail',issue.language.code, issue.phrase.id) }}">this entry</a>
         {% else %}
-            You are editing this specific Recording for this entry
+            You are editing this specific Recording for <a href="{{ url('validation:segment_detail',issue.language.code, issue.recording.phrase.id) }}">this entry</a>
         {% endif %}
     </h2>
     <container style="display: flex">
@@ -52,6 +52,17 @@
                 {% endif %}
             This issue was filed by {{ issue.created_by }} on
             {{ issue.created_on }}<br>
+            <br>
+            Other recordings for the same phrase are:<br>
+            <ul class="list__recording">
+                {% for recording in (issue.phrase.recordings if issue.phrase else issue.recording.phrase.recordings) %}
+                {% if issue.phrase or recording != issue.recording %}        
+                <li>
+                    {{ macros.player(recording) }} by {{recording.speaker.code}}
+                </li>
+                {% endif %}
+                {% endfor %}
+            </ul>
         </section>
 
         <section style="flex: 1">
@@ -60,7 +71,7 @@
                 <form action="" method="POST">
                     <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
                     {{ form }}
-                    <input data-cy="save-button" type="submit" class="button button--success" value="Save">
+                    <input data-cy="save-button" type="submit" class="button button--success" value="Resolve issue and return to list">
                 </form>
             {% endif %}
         </section>

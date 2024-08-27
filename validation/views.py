@@ -936,7 +936,7 @@ def record_audio_quality_judgement(request, recording_id):
     rec = get_object_or_404(Recording, id=recording_id)
     judgement = json.loads(request.body)
 
-    if judgement["judgement"] in ["good", "bad"]:
+    if judgement["judgement"] in ["good", "ok", "bad"]:
         rec.quality = judgement["judgement"]
     else:
         return HttpResponseBadRequest()

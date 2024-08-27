@@ -32,6 +32,33 @@
   cursor: pointer;
 }
 
+.button--meh {
+  color: var(--custom-yellow);
+  border: 2px solid var(--custom-yellow);
+}
+
+.button--meh > a {
+  color: var(--custom-yellow);
+}
+
+.button--meh:hover > a, .button--meh > a:hover {
+  color: var(--custom-white);
+  text-decoration: none;
+}
+
+.button--meh-solid {
+  color: var(--custom-white);
+  background-color: var(--custom-yellow);
+  border: 2px solid var(--custom-yellow);
+}
+
+.button--meh:hover, .button--meh-solid:hover {
+  color: var(--custom-white);
+  background-color: var(--custom-pale-yellow);
+  border-color: var(--custom-yellow);
+  cursor: pointer;
+}
+
 .button--fail {
   color: var(--custom-orange);
   border: 2px solid var(--custom-orange);

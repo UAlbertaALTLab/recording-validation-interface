@@ -540,10 +540,11 @@ class Recording(models.Model):
     """
 
     GOOD = "good"
+    OK = "ok"
     BAD = "bad"
     UNKNOWN = "unknown"
 
-    QUALITY_CHOICES = [(GOOD, "Good"), (BAD, "Bad"), (UNKNOWN, "Unknown")]
+    QUALITY_CHOICES = [(GOOD, "Good"), (OK, "OK"), (BAD, "Bad"), (UNKNOWN, "Unknown")]
 
     id = models.CharField(primary_key=True, max_length=SHA256_HEX_LENGTH)
 

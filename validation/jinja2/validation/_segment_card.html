@@ -140,6 +140,13 @@ along with this program.  If not, see
                                         {{ 'button--success-solid' if recording.quality == 'good' else 'button--success' }} audio-quality-good"
                                         data-cy="good-button" data-rec-id={{ recording.id }}>Good
                                 </button>
+
+                                <button class="button
+
+                                        {{ 'button--meh-solid' if recording.quality == 'ok' else 'button--meh' }} audio-quality-ok"
+                                        data-cy="ok-button" data-rec-id={{ recording.id }}>OK
+                                </button>
+                                
                                 <button class="button
 
                                         {{ 'button--fail-solid' if recording.quality == 'bad' else 'button--fail' }} audio-quality-bad"

@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    for (let judgement of ["good", "bad"]) {
+    for (let judgement of ["good", "ok", "bad"]) {
         for (let button of document.querySelectorAll(`.audio-quality-${judgement}`)) {
             button.addEventListener("click", async (e) => {
                 const recordingId = e.target.dataset.recId
@@ -93,19 +93,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 const goodButton = getElementByRecordingId("audio-quality-good", recordingId);
+                const okButton = getElementByRecordingId("audio-quality-ok", recordingId);
                 const badButton = getElementByRecordingId("audio-quality-bad", recordingId);
                 const wrongWordButton = getElementByRecordingId("wrong-word-button", recordingId);
                 const wrongSpeakerButton = getElementByRecordingId("wrong-speaker-button", recordingId);
 
-                wrongWordButton.classList.replace("button--neutral-solid", "button--neutral")
-                wrongSpeakerButton.classList.replace("button--neutral-solid", "button--neutral")
+                // wrongWordButton.classList.replace("button--neutral-solid", "button--neutral")
+                // wrongSpeakerButton.classList.replace("button--neutral-solid", "button--neutral")
 
                 if (judgement === 'good') {
                     button.classList.replace("button--success", "button--success-solid")
                     badButton.classList.replace("button--fail-solid", "button--fail")
+                    okButton.classList.replace("button--meh-solid", "button--meh")                    
                 } else if (judgement === 'bad') {
                     button.classList.replace("button--fail", "button--fail-solid")
                     goodButton.classList.replace("button--success-solid", "button--success")
+                    okButton.classList.replace("button--meh-solid", "button--meh")                    
+                } else if (judgement === 'ok') {
+                    button.classList.replace("button--meh", "button--meh-solid")
+                    goodButton.classList.replace("button--success-solid", "button--success")
+                    badButton.classList.replace("button--fail-solid", "button--fail")
                 }
             })
         }

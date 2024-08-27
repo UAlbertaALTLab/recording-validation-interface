@@ -21,13 +21,31 @@
 {% macro issue_card(issue, language) %}
     <div class="col-sm-6">
         <article class="card shadow" data-cy="issue-card">
-            <div class="card__header card__header--beige" data-cy="card-header">
-                <div class="right">
+            <div class="card__header
+            {% if issue.recording %}
+                {% if issue.recording.wrong_speaker %}
+                card__header--set-2
+                {% else %}
+                card__header--set-3
+                {% endif %}
+            {% else %}card__header--set-1{% endif %}" data-cy="card-header">
+                <div class="float-left">
+                    <h5 class="card-title">
+                        {% if issue.recording %}
+                        {% if issue.recording.wrong_speaker %}
+                        Wrong Speaker
+                        {% else %}
+                        Wrong word
+                        {% endif %}
+                        {% endif %}
+                    </h5>
+                </div>
+                <div class="float-right">
                     <button class="button button--neutral" data-cy="more-info-issue-button">
                         <a href="{{ url('validation:issue_detail', language.code, issue.id) }}">More Info</a>
                     </button>
                     <button class="button button--fail" data-cy="close-issue-button">
-                        <a href="{{ url('validation:close_issue', language.code, issue.id) }}">Close Issue</a>
+                        <a href="{{ url('validation:close_issue', language.code, issue.id) }}">Close Issue Unchanged</a>
                     </button>
                 </div>
             </div>
