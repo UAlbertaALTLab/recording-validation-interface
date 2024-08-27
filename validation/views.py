@@ -81,10 +81,19 @@ from .helpers import (
 from .crk_sort import custom_sort
 from .models import Phrase, Recording, Speaker, RecordingSession, Issue
 
+
 class UserRoles:
     def __init__(self, user=None, lang=None):
-        self.is_linguist = user and user.groups.filter(name="Linguist").exists() and user.groups.filter(name=lang).exists()
-        self.is_expert = user and user.groups.filter(name__in=["Linguist", "Expert"]).exists() and user.groups.filter(name=lang).exists()
+        self.is_linguist = (
+            user
+            and user.groups.filter(name="Linguist").exists()
+            and user.groups.filter(name=lang).exists()
+        )
+        self.is_expert = (
+            user
+            and user.groups.filter(name__in=["Linguist", "Expert"]).exists()
+            and user.groups.filter(name=lang).exists()
+        )
         self.is_admin = user and user.is_superuser
 
 
@@ -109,29 +118,30 @@ def home(request):
     if no_lang_family:
         language_dict["All"] = no_lang_family
 
-    context = dict(languages=language_dict, language=None, auth=auth, roles=UserRoles(request.user, language))
+    context = dict(
+        languages=language_dict,
+        language=None,
+        auth=auth,
+        roles=UserRoles(request.user, language),
+    )
     return render(request, "validation/home.html", context)
 
 
 class RecvalLoginView(LoginView):
-    template_name = 'validation/login.html'
+    template_name = "validation/login.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update({
-            'roles': UserRoles()
-        })
+        context.update({"roles": UserRoles()})
         return context
 
 
 class RecvalLogoutView(LogoutView):
-    template_name = 'validation/logout.html'
+    template_name = "validation/logout.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update({
-            'roles': UserRoles()
-        })
+        context.update({"roles": UserRoles()})
         return context
 
 
@@ -881,7 +891,7 @@ def speaker_view(request, language, speaker_code):
         img_path=img_path,
         speaker=speaker,
         language=language,
-        roles=UserRoles(request.user, language)
+        roles=UserRoles(request.user, language),
     )
     return render(request, "validation/speaker_view.html", context)
 
@@ -922,7 +932,7 @@ def all_speakers(request, language):
         speakers=speakers,
         auth=request.user.is_authenticated,
         language=language,
-        roles=UserRoles(request.user, language)
+        roles=UserRoles(request.user, language),
     )
     return render(request, "validation/all_speakers.html", context)
 
