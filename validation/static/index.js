@@ -104,13 +104,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (judgement === 'good') {
                     button.classList.replace("button--success", "button--success-solid")
                     badButton.classList.replace("button--fail-solid", "button--fail")
-                    okButton.classList.replace("button--meh-solid", "button--meh")                    
+                    okButton.classList.replace("button--ok-solid", "button--ok")                    
                 } else if (judgement === 'bad') {
                     button.classList.replace("button--fail", "button--fail-solid")
                     goodButton.classList.replace("button--success-solid", "button--success")
-                    okButton.classList.replace("button--meh-solid", "button--meh")                    
+                    okButton.classList.replace("button--ok-solid", "button--ok")                    
                 } else if (judgement === 'ok') {
-                    button.classList.replace("button--meh", "button--meh-solid")
+                    button.classList.replace("button--ok", "button--ok-solid")
                     goodButton.classList.replace("button--success-solid", "button--success")
                     badButton.classList.replace("button--fail-solid", "button--fail")
                 }
