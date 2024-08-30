@@ -72,7 +72,11 @@
                     <ul class="table__td--speaker">
                         {% for recording in phrase.recordings %}
                             <li class="list__item--speaker-code">
+                                {% if recording.updated_compressed_audio %}
+                                <strong> {% endif %}
                                 {{ macros.speaker(recording) }}
+                                {% if recording.updated_compressed_audio %}
+                                </strong> {% endif %}
                             </li>
 
                         {% endfor %}{# for recording in phrase.recordings #}

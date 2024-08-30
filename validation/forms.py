@@ -106,6 +106,15 @@ class EditSegment(forms.Form):
         required=False,
         widget=forms.TextInput(attrs={"class": "form-control"}),
     )
+
+    stem = forms.CharField(
+        required=False, widget=forms.TextInput(attrs={"class": "form-control"})
+    )
+
+    lexical_category = forms.CharField(
+        required=False, widget=forms.TextInput(attrs={"class": "form-control"})
+    )
+
     comment = forms.CharField(
         required=False,
         widget=forms.TextInput(attrs={"class": "form-control bottom-margin"}),
@@ -114,6 +123,7 @@ class EditSegment(forms.Form):
     def __init__(self, *args, **kwargs):
         super(EditSegment, self).__init__(*args, **kwargs)
         self.fields["source_language"].label = "Entry"
+        self.fields["lexical_category"].label = "Lexical Category"
 
 
 class FlagSegment(forms.ModelForm):

@@ -684,6 +684,8 @@ def segment_content_view(request, language, segment_id):
             "translation": phrase.translation,
             "analysis": phrase.analysis,
             "comment": phrase.comment,
+            "stem": phrase.stem,
+            "lexical_category": phrase.lexical_category
         }
     )
 
