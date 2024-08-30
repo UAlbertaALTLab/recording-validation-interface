@@ -230,6 +230,18 @@ class Phrase(models.Model):
         null=True,
     )
 
+    stem = models.CharField(
+        help_text="The stem of the word",
+        blank=True,
+        max_length=MAX_TRANSCRIPTION_LENGTH,
+    )
+
+    lexical_category = models.CharField(
+        help_text="The Lexical Category of the word",
+        blank=True,
+        max_length=MAX_TRANSCRIPTION_LENGTH,
+    )
+
     semantic_class = models.ManyToManyField(SemanticClass, blank=True)
 
     status = models.CharField(
