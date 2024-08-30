@@ -122,6 +122,10 @@ document.addEventListener('DOMContentLoaded', () => {
         button.addEventListener("click", async (e) => {
             const recordingId = e.target.dataset.recordingId;
             const phraseId = e.target.dataset.phraseIdBest;
+            
+            // Make immediate feedback for clicks
+            e.target.parentElement.className = "red-star";
+            e.target.innerHTML = "&#9733;";
 
             const response = await fetch(`/api/record_audio_is_best/${recordingId}`, {
                 method: 'POST',
@@ -151,6 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 e.target.innerHTML = "&#9734;";
             }
+            e.target.parentElement.className="green-star";
         })
     }
 

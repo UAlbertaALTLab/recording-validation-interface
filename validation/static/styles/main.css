@@ -143,6 +143,12 @@ a:hover {
   cursor: pointer;
 }
 
+.red-star, .red-star > a {
+  color: var(--custom-orange);
+  text-decoration: none;
+  font-size:120%
+}
+
 .empty-semantic-class {
   color: grey;
 }
