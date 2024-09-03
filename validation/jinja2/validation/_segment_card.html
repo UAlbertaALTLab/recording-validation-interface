@@ -157,6 +157,16 @@ along with this program.  If not, see
 
                             <td>
                                 {{ wrong_buttons.button_col(recording, csrf_token, request, language) }}
+                                {% if roles.is_linguist and recording.issue_set.count() > 0 %}
+                                <div class="dropdown">
+                                    <button class="button button--neutral dropdown-toggle" data-cy="view-issue-button" data-toggle="dropdown" aria-expanded="false">Issues...</button>
+                                    <div class="dropdown-menu">
+                                        {% for issue in recording.issue_set.filter(status="open") %}
+                                        <a class="dropdown-item" href="{{ url('validation:issue_detail', language.code, issue.id)}}" target="_blank">{{issue}}</a>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endif %}
                             </td>
                         {% endif %}
                         {% if roles.is_linguist %}
