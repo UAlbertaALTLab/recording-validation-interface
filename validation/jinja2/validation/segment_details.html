@@ -14,9 +14,8 @@
     }
 
     function goBack() {
-        window.location = document.referrer;
+        location.href = "{{request.META.HTTP_REFERER}}";
     }
-
 
 </script>
 

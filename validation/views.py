@@ -787,25 +787,33 @@ def view_issue_detail(request, language, issue_id):
         if request.method == "POST":
             form = EditIssueWithRecording(request.POST)
             if request.method == "POST" and form.is_valid():
+                form.issue_origin_url = request.session.get(
+                    "issue_origin_url", url("validation:issues", language.code)
+                )
                 return handle_save_issue_with_recording(form, issue, request, language)
         else:
             phrase = issue.source_language_suggestion
             if not phrase:
                 phrase = issue.recording.phrase.transcription
             form = EditIssueWithRecording(
-                initial={
-                    "phrase": phrase,
-                    "speaker": issue.recording.speaker,
-                }
+                initial={"phrase": phrase, "speaker": issue.recording.speaker}
             )
             autocomplete = list(
                 Phrase.objects.values_list("transcription", flat=True).distinct()
+            )
+
+            # Save previous URL to make the "back" button work properly
+            request.session["issue_origin_url"] = request.META.get(
+                "HTTP_REFERER", url("validation:issues", language.code)
             )
 
     if issue.phrase:
         if request.method == "POST":
             form = EditIssueWithPhrase(request.POST)
             if request.method == "POST" and form.is_valid():
+                form.issue_origin_url = request.session.get(
+                    "issue_origin_url", url("validation:issues", language.code)
+                )
                 return handle_save_issue_with_phrase(form, issue, request, language)
         else:
             transcription_initial = issue.source_language_suggestion
@@ -820,6 +828,11 @@ def view_issue_detail(request, language, issue_id):
                     "transcription": transcription_initial,
                     "translation": translation_initial,
                 }
+            )
+
+            # Save previous URL to make the "back" button work properly
+            request.session["issue_origin_url"] = request.META.get(
+                "HTTP_REFERER", url("validation:issues", language.code)
             )
 
     context = dict(
@@ -839,7 +852,9 @@ def close_issue(request, language, issue_id):
     issue.status = Issue.RESOLVED
     issue.save()
 
-    return HttpResponseRedirect(url("validation:issues", language.code))
+    return HttpResponseRedirect(
+        request.META.get("HTTP_REFERER", url("validation:issues", language.code))
+    )
 
 
 AVAILABLE_IMAGES = [
@@ -1320,7 +1335,11 @@ def handle_save_issue_with_recording(form, issue, request, language):
 
     issue.status = Issue.RESOLVED
     issue.save()
-    return HttpResponseRedirect(url("validation:issues", language.code))
+    return HttpResponseRedirect(
+        form.issue_origin_url
+        if form.issue_origin_url
+        else url("validation:issues", language.code)
+    )
 
 
 def handle_save_issue_with_phrase(form, issue, request, language):
@@ -1345,7 +1364,11 @@ def handle_save_issue_with_phrase(form, issue, request, language):
 
     issue.status = Issue.RESOLVED
     issue.save()
-    return HttpResponseRedirect(url("validation:issues", language.code))
+    return HttpResponseRedirect(
+        form.issue_origin_url
+        if form.issue_origin_url
+        else url("validation:issues", language.code)
+    )
 
 
 def encode_query_with_page(query, page):
