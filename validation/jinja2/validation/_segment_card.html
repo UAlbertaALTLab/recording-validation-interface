@@ -157,7 +157,14 @@ along with this program.  If not, see
 
                             <td>
                                 {{ wrong_buttons.button_col(recording, csrf_token, request, language) }}
-                                {% if roles.is_linguist and recording.issue_set.count() > 0 %}
+                                {% if roles.is_linguist 
+                                    and (recording.wrong_speaker or recording.wrong_word) 
+                                    and recording.issue_set.count() > 0 %}
+                                {% if recording.issue_set.count() == 1 %}
+                                <a class="button button--neutral"
+                                   data-cy="view-issue-button" 
+                                   href="{{ url('validation:issue_detail', language.code, recording.issue_set.get().id)}}">See Issue...</a>
+                                {% else %}
                                 <div class="dropdown">
                                     <button class="button button--neutral dropdown-toggle" data-cy="view-issue-button" data-toggle="dropdown" aria-expanded="false">Issues...</button>
                                     <div class="dropdown-menu">
@@ -166,6 +173,7 @@ along with this program.  If not, see
                                         {% endfor %}
                                     </div>
                                 </div>
+                                {% endif %}
                                 {% endif %}
                             </td>
                         {% endif %}
