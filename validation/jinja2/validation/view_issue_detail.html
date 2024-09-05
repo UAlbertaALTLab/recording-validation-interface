@@ -53,7 +53,12 @@
             This issue was filed by {{ issue.created_by }} on
             {{ issue.created_on }}<br>
             <br>
-            Other recordings for the same phrase are:<br>
+            {% if issue.phrase %}
+            The recordings for this phrase are:
+            {% else %}
+            Other recordings for the same phrase:
+            {% endif %}
+            <br>
             <ul class="list__recording">
                 {% for recording in (issue.phrase.recordings if issue.phrase else issue.recording.phrase.recordings) %}
                 {% if issue.phrase or recording != issue.recording %}        
