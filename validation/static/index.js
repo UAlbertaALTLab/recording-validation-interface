@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 const goodButton = getElementByRecordingId("audio-quality-good", recordingId);
-                const okButton = getElementByRecordingId("audio-quality-ok", recordingId);
+                // const okButton = getElementByRecordingId("audio-quality-ok", recordingId);
                 const badButton = getElementByRecordingId("audio-quality-bad", recordingId);
                 const wrongWordButton = getElementByRecordingId("wrong-word-button", recordingId);
                 const wrongSpeakerButton = getElementByRecordingId("wrong-speaker-button", recordingId);
@@ -104,13 +104,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (judgement === 'good') {
                     button.classList.replace("button--success", "button--success-solid")
                     badButton.classList.replace("button--fail-solid", "button--fail")
-                    okButton.classList.replace("button--ok-solid", "button--ok")                    
+                    // okButton.classList.replace("button--ok-solid", "button--ok")                    
                 } else if (judgement === 'bad') {
                     button.classList.replace("button--fail", "button--fail-solid")
                     goodButton.classList.replace("button--success-solid", "button--success")
-                    okButton.classList.replace("button--ok-solid", "button--ok")                    
+                    // okButton.classList.replace("button--ok-solid", "button--ok")                    
                 } else if (judgement === 'ok') {
-                    button.classList.replace("button--ok", "button--ok-solid")
+                    // button.classList.replace("button--ok", "button--ok-solid")
                     goodButton.classList.replace("button--success-solid", "button--success")
                     badButton.classList.replace("button--fail-solid", "button--fail")
                 }
