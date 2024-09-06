@@ -48,6 +48,7 @@ class Command(BaseCommand):
             "--speakers",
             nargs=2,
             help="The short codes used for speakers.  Provide two.",
+            required=True
         )
 
     def handle(self, *args, session_id, speakers, **options) -> None:
