@@ -562,7 +562,7 @@ SHA256_HEX_LENGTH = 64
 
 
 def get_default_collection():
-    return Collection.objects.get_or_create(code="DEFAULT")
+    return Collection.objects.get(code="DEFAULT").code
 
 
 class Recording(models.Model):
