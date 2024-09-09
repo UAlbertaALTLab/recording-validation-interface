@@ -89,6 +89,18 @@ class LanguageVariant(models.Model):
         return self.name
 
 
+class Collection(models.Model):
+    code = models.CharField(
+        help_text="Short code assigned to collection",
+        max_length=8,
+        primary_key=True,
+    )
+
+    name = models.CharField(help_text="The collection's name", max_length=2048)
+
+    comment = models.TextField()
+
+
 class SemanticClass(models.Model):
     """
     A semantic class, typically from WordNet or RapidWords that describes a phrase
@@ -549,6 +561,10 @@ def generate_primary_key(sender, instance, **kwargs):
 SHA256_HEX_LENGTH = 64
 
 
+def get_default_collection():
+    return Collection.objects.get_or_create(code="DEFAULT")
+
+
 class Recording(models.Model):
     """
     A recording of a phrase.
@@ -617,6 +633,10 @@ class Recording(models.Model):
 
     # Keep track of the recording's history.
     history = HistoricalRecords(excluded_fields=["compressed_audio"])
+
+    collection = models.ForeignKey(
+        "Collection", on_delete=models.SET_DEFAULT, default=get_default_collection
+    )
 
     def __str__(self):
         return f'"{self.phrase}" recorded by {self.speaker} during {self.session}'
@@ -707,18 +727,6 @@ class Issue(models.Model):
         choices=STATUS_CHOICES,
         default=OPEN,
     )
-
-
-class Collection(models.Model):
-    code = models.CharField(
-        help_text="Short code assigned to collection",
-        max_length=8,
-        primary_key=True,
-    )
-
-    name = models.CharField(help_text="The collection's name", max_length=2048)
-
-    comment = models.TextField()
 
 
 # ############################### Utilities ############################### #
