@@ -197,6 +197,8 @@ class Phrase(models.Model):
         (NEW_WORD, "New word"),
     )
 
+    # TODO: Because this field is recording-dependent and immutable, it should belong to the recording.
+    #       Why?  Because we want to be able to merge phrases later, and we do not want to have to decide which one to keep.
     field_transcription = models.CharField(
         help_text="The transcription from the day of the recording. This should never change.",
         blank=False,
@@ -258,6 +260,7 @@ class Phrase(models.Model):
         **arguments_for_choices(ORIGIN_CHOICES),
     )
 
+    # TODO: Should this be here?
     osid = models.CharField(
         help_text="Typically, this is the os##### for Tsuut'ina recordings",
         null=True,
@@ -704,6 +707,18 @@ class Issue(models.Model):
         choices=STATUS_CHOICES,
         default=OPEN,
     )
+
+
+class Collection(models.Model):
+    code = models.CharField(
+        help_text="Short code assigned to collection",
+        max_length=8,
+        primary_key=True,
+    )
+
+    name = models.CharField(help_text="The collection's name", max_length=2048)
+
+    comment = models.TextField()
 
 
 # ############################### Utilities ############################### #
