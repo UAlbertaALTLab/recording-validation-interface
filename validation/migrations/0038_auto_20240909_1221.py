@@ -14,6 +14,4 @@ class Migration(migrations.Migration):
         ("validation", "0037_collection"),
     ]
 
-    operations = [
-        migrations.RunPython(create_data)
-    ]
+    operations = [migrations.RunPython(create_data)]
