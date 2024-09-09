@@ -16,13 +16,24 @@
 from django.contrib import admin
 from simple_history.admin import SimpleHistoryAdmin
 
-from .models import Phrase, Recording, RecordingSession, Speaker, Issue, LanguageVariant
+from .models import (
+    Phrase,
+    Recording,
+    RecordingSession,
+    Speaker,
+    Issue,
+    LanguageVariant,
+    SemanticClass,
+    Collection,
+)
 
 admin.site.register(Phrase, SimpleHistoryAdmin)
 admin.site.register(RecordingSession)
 admin.site.register(Speaker)  # TODO: use simplehistory
 admin.site.register(Recording, SimpleHistoryAdmin)
 admin.site.register(LanguageVariant)
+admin.site.register(SemanticClass)
+admin.site.register(Collection)
 
 
 class IssueAdmin(admin.ModelAdmin):
