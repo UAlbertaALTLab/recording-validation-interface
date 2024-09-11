@@ -33,8 +33,9 @@
                     <h5 class="card-title">
                         {% if issue.recording %}
                         {% if issue.recording.wrong_speaker %}
-                        Wrong Speaker
-                        {% else %}
+                        Wrong speaker 
+                        {% endif %}
+                        {% if issue.recording.wrong_word %}
                         Wrong word
                         {% endif %}
                         {% endif %}

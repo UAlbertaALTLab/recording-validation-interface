@@ -807,6 +807,7 @@ def view_issue_detail(request, language, issue_id):
             request.session["issue_origin_url"] = request.META.get(
                 "HTTP_REFERER", url("validation:issues", language.code)
             )
+            other_issues = issue.recording.issue_set.filter(~Q(id=issue.id))
 
     if issue.phrase:
         if request.method == "POST":
@@ -835,6 +836,7 @@ def view_issue_detail(request, language, issue_id):
             request.session["issue_origin_url"] = request.META.get(
                 "HTTP_REFERER", url("validation:issues", language.code)
             )
+            other_issues = issue.phrase.issue_set.filter(~Q(id=issue.id))
 
     context = dict(
         issue=issue,
@@ -843,6 +845,7 @@ def view_issue_detail(request, language, issue_id):
         roles=UserRoles(request.user, language),
         language=language,
         autocomplete=autocomplete,
+        other_issues=other_issues
     )
     return render(request, "validation/view_issue_detail.html", context)
 

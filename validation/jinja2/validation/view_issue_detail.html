@@ -17,6 +17,7 @@
 
 {% extends 'validation/_base.html' %}
 {% import 'validation/_macros.html' as macros %}
+{% import 'validation/_issue_card.html' as issue_card %}
 
 {% block content %}
     <h2>
@@ -68,6 +69,14 @@
                 {% endif %}
                 {% endfor %}
             </ul>
+            <div class="row">
+                {% if other_issues %}
+                <p> There are other issues for this specific entry as well:</p>
+                {% endif %}
+                {% for issue in other_issues %}
+                    {{ issue_card.issue_card(issue, language) }}
+                {% endfor %}
+            </div>
         </section>
 
         <section style="flex: 1">
