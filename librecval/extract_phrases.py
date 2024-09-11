@@ -430,10 +430,27 @@ def find_audio_oddities(annotation_path: Path, logger=None) -> Optional[Path]:
             pass
 
     if not sound_file:
+        # try 1c: the .wav file is in a subfolder, but it has 'Track number' in it,
+        #         ** without leading zeros **
+        track_1 = track.split("_")[0]
+        try:
+            track_2 = "_".join(track.split("_")[1:])
+            dirs = [
+                path
+                for path in _path.glob(f"**/{track_1} {track_2}*.wav")
+                if Path(path).exists()
+            ]
+            sound_file = Path(dirs[0]) if len(dirs) == 1 else None
+        except ValueError:
+            pass
+
+    if not sound_file:
         # try 2: the .wav file has no space between 'Track' and the number
         track_2 = track_1.replace(" ", "")
         dirs = list(_path.glob(f"**/{track_2}*.wav"))
-        sound_file = Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
+        sound_file = (
+            Path(dirs[0]) if len(dirs) == 1 and Path(dirs[0]).exists() else None
+        )
 
     if not sound_file:
         # try 3: the .wav file does have a space between 'Track' and the number
@@ -453,31 +470,33 @@ def find_audio_oddities(annotation_path: Path, logger=None) -> Optional[Path]:
 
         track_3 = track_3[:-1]
         dirs = list(_path.glob(f"**/{track_3}*.wav"))
-        sound_file = Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
+        sound_file = (
+            Path(dirs[0]) if len(dirs) == 1 and Path(dirs[0]).exists() else None
+        )
         if not sound_file:
             track_4 = track_3.replace("Track", "Track ")
             dirs = list(_path.glob(f"**/{track_4}*.wav"))
             sound_file = (
-                Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
+                Path(dirs[0]) if len(dirs) == 1 and Path(dirs[0]).exists() else None
             )
         if not sound_file:
             track_5 = track_3.replace(" ", "")
             track_5 = track_5.replace("Track_", "Track ")
             dirs = list(_path.glob(f"**/{track_5}*.wav"))
             sound_file = (
-                Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
+                Path(dirs[0]) if len(dirs) == 1 and Path(dirs[0]).exists() else None
             )
         if not sound_file:
             track_6 = track_3.replace("track", "Track")
             dirs = list(_path.glob(f"**/{track_6}*.wav"))
             sound_file = (
-                Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
+                Path(dirs[0]) if len(dirs) == 1 and Path(dirs[0]).exists() else None
             )
         if not sound_file:
             track_7 = track_3.replace("Track 0", "Track ")
             dirs = list(_path.glob(f"**/{track_7}*.wav"))
             sound_file = (
-                Path(dirs[0]) if len(dirs) > 0 and Path(dirs[0]).exists() else None
+                Path(dirs[0]) if len(dirs) == 1 and Path(dirs[0]).exists() else None
             )
 
     if not sound_file:
