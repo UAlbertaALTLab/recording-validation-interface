@@ -53,6 +53,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
 from django.utils.http import urlencode
 from django.views.decorators.http import require_http_methods
+from django.core.exceptions import PermissionDenied
 
 from librecval.normalization import to_indexable_form
 from librecval.recording_session import SessionID
@@ -1106,6 +1107,110 @@ def approve_user_phrase(request, phrase_id):
 
 
 @login_required()
+def merge_phrases_view(request, language):
+    roles = UserRoles(request.user, language)
+    if request.method == "GET" and (roles.is_linguist or roles.is_admin):
+        return merge_phrases_search(request, language)
+    raise PermissionDenied
+
+
+def merge_phrases_search(request, language):
+    language = get_language_object(language)
+    roles = UserRoles(request.user, language)
+
+    # Perform search
+    candidates = False
+    query = request.GET.get("merge-search", "")
+    if query:
+        candidates = (
+            Phrase.objects.filter(language=language)
+            .filter(
+                Q(transcription__contains=query)
+                | Q(fuzzy_transcription__contains=to_indexable_form(query))
+                | Q(translation__contains=query)
+            )
+            .order_by("transcription")
+        )
+
+    context = dict(
+        # form=form,
+        auth=request.user.is_authenticated,
+        roles=UserRoles(request.user, language),
+        language=language,
+        candidates=candidates,
+    )
+    return render(request, f"validation/merge_phrases_search.html", context)
+
+
+def phrases_can_auto_merge(candidates):
+    if candidates.count() < 2:
+        return False
+    first = candidates[0]
+    # Check that each Phrase in the query set is the same:
+    for candidate in candidates[1:]:
+        if not all(
+            [
+                candidate.transcription == first.transcription,
+                candidate.translation == first.translation,
+                candidate.language == first.language,
+                candidate.analysis == first.analysis
+                or (not candidate.analysis)
+                or (not first.analysis),
+                candidate.comment == first.comment
+                or (not candidate.comment)
+                or (not first.comment),
+            ]
+        ):
+            return False
+    return True
+
+
+@login_required()
+def merge_phrases_delete(request, language):
+    language = get_language_object(language)
+    roles = UserRoles(request.user, language)
+    if not (roles.is_linguist or roles.is_admin):
+        raise PermissionDenied
+    if request.method == "GET":
+        merge_items = [int(id) for id in request.GET.getlist("merge-selected")]
+        candidates = Phrase.objects.filter(id__in=merge_items).order_by("transcription")
+        if phrases_can_auto_merge(candidates):
+            handle_merge_phrases(
+                candidates.first(), Phrase.objects.filter(id__in=merge_items[1:]), True
+            )
+            return HttpResponseRedirect(url("validation:merge-search", language.code))
+        context = dict(
+            auth=request.user.is_authenticated,
+            roles=UserRoles(request.user, language),
+            language=language,
+            candidates=candidates,
+        )
+        return render(request, f"validation/merge_phrases_candidate.html", context)
+    if request.method == "POST":
+        destination = request.POST.get("merge-canonical", "")
+        if destination:
+            # The idea of the last check is that we should do nothing unless explicitly told where to place merge destinations.
+            merge_items = [
+                int(id)
+                for id in request.POST.getlist("merge-selected")
+                if id != destination
+            ]
+            should_deep_merge = destination == "MERGE"
+            if len(merge_items) > 0:
+                if should_deep_merge:
+                    destination = merge_items[0]
+                    merge_items = merge_items[1:]
+                candidates = Phrase.objects.filter(id__in=merge_items)
+                handle_merge_phrases(
+                    Phrase.objects.get(id=int(destination)),
+                    candidates,
+                    should_deep_merge,
+                )
+        return HttpResponseRedirect(url("validation:merge-search", language.code))
+    raise PermissionDenied
+
+
+@login_required()
 def record_audio(request, language):
     language = get_language_object(language)
     transcription = request.GET.get("transcription") or ""
@@ -1304,6 +1409,75 @@ def throw_500(request):
 
 
 # Small Helper functions
+
+
+def merge_strings(join_str=" | "):
+    def merge_function(destination, field, string_set):
+        values = [(" ".join(s.split()).strip()) for s in string_set if s]
+        setattr(destination, field, join_str.join(values))
+
+    return merge_function
+
+
+def merge_many_to_many(destination, field, dataset):
+    manager = getattr(destination, field)
+    for entries in dataset:
+        for entry in entries.all():
+            manager.add(entry)
+
+
+def merge_int_with_function(function):
+    def merge_function(destination, field, set):
+        setattr(destination, field, function(set))
+
+    return merge_function
+
+
+def different_contents_queryset(field, dest_value):
+    if hasattr(dest_value, "all"):
+        # The field is likely a many to many field, or some other using a RelatedManager
+        return ~Q(**{(field + "__in"): dest_value.all()})
+    return ~Q(**{field: dest_value})
+
+
+def handle_merge_phrases(destination, sources, should_deep_merge):
+
+    # Change all the phrases on the recordings for sources to the new canonical phrase
+    for source in sources:
+        for recording in source.recording_set.all():
+            recording.phrase = destination
+            recording.save(update_fields=["phrase"])
+
+    # Check for all fields in the set:
+    if should_deep_merge:
+        fields = {
+            "field_transcription": merge_strings(),
+            "transcription": merge_strings(),
+            "translation": merge_strings(),
+            "stem": merge_strings(),
+            "lexical_category": merge_strings(),
+            "osid": merge_strings(),
+            "analysis": merge_strings("\n"),
+            "comment": merge_strings(),
+            "display_order": merge_int_with_function(min),
+            "semantic_class": merge_many_to_many,
+        }
+        updated = []
+        for field, merge_fields in fields.items():
+            dest_value = getattr(destination, field)
+            if (
+                sources.filter(different_contents_queryset(field, dest_value)).count()
+                > 0
+            ):
+                # There is a different field!  Thus we must merge.
+                values = {getattr(entry, field) for entry in sources}
+                values.add(dest_value)
+                merge_fields(destination, field, values)
+                updated.append(field)
+        destination.save()
+
+    # Delete each of the source phrases
+    sources.delete()
 
 
 def handle_save_issue_with_recording(form, issue, request, language):

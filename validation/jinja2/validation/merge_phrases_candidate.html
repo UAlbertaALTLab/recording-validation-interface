@@ -1,0 +1,71 @@
+{#
+      Copyright (C) 2024 Felipe Bañados Schwerter <banadoss@ualberta.ca>
+
+      This program is free software: you can redistribute it and/or modify
+      it under the terms of the GNU Affero General Public License as
+      published by the Free Software Foundation, either version 3 of the
+      License, or (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      GNU Affero General Public License for more details.
+
+      You should have received a copy of the GNU Affero General Public License
+      along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#}
+
+{% extends 'validation/_base.html' %}
+{% import 'validation/_macros.html' as macros %}
+
+{% block content %}
+        <h2>Merge entries</h2>
+        <form method="POST" action="{{
+            url('validation:merge-delete', language.code)
+          }}">
+            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+        <div class="alert alert-danger" role="alert">
+            <h2>&#9888; You will remove information from the database!</h2>
+            <p><strong>Make sure you know what you are doing.</strong>  By selecting an entry and clicking the "Merge" button, all the other entries will be removed from the database and their recordings assigned to the selected phrase entry. After this action, the selected entry will be the only one to appear in the database.</p>
+        </div>
+        <div><p>Please select the <strong>ONLY ENTRY</strong> that will remain in the database:</p>
+            <button class="btn btn-danger my-2 my-sm-0 float-right" type="submit">Merge selected...</button></div>
+        <table class="table table-striped">
+            <thead>
+                <th scope="col">Selected</th>
+                <th scope="col">ID</th>
+                <th scope="col">Transcription</th>
+                <th scope="col">Translation</th>
+                <th scope="col">Lang</th>
+                <th scope="col"># Recordings</th>
+                <th scope="col">Analysis</th>
+                <th scope="col">Comment</th>
+            </thead>
+            <tbody>
+            {% for candidate in candidates %}
+            <tr>
+                <td class="d-flex justify-content-center"><div class="form-check"><input class="form-check-input" type="radio" name="merge-canonical" value="{{candidate.id}}" />
+                    <input type="hidden" name="merge-selected" value="{{candidate.id}}" /></div></td>
+                <td><a href="{{
+                    url('validation:segment_detail', language.code, candidate.id) 
+                }}">{{ candidate.id }}</a></td>
+                <td>{{ candidate.transcription }}</td>
+                <td>{{ candidate.translation }}</td>
+                <td>{{ candidate.language.code }}</td>
+                <td>{{ candidate.recording_set.count() }}</td>
+                <td>{{ candidate.analysis }}</td>
+                <td>{{ candidate.comment }} </td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td class="d-flex justify-content-center"><div class="form-check"><input class="form-check-input" type="radio" name="merge-canonical" value="MERGE" checked/></div></td>
+                <td colspan="7"> Pick one at random, keep the fields that are the same across this whole group, and merge those fields that are different</td>
+            </tr>
+            <tr>
+                <td class="d-flex justify-content-center"><div class="form-check"><input class="form-check-input" type="radio" name="merge-canonical" value="" checked/></div></td>
+                <td colspan="7"><strong> I do not want to merge these entries.</strong> (When selected, the merge button will do nothing)</td>
+            </tr> 
+            </tbody>
+        </table>
+    </form>
+{% endblock content %}

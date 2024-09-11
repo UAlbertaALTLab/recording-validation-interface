@@ -209,8 +209,9 @@ class Phrase(models.Model):
         (NEW_WORD, "New word"),
     )
 
-    # TODO: Because this field is recording-dependent and immutable, it should belong to the recording.
-    #       Why?  Because we want to be able to merge phrases later, and we do not want to have to decide which one to keep.
+    # TODO: WARNING: Changes to the Phrase model should be reflected on the handle_merge_phrases
+    # method available currently in validation/views.py.  Perhaps it should be moved closer to the model.
+
     field_transcription = models.CharField(
         help_text="The transcription from the day of the recording. This should never change.",
         blank=False,
