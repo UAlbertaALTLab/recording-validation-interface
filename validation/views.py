@@ -845,7 +845,7 @@ def view_issue_detail(request, language, issue_id):
         roles=UserRoles(request.user, language),
         language=language,
         autocomplete=autocomplete,
-        other_issues=other_issues
+        other_issues=other_issues,
     )
     return render(request, "validation/view_issue_detail.html", context)
 
