@@ -796,8 +796,11 @@ def view_issue_detail(request, language, issue_id):
             phrase = issue.source_language_suggestion
             if not phrase:
                 phrase = issue.recording.phrase.transcription
+            speaker = issue.speaker_suggestion
+            if not speaker:
+                speaker = issue.recording.speaker
             form = EditIssueWithRecording(
-                initial={"phrase": phrase, "speaker": issue.recording.speaker}
+                initial={"phrase": phrase, "speaker": speaker}
             )
             autocomplete = list(
                 Phrase.objects.values_list("transcription", flat=True).distinct()
@@ -1016,6 +1019,7 @@ def save_wrong_speaker_code(request, language, recording_id):
         recording=rec,
         comment=comment,
         created_by=request.user,
+        speaker_suggestion=Speaker.objects.get(code=speaker),
         created_on=datetime.datetime.now(),
         language=language,
         status=Issue.OPEN,

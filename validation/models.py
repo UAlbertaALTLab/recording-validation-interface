@@ -695,6 +695,10 @@ class Issue(models.Model):
         max_length=1024,
     )
 
+    speaker_suggestion = models.ForeignKey(
+        Speaker, on_delete=models.SET_NULL, blank=True, null=True
+    )
+
     phrase = models.ForeignKey(Phrase, on_delete=models.CASCADE, blank=True, null=True)
 
     recording = models.ForeignKey(
