@@ -2,32 +2,42 @@
 
 from django.db import migrations
 
+
 def regenerate_issue_suggestions(apps, schema_editor):
-    Issue = apps.get_model('validation', 'Issue')
-    Speaker = apps.get_model('validation', 'Speaker')
-    Phrase = apps.get_model('validation', 'Phrase')
+    Issue = apps.get_model("validation", "Issue")
+    Speaker = apps.get_model("validation", "Speaker")
+    Phrase = apps.get_model("validation", "Phrase")
     count = 0
     for issue in Issue.objects.all():
         try_speaker = issue.comment.split("speaker should be:")
         if len(try_speaker) > 1 and not issue.speaker_suggestion:
             try:
-                issue.speaker_suggestion = Speaker.objects.get(code=try_speaker[-1].strip())
-                print(f"Updating speaker suggestion for issue {issue.id} to {issue.speaker_suggestion.code}")
+                issue.speaker_suggestion = Speaker.objects.get(
+                    code=try_speaker[-1].strip()
+                )
+                print(
+                    f"Updating speaker suggestion for issue {issue.id} to {issue.speaker_suggestion.code}"
+                )
                 issue.save()
             except Speaker.DoesNotExist:
-                print(f"WARNING: Couldn't find the speaker suggested for issue {issue.id}.")
+                print(
+                    f"WARNING: Couldn't find the speaker suggested for issue {issue.id}."
+                )
             count = count + 1
             continue
 
         try_phrase = issue.comment.split("word is actually:")
         if len(try_phrase) > 1 and not issue.source_language_suggestion:
             issue.source_language_suggestion = try_phrase[-1].strip()
-            print(f"Updating source language suggestion for issue {issue.id} to {issue.source_language_suggestion}")
+            print(
+                f"Updating source language suggestion for issue {issue.id} to {issue.source_language_suggestion}"
+            )
             issue.save()
             count = count + 1
             continue
 
     print(f"Performed {count} changes to issues. Done.")
+
 
 class Migration(migrations.Migration):
 
@@ -35,6 +45,4 @@ class Migration(migrations.Migration):
         ("validation", "0040_issue_speaker_suggestion"),
     ]
 
-    operations = [
-        migrations.RunPython(regenerate_issue_suggestions)
-    ]
+    operations = [migrations.RunPython(regenerate_issue_suggestions)]
