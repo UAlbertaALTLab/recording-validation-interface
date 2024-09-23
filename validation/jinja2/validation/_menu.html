@@ -44,7 +44,7 @@ along with this program.  If not, see
             {% if roles.is_admin %}
                 <li> <a href="{{ url('admin:index') }}" class="menu__options-link">Django admin section</a></li>
             {% endif %}
-            {% if roles.is_manager %}
+            {% if language and roles.is_manager %}
                 <li> <a href="{{ url('validation:merge-search', language.code)}}" class="menu__options-link">Merge phrases</a></li>
             {% endif %}
             <li><a href="{{ url('validation:logout') }}" id="logout-link" class="logout-link">Logout</a></li>
