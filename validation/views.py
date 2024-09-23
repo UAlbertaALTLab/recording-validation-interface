@@ -96,6 +96,11 @@ class UserRoles:
             and user.groups.filter(name=lang).exists()
         )
         self.is_admin = user and user.is_superuser
+        self.is_manager = (
+            user
+            and user.groups.filter(name="Manager").exists()
+            and user.groups.filter(name=lang).exists()
+        ) or self.is_admin
 
 
 def home(request):
@@ -1116,7 +1121,7 @@ def approve_user_phrase(request, phrase_id):
 @login_required()
 def merge_phrases_view(request, language):
     roles = UserRoles(request.user, language)
-    if request.method == "GET" and (roles.is_linguist or roles.is_admin):
+    if request.method == "GET" and (roles.is_manager):
         return merge_phrases_search(request, language)
     raise PermissionDenied
 
@@ -1176,7 +1181,7 @@ def phrases_can_auto_merge(candidates):
 def merge_phrases_delete(request, language):
     language = get_language_object(language)
     roles = UserRoles(request.user, language)
-    if not (roles.is_linguist or roles.is_admin):
+    if not (roles.is_manager):
         raise PermissionDenied
     if request.method == "GET":
         merge_items = [int(id) for id in request.GET.getlist("merge-selected")]
