@@ -128,7 +128,7 @@ def home(request):
         languages=language_dict,
         language=None,
         auth=auth,
-        roles=UserRoles(request.user, language),
+        roles=UserRoles(request.user, None),
     )
     return render(request, "validation/home.html", context)
 
@@ -776,7 +776,7 @@ def view_issues(request, language):
     context = dict(
         issues=paged_issues,
         auth=request.user.is_authenticated,
-        roles=UserRoles(request.user, language),
+        roles=UserRoles(request.user, language.code),
         language=language,
         encode_query_with_page=encode_query_with_page,
     )
@@ -850,7 +850,7 @@ def view_issue_detail(request, language, issue_id):
         issue=issue,
         form=form,
         auth=request.user.is_authenticated,
-        roles=UserRoles(request.user, language),
+        roles=UserRoles(request.user, language.code),
         language=language,
         autocomplete=autocomplete,
         other_issues=other_issues.filter(status="open"),
@@ -920,7 +920,7 @@ def speaker_view(request, language, speaker_code):
         img_path=img_path,
         speaker=speaker,
         language=language,
-        roles=UserRoles(request.user, language),
+        roles=UserRoles(request.user, language.code),
     )
     return render(request, "validation/speaker_view.html", context)
 
@@ -961,7 +961,7 @@ def all_speakers(request, language):
         speakers=speakers,
         auth=request.user.is_authenticated,
         language=language,
-        roles=UserRoles(request.user, language),
+        roles=UserRoles(request.user, language.code),
     )
     return render(request, "validation/all_speakers.html", context)
 
@@ -1128,7 +1128,7 @@ def merge_phrases_view(request, language):
 
 def merge_phrases_search(request, language):
     language = get_language_object(language)
-    roles = UserRoles(request.user, language)
+    roles = UserRoles(request.user, language.code)
 
     # Perform search
     candidates = False
@@ -1147,7 +1147,7 @@ def merge_phrases_search(request, language):
     context = dict(
         # form=form,
         auth=request.user.is_authenticated,
-        roles=UserRoles(request.user, language),
+        roles=UserRoles(request.user, language.code),
         language=language,
         candidates=candidates,
     )
@@ -1180,7 +1180,7 @@ def phrases_can_auto_merge(candidates):
 @login_required()
 def merge_phrases_delete(request, language):
     language = get_language_object(language)
-    roles = UserRoles(request.user, language)
+    roles = UserRoles(request.user, language.code)
     if not (roles.is_manager):
         raise PermissionDenied
     if request.method == "GET":
@@ -1193,7 +1193,7 @@ def merge_phrases_delete(request, language):
             return HttpResponseRedirect(url("validation:merge-search", language.code))
         context = dict(
             auth=request.user.is_authenticated,
-            roles=UserRoles(request.user, language),
+            roles=UserRoles(request.user, language.code),
             language=language,
             candidates=candidates,
         )
@@ -1310,7 +1310,7 @@ def record_audio(request, language):
         context = dict(
             form=form,
             auth=request.user.is_authenticated,
-            roles=UserRoles(request.user, language),
+            roles=UserRoles(request.user, language.code),
             language=language,
         )
         return HttpResponseRedirect(f"/{language.code}/record_audio", context)
@@ -1323,7 +1323,7 @@ def record_audio(request, language):
     context = dict(
         form=form,
         auth=request.user.is_authenticated,
-        roles=UserRoles(request.user, language),
+        roles=UserRoles(request.user, language.code),
         language=language,
     )
     return render(request, f"validation/record_audio.html", context)
