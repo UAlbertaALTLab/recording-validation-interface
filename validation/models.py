@@ -100,8 +100,40 @@ class Collection(models.Model):
 
     comment = models.TextField()
 
-
 class SemanticClass(models.Model):
+    """
+    A semantic class, typically from WordNet or RapidWords that describes a phrase
+    """
+
+    # Database values
+    RW = "rapidwords"
+    WN = "wordnet"
+    O = "other"
+
+    COLLECTION_CHOICES = (
+        (RW, "RapidWords"),
+        (WN, "WordNet"),
+        (O, "Other"),
+    )
+
+    collection = models.CharField(
+        help_text="What collection does this class belong to?",
+        **arguments_for_choices(COLLECTION_CHOICES),
+    )
+
+    classification = models.CharField(
+        help_text="The classification for this semantic class",
+        blank=True,
+        max_length=256,
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['collection', 'classification'], name="unique_semantic_classification_per_collection")
+        ]
+
+
+class SemanticClassAnnotation(models.Model):
     """
     A semantic class, typically from WordNet or RapidWords that describes a phrase
     """
@@ -257,7 +289,7 @@ class Phrase(models.Model):
         max_length=MAX_TRANSCRIPTION_LENGTH,
     )
 
-    semantic_class = models.ManyToManyField(SemanticClass, blank=True)
+    semantic_class = models.ManyToManyField(SemanticClassAnnotation, blank=True)
 
     status = models.CharField(
         help_text="Status in the validation process",

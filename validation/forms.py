@@ -3,7 +3,7 @@ import re
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 
-from validation.models import Issue, Recording, Phrase, SemanticClass
+from validation.models import Issue, Recording, Phrase
 
 DEFAULT_MAX_LENGTH = 256
 

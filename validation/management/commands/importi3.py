@@ -20,7 +20,7 @@ from validation.models import (
     Phrase,
     Recording,
     LanguageVariant,
-    SemanticClass,
+    SemanticClassAnnotation,
 )
 
 
@@ -89,10 +89,10 @@ class Command(BaseCommand):
                 language=language,
             )
 
-            semantic_class, semantic_created = SemanticClass.objects.get_or_create(
+            semantic_class, semantic_created = SemanticClassAnnotation.objects.get_or_create(
                 classification=segment.semantic,
-                source=SemanticClass.META,
-                origin=SemanticClass.O,
+                source=SemanticClassAnnotation.META,
+                origin=SemanticClassAnnotation.O,
             )
 
             phrase.semantic_class.add(semantic_class)

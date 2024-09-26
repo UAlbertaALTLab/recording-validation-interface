@@ -1,0 +1,1792 @@
+1 Universe, creation
+1.1 Sky
+1.1.1 Sun
+1.1.1.1 Moon
+1.1.1.2 Star
+1.1.1.3 Planet
+1.1.2 Air
+1.1.2.1 Blow air
+1.1.3 Weather
+1.1.3.1 Wind
+1.1.3.2 Cloud
+1.1.3.3 Rain
+1.1.3.4 Snow, ice
+1.1.3.5 Storm
+1.1.3.6 Lightning, thunder
+1.1.3.7 Flood
+1.1.3.8 Drought
+1.2 World
+1.2.1 Land
+1.2.1.1 Mountain
+1.2.1.2 Volcano
+1.2.1.3 Plain, plateau
+1.2.1.4 Valley
+1.2.1.5 Underground
+1.2.1.6 Forest, grassland, desert
+1.2.1.7 Earthquake
+1.2.2 Substance, matter
+1.2.2.1 Soil, dirt
+1.2.2.2 Rock
+1.2.2.3 Metal
+1.2.2.4 Mineral
+1.2.2.5 Jewel
+1.2.3 Solid, liquid, gas
+1.2.3.1 Liquid
+1.2.3.2 Oil
+1.2.3.3 Gas
+1.3 Water
+1.3.1 Bodies of water
+1.3.1.1 Ocean, lake
+1.3.1.2 Swamp
+1.3.1.3 River
+1.3.1.4 Spring, well
+1.3.1.5 Island, shore
+1.3.2 Movement of water
+1.3.2.1 Flow
+1.3.2.2 Pour
+1.3.2.3 Drip
+1.3.2.4 Wave
+1.3.2.5 Calm, rough
+1.3.2.6 Tide
+1.3.3 Wet
+1.3.3.1 Dry
+1.3.4 Be in water
+1.3.5 Solutions of water
+1.3.6 Water quality
+1.4 Living things
+1.4.1 Dead things
+1.4.2 Spirits of things
+1.5 Plant
+1.5.1 Tree
+1.5.2 Bush, shrub
+1.5.3 Grass, herb, vine
+1.5.4 Moss, fungus, algae
+1.5.5 Parts of a plant
+1.5.6 Growth of plants
+1.5.7 Plant diseases
+1.6 Animal
+1.6.1 Types of animals
+1.6.1.1 Mammal
+1.6.1.1.1 Primate
+1.6.1.1.2 Carnivore
+1.6.1.1.3 Hoofed animals
+1.6.1.1.4 Rodent
+1.6.1.1.5 Marsupial
+1.6.1.1.6 Anteater, aardvark
+1.6.1.1.7 Sea mammal
+1.6.1.1.8 Bat
+1.6.1.2 Bird
+1.6.1.3 Reptile
+1.6.1.3.1 Snake
+1.6.1.3.2 Lizard
+1.6.1.3.3 Turtle
+1.6.1.3.4 Crocodile
+1.6.1.4 Amphibian
+1.6.1.5 Fish
+1.6.1.6 Shark, ray
+1.6.1.7 Insect
+1.6.1.8 Spider
+1.6.1.9 Small animals
+1.6.2 Parts of an animal
+1.6.2.1 Parts of a bird
+1.6.2.2 Parts of a reptile
+1.6.2.3 Parts of a fish
+1.6.2.4 Parts of an insect
+1.6.2.5 Parts of small animals
+1.6.3 Animal life cycle
+1.6.3.1 Egg
+1.6.4 Animal actions
+1.6.4.1 Animal movement
+1.6.4.2 Animal eating
+1.6.4.3 Animal sounds
+1.6.5 Animal home
+1.6.6 Animal group
+1.6.7 Male and female animals
+1.7 Nature, environment
+1.7.1 Natural
+2 Person
+2.1 Body
+2.1.1 Head
+2.1.1.1 Eye
+2.1.1.2 Ear
+2.1.1.3 Nose
+2.1.1.4 Mouth
+2.1.1.5 Tooth
+2.1.2 Torso
+2.1.3 Limb
+2.1.3.1 Arm
+2.1.3.2 Leg
+2.1.3.3 Finger, toe
+2.1.4 Skin
+2.1.5 Hair
+2.1.6 Bone, joint
+2.1.7 Flesh
+2.1.8 Internal organs
+2.1.8.1 Heart
+2.1.8.2 Stomach
+2.1.8.3 Male organs
+2.1.8.4 Female organs
+2.2 Body functions
+2.2.1 Breathe, breath
+2.2.2 Cough, sneeze
+2.2.3 Spit, saliva
+2.2.4 Mucus
+2.2.5 Bleed, blood
+2.2.6 Sweat
+2.2.7 Urinate, urine
+2.2.8 Defecate, feces
+2.3 Sense, perceive
+2.3.1 See
+2.3.1.1 Look
+2.3.1.2 Watch
+2.3.1.3 Examine
+2.3.1.4 Show, let someone see
+2.3.1.5 Visible
+2.3.1.5.1 Appear
+2.3.1.6 Transparent
+2.3.1.7 Reflect, mirror
+2.3.1.8 Appearance
+2.3.1.8.1 Beautiful
+2.3.1.8.2 Ugly
+2.3.1.9 Something used to see
+2.3.2 Hear
+2.3.2.1 Listen
+2.3.2.2 Sound
+2.3.2.3 Types of sounds
+2.3.2.4 Loud
+2.3.2.5 Quiet
+2.3.3 Taste
+2.3.4 Smell
+2.3.5 Sense of touch
+2.3.5.1 Comfortable
+2.4 Body condition
+2.4.1 Strong
+2.4.2 Weak
+2.4.3 Energetic
+2.4.4 Tired
+2.4.5 Rest
+2.5 Healthy
+2.5.1 Sick
+2.5.1.1 Recover from sickness
+2.5.2 Disease
+2.5.2.1 Malnutrition, starvation
+2.5.2.2 Skin disease
+2.5.2.3 Stomach illness
+2.5.2.4 Tooth decay
+2.5.3 Injure
+2.5.3.1 Amputate
+2.5.3.2 Poison
+2.5.4 Disabled
+2.5.4.1 Blind
+2.5.4.2 Poor eyesight
+2.5.4.3 Deaf
+2.5.4.4 Mute
+2.5.4.5 Birth defect
+2.5.5 Cause of disease
+2.5.6 Symptom of disease
+2.5.6.1 Pain
+2.5.6.2 Fever
+2.5.6.3 Swell
+2.5.6.4 Lose consciousness
+2.5.6.5 Dazed, confused
+2.5.6.6 Vision, hallucination
+2.5.7 Treat disease
+2.5.7.1 Doctor, nurse
+2.5.7.2 Medicine
+2.5.7.3 Medicinal plants
+2.5.7.4 Hospital
+2.5.7.5 Traditional medicine
+2.5.8 Mental illness
+2.6 Life
+2.6.1 Marriage
+2.6.1.1 Arrange a marriage
+2.6.1.2 Wedding
+2.6.1.3 Unmarried
+2.6.1.4 Divorce
+2.6.1.5 Romantic love
+2.6.2 Sexual relations
+2.6.2.1 Virginity
+2.6.2.2 Attract sexually
+2.6.2.3 Sexual immorality
+2.6.3 Birth
+2.6.3.1 Pregnancy
+2.6.3.2 Fetus
+2.6.3.3 Miscarriage
+2.6.3.4 Labor and birth pains
+2.6.3.5 Help to give birth
+2.6.3.6 Unusual birth
+2.6.3.7 Multiple births
+2.6.3.8 Fertile, infertile
+2.6.3.9 Birth ceremony
+2.6.4 Stage of life
+2.6.4.1 Baby
+2.6.4.1.1 Care for a baby
+2.6.4.2 Child
+2.6.4.2.1 Rear a child
+2.6.4.3 Youth
+2.6.4.4 Adult
+2.6.4.5 Old person
+2.6.4.6 Grow, get bigger
+2.6.4.7 Initiation
+2.6.4.8 Peer group
+2.6.5 Male, female
+2.6.5.1 Man
+2.6.5.2 Woman
+2.6.6 Die
+2.6.6.1 Kill
+2.6.6.2 Corpse
+2.6.6.3 Funeral
+2.6.6.4 Mourn
+2.6.6.5 Bury
+2.6.6.6 Grave
+2.6.6.7 Inherit
+2.6.6.8 Life after death
+3 Language and thought
+3.1 Soul, spirit
+3.1.1 Personality
+3.1.2 Mental state
+3.1.2.1 Alert
+3.1.2.2 Notice
+3.1.2.3 Attention
+3.1.2.4 Ignore
+3.2 Think
+3.2.1 Mind
+3.2.1.1 Think about
+3.2.1.2 Imagine
+3.2.1.3 Intelligent
+3.2.1.4 Stupid
+3.2.1.5 Logical
+3.2.1.6 Instinct
+3.2.2 Learn
+3.2.2.1 Study
+3.2.2.2 Check
+3.2.2.3 Evaluate, test
+3.2.2.4 Guess
+3.2.2.5 Solve
+3.2.2.6 Realize
+3.2.2.7 Willing to learn
+3.2.3 Know
+3.2.3.1 Known, unknown
+3.2.3.2 Area of knowledge
+3.2.3.3 Secret
+3.2.4 Understand
+3.2.4.1 Misunderstand
+3.2.4.2 Understandable
+3.2.4.3 Mysterious
+3.2.5 Opinion
+3.2.5.1 Believe
+3.2.5.1.1 Trust
+3.2.5.2 Disbelief
+3.2.5.3 Doubt
+3.2.5.4 Agree with someone
+3.2.5.4.1 Disagree
+3.2.5.4.2 Protest
+3.2.5.5 Philosophy
+3.2.5.6 Attitude
+3.2.5.7 Extreme belief
+3.2.5.8 Change your mind
+3.2.5.9 Approve of something
+3.2.6 Remember
+3.2.6.1 Forget
+3.2.6.2 Recognize
+3.2.6.3 Memorize
+3.2.6.4 Remind
+3.2.7 Expect
+3.2.7.1 Hope
+3.2.7.2 Hopeless
+3.2.7.3 Predict
+3.2.8 Tendency
+3.3 Want
+3.3.1 Decide, plan
+3.3.1.1 Purpose, goal
+3.3.1.2 Choose
+3.3.1.3 Cast lots
+3.3.1.4 Intend
+3.3.1.5 Deliberately
+3.3.1.6 Determined
+3.3.1.7 Stubborn
+3.3.1.8 Lust
+3.3.2 Request
+3.3.2.1 Agree to do something
+3.3.2.2 Refuse to do something
+3.3.2.3 Intercede
+3.3.2.4 Willing
+3.3.3 Influence
+3.3.3.1 Suggest
+3.3.3.2 Advise
+3.3.3.3 Persuade
+3.3.3.4 Insist
+3.3.3.5 Compel
+3.3.3.6 Control
+3.3.3.7 Warn
+3.3.3.8 Threaten
+3.3.4 Ask permission
+3.3.4.1 Give permission
+3.3.4.2 Refuse permission
+3.3.4.3 Exempt
+3.3.4.4 Prevent
+3.3.4.5 Free to do what you want
+3.3.5 Offer
+3.3.5.1 Accept
+3.3.5.2 Reject
+3.4 Emotion
+3.4.1 Feel good
+3.4.1.1 Like, love
+3.4.1.1.1 Enjoy doing something
+3.4.1.1.2 Self-esteem
+3.4.1.1.3 Prefer
+3.4.1.1.4 Popular
+3.4.1.1.5 Fashionable
+3.4.1.1.6 Contentment
+3.4.1.1.7 Happy for
+3.4.1.1.8 Pleased with
+3.4.1.2 Happy
+3.4.1.2.1 Relaxed
+3.4.1.2.2 Calm
+3.4.1.3 Surprise
+3.4.1.4 Interested
+3.4.1.4.1 Excited
+3.4.1.4.2 Enthusiastic
+3.4.1.4.3 Obsessed
+3.4.1.4.4 Attract
+3.4.1.4.5 Indifferent
+3.4.1.4.6 Uninterested, bored
+3.4.1.5 Confident
+3.4.2 Feel bad
+3.4.2.1 Sad
+3.4.2.1.1 Dislike
+3.4.2.1.2 Hate, detest
+3.4.2.1.3 Disgusted
+3.4.2.1.4 Disappointed
+3.4.2.1.5 Lonely
+3.4.2.1.6 Upset
+3.4.2.1.7 Shock
+3.4.2.1.8 Jealous
+3.4.2.1.9 Discontent
+3.4.2.2 Sorry
+3.4.2.2.1 Ashamed
+3.4.2.2.2 Embarrassed
+3.4.2.3 Angry
+3.4.2.3.1 Annoyed
+3.4.2.4 Afraid
+3.4.2.4.1 Worried
+3.4.2.4.2 Nervous
+3.4.2.4.3 Shy, timid
+3.4.2.5 Confused
+3.5 Communication
+3.5.1 Say
+3.5.1.1 Voice
+3.5.1.1.1 Shout
+3.5.1.1.2 Speak quietly
+3.5.1.1.3 Speak a lot
+3.5.1.1.4 Speak little
+3.5.1.1.5 Say nothing
+3.5.1.1.6 Speech style
+3.5.1.1.7 Speak well
+3.5.1.1.8 Speak poorly
+3.5.1.2 Talk about a subject
+3.5.1.2.1 Announce
+3.5.1.2.2 Describe
+3.5.1.2.3 Explain
+3.5.1.2.4 Mention
+3.5.1.2.5 Introduce
+3.5.1.2.6 Repeat
+3.5.1.2.7 Summarize
+3.5.1.2.8 Emphasize
+3.5.1.2.9 Be about, subject
+3.5.1.3 True
+3.5.1.3.1 Tell the truth
+3.5.1.3.2 Tell a lie
+3.5.1.3.3 Contradict
+3.5.1.3.4 Expose falsehood
+3.5.1.3.5 Real
+3.5.1.3.6 Exaggerate
+3.5.1.4 Speak with others
+3.5.1.4.1 Call
+3.5.1.4.2 Contact
+3.5.1.4.3 Greet
+3.5.1.4.4 Say farewell
+3.5.1.4.5 Speak in unison
+3.5.1.5 Ask
+3.5.1.5.1 Answer
+3.5.1.5.2 Disclose
+3.5.1.5.3 Hide your thoughts
+3.5.1.6 Debate
+3.5.1.6.1 Demonstrate
+3.5.1.6.2 Quarrel
+3.5.1.7 Praise
+3.5.1.7.1 Thank
+3.5.1.7.2 Flatter
+3.5.1.7.3 Boast
+3.5.1.8 Criticize
+3.5.1.8.1 Blame
+3.5.1.8.2 Insult
+3.5.1.8.3 Mock
+3.5.1.8.4 Gossip
+3.5.1.8.5 Complain
+3.5.1.9 Promise
+3.5.2 Make speech
+3.5.2.1 Report
+3.5.2.2 News, message
+3.5.2.3 Figurative
+3.5.2.4 Admit
+3.5.3 Language
+3.5.3.1 Word
+3.5.3.2 Information
+3.5.4 Story
+3.5.4.1 Fable, myth
+3.5.4.2 Saying, proverb
+3.5.4.3 Riddle
+3.5.4.4 Poetry
+3.5.4.5 History
+3.5.4.6 Verbal tradition
+3.5.5 Foolish talk
+3.5.5.1 Obscenity
+3.5.6 Sign, symbol
+3.5.6.1 Gesture
+3.5.6.2 Point at
+3.5.6.3 Facial expression
+3.5.6.4 Laugh
+3.5.6.5 Cry, tear
+3.5.7 Reading and writing
+3.5.7.1 Write
+3.5.7.2 Written material
+3.5.7.3 Read
+3.5.7.4 Publish
+3.5.7.5 Record
+3.5.7.6 List
+3.5.7.7 Letter
+3.5.8 Interpreting messages
+3.5.8.1 Meaning
+3.5.8.2 Meaningless
+3.5.8.3 Unintelligible
+3.5.8.4 Show, indicate
+3.5.9 Mass communication
+3.5.9.1 Radio, television
+3.5.9.2 Telephone
+3.5.9.3 Newspaper
+3.5.9.4 Movie
+3.5.9.5 Recorded music
+3.5.9.6 Communication devices
+3.6 Teach
+3.6.1 Show, explain
+3.6.2 School
+3.6.3 Subject of teaching
+3.6.4 Class, lesson
+3.6.5 Correct
+3.6.6 Science
+3.6.7 Test
+3.6.8 Answer in a test
+4 Social behavior
+4.1 Relationships
+4.1.1 Friend
+4.1.1.1 Girlfriend, boyfriend
+4.1.2 Types of people
+4.1.2.1 Working relationship
+4.1.3 Know someone
+4.1.3.1 Meet for the first time
+4.1.4 Neighbor
+4.1.4.1 Social class
+4.1.5 Unity
+4.1.6 Disunity
+4.1.6.1 Unfriendly
+4.1.6.2 Set self apart
+4.1.6.3 Alone
+4.1.6.4 Independent person
+4.1.6.5 Private, public
+4.1.7 Begin a relationship
+4.1.7.1 End a relationship
+4.1.8 Show affection
+4.1.9 Kinship
+4.1.9.1 Related by birth
+4.1.9.1.1 Grandfather, grandmother
+4.1.9.1.2 Father, mother
+4.1.9.1.3 Brother, sister
+4.1.9.1.4 Son, daughter
+4.1.9.1.5 Grandson, granddaughter
+4.1.9.1.6 Uncle, aunt
+4.1.9.1.7 Cousin
+4.1.9.1.8 Nephew, niece
+4.1.9.1.9 Birth order
+4.1.9.2 Related by marriage
+4.1.9.2.1 Husband, wife
+4.1.9.2.2 In-law
+4.1.9.3 Widow, widower
+4.1.9.4 Orphan
+4.1.9.5 Illegitimate child
+4.1.9.6 Adopt
+4.1.9.7 Non-relative
+4.1.9.8 Family, clan
+4.1.9.9 Race
+4.2 Social activity
+4.2.1 Come together, form a group
+4.2.1.1 Invite
+4.2.1.2 Encounter
+4.2.1.3 Meet together
+4.2.1.4 Visit
+4.2.1.4.1 Welcome, receive
+4.2.1.4.2 Show hospitality
+4.2.1.5 Meeting, assembly
+4.2.1.6 Participate
+4.2.1.7 Crowd, group
+4.2.1.8 Organization
+4.2.1.8.1 Join an organization
+4.2.1.8.2 Leave an organization
+4.2.1.8.3 Belong to an organization
+4.2.1.9 Social group
+4.2.2 Social event
+4.2.2.1 Ceremony
+4.2.2.2 Festival, show
+4.2.2.3 Celebrate
+4.2.3 Music
+4.2.3.1 Compose music
+4.2.3.2 Play music
+4.2.3.3 Sing
+4.2.3.4 Musician
+4.2.3.5 Musical instrument
+4.2.4 Dance
+4.2.5 Drama
+4.2.6 Entertainment, recreation
+4.2.6.1 Game
+4.2.6.1.1 Card game
+4.2.6.1.2 Chess
+4.2.6.2 Sports
+4.2.6.2.1 Football, soccer
+4.2.6.2.2 Basketball
+4.2.6.3 Exercise
+4.2.6.4 Gambling
+4.2.7 Play, fun
+4.2.8 Humor
+4.2.8.1 Serious
+4.2.9 Holiday
+4.2.9.1 Free time
+4.3 Behavior
+4.3.1 Good, moral
+4.3.1.1 Bad, immoral
+4.3.1.2 Meet a standard
+4.3.1.2.1 Below standard
+4.3.1.3 Mature in behavior
+4.3.1.3.1 Immature in behavior
+4.3.1.3.2 Sensible
+4.3.1.4 Reputation
+4.3.1.5 Patient
+4.3.1.5.1 Impatient
+4.3.1.5.2 Bad-tempered
+4.3.2 Admire someone
+4.3.2.1 Despise someone
+4.3.2.2 Humble
+4.3.2.3 Proud
+4.3.2.4 Show off
+4.3.3 Love
+4.3.3.1 Hate, ill will
+4.3.3.2 Not care
+4.3.3.3 Abandon
+4.3.4 Do good to
+4.3.4.1 Do evil to
+4.3.4.2 Help
+4.3.4.2.1 Hinder
+4.3.4.3 Cooperate with
+4.3.4.3.1 Compete with
+4.3.4.4 Altruistic, selfless
+4.3.4.4.1 Selfish
+4.3.4.4.2 Use a person
+4.3.4.5 Share with
+4.3.4.5.1 Provide for, support
+4.3.4.5.2 Care for
+4.3.4.5.3 Entrust to the care of
+4.3.4.6 Meddle
+4.3.4.6.1 Spoil
+4.3.4.7 Enter by force
+4.3.4.8 Kidnap
+4.3.4.9 Cruel
+4.3.5 Honest
+4.3.5.1 Dishonest
+4.3.5.2 Faithful
+4.3.5.3 Reliable
+4.3.5.4 Unreliable
+4.3.5.5 Deceive
+4.3.5.6 Hypocrite
+4.3.6 Self-controlled
+4.3.6.1 Lack self-control
+4.3.6.2 Tidy
+4.3.6.3 Untidy
+4.3.6.4 Mistake
+4.3.7 Polite
+4.3.7.1 Impolite
+4.3.7.2 Crazy
+4.3.8 Change behavior
+4.3.8.1 Conform
+4.3.9 Culture
+4.3.9.1 Custom
+4.3.9.2 Habit
+4.4 Prosperity, trouble
+4.4.1 Prosperity
+4.4.2 Trouble
+4.4.2.1 Problem
+4.4.2.2 Danger
+4.4.2.3 Accident
+4.4.2.4 Disaster
+4.4.2.5 Separate, alone
+4.4.2.6 Suffer
+4.4.3 Respond to trouble
+4.4.3.1 Brave
+4.4.3.2 Cowardice
+4.4.3.3 Avoid
+4.4.3.4 Caution
+4.4.3.5 Solve a problem
+4.4.3.6 Endure
+4.4.3.7 Survive
+4.4.4 Respond to someone in trouble
+4.4.4.1 Mercy
+4.4.4.2 Show sympathy, support
+4.4.4.3 Gentle
+4.4.4.4 Save from trouble
+4.4.4.5 Protect
+4.4.4.6 Free from bondage
+4.4.4.7 Relief
+4.4.4.8 Risk
+4.4.5 Chance
+4.4.5.1 Lucky
+4.4.5.2 Unlucky
+4.5 Authority
+4.5.1 Person in authority
+4.5.2 Have authority
+4.5.3 Exercise authority
+4.5.3.1 Lead
+4.5.3.2 Command
+4.5.3.3 Discipline, train
+4.5.3.4 Appoint, delegate
+4.5.4 Submit to authority
+4.5.4.1 Obey
+4.5.4.2 Disobey
+4.5.4.3 Serve
+4.5.4.4 Slave
+4.5.4.5 Follow, be a disciple
+4.5.4.6 Rebel against authority
+4.5.4.7 Independent
+4.5.5 Honor
+4.5.5.1 Title, name of honor
+4.5.5.2 Lack respect
+4.5.6 Status
+4.5.6.1 High status
+4.5.6.2 Low status
+4.6 Government
+4.6.1 Ruler
+4.6.1.1 King's family
+4.6.1.2 Government official
+4.6.2 Citizen
+4.6.2.1 Foreigner
+4.6.3 Government organization
+4.6.3.1 Governing body
+4.6.4 Rule
+4.6.5 Subjugate
+4.6.6 Government functions
+4.6.6.1 Police
+4.6.6.1.1 Arrest
+4.6.6.1.2 Informal justice
+4.6.6.2 Diplomacy
+4.6.6.3 Represent
+4.6.6.4 Election
+4.6.6.5 Politics
+4.6.7 Region
+4.6.7.1 Country
+4.6.7.2 City
+4.6.7.3 Countryside
+4.6.7.4 Community
+4.7 Law
+4.7.1 Laws
+4.7.2 Pass laws
+4.7.3 Break the law
+4.7.4 Court of law
+4.7.4.1 Legal personnel
+4.7.5 Trial
+4.7.5.1 Investigate a crime
+4.7.5.2 Suspect
+4.7.5.3 Accuse, confront
+4.7.5.4 Defend against accusation
+4.7.5.5 Witness, testify
+4.7.5.6 Drop charges
+4.7.5.7 Take oath
+4.7.5.8 Vindicate
+4.7.6 Judge, render a verdict
+4.7.6.1 Acquit
+4.7.6.2 Condemn, find guilty
+4.7.6.3 Fault
+4.7.7 Punish
+4.7.7.1 Reward
+4.7.7.2 Fine
+4.7.7.3 Imprison
+4.7.7.4 Execute
+4.7.7.5 Ostracize
+4.7.7.6 Pardon, release
+4.7.7.7 Atone, restitution
+4.7.8 Legal contract
+4.7.8.1 Covenant
+4.7.8.2 Break a contract
+4.7.9 Justice
+4.7.9.1 Impartial
+4.7.9.2 Unfair
+4.7.9.3 Deserve
+4.7.9.4 Discriminate, be unfair
+4.7.9.5 Act harshly
+4.7.9.6 Oppress
+4.8 Conflict
+4.8.1 Hostility
+4.8.1.1 Oppose
+4.8.2 Fight
+4.8.2.1 Fight for something good
+4.8.2.2 Fight against something bad
+4.8.2.3 Attack
+4.8.2.3.1 Ambush
+4.8.2.4 Defend
+4.8.2.5 Revenge
+4.8.2.6 Riot
+4.8.2.7 Betray
+4.8.2.8 Violent
+4.8.2.9 Enemy
+4.8.3 War
+4.8.3.1 Defeat
+4.8.3.2 Win
+4.8.3.3 Lose a fight
+4.8.3.4 Surrender
+4.8.3.5 Prisoner of war
+4.8.3.6 Military organization
+4.8.3.6.1 Army
+4.8.3.6.2 Navy
+4.8.3.6.3 Air force
+4.8.3.6.4 Soldier
+4.8.3.6.5 Spy
+4.8.3.6.6 Fort
+4.8.3.7 Weapon, shoot
+4.8.3.8 Plunder
+4.8.4 Peace
+4.8.4.1 Rebuke
+4.8.4.2 Make an appeal
+4.8.4.3 Appease
+4.8.4.4 Negotiate
+4.8.4.5 Renounce claim, concede
+4.8.4.6 Repent
+4.8.4.6.1 Request forgiveness
+4.8.4.7 Forgive
+4.8.4.8 Make peace
+4.8.4.8.1 Stop fighting
+4.8.4.9 Reconcile
+4.9 Religion
+4.9.1 God
+4.9.2 Supernatural being
+4.9.3 Theology
+4.9.3.1 Sacred writings
+4.9.4 Miracle, supernatural power
+4.9.4.1 Sorcery
+4.9.4.2 Demon possession
+4.9.4.3 Bless
+4.9.4.4 Curse
+4.9.4.5 Destiny
+4.9.4.6 Prophecy
+4.9.4.7 Omen, divination
+4.9.5 Practice religion
+4.9.5.1 Devout
+4.9.5.2 Pray
+4.9.5.3 Worship
+4.9.5.4 Religious ceremony
+4.9.5.5 Offering, sacrifice
+4.9.5.6 Religious purification
+4.9.5.6.1 Taboo
+4.9.5.7 Salvation
+4.9.5.8 Dedicate to religious use
+4.9.5.9 Fasting
+4.9.6 Heaven, hell
+4.9.6.1 Resurrection
+4.9.7 Religious organization
+4.9.7.1 Religious person
+4.9.7.2 Christianity
+4.9.7.3 Islam
+4.9.7.4 Hinduism
+4.9.7.5 Buddhism
+4.9.7.6 Judaism
+4.9.7.7 Animism 
+4.9.8 Religious things
+4.9.8.1 Idol
+4.9.8.2 Place of worship
+4.9.9 Irreligion
+5 Daily life
+5.1 Household equipment
+5.1.1 Furniture
+5.1.1.1 Table
+5.1.1.2 Chair
+5.1.1.3 Bed
+5.1.1.4 Cabinet
+5.1.2 Household decoration
+5.2 Food
+5.2.1 Food preparation
+5.2.1.1 Cooking methods
+5.2.1.2 Steps in food preparation
+5.2.1.2.1 Remove shell, skin
+5.2.1.2.2 Pound in mortar and pestle
+5.2.1.2.3 Grind flour
+5.2.1.3 Cooking utensil
+5.2.1.4 Food storage
+5.2.1.5 Serve food
+5.2.2 Eat
+5.2.2.1 Bite, chew
+5.2.2.2 Meal
+5.2.2.3 Feast
+5.2.2.4 Manner of eating
+5.2.2.5 Hungry, thirsty
+5.2.2.6 Satiated, full
+5.2.2.7 Drink
+5.2.2.8 Eating utensil
+5.2.2.9 Fast, not eat
+5.2.3 Types of food
+5.2.3.1 Food from plants
+5.2.3.1.1 Food from seeds
+5.2.3.1.2 Food from fruit
+5.2.3.1.3 Food from vegetables
+5.2.3.1.4 Food from leaves
+5.2.3.1.5 Food from roots
+5.2.3.2 Food from animals
+5.2.3.2.1 Meat
+5.2.3.2.2 Milk products
+5.2.3.2.3 Egg dishes
+5.2.3.3 Cooking ingredients
+5.2.3.3.1 Sugar
+5.2.3.3.2 Salt
+5.2.3.3.3 Spice
+5.2.3.3.4 Leaven
+5.2.3.3.5 Cooking oil
+5.2.3.4 Prepared food
+5.2.3.5 Prohibited food
+5.2.3.6 Beverage
+5.2.3.7 Alcoholic beverage
+5.2.3.7.1 Alcohol preparation
+5.2.3.7.2 Drunk
+5.2.4 Tobacco
+5.2.5 Narcotic
+5.2.6 Stimulant
+5.3 Clothing
+5.3.1 Men's clothing
+5.3.2 Women's clothing
+5.3.3 Traditional clothing
+5.3.4 Clothes for special occasions
+5.3.5 Clothes for special people
+5.3.6 Parts of clothing
+5.3.7 Wear clothing
+5.3.8 Naked
+5.3.9 Style of clothing
+5.4 Adornment
+5.4.1 Jewelry
+5.4.2 Cosmetics
+5.4.3 Care for hair
+5.4.3.1 Comb hair
+5.4.3.2 Plait hair
+5.4.3.3 Dye hair
+5.4.3.4 Hairstyle
+5.4.3.5 Cut hair
+5.4.3.6 Shave
+5.4.4 Care for the teeth
+5.4.5 Anoint the body
+5.4.6 Ritual scar
+5.4.6.1 Circumcision
+5.4.7 Care for the fingernails
+5.5 Fire
+5.5.1 Light a fire
+5.5.2 Tend a fire
+5.5.3 Extinguish a fire
+5.5.4 Burn
+5.5.5 What fires produce
+5.5.6 Fuel
+5.5.7 Fireplace
+5.6 Cleaning
+5.6.1 Clean, dirty
+5.6.2 Bathe
+5.6.3 Wash dishes
+5.6.4 Wash clothes
+5.6.5 Sweep, rake
+5.6.6 Wipe, erase
+5.7 Sleep
+5.7.1 Go to sleep
+5.7.2 Dream
+5.7.3 Wake up
+5.8 Manage a house
+5.9 Live, stay
+6 Work and occupation
+6.1 Work
+6.1.1 Worker
+6.1.1.1 Expert
+6.1.2 Method
+6.1.2.1 Try, attempt
+6.1.2.2 Use
+6.1.2.2.1 Useful
+6.1.2.2.2 Useless
+6.1.2.2.3 Available
+6.1.2.2.4 Use up
+6.1.2.2.5 Take care of something
+6.1.2.2.6 Waste
+6.1.2.3 Work well
+6.1.2.3.1 Careful
+6.1.2.3.2 Work hard
+6.1.2.3.3 Busy
+6.1.2.3.4 Power, force
+6.1.2.3.5 Complete, finish
+6.1.2.3.6 Ambitious
+6.1.2.4 Work poorly
+6.1.2.4.1 Careless, irresponsible
+6.1.2.4.2 Lazy
+6.1.2.4.3 Give up
+6.1.2.5 Plan
+6.1.2.5.1 Arrange an event
+6.1.2.5.2 Cancel an event
+6.1.2.6 Prepare
+6.1.2.6.1 Prepare something for use
+6.1.2.7 Effective
+6.1.2.8 Efficient
+6.1.2.9 Opportunity
+6.1.3 Difficult, impossible
+6.1.3.1 Easy, possible
+6.1.3.2 Succeed
+6.1.3.3 Fail
+6.1.3.4 Advantage
+6.1.4 Job satisfaction
+6.1.5 Unemployed, not working
+6.1.6 Made by hand
+6.1.7 Artificial
+6.1.8 Experienced
+6.1.8.1 Accustomed to
+6.2 Agriculture
+6.2.1 Growing crops
+6.2.1.1 Growing grain
+6.2.1.1.1 Growing rice
+6.2.1.1.2 Growing wheat
+6.2.1.1.3 Growing maize
+6.2.1.2 Growing roots
+6.2.1.2.1 Growing potatoes
+6.2.1.2.2 Growing cassava
+6.2.1.3 Growing vegetables
+6.2.1.4 Growing fruit
+6.2.1.4.1 Growing grapes
+6.2.1.4.2 Growing bananas
+6.2.1.5 Growing grass
+6.2.1.5.1 Growing sugarcane
+6.2.1.5.2 Growing tobacco
+6.2.1.6 Growing flowers
+6.2.1.7 Growing trees
+6.2.1.7.1 Growing coconuts
+6.2.1.7.2 Growing coffee
+6.2.2 Land preparation
+6.2.2.1 Clear a field
+6.2.2.2 Plow a field
+6.2.2.3 Fertilize a field
+6.2.3 Plant a field
+6.2.4 Tend a field
+6.2.4.1 Cut grass
+6.2.4.2 Uproot plants
+6.2.4.3 Irrigate
+6.2.4.4 Trim plants
+6.2.4.5 Neglect plants
+6.2.5 Harvest
+6.2.5.1 First fruits
+6.2.5.2 Crop failure
+6.2.5.3 Gather wild plants
+6.2.5.4 Plant product
+6.2.6 Process harvest
+6.2.6.1 Winnow grain
+6.2.6.2 Mill grain
+6.2.6.3 Thresh
+6.2.6.4 Store the harvest
+6.2.7 Farm worker
+6.2.8 Agricultural tool
+6.2.9 Farmland
+6.3 Animal husbandry
+6.3.1 Domesticated animal
+6.3.1.1 Cattle
+6.3.1.2 Sheep
+6.3.1.3 Goat
+6.3.1.4 Pig
+6.3.1.5 Dog
+6.3.1.6 Cat
+6.3.1.7 Beast of burden
+6.3.2 Tend herds in fields
+6.3.3 Milk
+6.3.4 Butcher, slaughter
+6.3.5 Wool production
+6.3.6 Poultry raising
+6.3.6.1 Chicken
+6.3.7 Animal products
+6.3.8 Veterinary science
+6.3.8.1 Animal diseases
+6.3.8.2 Castrate animal
+6.4 Hunt and fish
+6.4.1 Hunt
+6.4.1.1 Track an animal
+6.4.2 Trap
+6.4.3 Hunting birds
+6.4.4 Beekeeping
+6.4.5 Fishing
+6.4.5.1 Fish with net
+6.4.5.2 Fish with hooks
+6.4.5.3 Fishing equipment
+6.4.6 Things done to animals
+6.5 Working with buildings
+6.5.1 Building
+6.5.1.1 House
+6.5.1.2 Types of houses
+6.5.1.3 Land, property
+6.5.1.4 Yard
+6.5.1.5 Fence, wall
+6.5.2 Parts of a building
+6.5.2.1 Wall
+6.5.2.2 Roof
+6.5.2.3 Floor
+6.5.2.4 Door
+6.5.2.5 Window
+6.5.2.6 Foundation
+6.5.2.7 Room
+6.5.2.8 Floor, story
+6.5.3 Building materials
+6.5.3.1 Building equipment and maintenance
+6.5.4 Infrastructure
+6.5.4.1 Road
+6.5.4.2 Boundary
+6.6 Occupation
+6.6.1 Working with cloth
+6.6.1.1 Cloth
+6.6.1.2 Spinning thread
+6.6.1.3 Knitting
+6.6.1.4 Weaving cloth
+6.6.2 Working with minerals
+6.6.2.1 Mining
+6.6.2.2 Smelting
+6.6.2.3 Working with metal
+6.6.2.4 Working with clay
+6.6.2.5 Working with glass
+6.6.2.6 Working with oil and gas
+6.6.2.7 Working with stone
+6.6.2.8 Working with bricks
+6.6.2.9 Working with chemicals
+6.6.2.9.1 Explode
+6.6.3 Working with wood
+6.6.3.1 Lumbering
+6.6.3.2 Wood
+6.6.3.3 Working with paper
+6.6.4 Crafts
+6.6.4.1 Cordage
+6.6.4.2 Weaving baskets and mats
+6.6.4.3 Working with leather
+6.6.4.4 Working with bone
+6.6.5 Art
+6.6.5.1 Draw, paint
+6.6.5.2 Photography
+6.6.5.3 Sculpture
+6.6.6 Working with land
+6.6.7 Working with water
+6.6.7.1 Plumber
+6.6.7.2 Conveying water
+6.6.7.3 Controlling water
+6.6.7.4 Working in the sea
+6.6.8 Working with machines
+6.6.8.1 Working with electricity
+6.7 Tool
+6.7.1 Cutting tool
+6.7.1.1 Poking tool
+6.7.1.2 Digging tool
+6.7.2 Pounding tool
+6.7.3 Carrying tool
+6.7.4 Lifting tool
+6.7.5 Fastening tool
+6.7.6 Holding tool
+6.7.7 Container
+6.7.7.1 Bag
+6.7.7.2 Sheath
+6.7.8 Parts of tools
+6.7.9 Machine
+6.8 Finance
+6.8.1 Have wealth
+6.8.1.1 Own, possess
+6.8.1.2 Rich
+6.8.1.3 Poor
+6.8.1.4 Store wealth
+6.8.1.5 Possession, property
+6.8.2 Accumulate wealth
+6.8.2.1 Produce wealth
+6.8.2.2 Make profit
+6.8.2.3 Lose wealth
+6.8.2.4 Frugal
+6.8.2.5 Greedy
+6.8.2.6 Collect
+6.8.2.7 Earn
+6.8.3 Share wealth
+6.8.3.1 Give, donate
+6.8.3.2 Generous
+6.8.3.3 Stingy
+6.8.3.4 Beg
+6.8.4 Financial transaction
+6.8.4.1 Buy
+6.8.4.2 Sell
+6.8.4.3 Price
+6.8.4.3.1 Expensive
+6.8.4.3.2 Cheap
+6.8.4.3.3 Free of charge
+6.8.4.4 Bargain
+6.8.4.5 Pay
+6.8.4.6 Hire, rent
+6.8.4.7 Spend
+6.8.4.8 Store, marketplace
+6.8.4.9 Exchange, trade
+6.8.5 Borrow
+6.8.5.1 Lend
+6.8.5.2 Give pledge, bond
+6.8.5.3 Owe
+6.8.5.4 Repay debt
+6.8.5.5 Credit
+6.8.6 Money
+6.8.6.1 Monetary units
+6.8.7 Accounting
+6.8.8 Tax
+6.8.9 Dishonest financial practices
+6.8.9.1 Steal
+6.8.9.2 Cheat
+6.8.9.3 Extort money
+6.8.9.4 Take by force
+6.8.9.5 Bribe
+6.8.9.6 Smuggle
+6.9 Business organization
+6.9.1 Management
+6.9.2 Work for someone
+6.9.3 Marketing
+6.9.4 Commerce
+6.9.5 Economics
+6.9.6 Insurance
+7 Physical actions
+7.1 Posture
+7.1.1 Stand
+7.1.2 Sit
+7.1.3 Lie down
+7.1.4 Kneel
+7.1.5 Bow
+7.1.6 Lean
+7.1.7 Straight posture
+7.1.7.1 Relaxed posture
+7.1.8 Bend down
+7.1.9 Move a part of the body
+7.2 Move
+7.2.1 Manner of movement
+7.2.1.1 Walk
+7.2.1.1.1 Run
+7.2.1.1.2 Crawl
+7.2.1.1.3 Jump
+7.2.1.2 Move quickly
+7.2.1.2.1 Move slowly
+7.2.1.3 Wander
+7.2.1.4 Graceful
+7.2.1.4.1 Clumsy
+7.2.1.5 Walk with difficulty
+7.2.1.5.1 Slip, slide
+7.2.1.6 Steady, unsteady
+7.2.1.6.1 Balance
+7.2.1.7 Move noisily
+7.2.2 Move in a direction
+7.2.2.1 Move forward
+7.2.2.2 Move back
+7.2.2.3 Move sideways
+7.2.2.4 Move up
+7.2.2.5 Move down
+7.2.2.5.1 Fall
+7.2.2.6 Turn
+7.2.2.7 Move in a circle
+7.2.2.8 Move back and forth
+7.2.2.9 Move straight without turning
+7.2.3 Move toward something
+7.2.3.1 Move away
+7.2.3.2 Go
+7.2.3.2.1 Come
+7.2.3.3 Leave
+7.2.3.3.1 Arrive
+7.2.3.4 Move in
+7.2.3.4.1 Move out
+7.2.3.5 Move past, over, through
+7.2.3.6 Return
+7.2.4 Travel
+7.2.4.1 Travel by land
+7.2.4.1.1 Vehicle
+7.2.4.1.2 Railroad
+7.2.4.2 Travel by water
+7.2.4.2.1 Boat
+7.2.4.2.2 Swim
+7.2.4.2.3 Dive
+7.2.4.3 Fly
+7.2.4.4 Travel in space
+7.2.4.5 Move to a new house
+7.2.4.6 Way, route
+7.2.4.7 Lose your way
+7.2.4.8 Map
+7.2.5 Accompany
+7.2.5.1 Go first
+7.2.5.2 Follow
+7.2.5.3 Guide
+7.2.5.4 Move together
+7.2.6 Pursue
+7.2.6.1 Catch, capture
+7.2.6.2 Prevent from moving
+7.2.6.3 Escape
+7.2.6.4 Set free
+7.2.7 Not moving
+7.2.7.1 Stop moving
+7.2.7.2 Stay, remain
+7.2.7.3 Wait
+7.2.8 Send someone
+7.3 Move something
+7.3.1 Carry
+7.3.1.1 Throw
+7.3.1.2 Catch
+7.3.1.3 Shake
+7.3.1.4 Knock over
+7.3.1.5 Set upright
+7.3.2 Move something in a direction
+7.3.2.1 Put in front
+7.3.2.2 Put in back
+7.3.2.3 Put aside
+7.3.2.4 Lift
+7.3.2.4.1 Hang
+7.3.2.5 Lower something
+7.3.2.6 Put in
+7.3.2.7 Take something out of something
+7.3.2.8 Pull
+7.3.2.9 Push
+7.3.3 Take somewhere
+7.3.3.1 Take something from somewhere
+7.3.3.2 Return something
+7.3.3.3 Send
+7.3.3.4 Chase away
+7.3.3.5 Drive along
+7.3.4 Handle something
+7.3.4.1 Touch
+7.3.4.2 Pick up
+7.3.4.3 Put down
+7.3.4.4 Hold
+7.3.4.5 Actions of the hand
+7.3.4.6 Support
+7.3.4.7 Extend
+7.3.5 Turn something
+7.3.6 Open
+7.3.6.1 Shut, close
+7.3.6.2 Block, dam up
+7.3.6.3 Limit
+7.3.7 Cover
+7.3.7.1 Uncover
+7.3.7.2 Wrap
+7.3.7.3 Spread, smear
+7.3.8 Transport
+7.4 Have, be with
+7.4.1 Give, hand to
+7.4.2 Receive
+7.4.3 Get
+7.4.4 Distribute
+7.4.5 Keep something
+7.4.5.1 Leave something
+7.4.5.2 Throw away
+7.4.6 Not have
+7.5 Arrange
+7.5.1 Gather
+7.5.1.1 Separate, scatter
+7.5.1.2 Include
+7.5.1.3 Special
+7.5.2 Join, attach
+7.5.2.1 Link, connect
+7.5.2.2 Stick together
+7.5.2.3 Add to something
+7.5.2.4 Remove, take apart
+7.5.3 Mix
+7.5.3.1 Pure, unmixed
+7.5.4 Tie
+7.5.4.1 Rope, string
+7.5.4.2 Tangle
+7.5.5 Organize
+7.5.5.1 Disorganized
+7.5.6 Substitute
+7.5.7 Multiple things moving
+7.5.8 Simple, complicated
+7.5.9 Put
+7.5.9.1 Load, pile
+7.5.9.2 Fill, cover
+7.6 Hide
+7.6.1 Search
+7.6.2 Find
+7.6.3 Lose, misplace
+7.7 Physical impact
+7.7.1 Hit
+7.7.2 Aim at a target
+7.7.3 Kick
+7.7.4 Press
+7.7.5 Rub
+7.7.6 Grind
+7.7.7 Mark
+7.8 Divide into pieces
+7.8.1 Break
+7.8.2 Crack
+7.8.3 Cut
+7.8.4 Tear, rip
+7.8.5 Make hole, opening
+7.8.6 Dig
+7.9 Break, wear out
+7.9.1 Damage
+7.9.2 Tear down
+7.9.3 Destroy
+7.9.4 Repair
+8 States
+8.1 Quantity
+8.1.1 Number
+8.1.1.1 Cardinal numbers
+8.1.1.1.1 One
+8.1.1.1.2 Two
+8.1.1.2 Ordinal numbers
+8.1.1.3 Number of times
+8.1.1.4 Multiples
+8.1.1.5 Numbered group
+8.1.1.6 Fraction
+8.1.1.7 Number series
+8.1.2 Count
+8.1.2.1 Mathematics
+8.1.2.2 Add numbers
+8.1.2.3 Subtract numbers
+8.1.2.4 Multiply numbers
+8.1.2.5 Divide numbers
+8.1.3 Plural
+8.1.3.1 Many, much
+8.1.3.2 Few, little
+8.1.3.3 Group of things
+8.1.4 More
+8.1.4.1 Less
+8.1.4.2 Increase
+8.1.4.3 Decrease
+8.1.5 All
+8.1.5.1 Some
+8.1.5.2 None, nothing
+8.1.5.3 Both
+8.1.5.4 Most, almost all
+8.1.5.5 Most, least
+8.1.5.6 Almost
+8.1.5.7 Only
+8.1.5.8 Exact
+8.1.5.8.1 Approximate
+8.1.5.9 Average
+8.1.6 Whole, complete
+8.1.6.1 Part
+8.1.6.2 Piece
+8.1.7 Enough
+8.1.7.1 Extra
+8.1.7.2 Lack
+8.1.7.3 Need
+8.1.7.4 Remain, remainder
+8.1.8 Full
+8.1.8.1 Empty
+8.2 Big
+8.2.1 Small
+8.2.2 Long
+8.2.2.1 Short, not long
+8.2.2.2 Tall
+8.2.2.3 Short, not tall
+8.2.3 Thick
+8.2.3.1 Thin thing
+8.2.3.2 Fat person
+8.2.3.3 Thin person
+8.2.4 Wide
+8.2.4.1 Narrow
+8.2.5 Big area
+8.2.5.1 Big container, volume
+8.2.6 Distance
+8.2.6.1 Far
+8.2.6.2 Near
+8.2.6.3 High
+8.2.6.4 Low
+8.2.6.5 Deep, shallow
+8.2.7 Fit, size
+8.2.7.1 Tight
+8.2.7.2 Loose
+8.2.7.3 Wedged in, stuck
+8.2.8 Measure
+8.2.9 Weigh
+8.2.9.1 Heavy
+8.2.9.2 Light in weight
+8.3 Quality
+8.3.1 Shape
+8.3.1.1 Point, dot
+8.3.1.2 Line
+8.3.1.3 Straight
+8.3.1.3.1 Flat
+8.3.1.4 Horizontal
+8.3.1.4.1 Vertical
+8.3.1.4.2 Leaning, sloping
+8.3.1.5 Bend
+8.3.1.5.1 Roll up
+8.3.1.5.2 Twist, wring
+8.3.1.5.3 Fold
+8.3.1.6 Round
+8.3.1.6.1 Concave
+8.3.1.6.2 Convex
+8.3.1.6.3 Hollow
+8.3.1.7 Square
+8.3.1.8 Pattern, design
+8.3.1.8.1 Symmetrical
+8.3.1.9 Stretch
+8.3.2 Texture
+8.3.2.1 Smooth
+8.3.2.2 Rough
+8.3.2.3 Sharp
+8.3.2.3.1 Pointed
+8.3.2.4 Blunt
+8.3.2.5 Furrow
+8.3.3 Light
+8.3.3.1 Shine
+8.3.3.1.1 Light source
+8.3.3.1.2 Bright
+8.3.3.2 Dark
+8.3.3.2.1 Shadow
+8.3.3.3 Color
+8.3.3.3.1 White
+8.3.3.3.2 Black
+8.3.3.3.3 Gray
+8.3.3.3.4 Colors of the spectrum
+8.3.3.3.5 Animal color, marking
+8.3.3.3.6 Change color
+8.3.3.3.7 Multicolored
+8.3.3.4 Shiny
+8.3.4 Hot
+8.3.4.1 Cold
+8.3.5 Type, kind
+8.3.5.1 Nature, character
+8.3.5.2 Compare
+8.3.5.2.1 Same
+8.3.5.2.2 Like, similar
+8.3.5.2.3 Different
+8.3.5.2.4 Other
+8.3.5.2.5 Various
+8.3.5.2.6 Opposite
+8.3.5.3 Common
+8.3.5.3.1 Usual
+8.3.5.3.2 Unusual
+8.3.5.3.3 Unique
+8.3.5.3.4 Strange
+8.3.5.4 Pattern, model
+8.3.5.5 Imitate
+8.3.5.6 Copy
+8.3.6 Made of, material
+8.3.6.1 Strong, brittle
+8.3.6.2 Hard, firm
+8.3.6.3 Stiff, flexible
+8.3.6.4 Dense
+8.3.6.5 Soft, flimsy
+8.3.7 Good
+8.3.7.1 Bad
+8.3.7.2 Better
+8.3.7.2.1 Worse
+8.3.7.3 Perfect
+8.3.7.4 Mediocre
+8.3.7.5 Important
+8.3.7.5.1 Basic
+8.3.7.6 Improve
+8.3.7.7 Right, proper
+8.3.7.7.1 Wrong, unsuitable
+8.3.7.7.2 Convenient
+8.3.7.7.3 Compatible
+8.3.7.8 Decay
+8.3.7.8.1 Rust
+8.3.7.8.2 Blemish
+8.3.7.8.3 Garbage
+8.3.7.8.4 Preserve
+8.3.7.9 Value
+8.3.8 Decorated
+8.3.8.1 Simple, plain
+8.3.8.2 Glory
+8.4 Time
+8.4.1 Period of time
+8.4.1.1 Calendar
+8.4.1.2 Day
+8.4.1.2.1 Night
+8.4.1.2.2 Yesterday, today, tomorrow
+8.4.1.2.3 Time of the day
+8.4.1.3 Week
+8.4.1.3.1 Days of the week
+8.4.1.4 Month
+8.4.1.4.1 Months of the year
+8.4.1.5 Season
+8.4.1.6 Year
+8.4.1.7 Era
+8.4.1.8 Special days
+8.4.2 Take time
+8.4.2.1 A short time
+8.4.2.2 A long time
+8.4.2.3 Forever
+8.4.2.4 Temporary
+8.4.3 Indefinite time
+8.4.4 Telling time
+8.4.4.1 Plan a time
+8.4.4.2 Clock, watch
+8.4.5 Relative time
+8.4.5.1 Order, sequence
+8.4.5.1.1 Series
+8.4.5.1.2 First
+8.4.5.1.3 Next
+8.4.5.1.4 Last
+8.4.5.1.5 Regular
+8.4.5.1.6 Alternate
+8.4.5.2 Before
+8.4.5.2.1 After
+8.4.5.2.2 At the same time
+8.4.5.2.3 During
+8.4.5.3 Right time
+8.4.5.3.1 Early
+8.4.5.3.2 On time
+8.4.5.3.3 Late
+8.4.5.3.4 Delay
+8.4.5.3.5 Postpone
+8.4.6 Aspectual time
+8.4.6.1 Start something
+8.4.6.1.1 Beginning
+8.4.6.1.2 Stop something
+8.4.6.1.3 End
+8.4.6.1.4 Until
+8.4.6.1.5 Since, from
+8.4.6.2 Past
+8.4.6.2.1 Recently
+8.4.6.3 Present
+8.4.6.3.1 Now
+8.4.6.4 Future
+8.4.6.4.1 Soon
+8.4.6.4.2 Not yet
+8.4.6.4.3 Eventually
+8.4.6.4.4 Immediately
+8.4.6.5 Age
+8.4.6.5.1 Young
+8.4.6.5.2 Old, not young
+8.4.6.5.3 New
+8.4.6.5.4 Old, not new
+8.4.6.5.5 Modern
+8.4.6.5.6 Old fashioned
+8.4.6.6 Once
+8.4.6.6.1 Again
+8.4.6.6.2 Sometimes
+8.4.6.6.3 Often
+8.4.6.6.4 All the time
+8.4.6.6.5 Every time
+8.4.6.6.6 Never
+8.4.7 Continue, persevere
+8.4.7.1 Interrupt
+8.4.7.2 Start again
+8.4.7.3 Interval
+8.4.8 Speed
+8.4.8.1 Quick
+8.4.8.2 Slow
+8.4.8.3 Sudden
+8.5 Location
+8.5.1 Here, there
+8.5.1.1 In front of
+8.5.1.1.1 Behind
+8.5.1.2 Beside
+8.5.1.2.1 Around
+8.5.1.2.2 Between
+8.5.1.3 On
+8.5.1.3.1 Above
+8.5.1.3.2 Under, below
+8.5.1.4 Inside
+8.5.1.4.1 Out, outside
+8.5.1.5 Touching, contact
+8.5.1.5.1 Next to
+8.5.1.6 Across
+8.5.1.7 Indefinite location
+8.5.2 Direction
+8.5.2.1 Forward
+8.5.2.2 Backward
+8.5.2.3 Right, left
+8.5.2.4 Up
+8.5.2.5 Down
+8.5.2.6 Away from
+8.5.2.7 Towards
+8.5.2.8 North, south, east, west
+8.5.3 Be at a place
+8.5.3.1 Absent
+8.5.4 Area
+8.5.4.1 Vicinity
+8.5.4.2 Occupy an area
+8.5.4.3 Space, room
+8.5.4.4 Interval, space
+8.5.5 Spatial relations
+8.5.6 Contain
+8.6 Parts of things
+8.6.1 Front
+8.6.1.1 Back
+8.6.2 Top
+8.6.2.1 Bottom
+8.6.3 Side
+8.6.4 Inner part
+8.6.4.1 Outer part
+8.6.5 Middle
+8.6.6 Edge
+8.6.7 End, point
+9 Grammar
+9.1 General words
+9.1.1 Be
+9.1.1.1 Exist
+9.1.1.2 Become, change state
+9.1.1.3 Have, of
+9.1.1.4 Attribution
+9.1.2 Do
+9.1.2.1 Happen
+9.1.2.2 React, respond
+9.1.2.3 Create
+9.1.2.4 Design
+9.1.2.5 Make
+9.1.2.6 Change something
+9.1.2.7 Event propositions
+9.1.3 Thing
+9.1.3.1 Physical, non-physical
+9.1.3.2 Situation
+9.1.4 General adjectives
+9.1.5 General adverbs
+9.2 Part of speech
+9.2.1 Adjectives
+9.2.2 Adverbs
+9.2.3 Pronouns
+9.2.3.1 Reflexive pronouns
+9.2.3.2 Indefinite pronouns
+9.2.3.3 Relative pronouns
+9.2.3.4 Question words
+9.2.3.5 Demonstrative pronouns
+9.2.3.6 Personally
+9.2.4 Prepositions, postpositions
+9.2.5 Conjunctions
+9.2.5.1 Phrase conjunctions
+9.2.5.2 Clause conjunctions
+9.2.5.3 Sentence conjunctions
+9.2.6 Particles
+9.2.6.1 Classifiers
+9.2.7 Interjections
+9.2.8 Idiophones
+9.2.9 Affixes
+9.2.9.1 Verb affixes
+9.2.9.2 Noun affixes
+9.2.9.3 Derivational affixes
+9.3 Very
+9.3.1 Degree
+9.3.1.1 To a large degree
+9.3.1.2 To a small degree
+9.3.1.3 To a larger degree
+9.3.1.4 To a smaller degree
+9.3.2 Completely
+9.3.3 Partly
+9.3.4 Do intensely
+9.3.5 Attribution of an attribute
+9.4 Semantic constituents related to verbs
+9.4.1 Tense and aspect
+9.4.1.1 Tense
+9.4.1.2 Aspect--dynamic verbs
+9.4.1.3 Aspect--stative verbs
+9.4.1.4 Relational tenses
+9.4.2 Agent-oriented modalities
+9.4.2.1 Can
+9.4.2.2 Can't
+9.4.2.3 Necessary 
+9.4.3 Moods
+9.4.3.1 Imperative 
+9.4.3.2 Hortative
+9.4.3.3 Interrogative 
+9.4.4 Epistemic moods
+9.4.4.1 Certainly, definitely
+9.4.4.2 Sure
+9.4.4.3 Probably 
+9.4.4.4 Possible
+9.4.4.5 Uncertain
+9.4.4.6 Unsure
+9.4.4.6.1 Think so
+9.4.4.6.2 Maybe
+9.4.4.6.3 Seem
+9.4.4.7 Just, almost not
+9.4.4.8 Don't think so, doubt it
+9.4.4.9 Impossible
+9.4.5 Evidentials
+9.4.5.1 Evaluator
+9.4.6 Yes
+9.4.6.1 No, not
+9.4.6.2 Markers expecting an affirmative answer
+9.4.6.3 Markers expecting a negative answer
+9.4.7 Subordinating particles
+9.4.8 Adverbial clauses
+9.5 Case
+9.5.1 Primary cases
+9.5.1.1 Beneficiary of an event
+9.5.1.2 Instrument
+9.5.1.3 Means
+9.5.1.4 Way, manner
+9.5.1.5 Attendant circumstances
+9.5.1.6 Spatial location of an event
+9.5.1.6.1 Source (of movement)
+9.5.1.6.2 Path (of movement)
+9.5.1.6.3 Goal (of movement)
+9.5.1.6.4 Origin (of a person)
+9.5.2 Semantically similar events
+9.5.2.1 Together
+9.5.2.2 With, be with
+9.5.2.3 With, do with someone
+9.5.2.4 Each other
+9.5.2.5 In groups
+9.5.3 Patient-related cases
+9.5.3.1 Beneficiary (of a patient)
+9.5.3.2 Recipient (of a patient)
+9.5.3.3 With (a patient)
+9.6 Connected with, related 
+9.6.1 Coordinate relations
+9.6.1.1 And, also
+9.6.1.2 Or, either
+9.6.1.3 Association
+9.6.1.4 Combinative relation
+9.6.1.5 But
+9.6.1.5.1 Except
+9.6.1.5.2 Instead
+9.6.1.6 Dissociation
+9.6.1.7 Distribution
+9.6.1.8 Equivalence
+9.6.2 Dependency relations
+9.6.2.1 Derivation 
+9.6.2.2 Limitation of topic
+9.6.2.2.1 In general
+9.6.2.3 Relations involving correspondences
+9.6.2.4 Basis
+9.6.2.5 Cause
+9.6.2.5.1 Reason
+9.6.2.5.2 Without cause
+9.6.2.6 Result
+9.6.2.6.1 Without result 
+9.6.2.7 Purpose 
+9.6.2.7.1 Without purpose 
+9.6.2.8 Condition
+9.6.2.9 Concession
+9.6.3 Discourse markers
+9.6.3.1 Markers of transition 
+9.6.3.2 Markers of emphasis 
+9.6.3.3 Prompters of attention 
+9.6.3.4 Markers of direct address 
+9.6.3.5 Markers of identificational and explanatory clauses 
+9.6.3.6 Markers of focus
+9.6.3.7 Hesitation fillers
+9.6.3.8 Honorifics 
+9.7 Name
+9.7.1 Name of a person
+9.7.1.1 Personal names
+9.7.1.2 Family names
+9.7.1.3 Clan names
+9.7.1.4 Tribal names
+9.7.1.5 Names of languages
+9.7.1.6 Nickname
+9.7.1.7 Terms of endearment
+9.7.2 Name of a place
+9.7.2.1 Names of countries
+9.7.2.2 Names of regions
+9.7.2.3 Names of cities
+9.7.2.4 Names of streets
+9.7.2.5 Names of heavenly bodies
+9.7.2.6 Names of continents
+9.7.2.7 Names of mountains
+9.7.2.8 Names of oceans and lakes
+9.7.2.9 Names of rivers
+9.7.3 Name of a thing
+9.7.3.1 Names of animals
+9.7.3.2 Names of buildings
