@@ -49,12 +49,16 @@ def serve_file(request: HttpRequest, local_file_path: Path):
         partial_file_contents = file_contents[lower : upper + 1]
 
         response = FileResponse(
-            io.BytesIO(partial_file_contents), content_type="audio/m4a",
+            io.BytesIO(partial_file_contents),
+            content_type="audio/m4a",
         )
         response.status_code = 206
         response["Accept-Ranges"] = "bytes"
         response["Content-Range"] = f"bytes {lower}-{upper}/{total_content_length}"
     else:
-        response = FileResponse(local_file_path.open("rb"), content_type="audio/m4a",)
+        response = FileResponse(
+            local_file_path.open("rb"),
+            content_type="audio/m4a",
+        )
 
     return response

@@ -213,7 +213,9 @@ def entries(request, language):
         sorted_phrases = request.GET.get("sorted_phrases")
 
         if semantic:
-            semantic_object = SemanticClassAnnotation.objects.get(classification=semantic)
+            semantic_object = SemanticClassAnnotation.objects.get(
+                classification=semantic
+            )
             if hyponyms == "checked":
                 all_phrases = all_phrases.filter(
                     Q(semantic_class__hyponyms=semantic_object)
@@ -273,7 +275,9 @@ def entries(request, language):
     else:
         semantic_display = ""
 
-    all_semantic_classes = SemanticClassAnnotation.objects.distinct().order_by("classification")
+    all_semantic_classes = SemanticClassAnnotation.objects.distinct().order_by(
+        "classification"
+    )
     semantic_classes_with_values = SemanticClassAnnotation.objects.filter(
         phrase__language=language_object
     )
@@ -679,7 +683,9 @@ def segment_content_view(request, language, segment_id):
 
     history = phrase.history.all()
     auth = request.user.is_authenticated
-    semantic_classes = SemanticClassAnnotation.objects.all().distinct().order_by("classification")
+    semantic_classes = (
+        SemanticClassAnnotation.objects.all().distinct().order_by("classification")
+    )
     semantic_class_list = [
         (p.classification, p.classification) for p in semantic_classes
     ]

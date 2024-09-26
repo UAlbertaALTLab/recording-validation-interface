@@ -89,10 +89,12 @@ class Command(BaseCommand):
                 language=language,
             )
 
-            semantic_class, semantic_created = SemanticClassAnnotation.objects.get_or_create(
-                classification=segment.semantic,
-                source=SemanticClassAnnotation.META,
-                origin=SemanticClassAnnotation.O,
+            semantic_class, semantic_created = (
+                SemanticClassAnnotation.objects.get_or_create(
+                    classification=segment.semantic,
+                    source=SemanticClassAnnotation.META,
+                    origin=SemanticClassAnnotation.O,
+                )
             )
 
             phrase.semantic_class.add(semantic_class)

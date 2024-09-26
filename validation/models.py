@@ -100,6 +100,7 @@ class Collection(models.Model):
 
     comment = models.TextField()
 
+
 class SemanticClass(models.Model):
     """
     A semantic class, typically from WordNet or RapidWords that describes a phrase
@@ -129,7 +130,10 @@ class SemanticClass(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['collection', 'classification'], name="unique_semantic_classification_per_collection")
+            models.UniqueConstraint(
+                fields=["collection", "classification"],
+                name="unique_semantic_classification_per_collection",
+            )
         ]
 
 
