@@ -1,16 +1,16 @@
 from django.core.management.base import BaseCommand
 from tqdm import tqdm
 
-from validation.models import SemanticClassAnnotation, Phrase
+from validation.models import SemanticClassOldAnnotation, Phrase
 
 
 class Command(BaseCommand):
     help = "adds semantic classes to the database"
 
     def handle(self, *args, **options):
-        semantic_classes = SemanticClassAnnotation.objects.all()
+        semantic_classes = SemanticClassOldAnnotation.objects.all()
         for s_class in tqdm(semantic_classes):
-            other_classes = SemanticClassAnnotation.objects.filter(
+            other_classes = SemanticClassOldAnnotation.objects.filter(
                 classification=s_class.classification
             )
             if len(other_classes) > 1:

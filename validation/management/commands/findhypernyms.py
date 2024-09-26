@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 from validation.models import (
     Phrase,
-    SemanticClassAnnotation,
+    SemanticClassOldAnnotation,
 )
 
 
@@ -15,7 +15,7 @@ class Command(BaseCommand):
     help = "Populate the hypernym and hyponym fields of the semantic class"
 
     def handle(self, *args, **options):
-        classes = SemanticClassAnnotation.objects.all()
+        classes = SemanticClassOldAnnotation.objects.all()
         for c in tqdm(classes):
             name = c.classification
             name = name.replace("_", " ")
@@ -24,7 +24,7 @@ class Command(BaseCommand):
                 continue
 
             number = name[0]
-            iter_classes = SemanticClassAnnotation.objects.all()
+            iter_classes = SemanticClassOldAnnotation.objects.all()
             for s_class in iter_classes:
                 if s_class.classification.startswith(number):
                     if s_class != c:

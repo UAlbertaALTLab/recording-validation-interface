@@ -6,7 +6,7 @@ from tqdm import tqdm
 
 from validation.models import (
     Phrase,
-    SemanticClassAnnotation,
+    SemanticClassOldAnnotation,
 )
 
 
@@ -29,9 +29,9 @@ class Command(BaseCommand):
             if Phrase.objects.filter(osid=item).exists():
                 phrase = Phrase.objects.filter(osid=item).first()
                 phrase.semantic_class.clear()
-                semantic_class, _ = SemanticClassAnnotation.objects.get_or_create(
-                    source=SemanticClassAnnotation.META,
-                    origin=SemanticClassAnnotation.RW,
+                semantic_class, _ = SemanticClassOldAnnotation.objects.get_or_create(
+                    source=SemanticClassOldAnnotation.META,
+                    origin=SemanticClassOldAnnotation.RW,
                     classification=data[item],
                 )
                 phrase.semantic_class.add(semantic_class)

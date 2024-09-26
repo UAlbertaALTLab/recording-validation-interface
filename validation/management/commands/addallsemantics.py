@@ -6,7 +6,7 @@ from tqdm import tqdm
 
 from validation.models import (
     Phrase,
-    SemanticClassAnnotation,
+    SemanticClassOldAnnotation,
 )
 
 
@@ -33,8 +33,10 @@ class Command(BaseCommand):
                     rapid_words_class = line
                     rapid_words_class = rapid_words_class.replace("\n", "")
                     rapid_words_class = rapid_words_class.replace("_", " ")
-                    semantic_class, _ = SemanticClassAnnotation.objects.get_or_create(
-                        classification=rapid_words_class,
-                        origin=SemanticClassAnnotation.RW,
-                        source=SemanticClassAnnotation.META,
+                    semantic_class, _ = (
+                        SemanticClassOldAnnotation.objects.get_or_create(
+                            classification=rapid_words_class,
+                            origin=SemanticClassOldAnnotation.RW,
+                            source=SemanticClassOldAnnotation.META,
+                        )
                     )

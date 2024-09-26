@@ -140,7 +140,7 @@ class SemanticClass(models.Model):
         ]
 
 
-class SemanticClassAnnotation(models.Model):
+class SemanticClassOldAnnotation(models.Model):
     """
     A semantic class, typically from WordNet or RapidWords that describes a phrase
     """
@@ -296,7 +296,7 @@ class Phrase(models.Model):
         max_length=MAX_TRANSCRIPTION_LENGTH,
     )
 
-    semantic_class = models.ManyToManyField(SemanticClassAnnotation, blank=True)
+    semantic_class = models.ManyToManyField(SemanticClassOldAnnotation, blank=True)
 
     status = models.CharField(
         help_text="Status in the validation process",

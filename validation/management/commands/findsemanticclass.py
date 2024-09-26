@@ -6,7 +6,7 @@ from django.db.models import Q
 
 from validation.models import (
     Phrase,
-    SemanticClassAnnotation,
+    SemanticClassOldAnnotation,
 )
 
 
@@ -87,9 +87,9 @@ class Command(BaseCommand):
                             data[rapid_words_class].extend([p for p in phrases if p])
 
         for _class in data:
-            semantic_class, created = SemanticClassAnnotation.objects.get_or_create(
-                source=SemanticClassAnnotation.ELICIT,
-                origin=SemanticClassAnnotation.RW,
+            semantic_class, created = SemanticClasOldAnnotation.objects.get_or_create(
+                source=SemanticClassOldAnnotation.ELICIT,
+                origin=SemanticClassOldAnnotation.RW,
                 classification=_class,
             )
             for word in data[_class]:
