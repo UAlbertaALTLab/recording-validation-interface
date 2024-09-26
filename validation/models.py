@@ -128,6 +128,9 @@ class SemanticClass(models.Model):
         max_length=256,
     )
 
+    def __str__(self) -> str:
+        return self.classification
+
     class Meta:
         constraints = [
             models.UniqueConstraint(
