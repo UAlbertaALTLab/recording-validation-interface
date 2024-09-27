@@ -68,7 +68,6 @@ from .models import (
     LanguageVariant,
     SemanticClass,
     SemanticClassAnnotation,
-    HistoricalSemanticClassAnnotation,
 )
 from .forms import (
     EditSegment,
