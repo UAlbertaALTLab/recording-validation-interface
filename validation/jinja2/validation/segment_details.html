@@ -52,8 +52,8 @@
                 <td>{{ phrase.comment }}</td>
                 <td>
                     <ul>
-                        {% for classification in phrase.semantic_class.all() %}
-                            <li class="list__recording"> {{ classification.classification }}</li>
+                        {% for classification in phrase.semantic_classes.all() %}
+                            <li class="list__recording"> {{ classification.classification }} - {{ classification.semanticclassannotation_set.get(phrase=phrase).source }}</li>
                         {% endfor %}
                     </ul>
                 </td>

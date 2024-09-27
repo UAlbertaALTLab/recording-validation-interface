@@ -3,7 +3,7 @@ import re
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 
-from validation.models import Issue, Recording, Phrase
+from validation.models import Issue, Recording, Phrase, SemanticClass
 
 DEFAULT_MAX_LENGTH = 256
 
@@ -120,10 +120,16 @@ class EditSegment(forms.Form):
         widget=forms.TextInput(attrs={"class": "form-control bottom-margin"}),
     )
 
+    rapidwords = forms.ModelMultipleChoiceField(
+        queryset=SemanticClass.objects.filter(collection=SemanticClass.RW),
+        widget=forms.SelectMultiple(attrs={"class": "custom-select"}),
+    )
+
     def __init__(self, *args, **kwargs):
         super(EditSegment, self).__init__(*args, **kwargs)
         self.fields["source_language"].label = "Entry"
         self.fields["lexical_category"].label = "Lexical Category"
+        self.fields["rapidwords"].label = "RapidWords Semantic Classes"
 
 
 class FlagSegment(forms.ModelForm):

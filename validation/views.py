@@ -67,6 +67,8 @@ from .models import (
     Issue,
     LanguageVariant,
     SemanticClass,
+    SemanticClassAnnotation,
+    HistoricalSemanticClassAnnotation,
 )
 from .forms import (
     EditSegment,
@@ -670,7 +672,21 @@ def segment_content_view(request, language, segment_id):
             )
             analysis = form.cleaned_data["analysis"].strip() or og_phrase.analysis
             comment = form.cleaned_data["comment"].strip() or og_phrase.comment
+            rapidwords = form.cleaned_data["rapidwords"]
             p = Phrase.objects.get(id=phrase_id, language=language_object)
+            if rapidwords:
+                previous_classes = p.semantic_classes.filter(
+                    collection=SemanticClass.RW
+                )
+                for candidate in previous_classes:
+                    if candidate not in rapidwords:
+                        p.semantic_classes.remove(candidate)
+                for candidate in rapidwords:
+                    if candidate not in previous_classes:
+                        p.semantic_classes.add(
+                            candidate,
+                            through_defaults={"source": SemanticClassAnnotation.MANUAL},
+                        )
             p.transcription = transcription
             p.translation = translation
             p.analysis = analysis
@@ -688,24 +704,6 @@ def segment_content_view(request, language, segment_id):
 
     history = phrase.history.all()
     auth = request.user.is_authenticated
-    semantic_classes = (
-        SemanticClass.objects.all()
-        .distinct()
-        .annotate(
-            sum_hyponyms=Count(
-                "hyponyms__phrase",
-                distinct=True,
-                filter=Q(phrase__language=language_object),
-            ),
-            phrases=Count(
-                "phrase", distinct=True, filter=Q(phrase__language=language_object)
-            ),
-        )
-        .order_by("classification")
-    )
-    semantic_class_list = [
-        (p.classification, p.classification) for p in semantic_classes
-    ]
 
     form = EditSegment(
         initial={
@@ -715,6 +713,7 @@ def segment_content_view(request, language, segment_id):
             "comment": phrase.comment,
             "stem": phrase.stem,
             "lexical_category": phrase.lexical_category,
+            "rapidwords": phrase.semantic_classes.all(),
         }
     )
 
@@ -727,7 +726,6 @@ def segment_content_view(request, language, segment_id):
         auth=auth,
         roles=UserRoles(request.user, language),
         language=language_object,
-        semantic_list=semantic_class_list,
     )
 
     return render(request, "validation/segment_details.html", context)
