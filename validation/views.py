@@ -40,7 +40,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView, LogoutView
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.paginator import Paginator
-from django.db.models import Q, QuerySet
+from django.db.models import Q, QuerySet, Count
 from django.http import (
     HttpResponse,
     HttpResponseBadRequest,
@@ -66,7 +66,7 @@ from .models import (
     RecordingSession,
     Issue,
     LanguageVariant,
-    SemanticClassOldAnnotation,
+    SemanticClass,
 )
 from .forms import (
     EditSegment,
@@ -80,7 +80,6 @@ from .helpers import (
     get_distance_with_translations,
 )
 from .crk_sort import custom_sort
-from .models import Phrase, Recording, Speaker, RecordingSession, Issue
 
 
 class UserRoles:
@@ -213,16 +212,14 @@ def entries(request, language):
         sorted_phrases = request.GET.get("sorted_phrases")
 
         if semantic:
-            semantic_object = SemanticClassOldAnnotation.objects.get(
-                classification=semantic
-            )
+            semantic_object = SemanticClass.objects.get(classification=semantic)
             if hyponyms == "checked":
                 all_phrases = all_phrases.filter(
-                    Q(semantic_class__hyponyms=semantic_object)
-                    | Q(semantic_class=semantic_object)
+                    Q(semantic_classes__hypernyms=semantic_object)
+                    | Q(semantic_classes=semantic_object)
                 ).distinct()
             else:
-                all_phrases = all_phrases.filter(semantic_class=semantic_object)
+                all_phrases = all_phrases.filter(semantic_classes=semantic_object)
 
         if language in ["maskwacis", "moswacihk"]:
             # step 3:
@@ -275,11 +272,19 @@ def entries(request, language):
     else:
         semantic_display = ""
 
-    all_semantic_classes = SemanticClassOldAnnotation.objects.distinct().order_by(
-        "classification"
-    )
-    semantic_classes_with_values = SemanticClassOldAnnotation.objects.filter(
-        phrase__language=language_object
+    all_semantic_classes = (
+        SemanticClass.objects.distinct()
+        .order_by("classification")
+        .annotate(
+            sum_hyponyms=Count(
+                "hyponyms__phrase",
+                distinct=True,
+                filter=Q(phrase__language=language_object),
+            ),
+            phrases=Count(
+                "phrase", distinct=True, filter=Q(phrase__language=language_object)
+            ),
+        )
     )
 
     recordings, forms = prep_phrase_data(request, phrases, language_object.name)
@@ -374,7 +379,7 @@ def advanced_search(request, language):
     speakers = language_object.speaker_set.all()
     speakers = [speaker.code for speaker in speakers]
     semantic_classes = (
-        SemanticClassOldAnnotation.objects.filter(phrase__language=language_object)
+        SemanticClass.objects.filter(phrase__language=language_object)
         .distinct()
         .order_by("classification")
     )
@@ -446,10 +451,8 @@ def advanced_search_results(request, language):
     if status and status != "all":
         filter_query.append(Q(status=status))
     if semantic:
-        semantic_object = SemanticClassOldAnnotation.objects.get(
-            classification=semantic
-        )
-        filter_query.append(Q(semantic_class=semantic_object))
+        semantic_object = SemanticClass.objects.get(classification=semantic)
+        filter_query.append(Q(semantic_classes=semantic_object))
 
     if kind and kind != "all":
         filter_kind = Phrase.WORD if kind == "word" else Phrase.SENTENCE
@@ -686,7 +689,19 @@ def segment_content_view(request, language, segment_id):
     history = phrase.history.all()
     auth = request.user.is_authenticated
     semantic_classes = (
-        SemanticClassOldAnnotation.objects.all().distinct().order_by("classification")
+        SemanticClass.objects.all()
+        .distinct()
+        .annotate(
+            sum_hyponyms=Count(
+                "hyponyms__phrase",
+                distinct=True,
+                filter=Q(phrase__language=language_object),
+            ),
+            phrases=Count(
+                "phrase", distinct=True, filter=Q(phrase__language=language_object)
+            ),
+        )
+        .order_by("classification")
     )
     semantic_class_list = [
         (p.classification, p.classification) for p in semantic_classes

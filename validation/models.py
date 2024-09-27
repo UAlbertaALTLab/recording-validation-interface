@@ -128,6 +128,10 @@ class SemanticClass(models.Model):
         max_length=256,
     )
 
+    hypernyms = models.ManyToManyField(
+        "self", blank=True, default=None, symmetrical=False, related_name="hyponyms"
+    )
+
     def __str__(self) -> str:
         return self.classification
 
@@ -296,6 +300,13 @@ class Phrase(models.Model):
         max_length=MAX_TRANSCRIPTION_LENGTH,
     )
 
+    semantic_classes = models.ManyToManyField(
+        SemanticClass,
+        through="SemanticClassAnnotation",
+        through_fields=("phrase", "semantic_class"),
+        blank=True,
+    )
+
     semantic_class = models.ManyToManyField(SemanticClassOldAnnotation, blank=True)
 
     status = models.CharField(
@@ -396,6 +407,29 @@ class Phrase(models.Model):
 
     def __str__(self) -> str:
         return self.transcription
+
+
+class SemanticClassAnnotation(models.Model):
+    phrase = models.ForeignKey(Phrase, on_delete=models.CASCADE)
+    semantic_class = models.ForeignKey(SemanticClass, on_delete=models.CASCADE)
+
+    META = "metadata"
+    MANUAL = "manual classification"
+    ELICIT = "elicitation sheet"
+    SOURCE_CHOICES = (
+        (META, "Metadata"),
+        (MANUAL, "Manual Classification"),
+        (ELICIT, "Elicitation Sheet"),
+    )
+
+    source = models.CharField(
+        help_text="How did we determine this class?",
+        blank=True,
+        **arguments_for_choices(SOURCE_CHOICES),
+    )
+
+    # Keep track of Semantic Class' history, so we can review, revert, and inspect them.
+    history = HistoricalRecords()
 
 
 class Speaker(models.Model):

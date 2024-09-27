@@ -25,6 +25,7 @@ from .models import (
     LanguageVariant,
     SemanticClassOldAnnotation,
     SemanticClass,
+    SemanticClassAnnotation,
     Collection,
 )
 
@@ -34,6 +35,7 @@ admin.site.register(Speaker)  # TODO: use simplehistory
 admin.site.register(Recording, SimpleHistoryAdmin)
 admin.site.register(LanguageVariant)
 admin.site.register(SemanticClassOldAnnotation)
+admin.site.register(SemanticClassAnnotation, SimpleHistoryAdmin)
 admin.site.register(SemanticClass)
 admin.site.register(Collection)
 
