@@ -97,7 +97,7 @@ def test_search_multiple_recordings_relaxed(client, insert_test_data):
         wordform_results = [r for r in results if r["wordform"] == wordform]
         assert len(wordform_results) == 1
         assert wordform_results[0]["recording_url"] == base_recording
-        assert wordform_results[0]["recorded_wordform"] == "nîpiy"
+        assert wordform_results[0]["wordform"] == "nîpiy"
 
 
 @pytest.mark.django_db
@@ -176,7 +176,8 @@ def test_search_recordings_with_macrons(client, insert_test_data):
     assert len(recordings["not_found"]) == 0
 
     recording = recordings["matched_recordings"][0]
-    assert recording.get("wordform") == phrase.transcription
+    assert recording.get("recorded_wordform") == phrase.transcription
+    assert recording.get("wordform") == test_word
     assert "speaker" in recording.keys()
     assert recording.get("gender") in ("M", "F")
     assert recording.get("recording_url").startswith(("http://", "https://"))
