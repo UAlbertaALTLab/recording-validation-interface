@@ -123,6 +123,7 @@ class EditSegment(forms.Form):
     rapidwords = forms.ModelMultipleChoiceField(
         queryset=SemanticClass.objects.filter(collection=SemanticClass.RW),
         widget=forms.SelectMultiple(attrs={"class": "custom-select"}),
+        required=False,
     )
 
     def __init__(self, *args, **kwargs):
