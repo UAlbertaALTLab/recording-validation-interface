@@ -76,6 +76,31 @@ def test_search_multiple_recordings(client, insert_test_data):
 
 
 @pytest.mark.django_db
+def test_search_multiple_recordings_relaxed(client, insert_test_data):
+    wordforms = ["nîpiy", "nîpiý", "nīpiy", "nípiy", "nìpiy"]
+
+    url = reverse("validation:bulk_search_recordings", args=["maskwacis"])
+
+    query_params = [("q", form) for form in wordforms]
+    response = client.get(url + "?" + urllib.parse.urlencode(query_params))
+    recordings = response.json()
+
+    assert isinstance(recordings, dict)
+    assert len(recordings["matched_recordings"]) == 5
+    assert len(recordings["not_found"]) == 0
+
+    results = recordings["matched_recordings"]
+
+    base_recording = results[0]["recording_url"]
+
+    for wordform in {r["wordform"] for r in results}:
+        wordform_results = [r for r in results if r["wordform"] == wordform]
+        assert len(wordform_results) == 1
+        assert wordform_results[0]["recording_url"] == base_recording
+        assert wordform_results[0]["recorded_wordform"] == "nîpiy"
+
+
+@pytest.mark.django_db
 def test_search_recordings_not_found(client, insert_test_data):
     real_word = "nîpiy"
     non_word = "Fhqwhgads"
@@ -148,7 +173,7 @@ def test_search_recordings_with_macrons(client, insert_test_data):
 
     assert isinstance(recordings, dict)
     assert len(recordings["matched_recordings"]) == 1
-    assert len(recordings["not_found"]) == 1
+    assert len(recordings["not_found"]) == 0
 
     recording = recordings["matched_recordings"][0]
     assert recording.get("wordform") == phrase.transcription

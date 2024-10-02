@@ -22,6 +22,7 @@ import operator
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import subprocess
 import time
+import re
 from functools import reduce
 from hashlib import sha256
 from http import HTTPStatus
@@ -562,6 +563,13 @@ def serve_recording(request, recording_id):
     return response
 
 
+def annotate_relaxed_wordform(data, desired_wordform):
+    recorded_wordform = data["wordform"]
+    data["wordform"] = desired_wordform
+    data["recorded_wordform"] = recorded_wordform
+    return data
+
+
 def search_recordings(request, query):
     """
     Searches for recordings whose phrase's transcription matches the query.
@@ -599,15 +607,34 @@ def search_recordings(request, query):
     return add_cors_headers(response)
 
 
+def regex_from_equivalences(term, equivalences):
+    str = r"{}".format(term)
+    for equivalence in equivalences:
+        str = re.sub(equivalence, equivalence, str)
+    return str
+
+
 def bulk_search_recordings(request: HttpRequest, language: str):
     """
     API endpoint to retrieve EXACT wordforms and return the URLs and metadata for the recordings.
-    Example: /maskwacis/api/bulk_search?q=mistik&q=minahik&q=waskay&q=mîtos&q=mistikow&q=mêstan
+
+    Oct 2024 API CHANGE:  The API now is expected to retrieve RELAXED wordforms, not EXACT
+                          UNLESS also given the exact=true parameter.
+
+    Example: /maskwacis/api/bulk_search?q=mistik&q=minahik&q=waskay&q=mîtos&q=mistikow&q=mêstan&exact=true
     """
 
     query_terms = request.GET.getlist("q")
     matched_recordings = []
     not_found = []
+    exact = request.GET.get("exact", default=None) == "true"
+    relaxed_equivalences = [
+        r"(y|ý)",
+        r"(á|à|â|ā)",
+        r"(í|ì|î|ī)",
+        r"(ó|ò|ô|ō)",
+        r"(e|é|è|ê|ē)",
+    ]
 
     if not LanguageVariant.objects.filter(code=language).exists():
         not_found = [term for term in query_terms]
@@ -615,20 +642,25 @@ def bulk_search_recordings(request: HttpRequest, language: str):
         json_response = JsonResponse(response)
         return add_cors_headers(json_response)
 
-    if language == "moswacihk":
-        # For mōswacīhk, we use macrons instead of circumflexes
-        query_terms = query_terms + [replace_circumflexes(term) for term in query_terms]
-
     for term in query_terms:
         language_object = get_language_object(language)
-        all_matches = Recording.objects.filter(
-            phrase__transcription=term, phrase__language=language_object
-        )
+        if exact:
+            all_matches = Recording.objects.filter(
+                phrase__transcription=term, phrase__language=language_object
+            )
+        else:
+            all_matches = Recording.objects.filter(
+                phrase__transcription__iregex=regex_from_equivalences(
+                    term, relaxed_equivalences
+                ),
+                phrase__language=language_object,
+            )
         results = exclude_known_bad_recordings(all_matches)
 
         if results:
             matched_recordings.extend(
-                recording.as_json(request) for recording in results
+                annotate_relaxed_wordform(recording.as_json(request), term)
+                for recording in results
             )
         else:
             not_found.append(term)
