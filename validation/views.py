@@ -379,7 +379,7 @@ def advanced_search(request, language):
     """
     language_object = get_language_object(language)
     speakers = language_object.speaker_set.all()
-    speakers = [speaker.code for speaker in speakers]
+    speakers = [speaker.code for speaker in speakers if speaker.recording_set.exists()]
     semantic_classes = (
         SemanticClass.objects.filter(phrase__language=language_object)
         .distinct()
@@ -485,26 +485,41 @@ def advanced_search_results(request, language):
     recordings = {}
     all_matches = []
 
-    # We use the negation of the query, ~Q, and .exclude here
-    # because we want to remove any entries and recordings that do not match
-    # the criteria, which cannot be accomplished with .filter
-    recordings_exclude_query = []
+    # Performing the filtering directly on the database (by using django querysets)
+    # is much faster than doing it in Python.
+
+    recordings_include_query = None
+    phrase_include_query = None
     if speakers and "all" not in speakers:
-        recordings_exclude_query.append(~Q(speaker__in=speakers))
+        recordings_include_query = Q(speaker__in=speakers)
+        phrase_include_query = Q(recording__speaker__in=speakers)
     if quality and "all" not in quality:
-        recordings_exclude_query.append(~Q(quality__in=quality))
+        quality_recording_filter = Q(quality__in=quality)
+        quality_phrase_filter = Q(recording__quality__in=quality)
+        recordings_include_query = (
+            quality_recording_filter
+            if not recordings_include_query
+            else recordings_include_query & quality_recording_filter
+        )
+        phrase_include_query = (
+            quality_phrase_filter
+            if not phrase_include_query
+            else phrase_include_query & quality_phrase_filter
+        )
 
-    for phrase in phrase_matches:
-        if recordings_exclude_query:
-            recordings[phrase] = phrase.recordings.exclude(
-                reduce(operator.and_, recordings_exclude_query)
-            )
-        else:
-            recordings[phrase] = list(phrase.recordings)
-        if recordings[phrase]:
-            all_matches.append(phrase)
+    all_matches = (
+        phrase_matches
+        if not phrase_include_query
+        else phrase_matches.filter(phrase_include_query)
+    )
+    all_matches = all_matches.order_by("transcription").distinct()
+    for phrase in all_matches:
+        recordings[phrase] = (
+            phrase.recording_set.all()
+            if not recordings_include_query
+            else phrase.recording_set.filter(recordings_include_query)
+        )
 
-    all_matches.sort(key=lambda phrase: phrase.transcription)
     _, forms = prep_phrase_data(request, all_matches, language_object.name)
 
     query = QueryDict("", mutable=True)
@@ -1087,7 +1102,9 @@ def save_wrong_speaker_code(request, language, recording_id):
         recording=rec,
         comment=comment,
         created_by=request.user,
-        speaker_suggestion=Speaker.objects.get(code=speaker),
+        speaker_suggestion=(
+            Speaker.objects.get(code=speaker) if speaker != "idk" else None
+        ),
         created_on=datetime.datetime.now(),
         language=language,
         status=Issue.OPEN,
