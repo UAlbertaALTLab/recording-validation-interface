@@ -39,6 +39,7 @@ along with this program.  If not, see
             {% if language %}
                 <li><a href="{{ url('validation:record_audio', language.code) }}" class="menu__options-link">Record
                     Audio</a></li>
+                <li><a href="{{url('validation:statistics', language.code) }}" class="menu__options-link">Statistics</a></li>                    
             {% endif %}
             <li>&nbsp;</li>
             {% if roles.is_admin %}

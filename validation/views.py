@@ -1668,6 +1668,7 @@ def encode_query_with_page(query, page):
     return f"?{query.urlencode()}"
 
 
+@login_required()
 def statistics_page(request, language):
     """
     The language statistics page
