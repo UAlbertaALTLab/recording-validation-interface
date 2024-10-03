@@ -424,7 +424,7 @@ def advanced_search_results(request, language):
     status_choice = status
     semantic = request.GET.get("semantic_class")
     speakers = request.GET.getlist("speaker-options")
-    quality = request.GET.get("quality")
+    quality = request.GET.getlist("quality")
     language_object = get_language_object(language)
 
     if status and status != "all":
