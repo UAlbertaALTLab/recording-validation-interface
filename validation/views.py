@@ -647,14 +647,14 @@ def extract_recording_sample(sample):
         list(sample.filter(speaker=s["speaker"]))
         for s in sample.values("speaker").distinct()
     ]
-    answer = list(sample.filter(is_best=True))
+    answer = set(sample.filter(is_best=True))
     while len(answer) < 10:
         for speaker_list in by_speaker:
             try:
-                answer.append(speaker_list.pop(0))
+                answer.add(speaker_list.pop(0))
             except IndexError:
                 pass
-    return answer
+    return list(answer)
 
 
 def bulk_search_recordings(request: HttpRequest, language: str):
