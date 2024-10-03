@@ -97,7 +97,7 @@ def test_search_multiple_recordings_relaxed(client, insert_test_data):
         wordform_results = [r for r in results if r["wordform"] == wordform]
         assert len(wordform_results) == 1
         assert wordform_results[0]["recording_url"] == base_recording
-        assert wordform_results[0]["wordform"] == "nîpiy"
+        assert wordform_results[0]["recorded_wordform"] == "nîpiy"
 
 
 @pytest.mark.django_db
