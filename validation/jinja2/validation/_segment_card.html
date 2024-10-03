@@ -27,9 +27,10 @@ along with this program.  If not, see
 
     <article id='phrase-{{ phrase.id }}' class="card shadow-sm" data-cy="segment-card">
         {% if phrase.validated %}
-            <div class="card__header card__header--green" data-cy="card-header" data-phrase-id={{ phrase.id }}>
+            <div class="card__header card__header--green" data-cy="card-header" data-phrase-id={{ phrase.id }} data-toggle="tooltip" title="This entry is green because it has been marked as validated">
                 {% if phrase.status == "user-submitted" %}
                     <td>
+                        User submitted:
                         <button class="button button--success" data-cy="approve-button"
                                 data-phrase-id="{{ phrase.id }}">Approve for Use
                         </button>
@@ -38,9 +39,10 @@ along with this program.  If not, see
                 {% endif %}
             </div>
         {% elif phrase.status == "needs review" %}
-            <div class="card__header card__header--red" data-cy="card-header" data-phrase-id={{ phrase.id }}>
+            <div class="card__header card__header--red" data-cy="card-header" data-phrase-id={{ phrase.id }} data-toggle="tooltip" title="This entry is red because it has been marked as needing review">
                 {% if phrase.status == "user-submitted" %}
                     <td>
+                        User submitted:
                         <button class="button button--success" data-cy="approve-button"
                                 data-phrase-id="{{ phrase.id }}">Approve for Use
                         </button>
@@ -49,9 +51,10 @@ along with this program.  If not, see
                 {% endif %}
             </div>
         {% else %}
-            <div class="card__header card__header--grey" data-cy="card-header" data-phrase-id={{ phrase.id }}>
+            <div class="card__header card__header--grey" data-cy="card-header" data-phrase-id={{ phrase.id }} data-toggle="tooltip" title="This entry is grey because it has neither been marked as validated nor as needing review. It is likely either a new entry or the transcription was automatically added.">
                 {% if phrase.status == "user-submitted" %}
                     <td>
+                        User submitted:
                         <button class="button button--success" data-cy="approve-button"
                                 data-phrase-id="{{ phrase.id }}">Approve for Use
                         </button>

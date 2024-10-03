@@ -37,5 +37,11 @@
       {{ macros.pagination_with_query(phrases, 'validation:search_phrases', query, encode_query_with_page) }}
     </nav>
 {% endblock content %}
-
+{% block bodyscripts %}
+<script>
+  $(function () {
+$('[data-toggle="tooltip"]').tooltip()
+  });
+</script>
+{% endblock bodyscripts %}
 {# vim: set ft=htmldjango :#}

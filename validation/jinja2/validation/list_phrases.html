@@ -82,5 +82,11 @@ along with this program.  If not, see
         {{ macros.pagination_with_query(phrases, 'validation:list_phrases', query, encode_query_with_page) }}
     </nav>
 {% endblock content %}
-
+{% block bodyscripts %}
+<script>
+  $(function () {
+$('[data-toggle="tooltip"]').tooltip()
+  });
+</script>
+{% endblock bodyscripts %}
 {# vim: set ft=htmldjango :#}

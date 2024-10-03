@@ -22,16 +22,22 @@
 
     Status:
     <input type="radio" id="all" name="status" value="all" checked>
-    <label for="all">All</label>  
+    <label for="all" data-toggle="tooltip" title="Include every entry in speech-db">All</label>  
     <input type="radio" id="new" name="status" value="new">
-    <label for="new">New</label>
+    <label for="new" data-toggle="tooltip" title="Phrase has been either just automatically imported to speech-db (no human input has happened), or the phrase has been submitted by a user to speech-db and approved for use">New</label>
     <input type="radio" id="linked" name="status" value="linked">
-    <label for="linked">Linked</label>
+    <label for="linked" data-toggle="tooltip" title="Either transcription/translation have been judged as correct, or a phrase issue has been resolved">Linked</label>
     {% if roles and roles.is_linguist %}
+        <input type="radio" id="needs-review" name="status" value="needs-review">
+        <label for="needs-review" data-toggle="tooltip" title="Transcription/translation have been judged as needing review">Needs review</label>
         <input type="radio" id="auto-val" name="status" value="auto-validated">
-        <label for="auto-val">Auto-validated</label>
+        <label for="auto-val" data-toggle="tooltip" title="Entries that have been auto validated:  There was a single suggestion match and it was automatically assigned to the entry.">Auto-validated</label>
         <input type="radio" id="user-sub" name="status" value="user-submitted">
-        <label for="user-sub">User-submitted</label> <br>
+        <label for="user-sub" data-toggle="tooltip" title="The entry has been recorded and uploaded directly from the browser using speech-db">User-submitted</label>
+        <input type="radio" id="not-checked" name="status" value="not-checked">
+        <label for="not-checked" data-toggle="tooltip" title="Has not been yet validated by an expert or linguist in speech-db (Either marked as new, auto-validated, or a user submission)">Not checked</label>
+        <input type="radio" id="grey-card" name="status" value="grey-card">
+        <label for="grey-card" data-toggle="tooltip" title="Shows only entries with a grey card (not validated nor needing review)">Grey card</label>  <br/>
     {% else %}
         <br>
     {% endif %}
@@ -75,3 +81,10 @@
   </form>
 
   {% endblock content %}
+  {% block bodyscripts %}
+  <script>
+    $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+    });
+  </script>
+  {% endblock bodyscripts %}

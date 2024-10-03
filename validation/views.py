@@ -421,6 +421,7 @@ def advanced_search_results(request, language):
         lemma = lemma.strip()
     kind = request.GET.get("kind")
     status = request.GET.get("status")
+    status_choice = status
     semantic = request.GET.get("semantic_class")
     speakers = request.GET.getlist("speaker-options")
     quality = request.GET.get("quality")
@@ -432,6 +433,9 @@ def advanced_search_results(request, language):
             "linked": Phrase.LINKED,
             "auto-validated": Phrase.AUTO,
             "user-submitted": Phrase.USER,
+            "needs-review": Phrase.REVIEW,
+            "not-checked": "not-checked",
+            "grey-card": "grey-card",
         }
         status = status_choices[status]
 
@@ -450,8 +454,15 @@ def advanced_search_results(request, language):
         filter_query.append(Q(analysis__contains=analysis))
     if lemma:
         filter_query.append(Q(analysis__contains=lemma))
-    if status and status != "all":
-        filter_query.append(Q(status=status))
+    if status:
+        if status == "not-checked":
+            filter_query.append(
+                Q(status=Phrase.NEW) | Q(status=Phrase.AUTO) | Q(status=Phrase.USER)
+            )
+        elif status == "grey-card":
+            filter_query.append(~Q(validated=True) & ~Q(status=Phrase.REVIEW))
+        elif status != "all":
+            filter_query.append(Q(status=status))
     if semantic:
         semantic_object = SemanticClass.objects.get(classification=semantic)
         filter_query.append(Q(semantic_classes=semantic_object))
@@ -502,7 +513,7 @@ def advanced_search_results(request, language):
             "transcription": transcription,
             "translation": translation,
             "analysis": analysis,
-            "status": status,
+            "status": status_choice,
             "kind": kind,
             "semantic": semantic,
             "exact": exact,
