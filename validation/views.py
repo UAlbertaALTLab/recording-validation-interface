@@ -640,6 +640,23 @@ def regex_from_equivalences(term, equivalences):
     return str
 
 
+def extract_recording_sample(sample):
+    if sample.count() <= 10:
+        return sample
+    by_speaker = [
+        list(sample.filter(speaker=s["speaker"]))
+        for s in sample.values("speaker").distinct()
+    ]
+    answer = list(sample.filter(is_best=True))
+    while len(answer) < 10:
+        for speaker_list in by_speaker:
+            try:
+                answer.append(speaker_list.pop(0))
+            except IndexError:
+                pass
+    return answer
+
+
 def bulk_search_recordings(request: HttpRequest, language: str):
     """
     API endpoint to retrieve EXACT wordforms and return the URLs and metadata for the recordings.
@@ -682,7 +699,11 @@ def bulk_search_recordings(request: HttpRequest, language: str):
                 phrase__language=language_object,
             )
         results = exclude_known_bad_recordings(all_matches)
-
+        if not exact:
+            # We will reuse the exact keyword for a full query.
+            # The advantage of this is that, because morphodict queries do not ask for an exact query,
+            # It will automatically limit requests coming from morphodict.
+            results = extract_recording_sample(results)
         if results:
             matched_recordings.extend(
                 annotate_relaxed_wordform(recording.as_json(request), term)
