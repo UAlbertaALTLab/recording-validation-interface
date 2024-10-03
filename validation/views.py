@@ -27,6 +27,7 @@ from functools import reduce
 from hashlib import sha256
 from http import HTTPStatus
 from pathlib import Path
+from collections import Counter
 from django.db import transaction
 
 import mutagen as mutagen
@@ -1665,6 +1666,53 @@ def encode_query_with_page(query, page):
         query = QueryDict("", mutable=True)
     query["page"] = page
     return f"?{query.urlencode()}"
+
+
+def statistics_page(request, language):
+    """
+    The language statistics page
+    """
+    language_object = get_language_object(language)
+
+    context = dict(
+        language=language_object,
+        roles=UserRoles(request.user, language),
+        statistics=collect_statistics(language_object),
+    )
+    return render(request, "validation/statistics.html", context)
+
+
+def collect_statistics(language):
+    phrases = language.phrase_set.all()
+    transcriptions = {x["transcription"] for x in phrases.values("transcription")}
+    split = [x.split(" ") for x in transcriptions]
+    lengths = Counter([len(x) for x in split])
+    words = {word for sentence in split for word in sentence}
+    stats = {
+        "Number of entries (words/phrases)": phrases.count(),
+        "Number of validated entries": phrases.filter(status=Phrase.LINKED).count(),
+        "Number of distinct transcriptions": len(transcriptions),
+        "Total distinct words (including as part of sentences)": len(words),
+    }
+    for key, value in lengths.most_common():
+        ending = "s" if int(key) > 1 else ""
+        stats[f"Number of transcriptions with {key} word{ending}"] = value
+
+    recordings = Recording.objects.filter(phrase__in=phrases)
+    unissued_recordings = recordings.filter(
+        wrong_word=False, wrong_speaker=False, is_user_submitted=False
+    )
+    stats["Total recordings"] = recordings.count()
+    stats["Total recordings without declared issues"] = unissued_recordings.count()
+    stats["Total recordings marked good"] = unissued_recordings.filter(
+        quality=Recording.GOOD
+    ).count()
+    stats["Total recordings marked bad"] = recordings.filter(
+        quality=Recording.BAD
+    ).count()
+    stats["Total recordings marked best"] = recordings.filter(is_best=True).count()
+
+    return stats
 
 
 def user_has_alexis_permissions(user):

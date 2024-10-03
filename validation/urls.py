@@ -133,6 +133,7 @@ urlpatterns = [
         views.merge_phrases_delete,
         name="merge-delete",
     ),
+    path("<str:language>/statistics", views.statistics_page, name="statistics"),
     path(
         "api/set_language/<str:language_code>", views.set_language, name="set_language"
     ),
