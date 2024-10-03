@@ -18,7 +18,7 @@ along with this program.  If not, see
 #}
 
 
-{% macro menu_options(request, auth, roles, showMacron, language) %}
+{% macro menu_options(request, auth, roles, language) %}
     <ul id="options-menu" class="menu__options menu__options--list menu__options--right">
         {% if language %}
             <li><a href="{{ url('validation:all_speakers', language.code) }}" class="menu__options-link">Speakers</a>
