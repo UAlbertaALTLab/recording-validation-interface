@@ -634,7 +634,7 @@ def search_recordings(request, query):
 
 
 def regex_from_equivalences(term, equivalences):
-    str = r"{}".format(term)
+    str = r"^{}$".format(term)
     for equivalence in equivalences:
         str = re.sub(equivalence, equivalence, str)
     return str
@@ -692,7 +692,9 @@ def bulk_search_recordings(request: HttpRequest, language: str):
             not_found.append(term)
 
     if matched_recordings:
-        matched_recordings.sort(key=lambda recording: recording.get("is_best"))
+        matched_recordings.sort(
+            key=lambda recording: not recording.get("is_best")
+        )  # Without not, it places the best at the end.
 
     response = {"matched_recordings": matched_recordings, "not_found": not_found}
 
