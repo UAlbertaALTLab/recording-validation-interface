@@ -57,7 +57,7 @@ along with this program.  If not, see
   <select name="semantic_class" id="semantic_class">
         <option value=""> - </option>
               {% for section in all_semantic_classes %}
-                <option value="{{ section }}" {% if section.sum_hyponyms + section.phrases < 1 %} class="empty-semantic-class" disabled="true" {% endif %}>{{ section }} ({{section.phrases}}-{{ section.sum_hyponyms + section.phrases }})</option>
+                <option value="{{ section.name }}" {% if section.total_phrases < 1 %} class="empty-semantic-class" disabled="true" {% if request.COOKIES["empty-rw"] != "on" %} hidden {% endif %}{% endif %}>{{ section.name }} ({{section.phrases}}-{{ section.total_phrases }})</option>
               {% endfor %}
           </select>
             <input type="checkbox" id="hyponyms" name="hyponyms" value="checked"> Include hyponyms

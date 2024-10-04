@@ -18,3 +18,19 @@ function showMacron(option) {
     menu.classList.remove("menu__block");
     location.reload();
 }
+
+function showEmptyRW(option) {
+    document.cookie = "empty-rw=" + option + "; SameSite=Lax;"
+    let menu = document.getElementById("options-menu");
+    menu.classList.add("menu__none");
+    menu.classList.remove("menu__block");
+    location.reload();
+}
+
+function showSuggestions(option) {
+    document.cookie = "suggestions=" + option + "; SameSite=Lax;"
+    let menu = document.getElementById("options-menu");
+    menu.classList.add("menu__none");
+    menu.classList.remove("menu__block");
+    location.reload();
+}

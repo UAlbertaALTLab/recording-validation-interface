@@ -42,7 +42,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView, LogoutView
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.paginator import Paginator
-from django.db.models import Q, QuerySet, Count
+from django.db.models import Q, QuerySet, Count, Func, F
 from django.http import (
     HttpResponse,
     HttpResponseBadRequest,
@@ -168,6 +168,32 @@ def update_phrase_order(all_phrases):
     return sorted_updated_phrases
 
 
+def semantic_classes_collect(semantic_classes):
+    base_data = {
+        str(x): {"phrases": x.phrases, "hyponyms": [str(y) for y in x.hyponyms.all()]}
+        for x in semantic_classes
+    }
+    data = dict()
+
+    def process(element):
+        if element not in data:
+            if len(base_data[element]["hyponyms"]) == 0:
+                data[element] = base_data[element]["phrases"]
+            for hyponym in base_data[element]["hyponyms"]:
+                process(hyponym)
+        data[element] = base_data[element]["phrases"] + sum(
+            [data[x] for x in base_data[element]["hyponyms"]]
+        )
+
+    for element in base_data.keys():
+        process(element)
+
+    return [
+        {"name": key, "total_phrases": value, "phrases": base_data[key]["phrases"]}
+        for key, value in data.items()
+    ]
+
+
 def entries(request, language):
     """
     The main page.
@@ -275,20 +301,14 @@ def entries(request, language):
     else:
         semantic_display = ""
 
-    all_semantic_classes = (
-        SemanticClass.objects.distinct()
-        .order_by("classification")
-        .annotate(
-            sum_hyponyms=Count(
-                "hyponyms__phrase",
-                distinct=True,
-                filter=Q(phrase__language=language_object),
-            ),
+    all_semantic_classes = semantic_classes_collect(
+        SemanticClass.objects.distinct().annotate(
             phrases=Count(
                 "phrase", distinct=True, filter=Q(phrase__language=language_object)
             ),
         )
     )
+    all_semantic_classes.sort(key=lambda x: x["name"])
 
     recordings, forms = prep_phrase_data(request, phrases, language_object.name)
 
@@ -779,7 +799,12 @@ def segment_content_view(request, language, segment_id):
 
     phrase = Phrase.objects.get(id=segment_id, language=language_object)
     _transcription = phrase.field_transcription or phrase.transcription
-    suggestions = get_distance_with_translations(_transcription)
+    suggestions = {}
+
+    # Only try to collect suggestions if the right cookie is set.
+    # Otherwise continue.
+    if request.COOKIES.get("suggestions", "on") != "off":
+        suggestions = get_distance_with_translations(_transcription)
 
     segment_name = phrase.transcription
 
