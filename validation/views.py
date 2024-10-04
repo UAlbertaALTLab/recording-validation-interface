@@ -188,9 +188,17 @@ def semantic_classes_collect(semantic_classes):
     for element in base_data.keys():
         process(element)
 
+    def build_dict(name, total_phrases, phrases):
+        rest = f", {total_phrases} ➘" if phrases != total_phrases else ""
+        return {
+            "name": name,
+            "total_phrases": total_phrases,
+            "phrases": phrases,
+            "entries": f"({phrases} entries{rest})",
+        }
+
     return [
-        {"name": key, "total_phrases": value, "phrases": base_data[key]["phrases"]}
-        for key, value in data.items()
+        build_dict(key, value, base_data[key]["phrases"]) for key, value in data.items()
     ]
 
 
@@ -1716,7 +1724,11 @@ def collect_statistics(language):
     words = {word for sentence in split for word in sentence}
     stats = {
         "Number of entries (words/phrases)": phrases.count(),
-        "Number of validated entries": phrases.filter(status=Phrase.LINKED).count(),
+        "Number of entries (marked good)": phrases.filter(status=Phrase.LINKED).count(),
+        "Number of entries (marked needs review)": phrases.filter(
+            status=Phrase.REVIEW
+        ).count(),  # TODO Separate No/IDK
+        "Number of grey entries": "",  # TODO
         "Number of distinct transcriptions": len(transcriptions),
         "Total distinct words (including as part of sentences)": len(words),
     }
