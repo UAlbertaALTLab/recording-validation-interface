@@ -143,13 +143,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 return
             }
 
-            // const bestElement = document.querySelector(`[data-recording-id='${recordingId}']`)
-            const otherElements = document.querySelectorAll(`[data-phrase-id-best='${phraseId}']`)
-
-            for (let el of otherElements) {
-                el.innerHTML = "&#9734;";
-            }
-
             if (r.set_solid) {
                 e.target.innerHTML = "&#9733;";
             } else {

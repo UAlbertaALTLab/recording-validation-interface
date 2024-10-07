@@ -366,7 +366,7 @@ class Phrase(models.Model):
     display_order = models.IntegerField(default=0)
 
     # Keep track of Phrases' history, so we can review, revert, and inspect them.
-    history = HistoricalRecords()
+    history = HistoricalRecords(excluded_fields=["semantic_classes"])
 
     class Meta:
         indexes = [

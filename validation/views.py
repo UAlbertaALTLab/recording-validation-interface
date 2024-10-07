@@ -70,6 +70,7 @@ from .models import (
     LanguageVariant,
     SemanticClass,
     SemanticClassAnnotation,
+    HistoricalSemanticClassAnnotation,
 )
 from .forms import (
     EditSegment,
@@ -783,19 +784,20 @@ def segment_content_view(request, language, segment_id):
             comment = form.cleaned_data["comment"].strip() or og_phrase.comment
             rapidwords = form.cleaned_data["rapidwords"]
             p = Phrase.objects.get(id=phrase_id, language=language_object)
-            if rapidwords:
-                previous_classes = p.semantic_classes.filter(
-                    collection=SemanticClass.RW
-                )
-                for candidate in previous_classes:
-                    if candidate not in rapidwords:
-                        p.semantic_classes.remove(candidate)
-                for candidate in rapidwords:
-                    if candidate not in previous_classes:
-                        p.semantic_classes.add(
-                            candidate,
-                            through_defaults={"source": SemanticClassAnnotation.MANUAL},
-                        )
+            previous_classes = SemanticClassAnnotation.objects.filter(
+                phrase=p, semantic_class__collection=SemanticClass.RW
+            )
+            for candidate in previous_classes:
+                if candidate.semantic_class not in rapidwords:
+                    candidate.delete()
+            previous_classes = p.semantic_classes.all()
+            for candidate in rapidwords:
+                if candidate not in previous_classes:
+                    SemanticClassAnnotation.objects.create(
+                        phrase=p,
+                        semantic_class=candidate,
+                        source=SemanticClassAnnotation.MANUAL,
+                    )
             p.transcription = transcription
             p.translation = translation
             p.analysis = analysis
@@ -817,6 +819,9 @@ def segment_content_view(request, language, segment_id):
     segment_name = phrase.transcription
 
     history = phrase.history.all()
+    rapidwords_history = HistoricalSemanticClassAnnotation.objects.filter(
+        phrase=phrase, semantic_class__collection="rapidwords"
+    )
     auth = request.user.is_authenticated
 
     form = EditSegment(
@@ -837,6 +842,7 @@ def segment_content_view(request, language, segment_id):
         suggestions=suggestions,
         form=form,
         history=history,
+        rw_history=rapidwords_history,
         auth=auth,
         roles=UserRoles(request.user, language),
         language=language_object,
@@ -1231,12 +1237,9 @@ def record_audio_is_best(request, recording_id):
         set_solid = True
     recording.save()
 
-    recording_set = Recording.objects.filter(phrase_id=phrase_id)
-    for rec in recording_set:
-        if rec == recording:
-            continue
-        rec.is_best = False
-        rec.save()
+    # We used to have a single best audio per recording.
+    # This is not enforced anymore, to allow multiple best in cases with many entries.
+    # This semantic change should be communicated to language experts.
 
     return JsonResponse({"status": "ok", "set_solid": set_solid})
 
@@ -1724,11 +1727,22 @@ def collect_statistics(language):
     words = {word for sentence in split for word in sentence}
     stats = {
         "Number of entries (words/phrases)": phrases.count(),
-        "Number of entries (marked good)": phrases.filter(status=Phrase.LINKED).count(),
-        "Number of entries (marked needs review)": phrases.filter(
-            status=Phrase.REVIEW
+        "Number of validated entries": phrases.filter(validated=True).count(),
+        "Number of entries manually marked good": phrases.filter(
+            origin=Phrase.NEW_WORD, status=Phrase.LINKED
+        ).count(),
+        "Number of entries manually marked needs review": phrases.filter(
+            origin=Phrase.NEW_WORD, status=Phrase.REVIEW
         ).count(),  # TODO Separate No/IDK
-        "Number of grey entries": "",  # TODO
+        "Number of grey card entries": phrases.filter(
+            ~Q(validated=True) & ~Q(status=Phrase.REVIEW)
+        ).count(),
+        "Number of green card with idk buttton entries": phrases.filter(
+            Q(origin=Phrase.NEW_WORD) & ~Q(status="linked") & ~Q(status="needs review")
+        ).count(),
+        "Number of entries with pre-accepted transcription/translation (e.g. from a dictionary)": phrases.filter(
+            ~Q(origin=Phrase.NEW_WORD)
+        ).count(),
         "Number of distinct transcriptions": len(transcriptions),
         "Total distinct words (including as part of sentences)": len(words),
     }
@@ -1750,6 +1764,7 @@ def collect_statistics(language):
     ).count()
     stats["Total recordings marked best"] = recordings.filter(is_best=True).count()
 
+    
     return stats
 
 

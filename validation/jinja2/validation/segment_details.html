@@ -32,6 +32,10 @@
             <p>This entry was last edited by {{ history[0].modifier }} on
                 {{ history[0].history_date.strftime('%Y-%m-%d') }}</p>
         {% endif %}
+        {% if rw_history|count > 0 %}
+        <p> The rapidwords for this entry were last edited by {{rw_history[0].modifier }} on
+            {{ rw_history[0].history_date.strftime('%Y-%m-%d') }}</p>
+        {% endif %}
 
         <table id="segment-table" class="table table-striped">
             <thead>
@@ -144,6 +148,41 @@
                     {% endif %}
                 {% endfor %}{# for suggestion in suggestions #}
             </table>
+        {% endif %}
+        {% if rw_history | count > 0 %}
+        <h4>RapidWords Semantic Classes History:</h4>
+        <table id="rapidwords-revision-table" class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col"> User</th>
+                    <th scope="col"> Date</th>
+                    <th scope="col"> Action</th>
+                    <th scope="col"> Source </th>
+                    <th scope="col"> Semantic Class</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for revision in rw_history %}
+                <tr>
+                    <td data-cy="rapidwords-revision-modifier">{{ revision.history_user }} </td>
+                    <td data-cy="rapidwords-revision-date">{{revision.history_date.date()}}</td>
+                    <td data-cy="rapidwords-revision-kind">
+                        {% if revision.history_type == '+' %}
+                        Added
+                        {% elif revision.history_type == '~' %}
+                        Updated
+                        {% elif revision.history_type == '-' %}
+                        Removed
+                        {% else %}
+                        (Unknown history change)
+                        {% endif %}
+                    </td>
+                    <td data-cy="rapidwords-revision-source">{{revision.source}}</td>
+                    <td data-cy="rapidwords-revision-semantic-class">{{revision.semantic_class}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
         {% endif %}
         <h4>Revision History:</h4>
         <table id="revision-table" class="table table-striped">
