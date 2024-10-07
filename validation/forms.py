@@ -8,6 +8,11 @@ from validation.models import Issue, Recording, Phrase, SemanticClass
 DEFAULT_MAX_LENGTH = 256
 
 
+class RapidWordsCheckboxMultiple(forms.CheckboxSelectMultiple):
+    class Media:
+        js = ["rwAccordion.js"]
+
+
 class Login(forms.Form):
     username = forms.CharField(
         required=True,
@@ -122,7 +127,7 @@ class EditSegment(forms.Form):
 
     rapidwords = forms.ModelMultipleChoiceField(
         queryset=SemanticClass.objects.filter(collection=SemanticClass.RW),
-        widget=forms.SelectMultiple(attrs={"class": "custom-select"}),
+        widget=RapidWordsCheckboxMultiple(),
         required=False,
     )
 
