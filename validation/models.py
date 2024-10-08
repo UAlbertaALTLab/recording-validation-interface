@@ -416,16 +416,28 @@ class SemanticClassAnnotation(models.Model):
     META = "metadata"
     MANUAL = "manual classification"
     ELICIT = "elicitation sheet"
+    DICTIONARY = "dictionary"
     SOURCE_CHOICES = (
         (META, "Metadata"),
         (MANUAL, "Manual Classification"),
         (ELICIT, "Elicitation Sheet"),
+        (DICTIONARY, "Dictionary"),
     )
+
+    CW = "CW"
+    MD = "MD"
+    DICTIONARY_CHOICES = ((CW, "Cree: Words"), (MD, "Maskwacis Dictionary"))
 
     source = models.CharField(
         help_text="How did we determine this class?",
         blank=True,
         **arguments_for_choices(SOURCE_CHOICES),
+    )
+
+    dictionary_source = models.CharField(
+        help_text="If annotation came from dictionary, which one?",
+        blank=True,
+        **arguments_for_choices(DICTIONARY_CHOICES),
     )
 
     # Keep track of Semantic Class' history, so we can review, revert, and inspect them.
