@@ -440,6 +440,13 @@ class SemanticClassAnnotation(models.Model):
         **arguments_for_choices(DICTIONARY_CHOICES),
     )
 
+    def source_string(self):
+        return self.source + (
+            f" ({self.dictionary_source})"
+            if self.source == SemanticClassAnnotation.DICTIONARY
+            else ""
+        )
+
     # Keep track of Semantic Class' history, so we can review, revert, and inspect them.
     history = HistoricalRecords()
 

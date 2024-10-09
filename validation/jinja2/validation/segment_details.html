@@ -13,10 +13,6 @@
         document.getElementById('id_analysis').value = analysis;
     }
 
-    function goBack() {
-        location.href = "{{request.META.HTTP_REFERER}}";
-    }
-
 </script>
 
 {% extends 'validation/_base.html' %}
@@ -25,9 +21,6 @@
 {% block content %}
     <div class="table-responsive">
 
-        <div>
-            <button class="button button--success button--back" onclick="goBack()">Back</button>
-        </div>
         {% if history|length > 0 %}
             <p>This entry was last edited by {{ history[0].modifier }} on
                 {{ history[0].history_date.strftime('%Y-%m-%d') }}</p>
@@ -57,7 +50,7 @@
                 <td>
                     <ul>
                         {% for classification in phrase.semantic_classes.all() %}
-                            <li class="list__recording"> {{ classification.classification }} - {{ classification.semanticclassannotation_set.get(phrase=phrase).source }}</li>
+                            <li class="list__recording"> {{ classification.classification }} - {{ classification.semanticclassannotation_set.get(phrase=phrase).source_string() }}</li>
                         {% endfor %}
                     </ul>
                 </td>
