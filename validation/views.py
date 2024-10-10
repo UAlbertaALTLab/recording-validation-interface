@@ -42,7 +42,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView, LogoutView
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.paginator import Paginator
-from django.db.models import Q, QuerySet, Count, Func, F
+from django.db.models import Q, QuerySet, Count, Case, When, IntegerField, F
 from django.http import (
     HttpResponse,
     HttpResponseBadRequest,
@@ -71,6 +71,8 @@ from .models import (
     SemanticClass,
     SemanticClassAnnotation,
     HistoricalSemanticClassAnnotation,
+    HistoricalRecording,
+    HistoricalPhrase,
 )
 from .forms import (
     EditSegment,
@@ -190,7 +192,7 @@ def semantic_classes_collect(semantic_classes):
         process(element)
 
     def build_dict(name, total_phrases, phrases):
-        rest = f", {total_phrases} ➘" if phrases != total_phrases else ""
+        rest = f", ↪︎{total_phrases}" if phrases != total_phrases else ""
         return {
             "name": name,
             "total_phrases": total_phrases,
@@ -1721,30 +1723,44 @@ def statistics_page(request, language):
 
 def collect_statistics(language):
     phrases = language.phrase_set.all()
+    historical = (
+        HistoricalPhrase.objects.filter(Q(id__in=phrases) & ~Q(history_user=None))
+        .values("id")
+        .distinct()
+    )
     transcriptions = {x["transcription"] for x in phrases.values("transcription")}
     split = [x.split(" ") for x in transcriptions]
     lengths = Counter([len(x) for x in split])
     words = {word for sentence in split for word in sentence}
     stats = {
         "Number of entries (words/phrases)": phrases.count(),
-        "Number of validated entries": phrases.filter(validated=True).count(),
+        "Number of distinct transcriptions": len(transcriptions),
+        "Total distinct words (including as part of sentences)": len(words),
+        "Number of entries touched by a human in speech-db": historical.count(),
+        "Number of entries with an empty linguistic analysis": phrases.filter(
+            analysis=""
+        ).count(),
+        "Number of entries with a green heading": phrases.filter(
+            validated=True
+        ).count(),
+        "Number of entries with a red heading": phrases.filter(
+            ~Q(validated=True) & Q(status=Phrase.REVIEW)
+        ).count(),
+        "Number of entries with a grey heading": phrases.filter(
+            ~Q(validated=True) & ~Q(status=Phrase.REVIEW)
+        ).count(),
+        "Number of entries with an origin different than new word": phrases.filter(
+            ~Q(origin=Phrase.NEW_WORD)
+        ).count(),
         "Number of entries manually marked good": phrases.filter(
             origin=Phrase.NEW_WORD, status=Phrase.LINKED
         ).count(),
         "Number of entries manually marked needs review": phrases.filter(
             origin=Phrase.NEW_WORD, status=Phrase.REVIEW
         ).count(),  # TODO Separate No/IDK
-        "Number of grey card entries": phrases.filter(
-            ~Q(validated=True) & ~Q(status=Phrase.REVIEW)
-        ).count(),
-        "Number of green card with idk buttton entries": phrases.filter(
+        "Number of entries where the 'I don't know' button appears marked": phrases.filter(
             Q(origin=Phrase.NEW_WORD) & ~Q(status="linked") & ~Q(status="needs review")
         ).count(),
-        "Number of entries with pre-accepted transcription/translation (e.g. from a dictionary)": phrases.filter(
-            ~Q(origin=Phrase.NEW_WORD)
-        ).count(),
-        "Number of distinct transcriptions": len(transcriptions),
-        "Total distinct words (including as part of sentences)": len(words),
     }
     for key, value in lengths.most_common():
         ending = "s" if int(key) > 1 else ""
@@ -1756,15 +1772,38 @@ def collect_statistics(language):
     )
     stats["Total recordings"] = recordings.count()
     stats["Total recordings without declared issues"] = unissued_recordings.count()
-    stats["Total recordings marked good"] = unissued_recordings.filter(
+    stats["Total recordings marked good quality"] = unissued_recordings.filter(
         quality=Recording.GOOD
     ).count()
-    stats["Total recordings marked bad"] = recordings.filter(
+    stats["Total recordings marked bad quality"] = recordings.filter(
         quality=Recording.BAD
+    ).count()
+    stats["Total recordings marked unknown quality"] = unissued_recordings.filter(
+        quality=Recording.UNKNOWN
     ).count()
     stats["Total recordings marked best"] = recordings.filter(is_best=True).count()
 
-    
+    historical = HistoricalRecording.objects.filter(
+        Q(id__in=recordings) & ~Q(history_user=None)
+    ).values("id")
+    counted = phrases.annotate(
+        total_recordings=Count("recording", distinct=True),
+        human_touched_recordings=Count(
+            Case(When(recording__in=historical, then=1), output_field=IntegerField())
+        ),
+    )
+    stats["Total recordings touched by a human"] = Recording.objects.filter(
+        id__in=historical
+    ).count()
+    stats[
+        "Total phrases where all recordings have been touched by a human in speech-db"
+    ] = counted.filter(total_recordings=F("human_touched_recordings")).count()
+    stats[
+        "Total phrases where some recordings have been touched by a human in speech-db"
+    ] = counted.filter(human_touched_recordings__gt=0).count()
+    stats[
+        "Total phrases where no recordings have been touched by a human in speech-db"
+    ] = counted.filter(human_touched_recordings=0).count()
     return stats
 
 

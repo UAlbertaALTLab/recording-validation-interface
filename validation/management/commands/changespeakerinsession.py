@@ -60,10 +60,8 @@ class Command(BaseCommand):
     def handle(self, *args, session_id, speaker_from, speaker_to, **options) -> None:
         session = RecordingSession.objects.get(id=session_id)
         speaker_from = Speaker.objects.get(code=speaker_from)
-        speaker_to   = Speaker.objects.get(code=speaker_to)
-        self._handle_change_speaker(
-            session, speaker_from, speaker_to
-        )
+        speaker_to = Speaker.objects.get(code=speaker_to)
+        self._handle_change_speaker(session, speaker_from, speaker_to)
 
     @logme.log
     def _handle_change_speaker(self, session, speaker_from, speaker_to, logger):
