@@ -424,6 +424,7 @@ def advanced_search(request, language):
         roles=UserRoles(request.user, language),
         language=language_object,
         semantic_classes=semantic_classes,
+        semantic_class_sources=SemanticClassAnnotation.SOURCE_CHOICES,
     )
     return render(request, "validation/advanced_search.html", context)
 
@@ -455,6 +456,7 @@ def advanced_search_results(request, language):
     status = request.GET.get("status")
     status_choice = status
     semantic = request.GET.get("semantic_class")
+    semantic_class_source = request.GET.get("semantic-class-source", "all")
     speakers = request.GET.getlist("speaker-options")
     quality = request.GET.getlist("quality")
     language_object = get_language_object(language)
@@ -498,6 +500,11 @@ def advanced_search_results(request, language):
     if semantic:
         semantic_object = SemanticClass.objects.get(classification=semantic)
         filter_query.append(Q(semantic_classes=semantic_object))
+    if semantic_class_source and semantic_class_source != "all":
+        annotations = SemanticClassAnnotation.objects.filter(
+            source=semantic_class_source
+        ).values("phrase")
+        filter_query.append(Q(id__in=annotations))
 
     if kind and kind != "all":
         filter_kind = Phrase.WORD if kind == "word" else Phrase.SENTENCE

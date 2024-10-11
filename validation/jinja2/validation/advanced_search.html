@@ -67,6 +67,14 @@
               {% endfor %}
           </select><br>
 
+    Semantic class source:
+    <input type="radio" id="all_semantic_classes" name="semantic-class-source" value="all" checked>
+    <label for="all_semantic_classes">All (including missing annotations)</label>&nbsp;
+    {% for source in semantic_class_sources %}
+    <input type="radio" id="{{source[0]}}" name="semantic-class-source" value="{{ source[0]}}">
+    <label for="{{source[0]}}">{{ source[1] }}</label>&nbsp;
+    {% endfor %}
+    <br>
     Speaker:
     <input type="checkbox" id="all_speakers" name="speaker-options" value="all">
     <label for="all_spakers">All</label><br>
