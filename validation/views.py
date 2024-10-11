@@ -1645,12 +1645,12 @@ def handle_save_issue_with_recording(form, issue, request, language):
     rec = Recording.objects.get(id=issue.recording.id)
 
     speaker_code = form.cleaned_data["speaker"]
-    if speaker_code:
+    if speaker_code and (not rec.speaker or rec.speaker.code != speaker_code):
         speaker = Speaker.objects.get(code=speaker_code)
         rec.speaker = speaker
 
     new_word = form.cleaned_data["phrase"].strip()
-    if new_word:
+    if new_word and (not rec.phrase or rec.phrase.transcription != new_word):
         new_phrase = Phrase.objects.filter(transcription=new_word).first()
         if not new_phrase:
             new_phrase = Phrase(
