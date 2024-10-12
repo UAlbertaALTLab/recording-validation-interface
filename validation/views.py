@@ -573,6 +573,8 @@ def advanced_search_results(request, language):
             "exact": exact,
             "lemma": lemma,
             "quality": quality,
+            "semantic_class": semantic,
+            "semantic-class-source": semantic_class_source,
         }
     )
     for speaker in speakers:
