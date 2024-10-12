@@ -569,16 +569,17 @@ def advanced_search_results(request, language):
             "analysis": analysis,
             "status": status_choice,
             "kind": kind,
-            "semantic": semantic,
             "exact": exact,
             "lemma": lemma,
-            "quality": quality,
             "semantic_class": semantic,
             "semantic-class-source": semantic_class_source,
         }
     )
     for speaker in speakers:
         query.appendlist("speaker-options", speaker)
+
+    for q in quality:
+        query.appendlist("quality", q)
 
     paginator = Paginator(all_matches, 5)
     page_no = request.GET.get("page", 1)
