@@ -239,6 +239,7 @@ class Phrase(models.Model):
     MASKWACÎS_DICTIONARY = "MD"
     ONESPOT_SAPIR = "OS"
     TVPD = "TVPD"
+    TPRP = "TPRP"
     PFN = "PFN"
     I3 = "I3"
     AUTO = "AUTO"
@@ -247,6 +248,7 @@ class Phrase(models.Model):
         (MASKWACÎS_DICTIONARY, "Maskwacîs Dictionary"),
         (ONESPOT_SAPIR, "Onespot-Sapir Dictionary"),
         (TVPD, "Tsuut'ina Verb Phrase Dictionary"),
+        (TPRP, "Tsuut'ina Paradigm Recording Project"),
         (PFN, "Paul First Nation"),
         (I3, "Îethka Îabi Institude"),
         (AUTO, "Auto-synthesized speech"),
