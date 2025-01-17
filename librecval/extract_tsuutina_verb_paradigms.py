@@ -61,8 +61,8 @@ class TsuutinaRecordingExtractor:
     Extracts recordings from a directory of Tsuut'ina files
     """
 
-    def scan(self, sessions_dir):
-        md_dict = get_metadata_from_file()
+    def scan(self, sessions_dir, metadata_file):
+        md_dict = get_metadata_from_file(metadata_file)
 
         sessions_dir = Path(sessions_dir)
         audio_dir = Path(sessions_dir)  # settings.TSUUTINA_AUDIO_PREFIX)
@@ -146,10 +146,8 @@ class TsuutinaRecordingExtractor:
         return
 
 
-def get_metadata_from_file():
-    metadata_file = open(
-        "/home/fbanados/Set1/INDEX.tsv"
-    )  # (settings.TSUUTINA_METADATA_PATH)
+def get_metadata_from_file(metadata_file):
+    metadata_file = open(metadata_file)  # (settings.TSUUTINA_METADATA_PATH)
     metadata = csv.DictReader(
         metadata_file,
         delimiter="\t",

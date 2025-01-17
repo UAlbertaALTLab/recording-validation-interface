@@ -35,14 +35,27 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("sessions_dir", nargs="?", type=Path, default=None)
+        parser.add_argument(
+            "--audio-dir",
+            type=Path,
+            help="where to store the extracted audio",
+            default=Path("./audio"),
+        )
+        parser.add_argument(
+            "--metadata-file",
+            type=Path,
+            help="where to store the extracted audio",
+            default=Path("./INDEX.tsv"),
+        )
 
     def handle(
         self,
         *args,
         store_db=True,
         wav=False,
-        audio_dir: Path = Path("./data/audio"),
+        audio_dir: Path = Path("./audio"),
         sessions_dir=None,
+        metadata_file=None,
         **options,
     ) -> None:
 
@@ -51,10 +64,10 @@ class Command(BaseCommand):
 
         self.audio_dir = audio_dir
 
-        self._handle_store_django(sessions_dir)
+        self._handle_store_django(sessions_dir, metadata_file)
 
     @logme.log
-    def _handle_store_django(self, sessions_dir, logger) -> None:
+    def _handle_store_django(self, sessions_dir, metadata_file, logger) -> None:
         """
         Stores m4a files, managed by Django's media engine.
         """
@@ -62,7 +75,7 @@ class Command(BaseCommand):
         # these files will be then handled by the currently configured storage backend.
         recording_extractor = TsuutinaRecordingExtractor()
         collection, _ = Collection.objects.get_or_create(code="BRS-PAR")
-        for segment in recording_extractor.scan(sessions_dir):
+        for segment in recording_extractor.scan(sessions_dir, metadata_file):
             logger.info(f"Processing {segment.transcription}...")
             rec_id = segment.compute_sha256hash()
             if Recording.objects.filter(id=rec_id).exists():
