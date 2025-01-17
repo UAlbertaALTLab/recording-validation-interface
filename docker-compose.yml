@@ -24,3 +24,4 @@ services:
         - "/data/application-data/speech-db/i3-audio:/app/data/i3-audio"
         - "/data/application-data/speech-db/okimasis-bios:/app/data/okimasis-bios"
         - "/data/application-data/speech-db/rw_doc.txt:/app/private/rw_doc.txt"
+        - "/data/application-data/speech-db/tsuutina-recordings-2025:/app/private/tsuutina-recordings-2025"
