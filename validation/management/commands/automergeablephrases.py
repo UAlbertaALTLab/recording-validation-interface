@@ -32,7 +32,7 @@ from django.core.management.base import BaseCommand, CommandError  # type: ignor
 from django.db.models import Q, QuerySet, Count
 
 from validation.models import (
-    Phrase,
+    Phrase, # type: ignore
 )
 
 from validation.views import handle_merge_phrases

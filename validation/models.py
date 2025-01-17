@@ -17,6 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
+from typing import Any
 import unicodedata
 from pathlib import Path
 
@@ -300,7 +301,7 @@ class Phrase(models.Model):
         max_length=MAX_TRANSCRIPTION_LENGTH,
     )
 
-    semantic_classes = models.ManyToManyField(
+    semantic_classes : "models.ManyToManyField[SemanticClass, Phrase]"= models.ManyToManyField(
         SemanticClass,
         through="SemanticClassAnnotation",
         through_fields=("phrase", "semantic_class"),
@@ -591,7 +592,7 @@ class RecordingSession(models.Model):
         help_text="The 'subsession' number, if applicable.", null=True, blank=True
     )
 
-    def as_session_id(self) -> str:
+    def as_session_id(self) -> SessionID:
         """
         Converts back into a SessionID object.
         """
@@ -742,7 +743,7 @@ class Recording(models.Model):
         """
         return self.compressed_audio.url
 
-    def as_json(self, request):
+    def as_json(self, request) -> dict[str, Any]:
         """
         Returns JSON that API clients expect for a single recording.
         """

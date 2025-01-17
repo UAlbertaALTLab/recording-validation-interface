@@ -222,7 +222,7 @@ class RecordNewPhrase(forms.ModelForm):
 
     class Meta:
         model = Recording
-        fields = []
+        fields: list[str] = []
 
     def __init__(self, *args, **kwargs):
         super(RecordNewPhrase, self).__init__(*args, **kwargs)

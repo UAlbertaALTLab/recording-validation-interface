@@ -87,7 +87,16 @@ def generate_heading(phrase: Phrase) -> str:
         f'semantic-class="|{semantic_classes}|"',
     ]
     if recording:
-        inputs.append(f'recording="{best_recording(phrase).get_absolute_url()}"')
+        recording_best = best_recording(phrase)
+        inputs.extend(
+            [
+                f'recording="{recording_best.get_absolute_url() if recording_best else ""}"',
+                f'speaker="{recording.speaker.code}"',
+                f'session="{recording.session.id if recording.session else ""}"',
+                f"timestamp={recording.timestamp}",
+            ]
+        )
+
     inputs.append(">")
     return " ".join(inputs)
 
@@ -118,7 +127,7 @@ class Command(BaseCommand):
     def handle(self, *args, export_filename, language_code, **options):
         phrases = Phrase.objects.filter(language__code=language_code).distinct()
 
-        sentences = [x for x in phrases if has_enough_words(x)]
+        sentences = [x for x in phrases if has_enough_words(x) and best_recording(x)]
 
         with open(export_filename, "w") as f:
             f.write('<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>\n')

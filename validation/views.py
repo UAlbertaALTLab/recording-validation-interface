@@ -28,6 +28,7 @@ from hashlib import sha256
 from http import HTTPStatus
 from pathlib import Path
 from collections import Counter
+from typing import Any
 from django.db import transaction
 
 import mutagen as mutagen
@@ -61,7 +62,7 @@ from librecval.normalization import to_indexable_form
 from librecval.recording_session import SessionID
 from .jinja2 import url
 
-from .models import (
+from .models import ( # type: ignore
     Phrase,
     Recording,
     Speaker,
@@ -70,9 +71,9 @@ from .models import (
     LanguageVariant,
     SemanticClass,
     SemanticClassAnnotation,
-    HistoricalSemanticClassAnnotation,
-    HistoricalRecording,
-    HistoricalPhrase,
+    HistoricalSemanticClassAnnotation, # type: ignore
+    HistoricalRecording, # type: ignore
+    HistoricalPhrase, # type: ignore 
 )
 from .forms import (
     EditSegment,
@@ -710,7 +711,7 @@ def bulk_search_recordings(request: HttpRequest, language: str):
     """
 
     query_terms = request.GET.getlist("q")
-    matched_recordings = []
+    matched_recordings: list[Any] = []
     not_found = []
     exact = request.GET.get("exact", default=None) == "true"
     relaxed_equivalences = [
@@ -1866,7 +1867,7 @@ def save_issue(data, user):
     new_issue.save()
 
 
-def exclude_known_bad_recordings(recordings: QuerySet):
+def exclude_known_bad_recordings(recordings: QuerySet[Recording]):
     """
     Given a QuerySet of Recording objects, remove recordings that should NOT be
     presented to users of e.g., the dictionary.

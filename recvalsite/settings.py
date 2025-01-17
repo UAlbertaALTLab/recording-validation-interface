@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 import os
 import secrets
 from pathlib import Path
+from typing import Any
 
 from decouple import config
 
@@ -58,6 +59,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.forms",
     # Dependencies.
     "simple_history",
 ]
@@ -186,7 +188,7 @@ X_FRAME_OPTIONS = "DENY"
 STATIC_URL = "/static/"
 
 # Remember to run manage.py collectstatic!
-default_static_dir = "validation/static/validation"
+default_static_dir = Path("validation/static/validation")
 if DEBUG:
     default_static_dir = BASE_DIR / "static"
 STATIC_ROOT = config("STATIC_ROOT", default=default_static_dir)
@@ -264,7 +266,7 @@ RW_FILEPATH = config("RW_FILEPATH", BASE_DIR / "private" / "rw_doc.txt")
 MEDIA_URL = config("MEDIA_URL", default="/media/")
 
 # Recoring URLS will be moved here
-MEDIA_ROOT = config("MEDIA_ROOT", default=BASE_DIR / "data", cast=str)
+MEDIA_ROOT: str = str(config("MEDIA_ROOT", default=BASE_DIR / "data", cast=str))
 
 LOGIN_REDIRECT_URL = "/"
 LOGIN_URL = "/login"
@@ -276,7 +278,7 @@ FIXTURE_DIRS = (BASE_DIR / "validation" / "management" / "fixtures",)
 INTERNAL_IPS = ["127.0.0.1"]
 
 log_level = "INFO"
-LOGGING = {
+LOGGING :dict[str,Any]= {
     "version": 1,
     "disable_existing_loggers": False,
     "handlers": {

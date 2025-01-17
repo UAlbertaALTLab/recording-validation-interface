@@ -56,7 +56,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, importjson_path, language_code, **options):
-        # Change this if the raw audio files exist elsewhere!
+
         print("Loading importjson...")
         with open(importjson_path, "r") as f:
             importjson = json.load(f)

@@ -14,42 +14,7 @@ from pydub import AudioSegment  # type: ignore
 from librecval.recording_session import SessionID
 from recvalsite import settings
 from validation.models import Recording
-
-GoodBadUnknown = Literal["good", "bad", "unknown"]
-
-
-class Segment(NamedTuple):
-    translation: str
-    transcription: str
-    fixed_transcription: str
-    type: str
-    speaker: str
-    semantic: str
-    quality: GoodBadUnknown
-    session: SessionID
-    audio: AudioSegment
-
-    def signature(self) -> str:
-        # TODO: make this resilient to changing type, transcription, and speaker.
-        return (
-            f"session: {self.session}\n"
-            f"speaker: {self.speaker}\n"
-            f"{self.type}: {self.transcription}\n"
-            "\n"
-            f"{self.translation}\n"
-        )
-
-    def compute_sha256hash(self) -> str:
-        """
-        Compute a hash that can be used as a ID for this recording.
-        We use the hash instead of including the word in the id for these reasons:
-        - we want people to validate the spelling of the word, so
-        the word itself might change, making the name meaningless
-        - Sapir's filesystem and backups don't like diacritics very much
-        - we get URL issues trying to load the audio if we use the name
-        - other reasons, and good ones, too
-        """
-        return sha256(self.signature().encode("UTF-8")).hexdigest()
+from librecval.extract import SemanticSegment as Segment
 
 
 class I3RecordingExtractor:
