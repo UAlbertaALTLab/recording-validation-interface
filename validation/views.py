@@ -62,7 +62,7 @@ from librecval.normalization import to_indexable_form
 from librecval.recording_session import SessionID
 from .jinja2 import url
 
-from .models import ( # type: ignore
+from .models import (  # type: ignore
     Phrase,
     Recording,
     Speaker,
@@ -71,9 +71,9 @@ from .models import ( # type: ignore
     LanguageVariant,
     SemanticClass,
     SemanticClassAnnotation,
-    HistoricalSemanticClassAnnotation, # type: ignore
-    HistoricalRecording, # type: ignore
-    HistoricalPhrase, # type: ignore 
+    HistoricalSemanticClassAnnotation,  # type: ignore
+    HistoricalRecording,  # type: ignore
+    HistoricalPhrase,  # type: ignore
 )
 from .forms import (
     EditSegment,

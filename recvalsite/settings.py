@@ -278,7 +278,7 @@ FIXTURE_DIRS = (BASE_DIR / "validation" / "management" / "fixtures",)
 INTERNAL_IPS = ["127.0.0.1"]
 
 log_level = "INFO"
-LOGGING :dict[str,Any]= {
+LOGGING: dict[str, Any] = {
     "version": 1,
     "disable_existing_loggers": False,
     "handlers": {

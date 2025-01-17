@@ -301,11 +301,13 @@ class Phrase(models.Model):
         max_length=MAX_TRANSCRIPTION_LENGTH,
     )
 
-    semantic_classes : "models.ManyToManyField[SemanticClass, Phrase]"= models.ManyToManyField(
-        SemanticClass,
-        through="SemanticClassAnnotation",
-        through_fields=("phrase", "semantic_class"),
-        blank=True,
+    semantic_classes: "models.ManyToManyField[SemanticClass, Phrase]" = (
+        models.ManyToManyField(
+            SemanticClass,
+            through="SemanticClassAnnotation",
+            through_fields=("phrase", "semantic_class"),
+            blank=True,
+        )
     )
 
     semantic_class = models.ManyToManyField(SemanticClassOldAnnotation, blank=True)
