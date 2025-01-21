@@ -856,6 +856,18 @@ def segment_content_view(request, language, segment_id):
         form=form,
         history=history,
         rw_history=rapidwords_history,
+        rw_classification=[
+            {
+                "classification": x.classification,
+                "sources": "/".join(
+                    [
+                        y.source_string()
+                        for y in x.semanticclassannotation_set.filter(phrase=phrase)
+                    ]
+                ),
+            }
+            for x in phrase.semantic_classes.all()
+        ],
         auth=auth,
         roles=UserRoles(request.user, language),
         language=language_object,

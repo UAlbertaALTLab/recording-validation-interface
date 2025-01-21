@@ -26,7 +26,7 @@
                 {{ history[0].history_date.strftime('%Y-%m-%d') }}</p>
         {% endif %}
         {% if rw_history|count > 0 %}
-        <p> The rapidwords for this entry were last edited by {{rw_history[0].modifier }} on
+        <p> The rapidwords for this entry were last edited by {{rw_history[0].history_user.username }} on
             {{ rw_history[0].history_date.strftime('%Y-%m-%d') }}</p>
         {% endif %}
 
@@ -39,7 +39,7 @@
                 <th scope="col"> Comments</th>
                 <th scope="col"> Semantic Class</th>
                 <th scope="col"> Recordings</th>
-                <th scope="col">Speaker</th>
+                <th scope="col"> Speaker</th>
             </tr>
             </thead>
             <tr>
@@ -49,8 +49,8 @@
                 <td>{{ phrase.comment }}</td>
                 <td>
                     <ul>
-                        {% for classification in phrase.semantic_classes.all() %}
-                            <li class="list__recording"> {{ classification.classification }} - {{ classification.semanticclassannotation_set.get(phrase=phrase).source_string() }}</li>
+                        {% for classification in rw_classification %}
+                            <li class="list__recording"> {{ classification.classification }} - {{ classification.sources }}</li>
                         {% endfor %}
                     </ul>
                 </td>
