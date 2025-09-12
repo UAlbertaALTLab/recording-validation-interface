@@ -1303,9 +1303,11 @@ def merge_phrases_search(request, language):
             Phrase.objects.filter(language=language)
             .filter(
                 Q(transcription__contains=query)
+                | Q(historical_records__transcription__contains=query)
                 | Q(fuzzy_transcription__contains=to_indexable_form(query))
                 | Q(translation__contains=query)
             )
+            .distinct()
             .order_by("transcription")
         )
 
