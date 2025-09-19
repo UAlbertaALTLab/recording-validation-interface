@@ -28,7 +28,7 @@ def test_basic():
 
 
 def test_nfc():
-    assert normalize("   phơ\u0309 ") == normalize("pho\u031B\u0309 ")
+    assert normalize("   phơ\u0309 ") == normalize("pho\u031b\u0309 ")
 
 
 @given(text())
@@ -87,12 +87,12 @@ def test_idempotence(s):
         # ê (->) ē, # e macron
         # î (->) ī, # i macron
         # ô (->) ō, # o macron
-        ("\u0101\u0113\u012B\u014d", "aeio"),
+        ("\u0101\u0113\u012b\u014d", "aeio"),
         # Â (->) Ā, # A macron
         # Ê (->) Ē, # E macron
         # Î (->) Ī, # I macron
         # Ô (->) Ō, # O macron
-        ("\u0100\u0112\u012A\u014C", "aeio"),
+        ("\u0100\u0112\u012a\u014c", "aeio"),
         # â (->) {â}, # a + combining circumflex accent U+0302
         # ê (->) {ê}, # e + combining circumflex accent U+0302
         # î (->) {î}, # i + combining circumflex accent U+0302
