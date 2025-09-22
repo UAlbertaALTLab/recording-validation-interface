@@ -548,11 +548,12 @@ class Speaker(models.Model):
 
     def clean(self):
         self.code = self.code.strip().upper()
-        if not re.match(r"\A[A-Z]+[0-9]?\Z", self.code):
+        if not re.match(r"\A(E-)?[A-Z]+[0-9]?\Z", self.code):
             raise ValidationError(
                 _(
                     "Speaker code must be a single all-caps word, "
-                    "optionally followed by a digit"
+                    "optionally followed by a digit, "
+                    "optionally prefaced by E- (for elicitors)"
                 )
             )
 
