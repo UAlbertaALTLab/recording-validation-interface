@@ -58,7 +58,7 @@ along with this program.  If not, see
                 <li> <a href="{{ url('admin:index') }}" class="menu__options-link">Django admin section</a></li>
             {% endif %}
             {% if language and roles.is_manager %}
-                <li> <a href="{{ url('validation:merge-search', language.code)}}" class="menu__options-link">Merge phrases</a></li>
+                <li> <a href="{{ url('validation:merge-search', language.code)}}" class="menu__options-link">Merge entries</a></li>
             {% endif %}
             <li><a href="{{ url('validation:logout') }}" id="logout-link" class="logout-link">Logout</a></li>
 
