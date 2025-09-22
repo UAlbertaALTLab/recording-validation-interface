@@ -239,7 +239,11 @@ def entries(request, language):
         else:
             all_phrases = all_phrases.filter(status=mode)
 
-        all_phrases = all_phrases.prefetch_related("recording_set__speaker")
+        all_phrases = (
+            all_phrases.prefetch_related("recording_set__speaker")
+            .annotate(total_recordings=Count("recording", distinct=True))
+            .filter(total_recordings__gt=0)
+        )
 
         sessions = (
             RecordingSession.objects.order_by("id").values("id", "date").distinct()
@@ -370,6 +374,8 @@ def search_phrases(request, language):
         .exclude(status=Phrase.USER)
         .filter(language=language_object)
         .prefetch_related("recording_set__speaker")
+        .annotate(total_recordings=Count("recording", distinct=True))
+        .filter(total_recordings__gt=0)
     )
     all_matches = list(all_matches)
     all_matches.sort(key=lambda phrase: phrase.transcription)
@@ -998,11 +1004,15 @@ def view_issue_detail(request, language, issue_id):
             translation_initial = issue.target_language_suggestion
             if not translation_initial:
                 translation_initial = issue.phrase.translation
+            comment_initial = issue.phrase.comment
+            if not comment_initial:
+                comment_initial = issue.comment
 
             form = EditIssueWithPhrase(
                 initial={
                     "transcription": transcription_initial,
                     "translation": translation_initial,
+                    "comment": comment_initial,
                 }
             )
 

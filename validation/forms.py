@@ -191,18 +191,24 @@ class EditIssueWithPhrase(forms.ModelForm):
     transcription = forms.CharField(
         max_length=412,
         required=False,
-        widget=forms.Textarea(attrs={"class": "form-control"}),
+        widget=forms.Textarea(attrs={"class": "form-control", "rows": 4}),
     )
 
     translation = forms.CharField(
         max_length=412,
         required=False,
-        widget=forms.Textarea(attrs={"class": "form-control"}),
+        widget=forms.Textarea(attrs={"class": "form-control", "rows": 4}),
+    )
+
+    comment = forms.CharField(
+        max_length=2048,
+        required=False,
+        widget=forms.Textarea(attrs={"class": "form-control", "rows": 4}),
     )
 
     class Meta:
         model = Phrase
-        fields = ["transcription", "translation"]
+        fields = ["transcription", "translation", "comment"]
 
 
 class RecordNewPhrase(forms.ModelForm):

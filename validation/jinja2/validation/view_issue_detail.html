@@ -80,12 +80,15 @@
         </section>
 
         <section style="flex: 1">
-            <h3>Updates</h3>
             {% if form %}
                 <form action="" method="POST">
+                    <div class="d-flex justify-content-between">
+                    <h3 class="float-start">Updates</h3>
                     <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                    <input data-cy="save-button" type="submit" class="button button--success float-end float-right" value="Resolve issue and return to list">
+                    </div>
+                    <br />
                     {{ form }}
-                    <input data-cy="save-button" type="submit" class="button button--success" value="Resolve issue and return to list">
                 </form>
             {% endif %}
         </section>
