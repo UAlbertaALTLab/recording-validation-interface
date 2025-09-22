@@ -487,6 +487,7 @@ class Speaker(models.Model):
         max_length=1,
         choices=GENDER_CHOICES,
         null=True,
+        blank=True,
     )
 
     user = models.ForeignKey(
