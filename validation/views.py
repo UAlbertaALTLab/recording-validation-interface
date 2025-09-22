@@ -43,7 +43,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView, LogoutView
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.paginator import Paginator
-from django.db.models import Q, QuerySet, Count, Case, When, IntegerField, F
+from django.db.models import Q, QuerySet, Count, Case, When, IntegerField, F, Max
 from django.http import (
     HttpResponse,
     HttpResponseBadRequest,
@@ -1674,13 +1674,18 @@ def handle_save_issue_with_recording(form, issue, request, language):
             new_phrase = Phrase(
                 field_transcription=new_word,
                 transcription=new_word,
-                translation="",
-                kind="Sentence" if " " in new_word else "Word",
+                translation="[]",
+                kind=Phrase.SENTENCE if " " in new_word else Phrase.WORD,
                 date=datetime.datetime.now(),
+                language=rec.phrase.language,
                 modifier=str(request.user),
+                display_order=Phrase.objects.aggregate(Max("display_order", default=0))[
+                    "display_order__max"
+                ]
+                + 1,  # Place last
             )
             new_phrase.save()
-        rec.phrase_id = new_phrase.id
+        rec.phrase = new_phrase
 
     rec.wrong_word = False
     rec.wrong_speaker = False
@@ -1710,7 +1715,7 @@ def handle_save_issue_with_phrase(form, issue, request, language):
     if translation:
         phrase.translation = translation
 
-    phrase.status = "linked"
+    phrase.status = Phrase.LINKED
     phrase.modifier = str(request.user)
     phrase.date = datetime.datetime.now()
     phrase.save()

@@ -332,6 +332,7 @@ class Phrase(models.Model):
     osid = models.CharField(
         help_text="Typically, this is the os##### for Tsuut'ina recordings",
         null=True,
+        blank=True,
         max_length=16,
     )
 
