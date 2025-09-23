@@ -26,4 +26,4 @@ services:
         - "/data/application-data/speech-db/rw_doc.txt:/app/private/rw_doc.txt"
         - "/data/application-data/speech-db/tsuutina-recordings-2025:/app/private/tsuutina-recordings-2025"
         post_start:
-          - command: ["sh", "-c", "/app/.venv/bin/python3", "/app/manage.py", "collectstatic", "--no-inputs"]
+          - command: "/app/.venv/bin/python3 /app/manage.py collectstatic --no-input"
