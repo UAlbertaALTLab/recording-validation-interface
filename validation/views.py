@@ -214,7 +214,7 @@ def entries(request, language):
 
     # Only show selected language
     language_object = get_language_object(language)
-    all_phrases = Phrase.objects.filter(language=language_object)
+    all_phrases = Phrase.objects.filter(language=language_object, is_excluded=False)
     if (not language == "stoney-alexis") or user_has_alexis_permissions(request.user):
         language_sessions = (
             Recording.objects.filter(phrase_id__in=all_phrases)
@@ -371,7 +371,7 @@ def search_phrases(request, language):
             | Q(fuzzy_transcription__contains=to_indexable_form(query))
             | Q(translation__contains=query)
         )
-        .exclude(status=Phrase.USER)
+        .exclude(status=Phrase.USER, is_excluded=True)
         .filter(language=language_object)
         .prefetch_related("recording_set__speaker")
         .annotate(total_recordings=Count("recording", distinct=True))
@@ -456,6 +456,7 @@ def advanced_search_results(request, language):
         translation = translation.strip()
     exact = request.GET.get("exact")
     analysis = request.GET.get("analysis")
+    include_excluded = request.GET.get("excluded")
     lemma = request.GET.get("lemma")
     if lemma:
         lemma = lemma.strip()
@@ -527,6 +528,9 @@ def advanced_search_results(request, language):
         phrase_matches = Phrase.objects.filter(
             language=language_object
         ).prefetch_related("recording_set__speaker")
+
+    if not include_excluded:
+        phrase_matches = phrase_matches.filter(is_excluded=False)
 
     recordings = {}
     all_matches = []
@@ -801,6 +805,7 @@ def segment_content_view(request, language, segment_id):
             )
             analysis = form.cleaned_data["analysis"].strip() or og_phrase.analysis
             comment = form.cleaned_data["comment"].strip() or og_phrase.comment
+            is_excluded = form.cleaned_data["is_excluded"]
             rapidwords = form.cleaned_data["rapidwords"]
             p = Phrase.objects.get(id=phrase_id, language=language_object)
             previous_classes = SemanticClassAnnotation.objects.filter(
@@ -821,9 +826,11 @@ def segment_content_view(request, language, segment_id):
             p.translation = translation
             p.analysis = analysis
             p.comment = comment
-            p.validated = True
+            if p.is_excluded == is_excluded:
+                p.validated = True
             p.modifier = str(request.user)
             p.date = datetime.datetime.now()
+            p.is_excluded = bool(form.cleaned_data["is_excluded"])
             p.save()
 
     phrase = Phrase.objects.get(id=segment_id, language=language_object)
@@ -852,6 +859,7 @@ def segment_content_view(request, language, segment_id):
             "stem": phrase.stem,
             "lexical_category": phrase.lexical_category,
             "rapidwords": phrase.semantic_classes.all(),
+            "is_excluded": phrase.is_excluded,
         }
     )
 
@@ -1876,7 +1884,7 @@ def prep_phrase_data(request, phrases, lang):
     recordings = {}
     forms = {}
     for phrase in phrases:
-        recordings[phrase] = [rec for rec in phrase.recordings if rec.speaker != "DAR"]
+        recordings[phrase] = [rec for rec in phrase.recordings]
 
         if request.method == "POST" and int(request.POST.get("phrase_id")) == phrase.id:
             forms[phrase.id] = FlagSegment(

@@ -125,6 +125,12 @@ class EditSegment(forms.Form):
         widget=forms.TextInput(attrs={"class": "form-control bottom-margin"}),
     )
 
+    is_excluded = forms.BooleanField(
+        required=False,
+        label="Exclude this Phrase from Search Results in Speech DB (without deleting)",
+        widget=forms.CheckboxInput(attrs={"class": "form-check form-check-input"}),
+    )
+
     rapidwords = forms.ModelMultipleChoiceField(
         queryset=SemanticClass.objects.filter(collection=SemanticClass.RW),
         widget=RapidWordsCheckboxMultiple(),

@@ -123,6 +123,7 @@ along with this program.  If not, see
                 {% endif %}
 
                 {% for recording in recordings[phrase] %}
+                {% if roles.is_linguist or not recording.is_excluded %}
                     <tr>
                         {% if roles.is_expert %}
                             <td class="green-star"><a data-cy="is-best" data-recording-id="{{ recording.id }}"
@@ -199,7 +200,7 @@ along with this program.  If not, see
                     </tr>
 
                     {{ speaker_code_modal.modal(recording.id, speakers, csrf_token, language, request) }}
-
+                {% endif %}{# check for exclusion of recording #}
                 {% endfor %}{# for recording in phrase.recordings #}
             </table>
             {% if roles.is_expert %}
