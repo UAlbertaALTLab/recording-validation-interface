@@ -9,7 +9,7 @@ from django.urls import path
 from . import views
 
 
-def media_with_range():
+def media_with_range() -> list:
     """
     Return URL patterns that will delegate to serving media from MEDIA_ROOT.
     """

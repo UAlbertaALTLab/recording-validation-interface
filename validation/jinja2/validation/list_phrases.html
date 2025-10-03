@@ -85,7 +85,7 @@ along with this program.  If not, see
 {% block bodyscripts %}
 <script>
   $(function () {
-    $('[data-toggle="tooltip"]').tooltip();
+    $('[data-bs-toggle="tooltip"]').tooltip();
   {% if request.COOKIES["empty-rw"] != "on" %}
     $(".empty-semantic-class").remove();
   {% endif %}

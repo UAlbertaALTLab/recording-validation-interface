@@ -837,7 +837,7 @@ def segment_content_view(request, language, segment_id):
 
     segment_name = phrase.transcription
 
-    history = phrase.history.all()
+    history = phrase.history.all()  # type: ignore
     rapidwords_history = HistoricalSemanticClassAnnotation.objects.filter(
         phrase=phrase, semantic_class__collection="rapidwords"
     )
@@ -923,11 +923,11 @@ def register(request):
                     )
                     group = "Learner"
                 group, _ = Group.objects.get_or_create(name=group)
-                group.user_set.add(new_user)
+                group.user_set.add(new_user)  # type: ignore
                 if languages:
                     for language in languages:
                         lang_group, _ = Group.objects.get_or_create(name=language)
-                        lang_group.user_set.add(new_user)
+                        lang_group.user_set.add(new_user)  # type: ignore
                 response = HttpResponseRedirect("/login")
                 return response
 
@@ -1013,6 +1013,7 @@ def view_issue_detail(request, language, issue_id):
                     "transcription": transcription_initial,
                     "translation": translation_initial,
                     "comment": comment_initial,
+                    "analysis": issue.phrase.analysis,
                 }
             )
 
@@ -1260,6 +1261,7 @@ def save_wrong_word(request, language, recording_id):
     return response
 
 
+@login_required()
 def record_audio_is_best(request, recording_id):
     phrase_id = json.loads(request.body)["phraseId"]
 
@@ -1279,6 +1281,22 @@ def record_audio_is_best(request, recording_id):
     return JsonResponse({"status": "ok", "set_solid": set_solid})
 
 
+@login_required()
+def record_is_excluded(request, language, recording_id):
+    roles = UserRoles(request.user, language)
+    if not roles.is_linguist:
+        return HttpResponseBadRequest()
+    recording = get_object_or_404(Recording, id=recording_id)
+    if recording.is_excluded:
+        recording.is_excluded = False
+    else:
+        recording.is_excluded = True
+    recording.save()
+
+    return JsonResponse({"status": "ok", "is_excluded": recording.is_excluded})
+
+
+@login_required()
 def approve_user_phrase(request, phrase_id):
     phrase = get_object_or_404(Phrase, id=phrase_id)
     phrase.status = Phrase.NEW
@@ -1469,7 +1487,7 @@ def record_audio(request, language):
         rec.save()
         source = settings.RECVAL_AUDIO_PREFIX + rec_id + ".wav"
         dest = settings.RECVAL_AUDIO_PREFIX + rec_id + ".m4a"
-        audio_info = mutagen.File(settings.MEDIA_ROOT + "/" + source).info
+        audio_info = mutagen.File(settings.MEDIA_ROOT + "/" + source).info  # type: ignore
         new_length = (
             audio_info.length - 0.1
         )  # It takes the average human 0.1 seconds to click down on a button
@@ -1490,7 +1508,7 @@ def record_audio(request, language):
             roles=UserRoles(request.user, language.code),
             language=language,
         )
-        return HttpResponseRedirect(f"/{language.code}/record_audio", context)
+        return HttpResponseRedirect(f"/{language.code}/record_audio", context=context)
     else:
         form = RecordNewPhrase(
             {"transcription": transcription, "translation": translation}
@@ -1561,7 +1579,7 @@ def record_audio_from_entry(request, language, phrase):
     rec.save()
     source = settings.RECVAL_AUDIO_PREFIX + rec_id + ".wav"
     dest = settings.RECVAL_AUDIO_PREFIX + rec_id + ".m4a"
-    audio_info = mutagen.File(settings.MEDIA_ROOT + "/" + source).info
+    audio_info = mutagen.File(settings.MEDIA_ROOT + "/" + source).info  # type: ignore
     new_length = (
         audio_info.length - 0.1
     )  # It takes the average human 0.1 seconds to click down on a button
@@ -1699,6 +1717,7 @@ def handle_save_issue_with_recording(form, issue, request, language):
 
     rec.wrong_word = False
     rec.wrong_speaker = False
+    rec.is_excluded = form.cleaned_data["is_excluded"]
     rec.save()
 
     issue.status = Issue.RESOLVED

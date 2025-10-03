@@ -17,8 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
-from typing import Any
-import unicodedata
+from typing import Any, TypedDict
 from pathlib import Path
 
 from django.conf import settings
@@ -35,6 +34,10 @@ from librecval.recording_session import Location, SessionID, TimeOfDay
 
 User = get_user_model()
 
+ChoicesDict = TypedDict(
+    "ChoicesDict", {"max_length": int, "choices": tuple[tuple[str, str], ...]}
+)
+
 
 def choices_from_enum(enum_class):
     """
@@ -44,18 +47,20 @@ def choices_from_enum(enum_class):
     """
     choices = tuple((x.value, x.value) for x in enum_class)
     max_length = max(len(x.value) for x in enum_class)
-    return dict(max_length=max_length, choices=choices)
+    return {"max_length": max_length, "choices": choices}
 
 
-def arguments_for_choices(choices):
+def arguments_for_choices(choices: tuple[tuple[str, str], ...]) -> ChoicesDict:
     """
     Given a sequence of choices, generates the appropriate keyword arguments
     for a CharField.
     """
-    return dict(choices=choices, max_length=max(len(choice[0]) for choice in choices))
+    return {"choices": choices, "max_length": max(len(choice[0]) for choice in choices)}
 
 
 class LanguageVariant(models.Model):
+    speaker_set: "models.Manager[Speaker]"
+
     name = models.CharField(
         help_text="The full name of the language", blank=False, max_length=256
     )
@@ -107,6 +112,7 @@ class SemanticClass(models.Model):
     A semantic class, typically from WordNet or RapidWords that describes a phrase
     """
 
+    semanticclassannotation_set: "models.Manager[SemanticClassAnnotation]"
     # Database values
     RW = "rapidwords"
     WN = "wordnet"
@@ -210,6 +216,9 @@ class Phrase(models.Model):
     least one recording. Phrases may be awaiting validation, or may have
     already be validated.
     """
+
+    recording_set: "models.Manager[Recording]"
+    id: models.AutoField
 
     MAX_TRANSCRIPTION_LENGTH = 256
 
@@ -369,6 +378,12 @@ class Phrase(models.Model):
         max_length=2048,
     )
 
+    is_excluded = models.BooleanField(
+        help_text="Exclude from results but keep in the database",
+        default=False,
+        null=False,
+    )
+
     display_order = models.IntegerField(default=0)
 
     # Keep track of Phrases' history, so we can review, revert, and inspect them.
@@ -463,6 +478,8 @@ class Speaker(models.Model):
     """
     A person who spoke at the recording sessions.
     """
+
+    recording_set: "models.Manager[Recording]"
 
     # We store gender so that we can categorize how their voice sounds.
     # The community is interested in hearing each word with both a male and a
@@ -601,6 +618,12 @@ class RecordingSession(models.Model):
         help_text="The 'subsession' number, if applicable.", null=True, blank=True
     )
 
+    is_excluded = models.BooleanField(
+        help_text="Exclude from results but keep in the database",
+        default=False,
+        null=False,
+    )
+
     def as_session_id(self) -> SessionID:
         """
         Converts back into a SessionID object.
@@ -673,6 +696,7 @@ class Recording(models.Model):
     A recording of a phrase.
     """
 
+    phrase_id: models.AutoField
     GOOD = "good"
     OK = "ok"
     BAD = "bad"
@@ -734,6 +758,12 @@ class Recording(models.Model):
         default=False,
     )
 
+    is_excluded = models.BooleanField(
+        help_text="Exclude from results but keep in the database",
+        default=False,
+        null=False,
+    )
+
     # Keep track of the recording's history.
     history = HistoricalRecords(excluded_fields=["compressed_audio"])
 
@@ -779,6 +809,8 @@ class Recording(models.Model):
 
 
 class Issue(models.Model):
+    id: models.AutoField
+
     comment = models.CharField(
         help_text="The comment left by the validator",
         blank=True,

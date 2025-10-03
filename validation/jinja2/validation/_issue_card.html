@@ -20,7 +20,7 @@
 
 {% macro issue_card(issue, language) %}
     <div class="col-sm-6">
-        <article class="card shadow" data-cy="issue-card">
+        <div class="card shadow" data-cy="issue-card">
             <div class="card__header
             {% if issue.recording %}
                 {% if issue.recording.wrong_speaker %}
@@ -75,7 +75,7 @@
                     This issue was filed by {{ issue.created_by }} on {{ issue.created_on }}
                 </div>
             </div>
-        </article>
+        </div>
     </div>
 
 {% endmacro %}

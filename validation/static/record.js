@@ -38,14 +38,6 @@ function startRecording() {
     });
 }
 
-function pauseRecording() {
-    if (rec.recording) {
-        rec.stop();
-    } else {
-        rec.record()
-    }
-}
-
 function stopRecording() {
     recordButton.innerHTML = "Record";
     stopButton.disabled = true;

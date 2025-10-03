@@ -83,9 +83,9 @@
             {% if form %}
                 <form action="" method="POST">
                     <div class="d-flex justify-content-between">
-                    <h3 class="float-start">Updates</h3>
+                    <h3 class="float-left">Updates</h3>
                     <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-                    <input data-cy="save-button" type="submit" class="button button--success float-end float-right" value="Resolve issue and return to list">
+                    <input data-cy="save-button" type="submit" class="button button--success float-right" value="Resolve issue and return to list">
                     </div>
                     <br />
                     {{ form }}

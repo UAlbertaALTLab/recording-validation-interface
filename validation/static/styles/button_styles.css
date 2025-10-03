@@ -177,3 +177,8 @@
   display: inline-flex;
   justify-content: end;
 }
+
+.danger-toggle:checked {
+  background-color: var(--custom-orange)!important;
+  border-color: var(--custon-orange)!important;
+}

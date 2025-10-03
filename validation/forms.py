@@ -3,7 +3,7 @@ import re
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 
-from validation.models import Issue, Recording, Phrase, SemanticClass
+from validation.models import Issue, Recording, Phrase, SemanticClass, Speaker
 
 DEFAULT_MAX_LENGTH = 256
 
@@ -173,10 +173,22 @@ class FlagSegment(forms.ModelForm):
 
 
 class EditIssueWithRecording(forms.ModelForm):
+
     phrase = forms.CharField(
         widget=forms.TextInput(attrs={"id": "autoCompleteTranscriptions"}),
         required=False,
         help_text="What word or phrase this recording is actually for.  Field has autocompletion.",
+    )
+
+    issue_origin_url = forms.CharField(
+        widget=forms.HiddenInput(),
+        required=False,
+    )
+
+    is_excluded = forms.BooleanField(
+        label="Exclude this Recording from Speech-DB (without deleting it)",
+        widget=forms.CheckboxInput(attrs={"class": "form-check mb3"}),
+        required=False,
     )
 
     class Meta:
@@ -200,15 +212,32 @@ class EditIssueWithPhrase(forms.ModelForm):
         widget=forms.Textarea(attrs={"class": "form-control", "rows": 4}),
     )
 
+    analysis = forms.CharField(
+        required=False,
+        widget=forms.Textarea(
+            attrs={"class": "form-control", "rows": 4, "disabled": True}
+        ),
+    )
+
     comment = forms.CharField(
         max_length=2048,
         required=False,
         widget=forms.Textarea(attrs={"class": "form-control", "rows": 4}),
     )
 
+    is_excluded = forms.BooleanField(
+        label="Exclude this Phrase from Speech-DB (without deleting it, write reason in comment)",
+        required=False,
+    )
+
+    issue_origin_url = forms.CharField(
+        widget=forms.HiddenInput(),
+        required=False,
+    )
+
     class Meta:
         model = Phrase
-        fields = ["transcription", "translation", "comment"]
+        fields = ["transcription", "translation", "analysis", "comment", "is_excluded"]
 
 
 class RecordNewPhrase(forms.ModelForm):

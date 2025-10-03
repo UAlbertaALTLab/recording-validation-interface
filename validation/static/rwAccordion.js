@@ -46,7 +46,7 @@ $(function () {
             click.addClass("form-check-input")
             replacement_div.append(click)
             
-            $("<div />",{"id":"base-"+element["id"],"class":"form-check-label", "data-toggle":"collapse", "data-target":"#"+element["id"], "aria-expanded":"true", "aria-controls":element["id"]}).append(element["text"]).appendTo(replacement_div)
+            $("<div />",{"id":"base-"+element["id"],"class":"form-check-label", "data-bs-toggle":"collapse", "data-bs-target":"#"+element["id"], "aria-expanded":"true", "aria-controls":element["id"]}).append(element["text"]).appendTo(replacement_div)
             base.append(replacement_div)
             let sub = $("<div />",{class:"collapse",id:element["id"], "aria-labelledby": "base-"+element["id"],"data-parent":"#"+div.attr("id")}).appendTo(group)
             if (Object.keys(element["children"]).length > 0){

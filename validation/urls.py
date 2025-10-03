@@ -124,6 +124,11 @@ urlpatterns = [
         name="bulk_search_recordings",
     ),
     path(
+        "<str:language>/api/record_is_excluded/<str:recording_id>",
+        views.record_is_excluded,
+        name="record_is_excluded",
+    ),
+    path(
         "<str:language>/merge/search",
         views.merge_phrases_view,
         name="merge-search",

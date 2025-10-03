@@ -203,3 +203,15 @@ function getElementByRecordingId(className, recordingId) {
         }
     }
 }
+
+function toggleRecordingEnabledListener(element,language,recordingId) {
+    return () => {
+        element.attr('disabled', true);
+        fetch('/'+language+'/api/record_is_excluded/'+recordingId, {
+            method:'GET',
+            cache:'no-cache'
+        }).then(() => {
+            element.removeAttr('disabled')
+        })
+    }
+}

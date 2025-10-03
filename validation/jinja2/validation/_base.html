@@ -6,20 +6,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="icon" type="image/png" href="/static/images/speech.png">
   <link rel="stylesheet" href="{{ static('styles/main.css') }}" type="text/css">
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
   <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.0/themes/base/jquery-ui.css" crossorigin="anonymous"></script>
   <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
   <script src="https://code.jquery.com/ui/1.14.0/jquery-ui.min.js" integrity="sha256-Fb0zP4jE3JHqu+IBB9YktLcSjI1Zc6J2b6gTjB0LpoM=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js" integrity="sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y" crossorigin="anonymous"></script>
       {{ csrf_input }}
 <script>
 const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 </script>
-      <script type="application/javascript" src="{{ static('index.js') }}"></script>
-      <script type="application/javascript" src="{{ static('menu.js') }}"></script>
-      <script type="application/javascript" src="{{ static('nav.js') }}"></script>
-      <title>{% block title %}
+  <script type="application/javascript" src="{{ static('index.js') }}"></script>
+  <script type="application/javascript" src="{{ static('menu.js') }}"></script>
+  <script type="application/javascript" src="{{ static('nav.js') }}"></script>
+  <title>{% block title %}
           {% if auth %}
               {{ language.name if language != None else "" }} Speech DB
           {% else %}
@@ -47,17 +47,17 @@ const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
             Speech DB
         </a>
     {% endif %}
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
     {# The navbar #}
   {% if language %}
     <div class="navbar-collapse collapse justify-content-stretch" id="navbarSupportedContent">
-      <form class="form-inline ml-2 my-2 my-lg-0" method="GET" action="{{
+      <form class="form-inline ms-2 my-2 my-lg-0" method="GET" action="{{
         url('validation:search_phrases', language.code)
       }}">
-        <input class="form-control mr-sm-2" name="query" type="search" placeholder="Search" aria-label="Search" data-cy="search-bar">
+        <input class="form-control me-sm-2" name="query" type="search" placeholder="Search" aria-label="Search" data-cy="search-bar">
         <button class="my-2 my-sm-0 button button--success" type="submit">Search</button>
         &nbsp;
         <a data-cy="advanced-search-button" href="{{ url('validation:advanced_search', language.code) }}" class="button button--adv-search">Advanced Search</a>
