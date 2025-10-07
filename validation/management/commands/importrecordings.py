@@ -35,6 +35,7 @@ import logme  # type: ignore
 from django.conf import settings  # type: ignore
 from django.core.files.base import ContentFile  # type: ignore
 from django.core.management.base import BaseCommand, CommandError  # type: ignore
+from django.db.models import Q
 
 from librecval import REPOSITORY_ROOT
 from librecval.extract_phrases import Segment
@@ -209,20 +210,31 @@ def django_recording_importer(
 
         language = LanguageVariant.objects.get(name="Maskwacîs", code="maskwacis")
 
-        phrase, phrase_created = Phrase.objects.get_or_create(
-            field_transcription=info.cree_transcription,
-            transcription=info.cree_transcription,
-            status=Phrase.NEW,
-            kind=info.type,
-            language=language,
-            defaults=dict(
-                translation=info.english_translation,
-                validated=False,
-                origin=Phrase.MASKWACÎS_DICTIONARY,
-            ),
-        )
-        if phrase_created:
-            logger.info("New phrase: %s", phrase)
+        try:
+            phrase, phrase_created = Phrase.objects.filter(
+                Q(field_transcription=info.cree_transcription)
+                | Q(transcription=info.cree_transcription)
+            ).get_or_create(
+                language=language,
+                defaults=dict(
+                    translation=info.english_translation,
+                    validated=False,
+                    origin=Phrase.MASKWACÎS_DICTIONARY,
+                    field_transcription=info.cree_transcription,
+                    transcription=info.cree_transcription,
+                    status=Phrase.NEW,
+                    kind=info.type,
+                ),
+            )
+            if phrase_created:
+                logger.info("New phrase: %s", phrase)
+        except Phrase.MultipleObjectsReturned:
+            logger.error(
+                "Multiple phrases attempted for recording import of %s - ID %s",
+                info.cree_transcription,
+                info.compute_sha256hash(),
+            )
+            return
 
         # XXX: this is kind of dumb; the compressed audio is written to storage, read again,
         # and will be written back by Django :/
