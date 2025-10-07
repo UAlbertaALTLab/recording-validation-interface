@@ -371,10 +371,15 @@ def search_phrases(request, language):
             | Q(fuzzy_transcription__contains=to_indexable_form(query))
             | Q(translation__contains=query)
         )
-        .exclude(status=Phrase.USER, is_excluded=True)
+        .exclude(status=Phrase.USER)
+        .exclude(is_excluded=True)
         .filter(language=language_object)
         .prefetch_related("recording_set__speaker")
-        .annotate(total_recordings=Count("recording", distinct=True))
+        .annotate(
+            total_recordings=Count(
+                "recording", distinct=True, filter=Q(is_excluded=False)
+            )
+        )
         .filter(total_recordings__gt=0)
     )
     all_matches = list(all_matches)
