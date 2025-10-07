@@ -54,7 +54,7 @@ const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     {# The navbar #}
   {% if language %}
     <div class="navbar-collapse collapse justify-content-stretch" id="navbarSupportedContent">
-      <form class="form-inline ms-2 my-2 my-lg-0" method="GET" action="{{
+      <form class="form-inline ms-2 my-2 my-lg-0 d-flex" method="GET" action="{{
         url('validation:search_phrases', language.code)
       }}">
         <input class="form-control me-sm-2" name="query" type="search" placeholder="Search" aria-label="Search" data-cy="search-bar">
