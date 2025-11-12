@@ -234,7 +234,35 @@ def django_recording_importer(
                 info.cree_transcription,
                 info.compute_sha256hash(),
             )
-            return
+            try:
+                phrase, phrase_created = Phrase.objects.get_or_create(
+                    field_transcription=info.cree_transcription,
+                    transcription=info.cree_transcription,
+                    status=Phrase.NEW,
+                    kind=info.type,
+                    language=language,
+                    defaults=dict(
+                        translation=info.english_translation,
+                        validated=False,
+                        origin=Phrase.MASKWACÎS_DICTIONARY,
+                    ),
+                )
+                if phrase_created:
+                    logger.info("New phrase: %s", phrase)
+            except Phrase.MultipleObjectsReturned:
+                logger.error(
+                    "Traditional phrase assigment still produced multiple phrases",
+                    info.cree_transcription,
+                    info.compute_sha256hash(),
+                )
+                phrase = Phrase.objects.filter(
+                    field_transcription=info.cree_transcription,
+                    transcription=info.cree_transcription,
+                    status=Phrase.NEW,
+                    kind=info.type,
+                    language=language,
+                ).first()
+                phrase_created = False
 
         # XXX: this is kind of dumb; the compressed audio is written to storage, read again,
         # and will be written back by Django :/
