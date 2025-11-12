@@ -17,7 +17,7 @@ typing-extensions = "*"
 pympi-ling = "*"
 requests = "*"
 uwsgi = "*"
-divvunspell = "*"
+divvunspell = {git = "https://github.com/divvun/divvunspell-sdk-python.git", ref = "main"}
 tqdm = "*"
 whitenoise = "*"
 mutagen = "*"
