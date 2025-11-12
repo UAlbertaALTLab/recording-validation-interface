@@ -127,7 +127,7 @@
                         {% for match in suggestions[suggestion]['matches'] %}
                             <tr>
                                 <td>{{ match['translation'] }}</td>
-                                <td>{{ match['analysis'] }}</td>
+                                <td data-cy="suggestion-analysis" lang="en">{{ match['analysis'] }}</td>
                                 <td>{{ match['source'] }}</td>
                                 {% if auth %}
                                     <td>
