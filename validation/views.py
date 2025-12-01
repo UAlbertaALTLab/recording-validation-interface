@@ -743,32 +743,38 @@ def bulk_search_recordings(request: HttpRequest, language: str):
         json_response = JsonResponse(response)
         return add_cors_headers(json_response)
 
-    for term in query_terms:
-        language_object = get_language_object(language)
-        if exact:
-            all_matches = Recording.objects.filter(
-                phrase__transcription=term, phrase__language=language_object
-            )
-        else:
-            all_matches = Recording.objects.filter(
+    language_object = get_language_object(language)
+    recording_universe = Recording.objects.filter(phrase__language=language_object)
+
+    if exact:
+        all_matches = recording_universe.filter(phrase__transcription__in=query_terms)
+        matched_recordings = [
+            recording.as_json(request)
+            for recording in exclude_known_bad_recordings(all_matches)
+        ]
+        transcriptions = {
+            recording.phrase.transcription for recording in matched_recordings
+        }
+        not_found = [term for term in query_terms if term not in transcriptions]
+    else:
+        for term in query_terms:
+            all_matches = recording_universe.filter(
                 phrase__transcription__iregex=regex_from_equivalences(
                     term, relaxed_equivalences
-                ),
-                phrase__language=language_object,
+                )
             )
-        results = exclude_known_bad_recordings(all_matches)
-        if not exact:
+            results = exclude_known_bad_recordings(all_matches)
             # We will reuse the exact keyword for a full query.
             # The advantage of this is that, because morphodict queries do not ask for an exact query,
             # It will automatically limit requests coming from morphodict.
             results = extract_recording_sample(results)
-        if results:
-            matched_recordings.extend(
-                annotate_relaxed_wordform(recording.as_json(request), term)
-                for recording in results
-            )
-        else:
-            not_found.append(term)
+            if results:
+                matched_recordings.extend(
+                    annotate_relaxed_wordform(recording.as_json(request), term)
+                    for recording in results
+                )
+            else:
+                not_found.append(term)
 
     if matched_recordings:
         matched_recordings.sort(
