@@ -748,13 +748,9 @@ def bulk_search_recordings(request: HttpRequest, language: str):
 
     if exact:
         all_matches = recording_universe.filter(phrase__transcription__in=query_terms)
-        matched_recordings = [
-            recording.as_json(request)
-            for recording in exclude_known_bad_recordings(all_matches)
-        ]
-        transcriptions = {
-            recording.phrase.transcription for recording in matched_recordings
-        }
+        good_matches = exclude_known_bad_recordings(all_matches)
+        matched_recordings = [recording.as_json(request) for recording in good_matches]
+        transcriptions = {recording.phrase.transcription for recording in good_matches}
         not_found = [term for term in query_terms if term not in transcriptions]
     else:
         for term in query_terms:
