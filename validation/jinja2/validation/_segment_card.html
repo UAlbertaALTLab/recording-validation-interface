@@ -81,6 +81,9 @@ along with this program.  If not, see
                 {% else %}
                     {{ phrase.transcription }}
                 {% endif %}
+                {% if roles.is_linguist %}
+                <img src="{{ static('images/info-circle-fill.svg') }}" class="fs-3" style="width:1em; height:1em;" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Analysis: {% if phrase.analysis %} {{ phrase.analysis }} {% else %} &lt;empty&gt; {% endif %}"/>
+                {% endif %}
             </p>
             <p class="card__title--target-language" data-cy="translation">Translation: {{ phrase.translation }}</p>
 
