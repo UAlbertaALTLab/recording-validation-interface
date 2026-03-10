@@ -85,6 +85,7 @@ def initialize(
     )
     mics: Dict[int, str | None] = dict()
     mics[1] = "BLA"
+    mics[2] = "BLA"
     metadata[session] = SessionMetadata(
         session, raw_name="2026-03-05", rapid_words=[], mics=mics
     )
