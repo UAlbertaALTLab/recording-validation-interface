@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "7fd88c73d92267dc134326aed8b85c36199d6c0cbd0c3943b192312f43dace08"
+            "sha256": "3a8fc0bdd19e2672a8d41b1386edd3e002781fdaf1a156916b5c03006abb7f2f"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -166,10 +166,6 @@
             ],
             "markers": "python_version >= '3.10'",
             "version": "==8.3.1"
-        },
-        "divvunspell": {
-            "git": "https://github.com/divvun/divvunspell-sdk-python.git",
-            "ref": "ed4cf6f3c03fe8a5b50432b184cf9a982f77d4c1"
         },
         "django": {
             "hashes": [

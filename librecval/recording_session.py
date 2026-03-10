@@ -239,7 +239,11 @@ class SessionMetadata:
     """
 
     def __init__(
-        self, session: SessionID, raw_name: str, rapid_words, mics: Dict[int, str | None]
+        self,
+        session: SessionID,
+        raw_name: str,
+        rapid_words,
+        mics: Dict[int, str | None],
     ) -> None:
         self.session = session
         self.raw_name = raw_name
