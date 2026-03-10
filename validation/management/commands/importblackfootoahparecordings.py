@@ -142,7 +142,6 @@ class Command(BaseCommand):
             import_recordings(
                 directory=sessions_dir,
                 transcoded_recordings_path=audio_dir,
-                metadata_filename=settings.RECVAL_METADATA_PATH,
                 import_recording=django_recording_importer(
                     compare_recordings, replace_recordings
                 ),
