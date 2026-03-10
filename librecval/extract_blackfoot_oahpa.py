@@ -29,7 +29,13 @@ from datetime import date as datetype
 import logme  # type: ignore
 from typing_extensions import Literal, Dict
 
-from librecval.extract_phrases import AudioSegment, RecordingExtractor, Segment, SessionID, SessionMetadata
+from librecval.extract_phrases import (
+    AudioSegment,
+    RecordingExtractor,
+    Segment,
+    SessionID,
+    SessionMetadata,
+)
 from librecval.transcode_recording import transcode_to_aac
 
 ImportRecording = Callable[[Segment, Path], None]
@@ -70,11 +76,18 @@ def initialize(
     ), f"audio destination is not a folder: {dest.resolve()}"
 
     # Insert each thing found.
-    metadata: Dict[SessionID, SessionMetadata]= dict()
-    session = SessionID(date=datetype.fromisoformat('2026-03-05'),time_of_day=None, subsession=None, location=None )
-    mics: Dict[int,str] = dict()
-    mics[1]="BLA"
-    metadata[session] = SessionMetadata(session, raw_name ="2026-03-05",rapid_words=[],mics=mics)
+    metadata: Dict[SessionID, SessionMetadata] = dict()
+    session = SessionID(
+        date=datetype.fromisoformat("2026-03-05"),
+        time_of_day=None,
+        subsession=None,
+        location=None,
+    )
+    mics: Dict[int, str | None] = dict()
+    mics[1] = "BLA"
+    metadata[session] = SessionMetadata(
+        session, raw_name="2026-03-05", rapid_words=[], mics=mics
+    )
     ex = RecordingExtractor(metadata)
     for info, audio in ex.scan(root_directory=directory):
         try:
