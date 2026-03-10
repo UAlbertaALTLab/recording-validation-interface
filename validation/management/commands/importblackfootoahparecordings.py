@@ -125,7 +125,6 @@ class Command(BaseCommand):
         import_recordings(
             directory=sessions_dir,
             transcoded_recordings_path=audio_dir,
-            metadata_filename=settings.RECVAL_METADATA_PATH,
             import_recording=null_recording_importer,
             recording_format="wav" if wav else "m4a",
         )
