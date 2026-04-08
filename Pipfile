@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-django = "~=4.2.29"
+django = "~=4.2.30"
 TextGrid = "*"
 django-simple-history = "*"
 docopt = "*"
