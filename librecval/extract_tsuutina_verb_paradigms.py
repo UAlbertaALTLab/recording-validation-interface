@@ -74,6 +74,9 @@ class TsuutinaRecordingExtractor:
             if not audio_path.is_file():
                 continue
 
+            # Do this once instead of generating it every time.
+            audio_segment = AudioSegment.from_file(fspath(audio_path))
+
             _eaf = Eaf(elan_file)
             if "BRS" not in _eaf.get_tier_names():
                 continue
@@ -89,7 +92,7 @@ class TsuutinaRecordingExtractor:
                 transcription = elem[2]
                 start = elem[0]
                 stop = elem[1]
-                (rec_date, subsession) = get_session_from_filename(elan_file.name)
+                rec_date, subsession = get_session_from_filename(elan_file.name)
                 translation = ";".join(
                     [
                         ann[2]
@@ -104,7 +107,7 @@ class TsuutinaRecordingExtractor:
                     subsession=subsession,
                     location=None,
                 )
-                audio = AudioSegment.from_file(fspath(audio_path))[start:stop]
+                audio = audio_segment[start:stop]
                 comment = "\n".join(
                     [
                         ";".join(
