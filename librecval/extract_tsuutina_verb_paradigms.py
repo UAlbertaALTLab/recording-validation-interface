@@ -186,7 +186,7 @@ def get_session_from_filename(filename):
             month=int(_datetime["month"]),
             day=int(_datetime["day"]),
         ),
-        int(_datetime.get("session","01")),
+        int(_datetime.get("session", "01")),
     )
 
 
