@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-django = "~=4.2.29"
+django = "~=4.2.30"
 TextGrid = "*"
 django-simple-history = "*"
 docopt = "*"
@@ -17,15 +17,16 @@ typing-extensions = "*"
 pympi-ling = "*"
 requests = "*"
 uwsgi = "*"
-#divvunspell = {git = "https://github.com/divvun/divvunspell-sdk-python.git", ref = "main"}
+#divvunspell = {git = "https://github.com/fbanados/divvunspell-sdk-python.git", ref = "main"}
 tqdm = "*"
 whitenoise = "*"
 mutagen = "*"
 hfst-optimized-lookup = "*"
-pillow = ">=12.1.1"
+pillow = ">=12.2.0"
 scipy = "*"
-urllib3 = ">=2.6.3" # Dependabot
+urllib3 = ">=2.7.0" # Dependabot
 filelock = ">=3.20.3" # Dependabot
+maturin = "*"
 
 [dev-packages]
 gunicorn = "*"
@@ -45,7 +46,6 @@ types-setuptools = "*"
 python-decouple-stubs = "*"
 pydub-stubs = "*"
 types-tqdm = "*"
-
 
 [requires]
 python_version = "3.12"
