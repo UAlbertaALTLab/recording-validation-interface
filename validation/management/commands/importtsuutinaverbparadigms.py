@@ -7,6 +7,7 @@ import logme
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand
+
 from pydub import AudioSegment
 
 from librecval.extract_tsuutina_verb_paradigms import (

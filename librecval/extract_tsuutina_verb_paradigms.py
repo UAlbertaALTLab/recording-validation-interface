@@ -176,7 +176,7 @@ def get_session_from_filename(filename):
     )
     if not date:
         date = re.search(
-            r"srs-TLL-(?P<year>\d{4})(?P<month>\d{2})(?P<day>\d{2})-.*(?P<session>\d{2})\.eaf",
+            r"srs-TLL-(?P<year>\d{4})(?P<month>\d{2})(?P<day>\d{2})-.*(?P<session>\d{2})?\.eaf",
             filename,
         )
     _datetime = date.groupdict()
@@ -186,7 +186,7 @@ def get_session_from_filename(filename):
             month=int(_datetime["month"]),
             day=int(_datetime["day"]),
         ),
-        int(_datetime["session"]),
+        int(_datetime.get("session","01")),
     )
 
 
