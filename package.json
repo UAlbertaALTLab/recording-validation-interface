@@ -4,7 +4,7 @@
     "tailwindcss": "^2.2.19"
   },
   "devDependencies": {
-    "cypress": "^13.17.0"
+    "cypress": "^15.15.0"
   },
   "engines": {
     "node": ">=22"
