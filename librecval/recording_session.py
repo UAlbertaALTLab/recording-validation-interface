@@ -38,7 +38,6 @@ from typing import (
 
 import logme  # type: ignore
 
-
 T = TypeVar("T")
 
 # This a strict pattern, that differs from the one in etc/;

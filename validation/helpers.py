@@ -1,6 +1,6 @@
 from os import fspath
 
-#import divvunspell
+import divvunspell
 from difflib import Differ
 import hfst_optimized_lookup
 from urllib.parse import urljoin
@@ -23,8 +23,8 @@ RULES FOR MED
 """
 
 
-#archive = divvunspell.SpellerArchive(fspath(settings.BASE_DIR / "crk.zhfst"))
-#speller = archive.speller()
+archive = divvunspell.SpellerArchive(fspath(settings.BASE_DIR / "crk.zhfst"))
+speller = archive.speller()
 
 fst = hfst_optimized_lookup.TransducerFile(
     fspath(settings.BASE_DIR / "crk-descriptive-analyzer.hfstol")
@@ -36,7 +36,7 @@ consonants = [f"  {char}" for char in "chkmnpstwy"]
 
 def get_edit_distance(word):
 
-    ranked_suggestions = [] #speller.suggest(word)
+    ranked_suggestions = speller.suggest(word)
     suggestions = [s[0] for s in ranked_suggestions if len(s) > 0]
 
     rankings = {}

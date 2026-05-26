@@ -19,7 +19,6 @@
 import re
 import unicodedata
 
-
 # A translation table to convert macrons to cicumflexes in lowercase, NFC
 # strings.
 MACRON_TO_CIRCUMFLEX = str.maketrans("ēīōā", "êîôâ")
