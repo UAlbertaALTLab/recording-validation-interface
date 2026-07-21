@@ -22,7 +22,7 @@ tqdm = "*"
 whitenoise = "*"
 mutagen = "*"
 hfst-optimized-lookup = "*"
-pillow = ">=12.2.0"
+pillow = ">=12.3.0"
 scipy = "*"
 urllib3 = ">=2.7.0" # Dependabot
 filelock = ">=3.20.3" # Dependabot
