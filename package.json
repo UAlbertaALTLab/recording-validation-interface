@@ -10,7 +10,7 @@
     "node": ">=22"
   },
   "allowScripts": {
-    "cypress@15.18.1": true,
-    "fsevents@2.3.3": true
+    "fsevents@2.3.3": true,
+    "cypress@15.21.1": true
   }
 }
