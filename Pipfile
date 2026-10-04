@@ -24,7 +24,7 @@ mutagen = "*"
 hfst-optimized-lookup = "*"
 pillow = ">=12.3.0"
 scipy = "*"
-urllib3 = ">=2.7.0" # Dependabot
+urllib3 = ">=2.8.0" # Dependabot
 filelock = ">=3.20.3" # Dependabot
 idna = ">3.15.0" # Dependabot
 
