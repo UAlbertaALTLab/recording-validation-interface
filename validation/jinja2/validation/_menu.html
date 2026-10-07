@@ -18,7 +18,7 @@ along with this program.  If not, see
 #}
 
 
-{% macro menu_options(request, auth, roles, language) %}
+{% macro menu_options(request, csrf_token, auth, roles, language) %}
     <ul id="options-menu" class="menu__options menu__options--list menu__options--right">
         {% if language %}
             <li><a href="{{ url('validation:all_speakers', language.code) }}" class="menu__options-link">Speakers</a>
@@ -60,7 +60,10 @@ along with this program.  If not, see
             {% if language and roles.is_manager %}
                 <li> <a href="{{ url('validation:merge-search', language.code)}}" class="menu__options-link">Merge entries</a></li>
             {% endif %}
-            <li><a href="{{ url('validation:logout') }}" id="logout-link" class="logout-link">Logout</a></li>
+            <li><form action="{{ url('validation:logout') }}" method="post">
+                <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}" />
+                <button type="submit" id="logout-link" name="logout" value="logout" class="logout-link">Logout</button>
+            </form></li>
 
         {% else %}
             <li><a href="{{ url('validation:login') }}" id="login-link" class="login-link">Login</a></li>

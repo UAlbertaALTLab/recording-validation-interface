@@ -36,11 +36,4 @@ describe("Logout", () => {
             .contains('You are now logged out')
     })
 
-    it("can go directly to the logout page", () => {
-        // TODO: don't make it log in through the UI
-        cy.visit(Cypress.env('logout_url'))
-
-        cy.get('h2')
-            .contains('You are now logged out')
-    })
 })

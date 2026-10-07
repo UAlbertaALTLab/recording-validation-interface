@@ -66,7 +66,7 @@ const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     </div>
       <details>
         <summary data-cy="options-button-header" class="menu__caret">Options</summary>
-        {{ menu.menu_options(request, auth, roles, language) }}
+        {{ menu.menu_options(request, csrf_token, auth, roles, language) }}
       </details>
       {% else %}
       <div class="navbar-collapse collapse justify-content-stretch" id="navbarSupportedContent">
@@ -74,10 +74,9 @@ const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     </div>
       <details>
         <summary data-cy="options-button-header" class="menu__caret">Options</summary>
-        {{ menu.menu_options(request, auth, roles, "") }}
+        {{ menu.menu_options(request, csrf_token, auth, roles, "") }}
       </details>
     {% endif %}
-
 
   </nav>
 

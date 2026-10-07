@@ -6,7 +6,7 @@ on:
 
 jobs:
   trigger-deployment:
-      runs-on: ubuntu-20.04
+      runs-on: ubuntu-24.04
 
       steps:
       - name: send HTTP request to deploy.altlab.dev webhook

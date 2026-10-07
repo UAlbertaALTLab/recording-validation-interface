@@ -59,8 +59,20 @@
   cursor: pointer;
 }
 
-.logout-link, .login-link {
+.login-link {
   color: var(--custom-purple);
+}
+
+.logout-link {
+  color: var(--custom-purple);
+  border: none;
+  outline: none;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  font-family: inherit;
+  font-size: inherit;
 }
 
 .logout-link:hover, .login-link:hover {
