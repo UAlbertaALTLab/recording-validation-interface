@@ -24,7 +24,7 @@ mutagen = "*"
 hfst-optimized-lookup = "*"
 pillow = "*"
 scipy = "*"
-urllib3 = "*"
+urllib3 = ">=2.8.0" # Dependabot
 filelock = "*"
 idna = "*"
 
