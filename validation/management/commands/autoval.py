@@ -17,15 +17,14 @@
 
 from django.conf import settings  # type: ignore
 from django.core.management.base import BaseCommand
+from tqdm import tqdm
 
 from validation.helpers import (
-    perfect_match,
     exactly_one_analysis,
     get_distance_with_translations,
+    perfect_match,
 )
 from validation.models import Phrase
-
-from tqdm import tqdm
 
 
 class Command(BaseCommand):

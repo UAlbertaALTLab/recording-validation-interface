@@ -2,14 +2,13 @@ from datetime import datetime
 from hashlib import sha256
 from os import fspath
 from pathlib import Path
+import re
 from typing import NamedTuple
 
 from django.conf import settings
-from typing_extensions import Literal
-import re
-
 from pydub import AudioSegment  # type: ignore
 from pympi.Elan import Eaf  # type: ignore
+from typing_extensions import Literal
 
 from librecval.recording_session import SessionID
 

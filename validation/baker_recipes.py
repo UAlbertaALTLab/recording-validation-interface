@@ -27,7 +27,7 @@ import random
 
 from model_bakery.recipe import Recipe, foreign_key
 
-from validation.models import Phrase, Recording, Speaker, LanguageVariant
+from validation.models import LanguageVariant, Phrase, Recording, Speaker
 
 # What's the shortest a transcription can be (characters)?
 MIN_TRANSCRIPTION_LENGTH = 2

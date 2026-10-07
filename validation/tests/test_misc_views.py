@@ -1,5 +1,5 @@
-import urllib.robotparser
 from http import HTTPStatus
+import urllib.robotparser
 
 
 def test_robots_txt_is_served(client):

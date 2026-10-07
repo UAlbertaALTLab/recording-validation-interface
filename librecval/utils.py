@@ -5,8 +5,8 @@
 Temporary dumping ground before I find a better place for whatever is in here.
 """
 
-import os
 from contextlib import contextmanager
+import os
 from pathlib import Path
 
 

@@ -27,14 +27,11 @@ Its defaults are configured using the following settings:
 See recvalsite/settings.py for more information.
 """
 
-import logme  # type: ignore
 from django.core.management.base import BaseCommand, CommandError  # type: ignore
-from django.db.models import Q, QuerySet, Count
+from django.db.models import Count, Q, QuerySet
+import logme  # type: ignore
 
-from validation.models import (
-    Phrase,  # type: ignore
-)
-
+from validation.models import Phrase  # type: ignore
 from validation.views import handle_merge_phrases
 
 

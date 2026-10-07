@@ -17,11 +17,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import csv
-import re
 from datetime import date as datetype
 from datetime import datetime
 from enum import Enum, auto
 from pathlib import Path
+import re
 from typing import (
     Any,
     AnyStr,

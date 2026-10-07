@@ -16,13 +16,13 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import warnings
+from pathlib import Path
 import tempfile
 from uuid import uuid4
-from pathlib import Path
+import warnings
 
-import pytest  # type: ignore
 from pydub.generators import Square  # type: ignore
+import pytest  # type: ignore
 
 from librecval.transcode_recording import transcode_to_aac
 

@@ -28,27 +28,27 @@ See recvalsite/settings.py for more information.
 """
 
 from pathlib import Path
-from typing import Callable
 from tempfile import TemporaryDirectory
+from typing import Callable
 
-import logme  # type: ignore
 from django.conf import settings  # type: ignore
 from django.core.files.base import ContentFile  # type: ignore
 from django.core.management.base import BaseCommand, CommandError  # type: ignore
 from django.db.models import Q
+import logme  # type: ignore
 
 from librecval import REPOSITORY_ROOT
-from librecval.extract_phrases import Segment
 from librecval.extract_blackfoot_oahpa import (
-    initialize as import_recordings,
     equal_soundfiles,
 )
+from librecval.extract_blackfoot_oahpa import initialize as import_recordings
+from librecval.extract_phrases import Segment
 from validation.models import (
+    LanguageVariant,
     Phrase,
     Recording,
     RecordingSession,
     Speaker,
-    LanguageVariant,
 )
 
 
@@ -260,8 +260,8 @@ def django_recording_importer(
                     kind=info.type,
                     language=language,
                 ).first()
-                if not candidate: # Unreachable, but needed for typechecking.
-                    return   
+                if not candidate:  # Unreachable, but needed for typechecking.
+                    return
                 phrase = candidate
                 phrase_created = False
 

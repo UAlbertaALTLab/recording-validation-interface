@@ -16,15 +16,15 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import random
 from datetime import date as datetype
 from datetime import datetime
+import random
 
-import pytest  # type: ignore
 from django.core.exceptions import ValidationError  # type: ignore
 from hypothesis import assume, given
 from model_bakery import baker  # type: ignore
 from model_bakery.recipe import Recipe  # type: ignore
+import pytest  # type: ignore
 
 from librecval.normalization import nfc
 from librecval.recording_session import Location, SessionID, TimeOfDay

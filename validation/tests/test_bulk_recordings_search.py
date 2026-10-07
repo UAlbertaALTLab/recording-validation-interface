@@ -4,11 +4,11 @@ Unit/Integration tests for the bulk recordings search API.
 
 import urllib
 
-import pytest  # type: ignore
 from django.core.management import call_command
 from django.shortcuts import reverse  # type: ignore
+import pytest  # type: ignore
 
-from validation.models import Recording, Phrase, Speaker
+from validation.models import Phrase, Recording, Speaker
 
 
 @pytest.mark.django_db

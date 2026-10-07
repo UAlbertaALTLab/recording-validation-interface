@@ -1,20 +1,19 @@
-import os
-import time
 import csv
 from datetime import datetime
 from hashlib import sha256
+import os
 from os import fspath
 from pathlib import Path
+import time
 from typing import NamedTuple
 
+from pydub import AudioSegment  # type: ignore
 from typing_extensions import Literal
 
-from pydub import AudioSegment  # type: ignore
-
+from librecval.extract import SemanticSegment as Segment
 from librecval.recording_session import SessionID
 from recvalsite import settings
 from validation.models import Recording
-from librecval.extract import SemanticSegment as Segment
 
 
 class I3RecordingExtractor:

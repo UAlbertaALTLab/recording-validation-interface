@@ -21,12 +21,12 @@
 #  - extract_items.praat
 #  - extract_sessions.praat
 
-import logging
-import re
 from decimal import Decimal
 from hashlib import sha256
+import logging
 from os import fspath
 from pathlib import Path
+import re
 from typing import Dict, Iterable, NamedTuple, Optional, Tuple
 
 import logme  # type: ignore

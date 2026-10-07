@@ -16,9 +16,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from pathlib import Path
 import re
 from typing import Any, TypedDict
-from pathlib import Path
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -29,7 +29,7 @@ from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
 
-from librecval.normalization import normalize_sro, to_indexable_form, normalize_phrase
+from librecval.normalization import normalize_phrase, normalize_sro, to_indexable_form
 from librecval.recording_session import Location, SessionID, TimeOfDay
 
 User = get_user_model()

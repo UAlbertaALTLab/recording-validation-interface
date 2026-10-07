@@ -4,8 +4,8 @@ from django.core.management.base import BaseCommand
 
 from librecval.recording_session import SessionID
 from validation.models import (
-    RecordingSession,
     Recording,
+    RecordingSession,
 )
 
 

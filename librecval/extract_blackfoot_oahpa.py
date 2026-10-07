@@ -21,13 +21,13 @@
 Temporary place for database creation glue code.
 """
 
+from datetime import date as datetype
 import os
 from pathlib import Path
 from typing import Callable
-from datetime import date as datetype
 
 import logme  # type: ignore
-from typing_extensions import Literal, Dict
+from typing_extensions import Dict, Literal
 
 from librecval.extract_phrases import (
     AudioSegment,

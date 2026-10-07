@@ -20,8 +20,9 @@
 Old CLI commands that should be ported to the new framework.
 """
 
-import click
 from pathlib import Path
+
+import click
 
 
 def delete_audio(audio_dir: Path) -> None:

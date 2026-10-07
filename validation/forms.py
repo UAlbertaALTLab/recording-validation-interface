@@ -1,9 +1,10 @@
-from django import forms
 import re
-from django.core.exceptions import ObjectDoesNotExist
-from django.contrib.auth.models import User
 
-from validation.models import Issue, Recording, Phrase, SemanticClass, Speaker
+from django import forms
+from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
+
+from validation.models import Issue, Phrase, Recording, SemanticClass, Speaker
 
 DEFAULT_MAX_LENGTH = 256
 

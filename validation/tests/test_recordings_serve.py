@@ -27,10 +27,10 @@ import os
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-import pytest  # type: ignore
 from django.shortcuts import reverse  # type: ignore
 from model_bakery import baker  # type: ignore
 from pydub import AudioSegment  # type: ignore
+import pytest  # type: ignore
 
 from validation.models import Recording
 

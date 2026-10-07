@@ -15,11 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pathlib import Path
-import sqlite3
-import os
-import shutil
 from contextlib import closing
+import os
+from pathlib import Path
+import shutil
+import sqlite3
 
 from django.core.management.base import BaseCommand, CommandError  # type: ignore
 from tqdm import tqdm

@@ -2,8 +2,8 @@ from django.core.management.base import BaseCommand
 from tqdm import tqdm
 
 from validation.models import (
-    SemanticClassOldAnnotation,
     Phrase,
+    SemanticClassOldAnnotation,
 )
 
 

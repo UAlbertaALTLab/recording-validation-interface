@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
+from collections import Counter
 import datetime
+from functools import reduce
+from hashlib import sha256
+from http import HTTPStatus
 import json
 import operator
+from pathlib import Path
+import re
 
 # Copyright (C) 2018 Eddie Antonio Santos <easantos@ualberta.ca>,
 #               2024 Felipe Banados Schwerter <banadoss@ualberta.ca>
@@ -22,71 +28,64 @@ import operator
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import subprocess
 import time
-import re
-from functools import reduce
-from hashlib import sha256
-from http import HTTPStatus
-from pathlib import Path
-from collections import Counter
 from typing import Any
-from django.db import transaction
 
-import mutagen as mutagen
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import authenticate
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User, Group
-from django.core.mail import mail_admins
 from django.contrib.auth import login as django_login
-from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import Group, User
 from django.contrib.auth.views import LoginView, LogoutView
+from django.core.exceptions import PermissionDenied
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.core.mail import mail_admins
 from django.core.paginator import Paginator
-from django.db.models import Q, QuerySet, Count, Case, When, IntegerField, F, Max
+from django.db import transaction
+from django.db.models import Case, Count, F, IntegerField, Max, Q, QuerySet, When
 from django.http import (
+    HttpRequest,
     HttpResponse,
     HttpResponseBadRequest,
     HttpResponseRedirect,
     JsonResponse,
     QueryDict,
-    HttpRequest,
 )
-from django.shortcuts import get_object_or_404, render, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.http import urlencode
 from django.views.decorators.http import require_http_methods
-from django.core.exceptions import PermissionDenied
+import mutagen as mutagen
 
 from librecval.normalization import to_indexable_form
 from librecval.recording_session import SessionID
-from .jinja2 import url
 
-from .models import (  # type: ignore
-    Phrase,
-    Recording,
-    Speaker,
-    RecordingSession,
-    Issue,
-    LanguageVariant,
-    SemanticClass,
-    SemanticClassAnnotation,
-    HistoricalSemanticClassAnnotation,  # type: ignore
-    HistoricalRecording,  # type: ignore
-    HistoricalPhrase,  # type: ignore
-)
+from .crk_sort import custom_sort
 from .forms import (
-    EditSegment,
-    Register,
-    FlagSegment,
-    EditIssueWithRecording,
     EditIssueWithPhrase,
+    EditIssueWithRecording,
+    EditSegment,
+    FlagSegment,
     RecordNewPhrase,
+    Register,
 )
 from .helpers import (
     get_distance_with_translations,
 )
-from .crk_sort import custom_sort
+from .jinja2 import url
+from .models import (  # type: ignore
+    Issue,
+    LanguageVariant,
+    Phrase,
+    Recording,
+    RecordingSession,
+    SemanticClass,
+    SemanticClassAnnotation,
+    Speaker,
+)
+from .models import HistoricalPhrase  # type: ignore
+from .models import HistoricalRecording  # type: ignore
+from .models import HistoricalSemanticClassAnnotation  # type: ignore
 
 
 class UserRoles:

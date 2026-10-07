@@ -1,25 +1,25 @@
-import os
 from datetime import datetime
+import os
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-import logme
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand
+import logme
 from pydub import AudioSegment
 
 from librecval.extract_auto import SynthesizedRecordingExtractor
 from librecval.extract_pfn import PfnRecordingExtractor
-from librecval.extract_tsuutina import TsuutinaRecordingExtractor, Segment
+from librecval.extract_tsuutina import Segment, TsuutinaRecordingExtractor
 from librecval.extract_tvpd import TvpdRecordingExtractor
 from librecval.transcode_recording import transcode_to_aac
 from validation.models import (
-    Speaker,
-    RecordingSession,
+    LanguageVariant,
     Phrase,
     Recording,
-    LanguageVariant,
+    RecordingSession,
+    Speaker,
 )
 
 

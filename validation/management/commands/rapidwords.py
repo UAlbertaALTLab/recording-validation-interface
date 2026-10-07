@@ -15,18 +15,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pathlib import Path
+from contextlib import closing
 import json
 import os
-import shutil
+from pathlib import Path
 import re
-from tqdm import tqdm
-from contextlib import closing
-from simple_history.utils import bulk_create_with_history
+import shutil
 
 from django.core.management.base import BaseCommand, CommandError  # type: ignore
+from simple_history.utils import bulk_create_with_history
+from tqdm import tqdm
 
-from validation.models import SemanticClass, Phrase, SemanticClassAnnotation
+from validation.models import Phrase, SemanticClass, SemanticClassAnnotation
 
 
 def semantic_classes(indices):

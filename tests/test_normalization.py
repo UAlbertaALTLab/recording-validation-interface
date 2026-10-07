@@ -16,9 +16,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import pytest  # type: ignore
 from hypothesis import given  # type: ignore
 from hypothesis.strategies import text  # type: ignore
+import pytest  # type: ignore
 
 from librecval.normalization import normalize, to_indexable_form
 

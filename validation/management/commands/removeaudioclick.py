@@ -1,9 +1,9 @@
-import subprocess
 from pathlib import Path
+import subprocess
 
-import mutagen
 from django.conf import settings
 from django.core.management.base import BaseCommand
+import mutagen
 
 from validation.models import Recording
 

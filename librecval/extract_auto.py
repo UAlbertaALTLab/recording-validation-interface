@@ -1,18 +1,17 @@
-import os
-import time
 from datetime import datetime
 from hashlib import sha256
+import os
 from os import fspath
 from pathlib import Path
+import time
 from typing import NamedTuple
 
+from pydub import AudioSegment  # type: ignore
 from typing_extensions import Literal
 
-from pydub import AudioSegment  # type: ignore
-
+from librecval.extract import Segment
 from librecval.recording_session import SessionID
 from validation.models import Recording
-from librecval.extract import Segment
 
 
 class SynthesizedRecordingExtractor:

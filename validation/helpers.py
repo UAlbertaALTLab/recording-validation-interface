@@ -1,16 +1,14 @@
+from difflib import Differ
+import json
+import operator
 from os import fspath
+from urllib.parse import urljoin
 
 import divvunspell
-from difflib import Differ
-import hfst_optimized_lookup
-from urllib.parse import urljoin
-import operator
-
-import requests
-import json
-
 from django.conf import settings
 from django.utils.http import urlencode
+import hfst_optimized_lookup
+import requests
 
 """
 RULES FOR MED

@@ -11,8 +11,8 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
-import secrets
 from pathlib import Path
+import secrets
 from typing import Any
 
 from decouple import config

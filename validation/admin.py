@@ -17,16 +17,16 @@ from django.contrib import admin
 from simple_history.admin import SimpleHistoryAdmin
 
 from .models import (
+    Collection,
+    Issue,
+    LanguageVariant,
     Phrase,
     Recording,
     RecordingSession,
-    Speaker,
-    Issue,
-    LanguageVariant,
-    SemanticClassOldAnnotation,
     SemanticClass,
     SemanticClassAnnotation,
-    Collection,
+    SemanticClassOldAnnotation,
+    Speaker,
 )
 
 admin.site.register(Phrase, SimpleHistoryAdmin)

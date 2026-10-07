@@ -15,17 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from contextlib import closing
 import json
-import os
 from pathlib import Path
-import re
-import shutil
 
-from django.core.management.base import BaseCommand, CommandError  # type: ignore
-from django.urls import reverse
+from django.core.management.base import BaseCommand  # type: ignore
 import logme
-from simple_history.utils import bulk_create_with_history
 from tqdm import tqdm
 
 from validation.models import Phrase, Recording
@@ -127,9 +121,36 @@ class Command(BaseCommand):
     def handle(self, *args, export_filename, language_code, **options):
         phrases = Phrase.objects.filter(language__code=language_code).distinct()
 
-        sentences = [x for x in phrases if has_enough_words(x) and best_recording(x)]
+        # sentences = [x for x in phrases if best_recording(x)]
+        # sentences = [
+        #    x
+        #    for x in phrases
+        #    if x.recording_set.filter(compressed_audio__endswith="wav").exists()
+        #
+        sentences = phrases
 
         with open(export_filename, "w") as f:
-            f.write('<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>\n')
-            for sentence in sentences:
-                f.write(f"{generate_sentence_vrt(sentence)}\n")
+            data = []
+            for sentence in tqdm(sentences):
+                data.append(
+                    {
+                        "transcription": sentence.transcription,
+                        "translation": sentence.translation,
+                        "recording": [
+                            x.get_absolute_url()
+                            for x in sentence.recording_set.filter(
+                                compressed_audio__endswith="wav"
+                            )
+                        ],
+                        "field_transcription": sentence.field_transcription,
+                        "analysis": sentence.analysis,
+                        "comment": sentence.comment,
+                        "transcription_history": [
+                            h.transcription for h in sentence.history.all()
+                        ],
+                        "translation_history": [
+                            h.translation for h in sentence.history.all()
+                        ],
+                    }
+                )
+            json.dump(data, f, ensure_ascii=False)

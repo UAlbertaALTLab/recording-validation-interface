@@ -1,18 +1,17 @@
 import csv
-import os
 from datetime import datetime
-import time
 from hashlib import sha256
+import os
 from os import fspath
 from pathlib import Path
+import re
+import time
 from typing import NamedTuple
 
 from django.conf import settings
-from typing_extensions import Literal
-import re
-
 from pydub import AudioSegment  # type: ignore
 from pympi.Elan import Eaf  # type: ignore
+from typing_extensions import Literal
 
 from librecval.recording_session import SessionID
 from validation.models import Phrase, Recording

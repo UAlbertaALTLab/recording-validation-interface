@@ -27,15 +27,15 @@ Its defaults are configured using the following settings:
 See recvalsite/settings.py for more information.
 """
 
-import logme  # type: ignore
 from django.core.management.base import BaseCommand, CommandError  # type: ignore
+import logme  # type: ignore
 
 from validation.models import (
+    LanguageVariant,
     Phrase,
     Recording,
     RecordingSession,
     Speaker,
-    LanguageVariant,
 )
 
 

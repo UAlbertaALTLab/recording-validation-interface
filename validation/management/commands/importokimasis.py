@@ -1,22 +1,22 @@
-import os
 from datetime import datetime
+import os
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-import logme
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand
+import logme
 from pydub import AudioSegment
 
 from librecval.extract_okimasis import OkimasisRecordingExtractor, Segment
 from librecval.transcode_recording import transcode_to_aac
 from validation.models import (
-    Speaker,
-    RecordingSession,
+    LanguageVariant,
     Phrase,
     Recording,
-    LanguageVariant,
+    RecordingSession,
+    Speaker,
 )
 
 
@@ -108,9 +108,9 @@ class Command(BaseCommand):
                     origin=Phrase.NEW,
                     language=language,
                 ).first()
-                if not candidate: # Unreachable, but needed for typechecking.
-                    return   
-                phrase = candidate                
+                if not candidate:  # Unreachable, but needed for typechecking.
+                    return
+                phrase = candidate
                 print("(more than one)")
 
             recording_path = save_recording(

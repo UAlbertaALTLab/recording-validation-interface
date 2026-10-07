@@ -22,10 +22,10 @@ Unit/Integration tests for the recordings search API.
 
 from pathlib import Path
 
-import pytest  # type: ignore
 from django.core.files.base import ContentFile
 from django.shortcuts import reverse  # type: ignore
 from model_bakery import baker  # type: ignore
+import pytest  # type: ignore
 
 from validation.models import Recording
 
