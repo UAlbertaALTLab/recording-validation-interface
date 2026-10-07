@@ -26,6 +26,7 @@ Its defaults are configured using the following settings:
     RECVAL_SESSIONS_DIR
 See recvalsite/settings.py for more information.
 """
+
 from os import fspath
 from pathlib import Path
 from tempfile import TemporaryDirectory

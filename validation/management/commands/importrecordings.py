@@ -255,13 +255,18 @@ def django_recording_importer(
                     info.cree_transcription,
                     info.compute_sha256hash(),
                 )
-                phrase = Phrase.objects.filter(
+                candidate = Phrase.objects.filter(
                     field_transcription=info.cree_transcription,
                     transcription=info.cree_transcription,
                     status=Phrase.NEW,
                     kind=info.type,
                     language=language,
                 ).first()
+
+                if not candidate: # Unreachable, but needed for typechecking.
+                    return
+                
+                phrase = candidate
                 phrase_created = False
 
         # XXX: this is kind of dumb; the compressed audio is written to storage, read again,

@@ -68,7 +68,7 @@ class OkimasisRecordingExtractor:
         sessions_dir = Path(sessions_dir)
         audio_files = list(sessions_dir.glob("*.wav"))
         for audio_file in audio_files:
-            print(audio_file)
+            print(audio_file.name)
             session_num = str(audio_file.name).split(" ")[1].replace(".wav", "")
             session_num = f"{int(session_num):02}"
             elan_file_path = Path(
@@ -117,7 +117,7 @@ class OkimasisRecordingExtractor:
         audio_files = list(sessions_dir.glob("*.wav"))
         for audio_file in audio_files:
             word = Path(audio_file).stem
-            print(word)
+            print(word + " - " + word)
 
             session = get_session_from_mtime(os.path.getmtime(audio_file))
             session_id = SessionID(

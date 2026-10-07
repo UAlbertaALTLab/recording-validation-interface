@@ -31,6 +31,18 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("sessions_dir", nargs="?", type=Path, default=None)
+        parser.add_argument(
+            "--wav",
+            action="store_true",
+            default=False,
+            help="Stores wav files INSTEAD of transcoded m4as",
+        )
+        parser.add_argument(
+            "--audio-dir",
+            type=Path,
+            help="where to store the extracted audio",
+            default=Path("./audio"),
+        )
 
     def handle(
         self,
@@ -47,20 +59,19 @@ class Command(BaseCommand):
 
         self.audio_dir = audio_dir
 
-        self._handle_store_django(sessions_dir)
+        self._handle_store_django(sessions_dir, wav)
 
     @logme.log
-    def _handle_store_django(self, sessions_dir, logger) -> None:
+    def _handle_store_django(self, sessions_dir, wav, logger) -> None:
         """
         Stores m4a files, managed by Django's media engine.
         """
         # Store transcoded audio in a temp directory;
         # these files will be then handled by the currently configured storage backend.
         recording_extractor = OkimasisRecordingExtractor()
-        for segment in recording_extractor.scan_wav(sessions_dir):
+        for segment in recording_extractor.scan(sessions_dir):
+            print(segment.transcription)
             rec_id = segment.compute_sha256hash()
-            if Recording.objects.filter(id=rec_id).exists():
-                continue
 
             session, session_created = RecordingSession.get_or_create_by_session_id(
                 segment.session
@@ -76,28 +87,55 @@ class Command(BaseCommand):
             speaker.languages.add(language)
             speaker.save()
 
-            phrase, phrase_created = Phrase.objects.get_or_create(
-                field_transcription=segment.transcription,
-                transcription=segment.fixed_transcription or segment.transcription,
-                translation=segment.translation,
-                kind=segment.type,
-                origin=Phrase.NEW,
-                language=language,
-            )
+            try:
+                phrase, phrase_created = Phrase.objects.get_or_create(
+                    field_transcription=segment.transcription,
+                    transcription=segment.fixed_transcription or segment.transcription,
+                    translation=segment.translation,
+                    kind=segment.type,
+                    origin=Phrase.NEW,
+                    language=language,
+                )
 
-            recording_path = save_recording(self.audio_dir, segment, segment.audio)
+                if not phrase_created:
+                    print("(preexisting)")
+            except Phrase.MultipleObjectsReturned:
+                candidate = Phrase.objects.filter(
+                    field_transcription=segment.transcription,
+                    transcription=segment.fixed_transcription or segment.transcription,
+                    translation=segment.translation,
+                    kind=segment.type,
+                    origin=Phrase.NEW,
+                    language=language,
+                ).first()
+                if not candidate: # Unreachable, but needed for typechecking.
+                    return   
+                phrase = candidate                
+                print("(more than one)")
+
+            recording_path = save_recording(
+                self.audio_dir,
+                segment,
+                segment.audio,
+                recording_format="wav" if wav else "m4a",
+            )
             audio_data = recording_path.read_bytes()
             django_file = ContentFile(audio_data, name=recording_path.name)
 
-            recording = Recording(
-                id=rec_id,
-                compressed_audio=django_file,
-                speaker=speaker,
-                timestamp=0,
-                phrase=phrase,
-                session=session,
-                quality=segment.quality,
-            )
+            if Recording.objects.filter(id=rec_id).exists():
+                print("(just updating to wav)")
+                recording = Recording.objects.get(id=rec_id)
+                recording.compressed_audio = django_file
+            else:
+                recording = Recording(
+                    id=rec_id,
+                    compressed_audio=django_file,
+                    speaker=speaker,
+                    timestamp=0,
+                    phrase=phrase,
+                    session=session,
+                    quality=segment.quality,
+                )
             recording.clean()
             recording.save()
 

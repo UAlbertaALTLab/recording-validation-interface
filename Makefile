@@ -20,8 +20,10 @@ install-dev: init
 	pipenv install --dev
 	pipenv run python init --dev --debug
 
-test:
-	pipenv run mypy librecval
+typecheck:
+	pipenv run mypy librecval tests validation recvalsite
+
+test: typecheck
 	pipenv run pytest
 
 integration-test:
