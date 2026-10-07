@@ -36,5 +36,6 @@ migrate:
 	pipenv run python3 manage.py migrate
 
 reformat:
+	isort --profile black librecval tests validation recvalsite
 	black librecval tests validation recvalsite
 
