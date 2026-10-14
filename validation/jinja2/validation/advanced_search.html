@@ -1,7 +1,7 @@
 {#
     # Displays search form to perform an advanced search
 #}
-   
+
 {% extends 'validation/_base.html' %}
 {% import 'validation/_macros.html' as macros %}
 
@@ -9,82 +9,119 @@
 <form method="GET" action="{{
     url('validation:advanced_search_results', language.code)
   }}">
-    {{ language.endonym }} phrase:
-    <input class="form-control me-sm-2" name="transcription" type="search" placeholder="Search" aria-label="Search"><br>
-    English phrase:
-    <input class="form-control me-sm-2" name="translation" type="search" placeholder="Search" aria-label="Search"><br>
-    Analysis:
-    <input class="form-control me-sm-2" name="analysis" type="search" placeholder="Search" aria-label="Search"><br>
-    Lemma:
-    <input class="form-control me-sm-2" name="lemma" type="search" placeholder="Search" aria-label="Search"><br>
-
-    <input type="checkbox" id="exact" name="exact" value="exact"> Exact match <br >
-    {% if roles and roles.is_linguist %}<input type="checkbox" id="regexp" name="regexp" value="regexp"> Use regular expressions <br >{% endif %}
-
-    Status:
-    <input type="radio" id="all" name="status" value="all" checked>
-    <label for="all" data-bs-toggle="tooltip" title="Include every entry in speech-db">All</label>  
-    <input type="radio" id="new" name="status" value="new">
-    <label for="new" data-bs-toggle="tooltip" title="Phrase has been either just automatically imported to speech-db (no human input has happened), or the phrase has been submitted by a user to speech-db and approved for use">New</label>
-    <input type="radio" id="linked" name="status" value="linked">
-    <label for="linked" data-bs-toggle="tooltip" title="Either transcription/translation have been judged as correct, or a phrase issue has been resolved">Linked</label>
+    <div class="mb-3">
+      <label for="languagePhrase" class="form-label">{{ language.endonym }} phrase:</label>
+      <input class="form-control me-sm-2" name="transcription" type="search" placeholder="Search" aria-label="Search" id="languagePhrase" />
+    </div>
+    <div class="mb-3">
+      <label for="englishPhrase" class="form-label">English phrase:</label>
+      <input class="form-control me-sm-2" name="translation" type="search" placeholder="Search" aria-label="Search" id="englishPhrase" />
+    </div>
+    <div class="mb-3">
+      <label for="analysis" class="form-label">Analysis:</label>
+      <input class="form-control me-sm-2" name="analysis" type="search" placeholder="Search" aria-label="Search" id="analysis" />
+    </div>
+    <div class="mb-3">
+      <label for="lemma" class="form-label">Lemma:</label>
+      <input class="form-control me-sm-2" name="lemma" type="search" placeholder="Search" aria-label="Search" id="lemma" />
+    </div>
+    <div class="mb-3 form-check form-switch">
+      <input type="checkbox" id="exact" name="exact" value="exact" id="exactMatch" class="form-check-input" >
+      <label for="exactMatch" class="form-check-label">Exact match</label>
+    </div>
     {% if roles and roles.is_linguist %}
-        <input type="radio" id="needs-review" name="status" value="needs-review">
-        <label for="needs-review" data-bs-toggle="tooltip" title="Transcription/translation have been judged as needing review">Needs review</label>
-        <input type="radio" id="auto-val" name="status" value="auto-validated">
-        <label for="auto-val" data-bs-toggle="tooltip" title="Entries that have been auto validated:  There was a single suggestion match and it was automatically assigned to the entry.">Auto-validated</label>
-        <input type="radio" id="user-sub" name="status" value="user-submitted">
-        <label for="user-sub" data-bs-toggle="tooltip" title="The entry has been recorded and uploaded directly from the browser using speech-db">User-submitted</label>
-        <input type="radio" id="not-checked" name="status" value="not-checked">
-        <label for="not-checked" data-bs-toggle="tooltip" title="Has not been yet validated by an expert or linguist in speech-db (Either marked as new, auto-validated, or a user submission)">Not checked</label>
-        <input type="radio" id="grey-card" name="status" value="grey-card">
-        <label for="grey-card" data-bs-toggle="tooltip" title="Shows only entries with a grey card (not validated nor needing review)">Grey card</label>  <br/>
-    {% else %}
-        <br>
+    <div class="mb-3 form-check form-switch">
+      <input type="checkbox" id="regexp" name="regexp" value="regexp" id="useRegexp" class="form-check-input">
+      <label for="useRegexp" class="form-check-label">Use regular expressions</label>
+    </div>
     {% endif %}
-        <input type="checkbox" id="include-excluded" name="excluded" value="true"> Include Excluded Phrases </input>
 
-    Recording quality:
-    <input type="radio" id="all" name="quality" value="all" checked>
-    <label for="all">All</label>
-    <input type="radio" id="good" name="quality" value="good">
-    <label for="good">Good</label>
-    <input type="radio" id="bad" name="quality" value="bad">
-    <label for="bad">Bad</label> <br>
+    <div class="mb-3 input-group">
+    <span class="input-group-text">Status:</span>
+    <input type="radio" id="statusAll" name="status" value="all" checked class="btn-check">
+    <label for="statusAll" data-bs-toggle="tooltip" title="Include every entry in speech-db" class="btn btn-outline-dark">All</label>
+    <input type="radio" id="new" name="status" value="new" class="btn-check">
+    <label for="new" data-bs-toggle="tooltip" title="Phrase has been either just automatically imported to speech-db (no human input has happened), or the phrase has been submitted by a user to speech-db and approved for use" class="btn btn-outline-dark">New</label>
+    <input type="radio" id="linked" name="status" value="linked" class="btn-check">
+    <label for="linked" data-bs-toggle="tooltip" title="Either transcription/translation have been judged as correct, or a phrase issue has been resolved" class="btn btn-outline-dark">Linked</label>
+    {% if roles and roles.is_linguist %}
+        <input type="radio" id="needs-review" name="status" value="needs-review" class="btn-check">
+        <label for="needs-review" data-bs-toggle="tooltip" title="Transcription/translation have been judged as needing review" class="btn btn-outline-dark">Needs review</label>
+        <input type="radio" id="auto-val" name="status" value="auto-validated" class="btn-check">
+        <label for="auto-val" data-bs-toggle="tooltip" title="Entries that have been auto validated:  There was a single suggestion match and it was automatically assigned to the entry." class="btn btn-outline-dark">Auto-validated</label>
+        <input type="radio" id="user-sub" name="status" value="user-submitted" class="btn-check">
+        <label for="user-sub" data-bs-toggle="tooltip" title="The entry has been recorded and uploaded directly from the browser using speech-db" class="btn btn-outline-dark">User-submitted</label>
+        <input type="radio" id="not-checked" name="status" value="not-checked" class="btn-check">
+        <label for="not-checked" data-bs-toggle="tooltip" title="Has not been yet validated by an expert or linguist in speech-db (Either marked as new, auto-validated, or a user submission)" class="btn btn-outline-dark">Not checked</label>
+        <input type="radio" id="grey-card" name="status" value="grey-card" class="btn-check">
+        <label for="grey-card" data-bs-toggle="tooltip" title="Shows only entries with a grey card (not validated nor needing review)" class="btn btn-outline-dark">Grey card</label>
+    {% else %}
+    {% endif %}
+    </div>
 
-    Type:
-    <input type="radio" id="all" name="kind" value="all" checked>
-    <label for="all">All</label>
-    <input type="radio" id="word" name="kind" value="word">
-    <label for="word">Word</label>
-    <input type="radio" id="sentence" name="kind" value="sentence">
-    <label for="sentence">Sentence</label> <br>
+    <div class="mb-3 form-check form-switch">
+      <input type="checkbox" id="include-excluded" name="excluded" value="true"  class="form-check-input">
+      <label for="include-excluded" class="form-check-label">Include Excluded Phrases</label>
+    </div>
 
-    Semantic class:
-    <select name="semantic_class" id="semantic_class">
+    <div class="mb-3 input-group">
+      <span class="input-group-text">Recording quality:</span>
+      <input type="radio" id="qualityAll" name="quality" value="all" checked class="btn-check">
+      <label for="qualityAll" class="btn btn-outline-dark">All</label>
+      <input type="radio" id="good" name="quality" value="good" class="btn-check">
+      <label for="good" class="btn btn-outline-dark">Good</label>
+      <input type="radio" id="bad" name="quality" value="bad" class="btn-check">
+      <label for="bad" class="btn btn-outline-dark">Bad</label>
+      </div>
+
+    <div class="mb-3 input-group">
+      <span class="input-group-text">Type:</span>
+      <input type="radio" id="typeAll" name="kind" value="all" checked class="btn-check">
+      <label for="typeAll" class="btn btn-outline-dark">All</label>
+      <input type="radio" id="word" name="kind" value="word" class="btn-check">
+      <label for="word" class="btn btn-outline-dark">Word</label>
+      <input type="radio" id="sentence" name="kind" value="sentence" class="btn-check">
+      <label for="sentence" class="btn btn-outline-dark">Sentence</label>
+    </div>
+
+    <div class="mb-3 input-group">
+      <span class="input-group-text">Semantic class:</span>
+      <select class="form-select" name="semantic_class" id="semantic_class">
         <option value=""> - </option>
-              {% for section in semantic_classes %}
-                <option value="{{ section.classification }}">{{ section.classification }}</option>
-              {% endfor %}
-          </select><br>
-
-    Semantic class source:
-    <input type="radio" id="all_semantic_classes" name="semantic-class-source" value="all" checked>
-    <label for="all_semantic_classes">All (including missing annotations)</label>&nbsp;
-    {% for source in semantic_class_sources %}
-    <input type="radio" id="{{source[0]}}" name="semantic-class-source" value="{{ source[0]}}">
-    <label for="{{source[0]}}">{{ source[1] }}</label>&nbsp;
-    {% endfor %}
-    <br>
-    Speaker:
-    <input type="checkbox" id="all_speakers" name="speaker-options" value="all">
-    <label for="all_spakers">All</label><br>
-        {% for speaker in speakers %}
-        <input type="checkbox" id="{{ speaker }}" name="speaker-options" value="{{ speaker }}">
-        <label for="{{ speaker }}">{{ speaker }}</label><br>
+        {% for section in semantic_classes %}
+        <option value="{{ section.classification }}">{{ section.classification }}</option>
         {% endfor %}
+        </select>
+    </div>
 
+    <div class="mb-3 input-group">
+      <span class="input-group-text">Semantic class source:</span>
+      <div class="list-group">
+      <input type="radio" id="all_semantic_classes" name="semantic-class-source" value="all" checked class="btn-check">
+      <label for="all_semantic_classes" class="btn btn-outline-dark list-group-item">All (including missing annotations)</label>
+      {% for source in semantic_class_sources %}
+      <input type="radio" id="{{source[0]}}" name="semantic-class-source" value="{{ source[0]}}" class="btn-check">
+      <label for="{{source[0]}}" class="btn btn-outline-dark list-group-item">{{ source[1] }}</label>
+      {% endfor %}
+      </div>
+    </div>
+
+    <div class="mb-3 input-group">
+      <span class="input-group-text"> Speaker:</span>
+      <div class="form-control">
+        <div class="form-check form-check-inline form-switch">
+          <input type="checkbox" id="all_speakers" name="speaker-options" value="all" class="form-check-input">
+          <label for="all_spakers" class="form-check-label">All</label>
+        </div>
+        {% for speaker in speakers %}
+        <div class="form-check form-check-inline form-switch">
+          <input type="checkbox" id="{{ speaker }}" name="speaker-options" value="{{ speaker }}" class="form-check-input">
+          <label for="{{ speaker }}" class="form-check-label">{{ speaker }}</label>
+        </div>
+        {% endfor %}
+      </div>
     <input type="hidden" name="speaker" id="speaker">
+    </div>
 
     <button data-cy="advanced-form-submit" class="button button--success my-2 my-sm-0" type="submit">Search</button>
   </form>

@@ -423,6 +423,7 @@ def advanced_search(request, language):
     language_object = get_language_object(language)
     speakers = language_object.speaker_set.all()
     speakers = [speaker.code for speaker in speakers if speaker.recording_set.exists()]
+    speakers.sort()
     semantic_classes = (
         SemanticClass.objects.filter(phrase__language=language_object)
         .distinct()
