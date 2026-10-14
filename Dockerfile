@@ -17,10 +17,12 @@ WORKDIR /app/
 COPY Pipfile Pipfile.lock ./
 RUN PIPENV_VENV_IN_PROJECT=1 pipenv install --deploy --dev
 
+FROM python:3.12 as altlab_ffmpeg
+RUN apt-get update -qq && apt-get -y install ffmpeg
 
 ############################# Application image ##############################
 
-FROM python:3.12
+FROM altlab_ffmpeg
 
 # Choose an ID that will be consistent across all machines in the network
 # To avoid overlap with user IDs, use an ID over
@@ -33,8 +35,6 @@ RUN groupadd --system --gid ${UID_GID} ${WSGI_USER} \
  && mkdir /app \
  && mkdir -p /var/www/recvalsite \
  && chown ${WSGI_USER}:${WSGI_USER} /app /var/www/recvalsite
-
-RUN apt-get update -qq && apt-get -y install ffmpeg
 
 USER ${WSGI_USER}:${WSGI_USER}
 WORKDIR /app/
