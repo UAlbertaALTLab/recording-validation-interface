@@ -459,6 +459,7 @@ def advanced_search_results(request, language):
     if translation:
         translation = translation.strip()
     exact = request.GET.get("exact")
+    regexp = request.GET.get("regexp")
     analysis = request.GET.get("analysis")
     include_excluded = request.GET.get("excluded")
     lemma = request.GET.get("lemma")
@@ -489,17 +490,31 @@ def advanced_search_results(request, language):
     if transcription:
         if exact == "exact":
             filter_query.append(Q(transcription=transcription))
+        elif roles.is_linguist and regexp == "regexp":
+            filter_query.append(
+                Q(fuzzy_transcription__iregex=to_indexable_form(transcription))
+            )
+            filter_query.append(Q(transcription__iregex=transcription))
         else:
             filter_query.append(
                 Q(fuzzy_transcription__contains=to_indexable_form(transcription))
             )
             filter_query.append(Q(transcription__contains=transcription))
     if translation:
-        filter_query.append(Q(translation__contains=translation))
+        if roles.is_linguist and regexp == "regexp":
+            filter_query.append(Q(translation__iregex=translation))
+        else:
+            filter_query.append(Q(translation__contains=translation))
     if analysis:
-        filter_query.append(Q(analysis__contains=analysis))
+        if roles.is_linguist and regexp == "regexp":
+            filter_query.append(Q(analysis__iregex=analysis))
+        else:
+            filter_query.append(Q(analysis__contains=analysis))
     if lemma:
-        filter_query.append(Q(analysis__contains=lemma))
+        if roles.is_linguist and regexp == "regexp":
+            filter_query.append(Q(analysis__iregex=lemma))
+        else:
+            filter_query.append(Q(analysis__contains=lemma))
     if status:
         if status == "not-checked":
             filter_query.append(

@@ -19,6 +19,7 @@
     <input class="form-control me-sm-2" name="lemma" type="search" placeholder="Search" aria-label="Search"><br>
 
     <input type="checkbox" id="exact" name="exact" value="exact"> Exact match <br >
+    {% if roles and roles.is_linguist %}<input type="checkbox" id="regexp" name="regexp" value="regexp"> Use regular expressions <br >{% endif %}
 
     Status:
     <input type="radio" id="all" name="status" value="all" checked>
