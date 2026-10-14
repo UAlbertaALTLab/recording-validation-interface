@@ -534,8 +534,12 @@ def advanced_search_results(request, language):
         filter_query.append(Q(id__in=annotations))
 
     if kind and kind != "all":
-        filter_kind = Phrase.WORD if kind == "word" else Phrase.SENTENCE
-        filter_query.append(Q(kind=filter_kind))
+        # filter_kind = Phrase.WORD if kind == "word" else Phrase.SENTENCE
+        # filter_query.append(Q(kind=filter_kind))
+        if kind == "word":
+            filter_query.append(~Q(transcription__contains=" "))
+        else:
+            filter_query.append(Q(transcription__contains=" "))
 
     if filter_query:
         phrase_matches = (
