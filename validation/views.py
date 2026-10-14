@@ -534,14 +534,6 @@ def advanced_search_results(request, language):
         ).values("phrase")
         filter_query.append(Q(id__in=annotations))
 
-    if kind and kind != "all":
-        # filter_kind = Phrase.WORD if kind == "word" else Phrase.SENTENCE
-        # filter_query.append(Q(kind=filter_kind))
-        if kind == "word":
-            filter_query.append(~Q(transcription__contains=" "))
-        else:
-            filter_query.append(Q(transcription__contains=" "))
-
     if filter_query:
         phrase_matches = (
             Phrase.objects.filter(language=language_object)
@@ -552,6 +544,14 @@ def advanced_search_results(request, language):
         phrase_matches = Phrase.objects.filter(
             language=language_object
         ).prefetch_related("recording_set__speaker")
+
+    if kind and kind != "all":
+        # filter_kind = Phrase.WORD if kind == "word" else Phrase.SENTENCE
+        # filter_query.append(Q(kind=filter_kind))
+        if kind == "word":
+            phrase_matches = phrase_matches.filter(~Q(transcription__contains=" "))
+        else:
+            phrase_matches = phrase_matches.filter(Q(transcription__contains=" "))
 
     if not include_excluded:
         phrase_matches = phrase_matches.filter(is_excluded=False)
