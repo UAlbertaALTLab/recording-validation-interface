@@ -1,4 +1,5 @@
 import csv
+import unicodedata
 from datetime import datetime
 from hashlib import sha256
 from os import fspath
@@ -53,7 +54,12 @@ class NehiyawetanDemoRecordingExtractor:
             for entry in entries:
                 audio_path = Path(audio_dir, entry + ".wav")
                 if not audio_path.is_file():
-                    continue
+                    # This conversion was needed for locale issues in Linux (at the server)
+                    audio_path = Path(
+                        audio_dir, unicodedata.normalize("NFD", entry + ".wav")
+                    )
+                    if not audio_path.is_file():
+                        continue
                 audio = AudioSegment.from_file(fspath(audio_path))
                 s = Segment(transcription=entry, speaker="ROS", audio=audio)
 
