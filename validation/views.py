@@ -73,6 +73,9 @@ from .helpers import (
     get_distance_with_translations,
 )
 from .jinja2 import url
+from .models import HistoricalPhrase  # type: ignore
+from .models import HistoricalRecording  # type: ignore
+from .models import HistoricalSemanticClassAnnotation  # type: ignore
 from .models import (  # type: ignore
     Issue,
     LanguageVariant,
@@ -83,9 +86,6 @@ from .models import (  # type: ignore
     SemanticClassAnnotation,
     Speaker,
 )
-from .models import HistoricalPhrase  # type: ignore
-from .models import HistoricalRecording  # type: ignore
-from .models import HistoricalSemanticClassAnnotation  # type: ignore
 
 
 class UserRoles:
