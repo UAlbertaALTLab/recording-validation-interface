@@ -4,7 +4,7 @@ import operator
 from os import fspath
 from urllib.parse import urljoin
 
-import divvunspell
+import divvun_fst
 from django.conf import settings
 from django.utils.http import urlencode
 import hfst_optimized_lookup
@@ -21,8 +21,7 @@ RULES FOR MED
 """
 
 
-archive = divvunspell.SpellerArchive(fspath(settings.BASE_DIR / "crk.zhfst"))
-speller = archive.speller()
+speller = divvun_fst.load_speller(fspath(settings.BASE_DIR / "crk.zhfst"))
 
 fst = hfst_optimized_lookup.TransducerFile(
     fspath(settings.BASE_DIR / "crk-descriptive-analyzer.hfstol")
