@@ -9,7 +9,7 @@ from django.core.management.base import BaseCommand
 import logme
 from pydub import AudioSegment
 
-from librecval.extract_nehiyawetan import Segment, NehiyawetanDemoRecordingExtractor
+from librecval.extract_nehiyawetan import NehiyawetanDemoRecordingExtractor, Segment
 from librecval.transcode_recording import transcode_to_aac
 from validation.models import (
     Collection,

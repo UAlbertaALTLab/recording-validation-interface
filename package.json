@@ -10,6 +10,6 @@
   },
   "allowScripts": {
     "fsevents@2.3.3": true,
-    "cypress@15.21.1": true
+    "cypress@15.21.2": true
   }
 }
